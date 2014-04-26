@@ -1,0 +1,10 @@
+C:\Users\Thele\Documents\_SHearth\scrollcrawler\Common\HRCustomClasses\obj\Debug\HRCustomClasses.csprojResolveAssemblyReference.cache
+C:\Users\Thele\Documents\_SHearth\scrollcrawler\Common\bin\Engine\HRCustomClasses.dll
+C:\Users\Thele\Documents\_SHearth\scrollcrawler\Common\bin\Engine\HRCustomClasses.pdb
+C:\Users\Thele\Documents\_SHearth\scrollcrawler\Common\HRCustomClasses\obj\Debug\HRCustomClasses.dll
+C:\Users\Thele\Documents\_SHearth\scrollcrawler\Common\HRCustomClasses\obj\Debug\HRCustomClasses.pdb
+C:\Users\Thele\Documents\_SHearth\crawlerscrolls\HRCustomClasses\obj\Debug\HRCustomClasses.csprojResolveAssemblyReference.cache
+C:\Users\Thele\Documents\_SHearth\crawlerscrolls\bin\Engine\silver.dll
+C:\Users\Thele\Documents\_SHearth\crawlerscrolls\bin\Engine\silver.pdb
+C:\Users\Thele\Documents\_SHearth\crawlerscrolls\HRCustomClasses\obj\Debug\silver.dll
+C:\Users\Thele\Documents\_SHearth\crawlerscrolls\HRCustomClasses\obj\Debug\silver.pdb
