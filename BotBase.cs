@@ -103,14 +103,20 @@ namespace HREngine.Bots
 
             }
 
-            if (moveTodo.heroattack)
-            {
-                HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
-                HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                this.dirtytarget = moveTodo.enemyEntitiy;
-                //HRLog.Write("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
-                HRLog.Write("heroattack: " + attacker.GetName() + " target: " + target.GetName());
-                return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
+            HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
+            HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
+            this.dirtytarget = moveTodo.enemyEntitiy;
+            //HRLog.Write("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
+            HRLog.Write("heroattack: " + attacker.GetName() + " target: " + target.GetName());
+            if (HRPlayer.GetLocalPlayer().HasWeapon())
+               {
+               if (HRBattle.CanUseCard(HRPlayer.GetLocalPlayer().GetHeroCard().GetEntity()))
+                  {
+                  return new AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
+                  }
+               }
+               return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
+
 
             }
 
