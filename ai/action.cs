@@ -1037,7 +1037,7 @@ namespace HREngine.Bots
                     {
                         List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                         temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));
-                        temp.AddRange(Helpfunctions.Take(temp2, Math.Min(2, this.enemyMinions.Count)));
+                        temp.AddRange(Helpfunctions.TakeList(temp2, Math.Min(2, this.enemyMinions.Count)));
                     }
                     else
                     {
@@ -2182,7 +2182,7 @@ namespace HREngine.Bots
                     List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                     temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));//we take the weekest
 
-                    temp.AddRange(Helpfunctions.Take(temp2, 2));
+                    temp.AddRange(Helpfunctions.TakeList(temp2, 2));
                     Minion target = new Minion();
                     target = temp[0];
                     if (target.taunt && !temp[1].taunt) target = temp[1];
@@ -2442,7 +2442,7 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//destroys the weakest
-                temp.AddRange(Helpfunctions.Take(temp2, 1));
+                temp.AddRange(Helpfunctions.TakeList(temp2, 1));
                 foreach (Minion enemy in temp)
                 {
                     if (enemy.Hp <= 2)
@@ -3455,7 +3455,7 @@ namespace HREngine.Bots
                 int damage = getSpellDamageDamage(3);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the strongest
-                temp.AddRange(Helpfunctions.Take(temp2, 2));
+                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
                 foreach (Minion enemy in temp)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -3499,7 +3499,7 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));
-                temp.AddRange(Helpfunctions.Take(temp2, 1));
+                temp.AddRange(Helpfunctions.TakeList(temp2, 1));
                 foreach (Minion enemy in temp)
                 {
                     minionGetDestroyed(enemy, false);
@@ -3532,7 +3532,7 @@ namespace HREngine.Bots
                 int damage = getSpellDamageDamage(2);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                temp.AddRange(Helpfunctions.Take(temp2, 2));
+                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
                 foreach (Minion enemy in temp)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -3901,7 +3901,7 @@ namespace HREngine.Bots
                 int damage = getSpellDamageDamage(2);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                temp.AddRange(Helpfunctions.Take(temp2, 2));
+                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
                 foreach (Minion enemy in temp)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -4221,7 +4221,7 @@ namespace HREngine.Bots
                         int damage = 1;
                         List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                         temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                        temp.AddRange(Helpfunctions.Take(temp2, 1));
+                        temp.AddRange(Helpfunctions.TakeList(temp2, 1));
                         foreach (Minion enemy in temp)
                         {
                             minionGetDamagedOrHealed(enemy, damage, 0, false);

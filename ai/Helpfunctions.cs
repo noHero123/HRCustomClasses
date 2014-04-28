@@ -14,16 +14,21 @@ namespace HREngine.Bots
 
     public class Helpfunctions
     {
-        public static IEnumerable<T> Take<T>(IEnumerable<T> source, int limit)
+
+        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
         {
+            List<T> retlist = new List<T>();
+            int i = 0;
+
             foreach (T item in source)
             {
-                if (limit-- <= 0)
-                    yield break;
-
-                yield return item;
+                retlist.Add(item);
+                i++;
+                if (i >= limit) break;
             }
+            return retlist;
         }
+
 
         public bool runningbot = false;
 

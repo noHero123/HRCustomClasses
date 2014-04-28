@@ -308,7 +308,7 @@ namespace HREngine.Bots
             posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             temp.AddRange(posmoves);
             posmoves.Clear();
-            posmoves.AddRange(Helpfunctions.Take(temp, takenumber));
+            posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
 
         }
 
