@@ -426,7 +426,7 @@ namespace HREngine.Bots
             {
                 retval += m.Hp * 1;
                 retval += m.Angr * 2;
-                if (m.Angr >= m.Hp + 1)
+                if (m.Angr >= m.maxHp + 1)
                 {
                     //is a tanky minion
                     retval += m.Hp;
@@ -439,7 +439,7 @@ namespace HREngine.Bots
 
                 retval -= m.Hp;
                 retval -= m.Angr*2;
-                if (m.Angr >= m.Hp + 1)
+                if (m.Angr >= m.maxHp + 1)
                 {
                     //is a tanky minion
                     retval -= m.Hp;
@@ -2782,6 +2782,12 @@ namespace HREngine.Bots
             if (c.name == "hinrichten")
             {
                 destroy = true;
+            }
+
+            if (c.name == "toedlicherstoss")
+            {
+                damage = 4;
+                if (ownHeroHp <= 12) damage = 6;
             }
 
             if (c.name == "schildschlag")
