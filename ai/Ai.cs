@@ -336,13 +336,13 @@ namespace HREngine.Bots
 
         }
 
-        public void simulatorTester()
+        public void simulatorTester(BotBase botbase)
         {
             //setup cards in hand
-            this.hm.loadPreparedBattlefield(1);
+            this.hm.loadPreparedBattlefield(3);
 
             //setup minions on field, hero hp, weapons and stuff
-            this.hp.loadPreparedBattlefield(1);
+            this.hp.loadPreparedBattlefield(0);
 
             //calculate the stuff
             posmoves.Clear();
@@ -355,7 +355,7 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) +" cost/mana: " + item.card.cost +"/"+ posmoves[0].mana);
             }
 
-            doallmoves(true, null);
+            doallmoves(true, botbase);
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();

@@ -341,7 +341,7 @@ namespace HREngine.Bots
             {
                 currentMana = 10;
                 heroHp = 30;
-                enemyHp = 30;
+                enemyHp = 5;
                 heroAtk = 0;
                 enemyAtk = 0;
                 heroDefence = 0;
@@ -373,8 +373,10 @@ namespace HREngine.Bots
                 ownPlayerController = 1;
 
 
-                Minion enemy1 = createNewMinion(cdb.getCardDataFromID("EX1_298"), 0);
-                this.enemyMinions.Add(enemy1);
+                Minion enemy1 = createNewMinion(cdb.getCardDataFromID("EX1_011"), 0);
+                enemy1.Angr = 4;
+                enemy1.Ready = true;
+                this.ownMinions.Add(enemy1);
 
             }
 
@@ -382,7 +384,7 @@ namespace HREngine.Bots
             {
                 currentMana = 10;
                 heroHp = 30;
-                enemyHp = 30;
+                enemyHp =30;
                 heroAtk = 0;
                 enemyAtk = 0;
                 heroDefence = 0;

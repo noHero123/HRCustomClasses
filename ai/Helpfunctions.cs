@@ -24,6 +24,7 @@ namespace HREngine.Bots
             {
                 retlist.Add(item);
                 i++;
+
                 if (i >= limit) break;
             }
             return retlist;

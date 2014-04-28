@@ -685,8 +685,8 @@ namespace HREngine.Bots
 
         private void adjacentBuffUpdate(bool own)
         {
-            int before = -1;
-            int after = 1;
+            //int before = -1;
+            //int after = 1;
             List<Minion> lm = new List<Minion>();
             if (own)
             {
@@ -698,7 +698,7 @@ namespace HREngine.Bots
             }
             foreach (Minion m in lm)
             {
-                if (m.name == "terrorwolfalpha")
+                /*if (m.name == "terrorwolfalpha")
                 {
                     string enchantment = "EX1_162o";
                     adjacentBuffer(m, enchantment, before, after, own);
@@ -709,7 +709,11 @@ namespace HREngine.Bots
                     adjacentBuffer(m, enchantment, before, after, own);
                 }
                 before++;
-                after++;
+                after++;*/
+
+                getNewEffects(m, own, m.id, false);
+
+
             }
 
         }
@@ -804,7 +808,7 @@ namespace HREngine.Bots
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (ownm.name == "kriegshymnenanfuehrerin")
+                if (isSummon && ownm.name == "kriegshymnenanfuehrerin")
                 {
                     havekriegshymnenanfuehrerin = true;
                 }
@@ -883,17 +887,12 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
-                if (ownm.name == "tundranashorn" && (TAG_RACE)m.card.race == TAG_RACE.PET)
+                if (isSummon && ownm.name == "tundranashorn" && (TAG_RACE)m.card.race == TAG_RACE.PET)
                 {
-                    m.charge = true;
-                    m.Ready = true;
+                    minionGetCharge(m);
                 }
 
-                if (ownm.name == "verhungernderbussard" && (TAG_RACE)m.card.race == TAG_RACE.PET)
-                {
-                    this.owncarddraw++;
-                    this.drawACard("");
-                }
+                
 
             }
             // minions that gave ALL minions buffs
@@ -920,9 +919,9 @@ namespace HREngine.Bots
 
             }
 
-            if (havekriegshymnenanfuehrerin && m.Angr <= 3)
+            if (isSummon && havekriegshymnenanfuehrerin && m.Angr <= 3)
             {
-                m.Ready = true;
+                minionGetCharge(m);
             }
 
         }
@@ -4215,6 +4214,7 @@ namespace HREngine.Bots
                 foreach (Minion m in this.ownMinions)
                 {
                     if (m.silenced) continue;
+
                     if (m.name == "messerjongleur") 
                     {
                         if (this.enemyMinions.Count >= 1)
@@ -4236,7 +4236,15 @@ namespace HREngine.Bots
                         }
                     }
 
+                    if (own && m.name == "verhungernderbussard" && (TAG_RACE)c.race == TAG_RACE.PET)
+                    {
+                        this.owncarddraw++;
+                        this.drawACard("");
+                    }
+                
                 }
+
+
             }
 
 
