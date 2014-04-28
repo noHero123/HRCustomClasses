@@ -1,5 +1,5 @@
-small bot for hrtcrawler
-how to use:
-- copy _carddb.txt in the folder with the hearthcrawler.exe
+## botmakers Ultimate AI
+This AI is a Custom Class for Hearthcrawler and intends to simulate all possible turn actions and selects it automatically selects the best.
 
-- copy silver.dll and own.json to the bots-folder
+Official Thread:
+- http://www.thecrawlerforum.com/index.php/Thread/5871-The-Ultimate-AI
