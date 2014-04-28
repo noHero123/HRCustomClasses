@@ -1196,7 +1196,7 @@ namespace HREngine.Bots
             }
 
             //delete enrage (if minion is silenced the first time)
-            if (!m.silenced && m.name == "uralterwaechter" && !m.playedThisTurn && m.numAttacksThisTurn==0)
+            if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst") && !m.playedThisTurn && m.numAttacksThisTurn==0)
             {
                 m.Ready = true;
             }
@@ -4215,18 +4215,25 @@ namespace HREngine.Bots
                 foreach (Minion m in this.ownMinions)
                 {
                     if (m.silenced) continue;
-                    if (m.name == "messerjongleur" && this.enemyMinions.Count >= 1)
+                    if (m.name == "messerjongleur") 
                     {
-                        List<Minion> temp = new List<Minion>();
-                        int damage = 1;
-                        List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                        temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                        temp.AddRange(Helpfunctions.TakeList(temp2, 1));
-                        foreach (Minion enemy in temp)
+                        if (this.enemyMinions.Count >= 1)
                         {
-                            minionGetDamagedOrHealed(enemy, damage, 0, false);
-                        }
+                            List<Minion> temp = new List<Minion>();
+                            int damage = 1;
+                            List<Minion> temp2 = new List<Minion>(this.enemyMinions);
+                            temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
+                            temp.AddRange(Helpfunctions.TakeList(temp2, 1));
+                            foreach (Minion enemy in temp)
+                            {
+                                minionGetDamagedOrHealed(enemy, damage, 0, false);
+                            }
 
+                        }
+                        else
+                        {
+                            this.attackOrHealHero(1, false);
+                        }
                     }
 
                 }
