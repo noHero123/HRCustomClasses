@@ -70,7 +70,7 @@ namespace HREngine.Bots
             NextFixedAction = null;*/
         }
 
-        public void updateEverything()
+        public void updateEverything(BotBase botbase)
         {
             
 
@@ -105,7 +105,7 @@ namespace HREngine.Bots
 
             // calculate stuff
             HRLog.Write("calculating stuff...");
-            Ai.Instance.dosomethingclever();
+            Ai.Instance.dosomethingclever(botbase);
             
         }
 

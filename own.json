@@ -1,6 +1,7 @@
 {
    "dll": "silver.dll"
    "classes": [
-      { "class": "Rushi" }
+      	{ "class": "Rushi" },
+ 	{ "class": "BoardControli"}
    ]
 }

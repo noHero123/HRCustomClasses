@@ -392,7 +392,7 @@ namespace HREngine.Bots
 
         }
 
-        public int getValue()
+        public int getValuee()
         {
             //if (value >= -200000) return value;
             int retval = 0;
@@ -771,7 +771,11 @@ namespace HREngine.Bots
             //no deathrattle, but lowering the weapon
             if (m.name == "hasserfuellteschmiedin" && m.wounded)// remove weapon changes form hasserfuelleschmiedin
             {
-                if (own && this.ownWeaponDurability >= 1) this.ownWeaponAttack -= 2;
+                if (own && this.ownWeaponDurability >= 1)
+                {
+                    this.ownWeaponAttack -= 2;
+                    this.ownheroAngr -= 2;
+                }
                 if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack -= 2;
             }
         }
@@ -1348,7 +1352,11 @@ namespace HREngine.Bots
             }
             if (m.name == "hasserfuellteschmiedin")
             {
-                if (own && this.ownWeaponDurability >= 1) this.ownWeaponAttack -= 2;
+                if (own && this.ownWeaponDurability >= 1)
+                {
+                    this.ownWeaponAttack -= 2;
+                    this.ownheroAngr -= 2;
+                }
                 if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack -= 2;
             }
         }
@@ -1383,7 +1391,11 @@ namespace HREngine.Bots
                 }
                 if (m.name == "hasserfuellteschmiedin")
                 {
-                    if (own && this.ownWeaponDurability >= 1) this.ownWeaponAttack += 2;
+                    if (own && this.ownWeaponDurability >= 1)
+                    {
+                        this.ownWeaponAttack += 2;
+                        this.ownheroAngr += 2;
+                    }
                     if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack += 2;
                 }
 
@@ -1731,7 +1743,10 @@ namespace HREngine.Bots
             int segenderweisheitAnz = 0;
             foreach (Enchantment e in ownMinion.enchantments)
             {
-                if (e.CARDID == "EX1_363e2" && e.controllerOfCreator == this.ownController) segenderweisheitAnz++;
+                if (e.CARDID == "EX1_363e2" && e.controllerOfCreator == this.ownController)
+                {
+                    segenderweisheitAnz++;
+                }
             }
             this.owncarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
@@ -2256,7 +2271,7 @@ namespace HREngine.Bots
             }
             if (c.name == "blutsegelraeuberin")
             {
-                c.Angr += this.ownheroAngr;
+                c.Angr += this.ownWeaponAttack;
             }
 
             if (c.name == "suedmeerdeckmatrose" && this.ownWeaponDurability >= 1)
@@ -2377,6 +2392,7 @@ namespace HREngine.Bots
             {
                 if (this.ownWeaponName != "")
                 {
+                    this.ownheroAngr += 1;
                     this.ownWeaponAttack++;
                     this.ownWeaponDurability++;
                 }
@@ -2691,6 +2707,7 @@ namespace HREngine.Bots
                 this.ownWeaponDurability -= value;
                 if (this.ownWeaponDurability <= 0)
                 {
+                    this.ownheroAngr -= this.ownWeaponAttack;
                     this.ownWeaponDurability = 0;
                     this.ownWeaponAttack = 0;
                     this.ownWeaponName = "";
@@ -3528,12 +3545,14 @@ namespace HREngine.Bots
                 if (this.ownWeaponName != "")
                 {
                     this.ownWeaponAttack++;
+                    this.ownheroAngr++;
                     this.ownWeaponDurability++;
                 }
                 else
                 {
                     this.ownWeaponName = "schwereaxt";
                     this.ownWeaponAttack = 1;
+                    this.ownheroAngr = 1;
                     this.ownWeaponDurability = 3;
                 }
 
@@ -3835,6 +3854,7 @@ namespace HREngine.Bots
                 if (this.ownWeaponName != "")
                 {
                     this.ownWeaponAttack += 2;
+                    this.ownheroAngr += 2;
                 }
             }
             if (c.name == "dolchfaecher")
@@ -4473,6 +4493,7 @@ namespace HREngine.Bots
             if (ownWeaponName == "blutschrei")
             {
                 this.ownWeaponAttack--;
+                this.ownheroAngr--;
             }
             else
             {

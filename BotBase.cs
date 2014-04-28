@@ -71,8 +71,8 @@ namespace HREngine.Bots
            
             //SafeHandleBattleLocalPlayerTurnHandler();
 
-             
-             sf.updateEverything();
+
+             sf.updateEverything(this);
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
             {
@@ -120,8 +120,10 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                 if (HRPlayer.GetLocalPlayer().HasWeapon())
                 {
+                    HRLog.Write("hero attack with weapon");
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                 }
+                HRLog.Write("hero attack without weapon");
                 return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
             }
@@ -217,7 +219,16 @@ namespace HREngine.Bots
       {
          return null;
       }
-   
+
+      public int getPlayfieldValue(Playfield p)
+      {
+          return evaluatePlayfield(p);
+      }
+
+      protected virtual int evaluatePlayfield(Playfield p)
+      {
+          return 0;
+      }
    
    }
 }

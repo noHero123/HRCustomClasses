@@ -100,7 +100,7 @@ namespace HREngine.Bots
 
 
 
-        private void doallmoves(bool test)
+        private void doallmoves(bool test, BotBase botBase)
         {
 
             bool havedonesomething = true;
@@ -231,10 +231,10 @@ namespace HREngine.Bots
                     p.complete = true;
 
                     //sort stupid stuff ouf
-                    
-                    if (p.getValue() > bestoldval)
+
+                    if (botBase.getPlayfieldValue(p) > bestoldval)
                     {
-                        bestoldval = p.getValue();
+                        bestoldval = botBase.getPlayfieldValue(p);
                         bestold = p;
                     }
                     if (!test)
@@ -259,7 +259,7 @@ namespace HREngine.Bots
 
                 if (!test)
                 {
-                    cuttingposibilities();
+                    cuttingposibilities(botBase);
                 }
 
                 /*if ((deep + 1) % 4 == 0)
@@ -277,7 +277,7 @@ namespace HREngine.Bots
             Playfield bestplay = temp[0];
             foreach (Playfield p in temp)
             {
-                int val = p.getValue();
+                int val = botBase.getPlayfieldValue(p);
                 if (bestval <= val)
                 {
                     if (bestval == val && bestanzactions < p.playactions.Count) continue;
@@ -300,12 +300,12 @@ namespace HREngine.Bots
         }
 
 
-        private void cuttingposibilities()
+        private void cuttingposibilities(BotBase botBase)
         {
             // take the x best values
             int takenumber = 1000;
             List<Playfield> temp = new List<Playfield>();
-            posmoves.Sort((a, b) => -(a.getValue()).CompareTo(b.getValue()));//want to keep the best
+            posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             temp.AddRange(posmoves);
             posmoves.Clear();
             posmoves.AddRange(Helpfunctions.Take(temp, takenumber));
@@ -314,7 +314,7 @@ namespace HREngine.Bots
 
 
 
-        public void dosomethingclever()
+        public void dosomethingclever(BotBase botbase)
         {
             //return;
             //turncheck
@@ -331,7 +331,7 @@ namespace HREngine.Bots
             //help.logg("is hero ready?" + posmoves[0].ownHeroReady);
 
             help.loggonoff(false);
-            doallmoves(false);
+            doallmoves(false, botbase);
             //help.logging(true);
 
         }
@@ -355,7 +355,7 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) +" cost/mana: " + item.card.cost +"/"+ posmoves[0].mana);
             }
 
-            doallmoves(true);
+            doallmoves(true, null);
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();
