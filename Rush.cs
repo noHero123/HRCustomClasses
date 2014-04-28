@@ -32,11 +32,9 @@ namespace HREngine.Bots
           int retval = 0;
           retval += p.owncards.Count * 1;
 
-          retval += p.ownMinions.Count * 10;
-          retval -= p.enemyMinions.Count * 10;
 
           retval += p.ownHeroHp + p.ownHeroDefence;
-          retval += - (p.enemyHeroHp + p.enemyHeroDefence);
+          retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
           retval += p.ownheroAngr;// +ownWeaponDurability;
           retval -= p.enemyWeaponDurability;
@@ -61,16 +59,19 @@ namespace HREngine.Bots
 
           foreach (Minion m in p.enemyMinions)
           {
-
-              retval -= m.Hp;
-              retval -= m.Angr * 2;
-              if (m.Angr >= m.maxHp + 1)
+              if (p.enemyMinions.Count >= 4)
               {
-                  //is a tanky minion
                   retval -= m.Hp;
+                  retval -= m.Angr * 2;
+                  if (m.Angr >= m.maxHp + 1)
+                  {
+                      //is a tanky minion
+                      retval -= m.Hp;
+                  }
+                  if (m.windfury) retval -= m.Angr;
               }
 
-              if (m.windfury) retval -= m.Angr;
+
               if (m.taunt) retval -= 5;
               if (m.name == "schlachtzugsleiter") retval -= 50;
               if (m.name == "grimmschuppenorakel") retval -= 50;
@@ -90,7 +91,7 @@ namespace HREngine.Bots
           retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
 
           if (p.ownMinions.Count == 0) retval -= 20;
-          if (p.enemyMinions.Count >= 4) retval += 200;
+          if (p.enemyMinions.Count >= 4) retval -= 200;
           if (p.enemyHeroHp <= 0) retval = 10000;
           if (p.ownHeroHp <= 0) retval = -10000;
 
