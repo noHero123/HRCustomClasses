@@ -52,11 +52,7 @@ namespace HREngine.Bots
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
-              if (m.Angr >= m.maxHp + 1)
-              {
-                  //is a tanky minion
-                  retval += m.Hp;
-              }
+              
               if (m.windfury) retval += m.Angr;
           }
 
@@ -65,11 +61,11 @@ namespace HREngine.Bots
 
               retval -= m.Hp;
               retval -= m.Angr * 2;
-              if (m.Angr >= m.maxHp + 1)
+              /*if (m.Angr >= m.maxHp + 1)
               {
                   //is a tanky minion
                   retval -= m.Hp;
-              }
+              }*/
 
               if (m.windfury) retval -= m.Angr;
               if (m.taunt) retval -= 5;
@@ -84,6 +80,8 @@ namespace HREngine.Bots
               if (m.name == "klerikerinvonnordhain") retval -= 5;
               if (m.name == "zauberlehrling") retval -= 3;
               if (m.name == "winzigebeschwoererin") retval -= 3;
+              if (m.Angr >= 4) retval -= 20;
+              if (m.Angr >= 7) retval -= 50;
           }
 
           retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2

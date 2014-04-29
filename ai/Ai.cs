@@ -9,7 +9,7 @@ namespace HREngine.Bots
     {
 
         private int maxdeep = 12;
-        private int maxwide = 10000;
+        private int maxwide = 7000;
         List<Playfield> posmoves = new List<Playfield>();
 
         Hrtprozis hp = Hrtprozis.Instance;
@@ -264,7 +264,7 @@ namespace HREngine.Bots
                 {
                     cuttingposibilities(botBase);
                 }
-
+                help.logg("cut to len " + this.posmoves.Count);
                 /*if ((deep + 1) % 4 == 0)
                 {
                     help.logg("cut");

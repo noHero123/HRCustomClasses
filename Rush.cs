@@ -49,11 +49,6 @@ namespace HREngine.Bots
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
-              if (m.Angr >= m.maxHp + 1)
-              {
-                  //is a tanky minion
-                  retval += m.Hp;
-              }
               if (m.windfury) retval += m.Angr;
           }
 
@@ -63,11 +58,6 @@ namespace HREngine.Bots
               {
                   retval -= m.Hp;
                   retval -= m.Angr * 2;
-                  if (m.Angr >= m.maxHp + 1)
-                  {
-                      //is a tanky minion
-                      retval -= m.Hp;
-                  }
                   if (m.windfury) retval -= m.Angr;
               }
 

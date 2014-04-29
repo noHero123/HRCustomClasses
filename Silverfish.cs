@@ -128,10 +128,12 @@ namespace HREngine.Bots
             this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);//ownPlayer.GetRealTimeTempMana();
 
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
+            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
             //if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;
             this.ueberladung = ownPlayer.GetTag(HRGameTag.RECALL_OWED);
+
 
             //get weapon stuff
             this.ownHeroWeapon = "";
