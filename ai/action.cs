@@ -792,6 +792,7 @@ namespace HREngine.Bots
             bool untergang=false;
             foreach (Minion m in temp)
             {
+                if (m.silenced) continue;
                 if (m.name == "verwuester") // deal 2 dmg
                 {
                     List<Minion> temp2 = new List<Minion>(enemymins);
