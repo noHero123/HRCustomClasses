@@ -36,7 +36,7 @@ namespace HREngine.Bots
           retval += p.ownHeroHp + p.ownHeroDefence;
           retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
-          retval += p.ownheroAngr;// +ownWeaponDurability;
+          retval += p.ownWeaponAttack;// +ownWeaponDurability;
           retval -= p.enemyWeaponDurability;
 
           retval += p.owncarddraw * 5;

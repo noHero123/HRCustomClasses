@@ -1703,10 +1703,22 @@ namespace HREngine.Bots
             }
         }
 
+        private void minionGetReady(Minion m) // minion get ready due to attack-buff
+        {
+            if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst")) return;
+
+            if (!m.playedThisTurn && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+            {
+                m.Ready = true;
+            }
+        }
+
         private void minionGetBuffed(Minion m, int attackbuff, int hpbuff, bool own)
         {
+            if (m.Angr == 0 && attackbuff >= 1) minionGetReady(m);
 
             m.Angr = Math.Max(0, m.Angr + attackbuff);
+            
             if (hpbuff >= 1)
             {
                 m.Hp = m.Hp + hpbuff;
@@ -3549,10 +3561,24 @@ namespace HREngine.Bots
             }
             if (c.name == "waffedesfelsbeissers")
             {
-                Enchantment e = CardDB.getEnchantmentFromCardID("CS2_045e");
-                e.creator = c.entityID;
-                e.controllerOfCreator = this.ownController;
-                addEffectToMinionNoDoubles(m, e, own);
+                if (target <= 20)
+                {
+                    Enchantment e = CardDB.getEnchantmentFromCardID("CS2_045e");
+                    e.creator = c.entityID;
+                    e.controllerOfCreator = this.ownController;
+                    addEffectToMinionNoDoubles(m, e, own);
+                }
+                else
+                {
+                    if (target == 100)
+                    {
+                        this.ownheroAngr += 3;
+                        if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen)
+                        {
+                            this.ownHeroReady = true;
+                        }
+                    }
+                }
             }
             if (c.name == "windzorn")
             {
@@ -4529,6 +4555,21 @@ namespace HREngine.Bots
             {
                 this.ownheroAngr += 4;
                 this.ownHeroDefence += 4;
+                if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen)
+                {
+                    this.ownHeroReady = true;
+                }
+
+            }
+
+            if (c.name == "klaue")
+            {
+                this.ownheroAngr += 2;
+                this.ownHeroDefence += 2;
+                if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen)
+                {
+                    this.ownHeroReady = true;
+                }
 
             }
 
