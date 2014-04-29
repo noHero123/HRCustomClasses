@@ -13,6 +13,9 @@ namespace HREngine.Bots
       public List<HRCard> Cards;
    }
 
+
+
+
    public abstract class BotBase : API.IBot
    {
        
@@ -125,7 +128,8 @@ namespace HREngine.Bots
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                 }
                 HRLog.Write("hero attack without weapon");
-                return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHeroCard().GetEntity(), target);
+                HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
+                return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
             }
 
