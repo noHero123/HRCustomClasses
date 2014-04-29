@@ -343,16 +343,20 @@ namespace HREngine.Bots
         {
             help.logg("simulating board ");
             //setup cards in hand
-            this.hm.loadPreparedBattlefield(10);
+            this.hm.loadPreparedBattlefield(4);
 
 
             this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
             //setup minions on field
-            this.hp.loadPreparedBattlefield(10);
+            this.hp.loadPreparedBattlefield(3);
 
             //calculate the stuff
             posmoves.Clear();
             posmoves.Add(new Playfield());
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
             help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
             help.logg("owncardscount " + posmoves[0].owncards.Count);
 

@@ -441,7 +441,12 @@ namespace HREngine.Bots
                 //wichtelmeisterin
 
                 Minion own1 = createNewMinion(cdb.getCardDataFromID("EX1_597"), 0); // wichtelmeisterin
-                own1.Hp = 1;
+                own1.Hp = 2;
+                own1.Angr = 6;
+                Enchantment e = CardDB.getEnchantmentFromCardID("CS2_046e");
+                e.creator=1;
+                e.controllerOfCreator=1;
+                own1.enchantments.Add(e);
                 own1.Ready = false;
                 this.ownMinions.Add(own1);
 

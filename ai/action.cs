@@ -532,7 +532,8 @@ namespace HREngine.Bots
             {
                 m.cantLowerHPbelowONE = false;
                 m.immune = false;
-                foreach (Enchantment e in m.enchantments)
+                List<Enchantment> tempench = new List<Enchantment>(m.enchantments);
+                foreach (Enchantment e in tempench)
                 {
                     if (e.CARDID == "EX1_316e")//ueberwaeltigende macht
                     {
@@ -872,7 +873,8 @@ namespace HREngine.Bots
 
             foreach (Minion m in enemymins) // search for corruption in other minions
             {
-                foreach (Enchantment e in m.enchantments)
+                List<Enchantment> elist = new List<Enchantment>(m.enchantments);
+                foreach (Enchantment e in elist)
                 {
 
                     if (e.CARDID == "CS2_063e")//corruption
@@ -928,8 +930,12 @@ namespace HREngine.Bots
                 if (dmg < 0 || this.ownHeroDefence <= 0)
                 {
                     //heal
+                    int copy = this.ownHeroHp;
                     this.ownHeroHp = Math.Min(30, this.ownHeroHp - dmg);
-                    triggerAHeroGetHealed(own);
+                    if (copy < this.ownHeroHp)
+                    {
+                        triggerAHeroGetHealed(own);
+                    }
                 }
                 else
                 {
@@ -952,8 +958,12 @@ namespace HREngine.Bots
             {
                 if (dmg < 0 || this.enemyHeroDefence <= 0)
                 {
+                    int copy = this.enemyHeroHp;
                     this.enemyHeroHp = Math.Min(30, this.enemyHeroHp - dmg);
-                    triggerAHeroGetHealed(own);
+                    if (copy < this.enemyHeroHp)
+                    {
+                        triggerAHeroGetHealed(own);
+                    }
                 }
                 else
                 {

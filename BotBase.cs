@@ -24,7 +24,7 @@ namespace HREngine.Bots
           OnBattleStateUpdate = HandleOnBattleStateUpdate;
           OnMulliganStateUpdate = HandleBattleMulliganPhase;
           this.sf = new Silverfish();
-          //Ai.Instance.simulatorTester(this);
+          Ai.Instance.simulatorTester(this);
       }
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
