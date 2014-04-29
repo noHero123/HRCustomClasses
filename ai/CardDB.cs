@@ -646,7 +646,7 @@ namespace HREngine.Bots
                         if (c.description.Contains("wählt aus"))
                         {
                             c.choice = true;
-                            Helpfunctions.Instance.logg(c.name + " is choice");
+                            //Helpfunctions.Instance.logg(c.name + " is choice");
                         }
                     }
                     if (targettext)
@@ -938,8 +938,9 @@ namespace HREngine.Bots
                 {
                     string temp = s.Split(new string[] { "<Tag name=\"" }, StringSplitOptions.RemoveEmptyEntries)[1];
                     temp = temp.Split('\"')[0];
+                    /*
                     if (temp != "DevState" && temp != "FlavorText" && temp != "ArtistName" && temp != "Cost" && temp != "EnchantmentIdleVisual" && temp != "EnchantmentBirthVisual" && temp != "Collectible" && temp != "CardSet" && temp != "AttackVisualType" && temp != "CardName" && temp != "Class" && temp != "CardTextInHand" && temp != "Rarity" && temp != "TriggerVisual" && temp != "Faction" && temp != "HowToGetThisGoldCard" && temp != "HowToGetThisCard" && temp != "CardTextInPlay")
-                        Helpfunctions.Instance.logg(s);
+                        Helpfunctions.Instance.logg(s);*/
                 }
 
 

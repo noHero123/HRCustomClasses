@@ -27,6 +27,7 @@ namespace HREngine.Bots
         int ueberladung = 0;
 
 
+
         string ownHeroWeapon = "";
         int heroWeaponAttack = 0;
         int heroWeaponDurability = 0;
@@ -41,7 +42,8 @@ namespace HREngine.Bots
         int heroDefence = 0;
         string heroname = "";
         bool ownheroisread = false;
-        bool ownheroAlreadyAttacked = true;
+        int heroNumAttacksThisTurn = 0;
+        bool heroHasWindfury = false;
         bool herofrozen = false;
 
         int enemyAtk = 0;
@@ -91,7 +93,7 @@ namespace HREngine.Bots
 
             Hrtprozis.Instance.updatePlayer(this.ownMaxMana, this.currentMana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.ueberladung, ownPlayer.GetHero().GetEntityId(), enemyPlayer.GetHero().GetEntityId());
             
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.ownheroAlreadyAttacked, this.herofrozen, this.heroAbility, this.ownAbilityisReady);
+            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury);
             Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen);
             
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
@@ -109,64 +111,6 @@ namespace HREngine.Bots
             
         }
 
-        private HREngine.API.Actions.ActionBase UpdateBattleState()
-        {
-            HREngine.API.Actions.ActionBase result = NextFixedAction;
-
-            if (result != null)
-            {
-                NextFixedAction = null;
-                return result;
-            }
-            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
-            HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
-
-            ownPlayerController = ownPlayer.GetControllerId();//ownPlayer.GetHero().GetControllerId()
-
-            // create hero + minion data
-            getHerostuff();
-            getMinions();
-            getHandcards();
-
-            // send ai the data:
-            Hrtprozis.Instance.setOwnPlayer(ownPlayerController);
-            Handmanager.Instance.setOwnPlayer(ownPlayerController);
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.ownheroAlreadyAttacked, this.herofrozen, this.heroAbility, this.ownAbilityisReady);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen);
-            Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
-            Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
-
-            // print data
-            Hrtprozis.Instance.printHero();
-            Hrtprozis.Instance.printOwnMinions();
-            Hrtprozis.Instance.printEnemyMinions();
-
-            Handmanager.Instance.printcards();
-
-            // Next cards to push...
-            //result = PlayCardsToField();
-
-            return null;
-        }
-
-        private HREngine.API.Actions.ActionBase UpdateMulliganState()
-        {
-            if (HRMulligan.IsMulliganActive())
-            {
-                var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-
-                foreach (var item in list)
-                {
-                    if (!RejectedCardList.ContainsKey(item.GetEntity().GetEntityId()) && item.GetEntity().GetCost() >= 4)
-                    {
-                        RejectedCardList.Add(item.GetEntity().GetEntityId(), item);
-                        return new RejectCardsAction(item);
-                    }
-                }
-            }
-            return null;
-        }
-
         private void getHerostuff()
         {
 
@@ -179,14 +123,15 @@ namespace HREngine.Bots
             HREntity ownHeroAbility = ownPlayer.GetHeroPower();
 
             //player stuff#########################
+            //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             this.currentMana = ownPlayer.GetNumAvailableResources();
-            this.ownMaxMana = ownPlayer.GetNumAvailableResources();//ownPlayer.GetRealTimeTempMana();
+            this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);//ownPlayer.GetRealTimeTempMana();
 
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
-            this.numMinionsPlayedThisTurn = 0;
-            this.cardsPlayedThisTurn = 0;
-            if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;
-            //this.ueberladung = ownPlayer.re(GAME_TAG.RECALL_OWED);
+            this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
+            this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
+            //if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;
+            this.ueberladung = ownPlayer.GetTag(HRGameTag.RECALL_OWED);
 
             //get weapon stuff
             this.ownHeroWeapon = "";
@@ -216,19 +161,18 @@ namespace HREngine.Bots
             bool exausted = false;
             exausted = ownhero.IsExhausted();
             this.ownheroisread = true;
-            this.ownheroAlreadyAttacked = false;
 
             this.heroImmuneToDamageWhileAttacking = (ownhero.IsImmune()) ? true : false;
             this.herofrozen = ownhero.IsFrozen();
-
-            int numberofattacks = ownhero.GetNumAttacksThisTurn();
+            this.heroNumAttacksThisTurn = ownhero.GetNumAttacksThisTurn();
+            this.heroHasWindfury = ownhero.HasWindfury();
+            //int numberofattacks = ownhero.GetNumAttacksThisTurn();
 
             //HRLog.Write(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
             if (exausted == true)
             {
                 this.ownheroisread = false;
-                this.ownheroAlreadyAttacked = true;
             }
             if (exausted == false && this.heroAtk == 0)
             {

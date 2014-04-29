@@ -119,13 +119,13 @@ namespace HREngine.Bots
                 //HRLog.Write("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
                 HRLog.Write("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                 Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
-                if (HRPlayer.GetLocalPlayer().HasWeapon())
+                if (HRPlayer.GetLocalPlayer().HasWeapon() )
                 {
                     HRLog.Write("hero attack with weapon");
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                 }
                 HRLog.Write("hero attack without weapon");
-                return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
+                return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHeroCard().GetEntity(), target);
 
             }
 

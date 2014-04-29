@@ -230,6 +230,7 @@ namespace HREngine.Bots
 
         public void loadPreparedBattlefield(int bfield)
         {
+            this.handCards.Clear();
             if (bfield == 0)
             {
                 enemyAnzCards = 0;
@@ -270,6 +271,31 @@ namespace HREngine.Bots
                 Handcard hc1 = new Handcard();
                 hc1.position = 1;
                 hc1.card = cdb.getCardDataFromID("CS2_122");//schlachtzugsleiter
+                this.handCards.Add(hc1);
+
+            }
+            if (bfield == 4)
+            {
+                enemyAnzCards = 0;
+                this.handCards.Clear();
+                Handcard hc1 = new Handcard();
+                hc1.position = 1;
+                hc1.card = cdb.getCardDataFromID("EX1_246");//frogg
+                this.handCards.Add(hc1);
+
+            }
+
+            if (bfield == 10)
+            {
+                enemyAnzCards = 0;
+                this.handCards.Clear();
+                Handcard hc1 = new Handcard();
+                hc1.position = 1;
+                hc1.card = cdb.getCardDataFromID("NEW1_036");//befehlsruf
+                this.handCards.Add(hc1);
+                hc1 = new Handcard();
+                hc1.position = 2;
+                hc1.card = cdb.getCardDataFromID("EX1_392");//kampfeswut
                 this.handCards.Add(hc1);
 
             }

@@ -23,8 +23,13 @@ namespace HREngine.Bots
         public int heroAtk = 0, enemyAtk = 0;
         public int heroDefence = 0, enemyDefence = 0;
         public bool ownheroisread = false;
-        public bool ownheroAlreadyAttacked = false;
         public bool ownAbilityisReady = false;
+        public int ownHeroNumAttacksThisTurn = 0;
+        public bool ownHeroWindfury = false;
+
+        public int ownSecretCount = 0;
+        public int enemySecretCount = 0;
+
         public string heroname = "druid", enemyHeroname = "druid";
         public CardDB.Card heroAbility;
         public int anzEnemys = 0;
@@ -180,7 +185,7 @@ namespace HREngine.Bots
 
         }
 
-        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimune, int heroatt, int herohp, int herodef, string heron, bool heroready, bool alreadyatt, bool frozen, CardDB.Card hab, bool habrdy)
+        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimune, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury)
         {
             this.ownHeroWeapon = weapon;
             this.heroWeaponAttack = watt;
@@ -191,10 +196,11 @@ namespace HREngine.Bots
             this.heroDefence = herodef;
             this.heroname = heron;
             this.ownheroisread = heroready;
-            this.ownheroAlreadyAttacked = alreadyatt;
             this.herofrozen = frozen;
             this.heroAbility = hab;
             this.ownAbilityisReady = habrdy;
+            this.ownHeroWindfury = windfury;
+            this.ownHeroNumAttacksThisTurn = numAttacksTTurn;
 
         }
 
@@ -303,7 +309,7 @@ namespace HREngine.Bots
 
             help.logg("ownhero:");
             help.logg(this.heroname + " " + heroHp + " " + heroDefence);
-            help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownheroAlreadyAttacked + " attack: " + heroAtk + " weapon attk: " + heroWeaponAttack);
+            help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " attack: " + heroAtk + " weapon attk: " + heroWeaponAttack);
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + heroAtk);
 
@@ -335,10 +341,12 @@ namespace HREngine.Bots
         }
 
 
-        public void loadPreparedBattlefield(int bfield)
+        public void loadPreparedHeros(int bfield)
         {
+ 
             if (bfield == 0)
             {
+                
                 currentMana = 10;
                 heroHp = 30;
                 enemyHp = 5;
@@ -347,7 +355,6 @@ namespace HREngine.Bots
                 heroDefence = 0;
                 enemyDefence = 0;
                 ownheroisread = false;
-                ownheroAlreadyAttacked = false;
                 ownAbilityisReady = false;
                 heroname = "druid";
                 enemyHeroname = "warrior";
@@ -371,50 +378,30 @@ namespace HREngine.Bots
                 heroImmuneToDamageWhileAttacking = false;
 
                 ownPlayerController = 1;
+            }
+        }
+
+        public void loadPreparedBattlefield(int bfield)
+        {
+            this.ownMinions.Clear();
+            this.enemyMinions.Clear();
 
 
-                Minion enemy1 = createNewMinion(cdb.getCardDataFromID("EX1_011"), 0);
-                enemy1.Angr = 4;
+            if (bfield == 0)
+            {
+
+                Minion own1 = createNewMinion(cdb.getCardDataFromID("CS2_171"), 0); // steinhauereber
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+
+                Minion enemy1 = createNewMinion(cdb.getCardDataFromID("CS2_222"), 0);// champion von sturmwind
                 enemy1.Ready = true;
-                this.ownMinions.Add(enemy1);
+                this.enemyMinions.Add(enemy1);
 
             }
 
             if (bfield == 1)
             {
-                currentMana = 10;
-                heroHp = 30;
-                enemyHp =30;
-                heroAtk = 0;
-                enemyAtk = 0;
-                heroDefence = 0;
-                enemyDefence = 0;
-                ownheroisread = false;
-                ownheroAlreadyAttacked = false;
-                ownAbilityisReady = false;
-                heroname = "druid";
-                enemyHeroname = "warrior";
-                this.heroAbility = this.cdb.getCardDataFromID("CS2_017");
-                anzEnemys = 0;
-                anzOwn = 0;
-                herofrozen = false;
-                enemyfrozen = false;
-                numMinionsPlayedThisTurn = 0;
-                cardsPlayedThisTurn = 0;
-                ueberladung = 0;
-                ownMaxMana = 10;
-                enemyMaxMana = 10;
-                enemyWeaponDurability = 0;
-                enemyWeaponAttack = 0;
-                enemyHeroWeapon = "";
-
-                heroWeaponDurability = 0;
-                heroWeaponAttack = 0;
-                ownHeroWeapon = "";
-                heroImmuneToDamageWhileAttacking = false;
-
-                ownPlayerController = 1;
-
 
                 Minion enemy1 = createNewMinion(cdb.getCardDataFromID("CS2_152"), 0);
                 Minion enemy2 = createNewMinion(cdb.getCardDataFromID("CS2_152"), 1);
@@ -438,39 +425,6 @@ namespace HREngine.Bots
 
             if (bfield == 2)
             {
-                currentMana = 10;
-                heroHp = 30;
-                enemyHp = 30;
-                heroAtk = 0;
-                enemyAtk = 0;
-                heroDefence = 0;
-                enemyDefence = 0;
-                ownheroisread = false;
-                ownheroAlreadyAttacked = false;
-                ownAbilityisReady = false;
-                heroname = "druid";
-                enemyHeroname = "warrior";
-                this.heroAbility = this.cdb.getCardDataFromID("CS2_017");
-                anzEnemys = 0;
-                anzOwn = 0;
-                herofrozen = false;
-                enemyfrozen = false;
-                numMinionsPlayedThisTurn = 0;
-                cardsPlayedThisTurn = 0;
-                ueberladung = 0;
-                ownMaxMana = 10;
-                enemyMaxMana = 10;
-                enemyWeaponDurability = 0;
-                enemyWeaponAttack = 0;
-                enemyHeroWeapon = "";
-
-                heroWeaponDurability = 0;
-                heroWeaponAttack = 0;
-                ownHeroWeapon = "";
-                heroImmuneToDamageWhileAttacking = false;
-
-                ownPlayerController = 1;
-
 
                 Minion enemy1 = createNewMinion(cdb.getCardDataFromID("NEW1_011"), 0);
                 Minion enemy2 = createNewMinion(cdb.getCardDataFromID("CS2_152"), 1);
@@ -479,6 +433,81 @@ namespace HREngine.Bots
 
                 this.enemyMinions.Add(enemy1);
                 this.enemyMinions.Add(enemy2);
+
+            }
+
+            if (bfield == 3)
+            {
+                //wichtelmeisterin
+
+                Minion own1 = createNewMinion(cdb.getCardDataFromID("EX1_597"), 0); // wichtelmeisterin
+                own1.Hp = 1;
+                own1.Ready = false;
+                this.ownMinions.Add(own1);
+
+            }
+
+            if(bfield ==10)
+            {// benchmark
+                Minion own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 0); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 1); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 2); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 3); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 4); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 5); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+                 own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 6); // jeti
+                own1.Hp = 3;
+                own1.maxHp = 3;
+                own1.windfury = true;
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+
+                // enemys
+
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 0); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 1); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 2); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 3); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 4); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 5); // jeti
+                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardDataFromID("CS2_182"), 6); // jeti
+                this.enemyMinions.Add(own1);
 
             }
 

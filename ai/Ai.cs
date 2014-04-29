@@ -7,6 +7,9 @@ namespace HREngine.Bots
 
     public class Ai
     {
+
+        private int maxdeep = 12;
+        private int maxwide = 10000;
         List<Playfield> posmoves = new List<Playfield>();
 
         Hrtprozis hp = Hrtprozis.Instance;
@@ -228,7 +231,7 @@ namespace HREngine.Bots
                     }
 
 
-                    p.complete = true;
+                    p.endTurn();
 
                     //sort stupid stuff ouf
 
@@ -269,7 +272,7 @@ namespace HREngine.Bots
                 help.loggonoff(false);
                 deep++;
 
-                if (deep >= 20) break;//remove this?
+                if (deep >= this.maxdeep) break;//remove this?
             }
 
             int bestval = -10;
@@ -303,7 +306,7 @@ namespace HREngine.Bots
         private void cuttingposibilities(BotBase botBase)
         {
             // take the x best values
-            int takenumber = 1000;
+            int takenumber = this.maxwide;
             List<Playfield> temp = new List<Playfield>();
             posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             temp.AddRange(posmoves);
@@ -338,11 +341,14 @@ namespace HREngine.Bots
 
         public void simulatorTester(BotBase botbase)
         {
+            help.logg("simulating board ");
             //setup cards in hand
-            this.hm.loadPreparedBattlefield(3);
+            this.hm.loadPreparedBattlefield(10);
 
-            //setup minions on field, hero hp, weapons and stuff
-            this.hp.loadPreparedBattlefield(0);
+
+            this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
+            //setup minions on field
+            this.hp.loadPreparedBattlefield(10);
 
             //calculate the stuff
             posmoves.Clear();

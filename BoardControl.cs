@@ -87,7 +87,7 @@ namespace HREngine.Bots
           }
 
           retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
-
+          retval -= p.lostWeaponDamage;
           if (p.ownMinions.Count == 0) retval -= 20;
           if (p.enemyMinions.Count == 0) retval += 20;
           if (p.enemyHeroHp <= 0) retval = 10000;
