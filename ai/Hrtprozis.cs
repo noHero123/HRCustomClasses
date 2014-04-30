@@ -262,6 +262,22 @@ namespace HREngine.Bots
         {
             this.ownMinions.Sort((a, b) => a.zonepos.CompareTo(b.zonepos));
             this.enemyMinions.Sort((a, b) => a.zonepos.CompareTo(b.zonepos));
+            int i = 0;
+            foreach (Minion m in this.ownMinions)
+            {
+                m.id = i;
+                i++;
+                m.zonepos = i;
+
+            }
+            i = 0;
+            foreach (Minion m in this.enemyMinions)
+            {
+                m.id = i;
+                i++;
+                m.zonepos = i;
+            }
+
             /*List<Minion> temp = new List<Minion>();
             temp.AddRange(ownMinions);
             this.ownMinions.Clear();
@@ -526,6 +542,8 @@ namespace HREngine.Bots
 
             }
 
+
+            updatePositions();
         }
 
 

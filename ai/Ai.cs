@@ -324,6 +324,7 @@ namespace HREngine.Bots
             //help.moveMouse(950,750);
             //help.Screenshot();
             posmoves.Clear();
+            hp.updatePositions();
             posmoves.Add(new Playfield());
 
            /* foreach (var item in this.posmoves[0].owncards)
