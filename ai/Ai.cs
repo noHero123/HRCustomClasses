@@ -275,7 +275,7 @@ namespace HREngine.Bots
                 if (deep >= this.maxdeep) break;//remove this?
             }
 
-            int bestval = -10;
+            int bestval = int.MinValue;
             int bestanzactions = 1000;
             Playfield bestplay = temp[0];
             foreach (Playfield p in temp)
