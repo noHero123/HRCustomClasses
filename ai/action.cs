@@ -90,13 +90,17 @@ namespace HREngine.Bots
         public int enemyHeroEntity = -1;
 
         public int value = Int32.MinValue;
+        public int guessingHeroDamage = 0;
+
         public int mana = 0;
         public int enemyHeroHp = 30;
+        public string ownHeroName = "";
+        public string enemyHeroName = "";
         public bool ownHeroReady = false;
         public int ownHeroNumAttackThisTurn = 0;
         public bool ownHeroWindfury = false;
 
-        public int ownSecretCount = 0;
+        public List<string> ownSecretsIDList = new List<string>();
         public int enemySecretCount = 0;
 
         public int ownHeroHp = 30;
@@ -107,6 +111,7 @@ namespace HREngine.Bots
         public int ownWeaponDurability = 0;
         public int ownWeaponAttack = 0;
         public string ownWeaponName = "";
+        
         public int enemyWeaponAttack = 0;
         public int enemyWeaponDurability = 0;
         public List<Minion> ownMinions = new List<Minion>();
@@ -193,13 +198,15 @@ namespace HREngine.Bots
             this.ownMaxMana = Hrtprozis.Instance.ownMaxMana;
             this.enemyMaxMana = Hrtprozis.Instance.enemyMaxMana;
 
-            this.ownSecretCount = Hrtprozis.Instance.ownSecretCount;
+            this.ownSecretsIDList = Hrtprozis.Instance.ownSecretList;
             this.enemySecretCount = Hrtprozis.Instance.enemySecretCount;
 
             addMinionsReal(Hrtprozis.Instance.ownMinions, ownMinions);
             addMinionsReal(Hrtprozis.Instance.enemyMinions, enemyMinions);
             addCardsReal(Handmanager.Instance.handCards);
             this.enemyHeroHp = Hrtprozis.Instance.enemyHp;
+            this.ownHeroName = Hrtprozis.Instance.heroname;
+            this.enemyHeroName = Hrtprozis.Instance.enemyHeroname;
             this.ownHeroHp = Hrtprozis.Instance.heroHp;
             this.complete = false;
             this.ownHeroReady = Hrtprozis.Instance.ownheroisread;
@@ -312,7 +319,8 @@ namespace HREngine.Bots
             this.enemyHeroEntity = p.enemyHeroEntity;
 
 
-            this.ownSecretCount = p.ownSecretCount;
+            foreach(string s in p.ownSecretsIDList)
+            { this.ownSecretsIDList.Add(s); }
             this.enemySecretCount = p.enemySecretCount;
             this.mana = p.mana;
             this.ownMaxMana = p.ownMaxMana;
@@ -321,6 +329,8 @@ namespace HREngine.Bots
             addMinionsReal(p.enemyMinions, enemyMinions);
             addCardsReal(p.owncards);
             this.enemyHeroHp = p.enemyHeroHp;
+            this.ownHeroName = p.ownHeroName;
+            this.enemyHeroName = p.enemyHeroName;
             this.ownHeroHp = p.ownHeroHp;
             this.playactions.AddRange(p.playactions);
             this.complete = false;
@@ -511,10 +521,176 @@ namespace HREngine.Bots
             endTurnBuffs(true);//end own buffs 
             endTurnEffect(true);//own turn ends
             startTurnEffect(false);//enemy turn begins
+            guessHeroDamage();
+            simulateTraps();
             
         }
 
-        public void endTurnBuffs(bool own)
+
+        private void guessHeroDamage()
+        {
+            int ghd = 0;
+            foreach (Minion m in this.enemyMinions)
+            {
+                ghd += m.Angr;
+                if (m.windfury) ghd += m.Angr;
+            }
+
+            if (this.enemyHeroName == "druid") ghd++;
+            if (this.enemyHeroName == "mage") ghd++;
+            if (this.enemyHeroName == "thief") ghd++;
+            if (this.enemyHeroName == "hunter") ghd += 2;
+
+            foreach (Minion m in this.ownMinions)
+            {
+                if (m.taunt) ghd -= m.Hp;
+                if (m.taunt && m.divineshild) ghd -= 1;
+            }
+
+            this.guessingHeroDamage = Math.Max(0, ghd);
+        }
+
+        private void simulateTraps()
+        {
+            // DONT KILL ENEMY HERO (cause its only guessing)
+            foreach (string secretID in this.ownSecretsIDList)
+            {
+                //hunter secrets############
+                if (secretID == "EX1_554") //snaketrap
+                {
+
+                    //call 3 snakes (if possible)
+                    int posi = this.ownMinions.Count - 1;
+                    CardDB.Card kid = CardDB.Instance.getCardData("schlange");
+                    callKid(kid, posi, true);
+                    callKid(kid, posi, true);
+                    callKid(kid, posi, true);
+                }
+                if (secretID == "EX1_609") //snipe
+                {
+                    //kill weakest minion of enemy
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    minionGetDamagedOrHealed(m, 4, 0, false);
+                }
+                if (secretID == "EX1_610") //explosive trap
+                {
+                    //take 2 damage to each enemy
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    foreach (Minion m in temp)
+                    {
+                        minionGetDamagedOrHealed(m, 2, 0, false);
+                    }
+                    attackEnemyHeroWithoutKill(2);
+                }
+                if (secretID == "EX1_611") //freezing trap
+                {
+                    //return weakest enemy minion to hand
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    minionReturnToHand(m, false);
+                }
+                if (secretID == "EX1_533") // missdirection
+                {
+                    // first damage to your hero is nulled -> lower guessingHeroDamage
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr,1));
+                }
+
+                //mage secrets############
+                if (secretID == "EX1_287") //counterspell
+                {
+                    // what should we do?
+                    this.ownHeroDefence += 5;
+                }
+
+                if (secretID == "EX1_289") //ice barrier
+                {
+                    this.ownHeroDefence += 8;
+                }
+
+                if (secretID == "EX1_295") //ice barrier
+                {
+                    //set the guessed Damage to zero
+                    this.guessingHeroDamage = 0;
+                }
+
+                if (secretID == "EX1_294") //mirror entity
+                {
+                    //summon snake ( a weak minion)
+                    int posi = this.ownMinions.Count - 1;
+                    CardDB.Card kid = CardDB.Instance.getCardData("schlange");
+                    callKid(kid, posi, true);
+                }
+                if (secretID == "tt_010") //spellbender
+                {
+                    //whut???
+                    // add 2 to your defence (most attack-buffs give +2, lots of damage spells too)
+                    this.ownHeroDefence += 2;
+                }
+                if (secretID == "EX1_594") // vaporize
+                {
+                    // first damage to your hero is nulled -> lower guessingHeroDamage and destroy weakest minion
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
+                    minionGetDestroyed(m, false);
+                }
+                //pala secrets############
+                if (secretID == "EX1_132") // eye for an eye
+                {
+                    // enemy takes one damage
+                    attackEnemyHeroWithoutKill(1);
+                }
+                if (secretID == "EX1_130") // noble sacrifice
+                {
+                    //lower guessed hero damage
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
+                }
+
+                if (secretID == "EX1_136") // redemption
+                {
+                    // we give our weakest minion a divine shield :D
+                    List<Minion> temp = new List<Minion>(this.ownMinions);
+                    temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));//take the weakest
+                    if (temp.Count == 0) continue;
+                    foreach (Minion m in temp)
+                    {
+                        if (m.divineshild) continue;
+                        m.divineshild = true;
+                        break;
+                    }
+                }
+
+                if (secretID == "EX1_379") // repentance
+                {
+                    // set his current lowest hp minion to x/1
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));//take the weakest
+                    if (temp.Count == 0) continue;
+                    Minion m = temp[0];
+                    m.Hp = 1;
+                    m.maxHp = 1;
+                }
+            }
+
+            
+        }
+
+        private void endTurnBuffs(bool own)
         {
 
             List<Minion> temp = new List<Minion>();
@@ -579,7 +755,7 @@ namespace HREngine.Bots
         }
 
 
-        public void endTurnEffect(bool own)
+        private void endTurnEffect(bool own)
         {
 
             List<Minion> temp = new List<Minion>();
@@ -665,7 +841,7 @@ namespace HREngine.Bots
 
                 if (m.name == "astralerarkanist") // gain +2/+2
                 {
-                    if (own && this.ownSecretCount>=1)
+                    if (own && this.ownSecretsIDList.Count>=1)
                     {
                         minionGetBuffed(m, 2, 2, own);
                     }
@@ -772,7 +948,7 @@ namespace HREngine.Bots
 
         }
 
-        public void startTurnEffect(bool own)
+        private void startTurnEffect(bool own)
         {
             List<Minion> temp = new List<Minion>();
             List<Minion> ownmins = new List<Minion>();
@@ -921,6 +1097,31 @@ namespace HREngine.Bots
             if (this.auchenaiseelenpriesterin) retval *= -1;
             if (this.doublepriest >= 1) retval *= (2 * this.doublepriest);
             return retval;
+        }
+
+        private void attackEnemyHeroWithoutKill(int dmg)
+        {
+            int oldHp = this.enemyHeroHp;
+            if (this.enemyHeroDefence <= 0)
+            {
+                this.enemyHeroHp = Math.Min(30, this.enemyHeroHp - dmg);
+            }
+            else
+            {
+                if (this.enemyHeroDefence > 0)
+                {
+
+                    int rest = enemyHeroDefence - dmg;
+                    if (rest < 0)
+                    {
+                        this.enemyHeroHp += rest;
+                    }
+                    ownHeroDefence = Math.Max(0, enemyHeroDefence - dmg);
+
+                }
+            }
+
+            if (oldHp >= 1 && this.enemyHeroHp == 0) this.enemyHeroHp = 1;
         }
 
         private void attackOrHealHero(int dmg, bool own) // negative damage is heal
@@ -1525,13 +1726,16 @@ namespace HREngine.Bots
         private void triggerAMinionDied(Minion m, bool own)
         {
             List<Minion> temp = new List<Minion>();
+            List<Minion> temp2 = new List<Minion>();
             if (own)
             {
                 temp.AddRange(this.ownMinions);
+                temp2.AddRange(this.enemyMinions);
             }
             else
             {
                 temp.AddRange(this.enemyMinions);
+                temp2.AddRange(this.ownMinions);
             }
 
             foreach (Minion mnn in temp)
@@ -1559,6 +1763,16 @@ namespace HREngine.Bots
                     }
                 }
             }
+
+            foreach (Minion mnn in temp2)
+            {
+                if (mnn.silenced) continue;
+                if (mnn.name == "fleischfressenderghul")
+                {
+                    mnn.Angr += 1;
+                }
+            }
+
         }
 
         private void minionGetDestroyed(Minion m, bool own)
@@ -2670,6 +2884,7 @@ namespace HREngine.Bots
             if (c.name == "lordjaraxxus")
             {
                 this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_tk33");
+                this.ownHeroName = "lordjaraxxus";
                 this.ownHeroHp = c.Hp;
             }
 
@@ -3358,6 +3573,7 @@ namespace HREngine.Bots
             {
                 sheep = true;
             }
+
             if (c.name == "pyroschlag")
             {
                 damage = 10;
@@ -4138,22 +4354,19 @@ namespace HREngine.Bots
             if (c.name == "arkanegeschosse")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
+                temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
                 int damage = 1;
+                int ammount = getSpellDamageDamage(3);
                 int i = 0;
-                if (temp.Count >= 1)
+                int hp = 0;
+                foreach (Minion enemy in temp)
                 {
-                    foreach (Minion enemy in temp)
-                    {
-                        minionGetDamagedOrHealed(enemy, damage, 0, false);
-                        i++;
-                        if (i == 2) break;
-                    }
+                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    i++;
+                    hp += enemy.Hp;
+                    if (i == ammount) break;
                 }
-                else
-                {
-                    damage = getSpellDamageDamage(1);
-                    attackOrHealHero(damage, false);
-                }
+                if (hp < ammount) attackOrHealHero(ammount - hp, false);
 
             }
             if (c.name == "arkaneintelligenz")
@@ -4926,7 +5139,7 @@ namespace HREngine.Bots
 
             if (c.Secret)
             {
-                ownSecretCount++;
+                this.ownSecretsIDList.Add(c.CardID);
                 this.playedmagierinderkirintor = false;
             }
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
@@ -5074,8 +5287,9 @@ namespace HREngine.Bots
 
         }
 
-        public void activateAbility(CardDB.Card c, string heroname, int target, int targetEntity)
+        public void activateAbility(CardDB.Card c, int target, int targetEntity)
         {
+            string heroname = this.ownHeroName;
             this.ownAbilityReady = false;
             this.mana -= 2;
             Action a = new Action();

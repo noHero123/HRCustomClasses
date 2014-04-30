@@ -216,7 +216,7 @@ namespace HREngine.Bots
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
                                 havedonesomething = true;
                                 Playfield pf = new Playfield(p);
-                                pf.activateAbility(p.ownHeroAblility, this.hp.heroname, trgt.target, trgt.targetEntity);
+                                pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity);
                                 this.posmoves.Add(pf);
                             }
                         }
@@ -224,7 +224,7 @@ namespace HREngine.Bots
                         {
                             havedonesomething = true;
                             Playfield pf = new Playfield(p);
-                            pf.activateAbility(p.ownHeroAblility, this.hp.heroname, -1, -1);
+                            pf.activateAbility(p.ownHeroAblility, -1, -1);
                             this.posmoves.Add(pf);
                         }
 
@@ -337,6 +337,35 @@ namespace HREngine.Bots
             doallmoves(false, botbase);
             //help.logging(true);
 
+        }
+
+        public void doBenchmark(BotBase botbase)
+        {
+            help.logg("do benchmark, dont cry");
+            //setup cards in hand
+            this.hm.loadPreparedBattlefield(10);
+
+
+            this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
+            //setup minions on field
+            this.hp.loadPreparedBattlefield(10);
+
+            //calculate the stuff
+            posmoves.Clear();
+            posmoves.Add(new Playfield());
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+            help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
+            help.logg("owncardscount " + posmoves[0].owncards.Count);
+
+            foreach (var item in this.posmoves[0].owncards)
+            {
+                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
+            }
+
+            doallmoves(true, botbase);
         }
 
         public void simulatorTester(BotBase botbase)

@@ -478,6 +478,11 @@ namespace HREngine.Bots
                     //it requires a target-> return false if 
                 }
 
+                if (this.Secret)
+                {
+                    if (p.ownSecretsIDList.Contains(this.CardID)) return false;
+                    if (p.ownSecretsIDList.Count >= 5) return false;
+                }
 
 
                 return true;

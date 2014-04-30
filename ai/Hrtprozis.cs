@@ -27,7 +27,7 @@ namespace HREngine.Bots
         public int ownHeroNumAttacksThisTurn = 0;
         public bool ownHeroWindfury = false;
 
-        public int ownSecretCount = 0;
+        public List<string> ownSecretList = new List<string>();
         public int enemySecretCount = 0;
 
         public string heroname = "druid", enemyHeroname = "druid";
@@ -170,6 +170,16 @@ namespace HREngine.Bots
 
             //sort them 
             updatePositions();
+        }
+
+        public void updateSecretStuff(List<string> ownsecs, int numEnemSec)
+        {
+            this.ownSecretList.Clear();
+            foreach (string s in ownsecs)
+            {
+                this.ownSecretList.Add(s);
+            }
+            this.enemySecretCount = numEnemSec;
         }
 
         public void updatePlayer(int maxmana, int currentmana, int cardsplayedthisturn, int numMinionsplayed, int recall, int heroentity, int enemyentity)

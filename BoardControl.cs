@@ -54,6 +54,8 @@ namespace HREngine.Bots
               retval += m.Angr * 2;
               
               if (m.windfury) retval += m.Angr;
+              if (m.divineshild) retval += 1;
+              if (m.divineshild && m.taunt) retval += 4;
           }
 
           foreach (Minion m in p.enemyMinions)
@@ -79,6 +81,7 @@ namespace HREngine.Bots
               if (m.name == "leokk") retval -= 5;
               if (m.name == "klerikerinvonnordhain") retval -= 5;
               if (m.name == "zauberlehrling") retval -= 3;
+              if (m.name == "beschwoerungsportal") retval -= 5;
               if (m.name == "winzigebeschwoererin") retval -= 3;
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
@@ -89,6 +92,7 @@ namespace HREngine.Bots
           if (p.ownMinions.Count == 0) retval -= 20;
           if (p.enemyMinions.Count == 0) retval += 20;
           if (p.enemyHeroHp <= 0) retval = 10000;
+          if (p.enemyHeroHp >=1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
 
           p.value = retval;

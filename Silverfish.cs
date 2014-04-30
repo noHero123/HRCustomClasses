@@ -19,6 +19,8 @@ namespace HREngine.Bots
         List<Minion> enemyMinions = new List<Minion>();
         List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
         int ownPlayerController = 0;
+        List<string> ownSecretList = new List<string>();
+        int enemySecretCount = 0;
 
         int currentMana = 0;        
         int ownMaxMana = 0;
@@ -92,7 +94,8 @@ namespace HREngine.Bots
             Handmanager.Instance.setOwnPlayer(ownPlayerController);
 
             Hrtprozis.Instance.updatePlayer(this.ownMaxMana, this.currentMana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.ueberladung, ownPlayer.GetHero().GetEntityId(), enemyPlayer.GetHero().GetEntityId());
-            
+            Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
+
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury);
             Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen);
             
@@ -108,6 +111,7 @@ namespace HREngine.Bots
             // calculate stuff
             HRLog.Write("calculating stuff...");
             Ai.Instance.dosomethingclever(botbase);
+            HRLog.Write("calculating ended!");
             
         }
 
@@ -129,6 +133,8 @@ namespace HREngine.Bots
 
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
+            Helpfunctions.Instance.logg("enemy secretsCount: " + enemyPlayer.GetSecretDefinitions().Count);
+            this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
             //if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;

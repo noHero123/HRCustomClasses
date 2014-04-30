@@ -128,7 +128,7 @@ namespace HREngine.Bots
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                 }
                 HRLog.Write("hero attack without weapon");
-                HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
+                //HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
                 return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
             }
