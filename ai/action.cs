@@ -532,6 +532,7 @@ namespace HREngine.Bots
             int ghd = 0;
             foreach (Minion m in this.enemyMinions)
             {
+                if (m.frozen) continue;
                 ghd += m.Angr;
                 if (m.windfury) ghd += m.Angr;
             }
@@ -540,9 +541,11 @@ namespace HREngine.Bots
             if (this.enemyHeroName == "mage") ghd++;
             if (this.enemyHeroName == "thief") ghd++;
             if (this.enemyHeroName == "hunter") ghd += 2;
+            ghd += enemyWeaponAttack;
 
             foreach (Minion m in this.ownMinions)
             {
+                if (m.frozen) continue;
                 if (m.taunt) ghd -= m.Hp;
                 if (m.taunt && m.divineshild) ghd -= 1;
             }
@@ -1074,7 +1077,7 @@ namespace HREngine.Bots
                     minionGetDestroyed(mins, own);
                     
                 }
-                foreach (Minion mins in enemyMinions)
+                foreach (Minion mins in enemymins)
                 {
                     minionGetDestroyed(mins, !own);
                 }
@@ -1822,12 +1825,13 @@ namespace HREngine.Bots
         private void minionGetSilenced(Minion m, bool own)
         {
             //TODO
-            m.frozen = false;
+            
             m.taunt = false;
             m.stealth = false;
             m.charge = false;
-            m.windfury = false;
+            
             m.divineshild = false;
+            m.poisonous = false;
 
             //delete enrage (if minion is silenced the first time)
             if (m.wounded && m.card.Enrage && !m.silenced)
@@ -1836,6 +1840,15 @@ namespace HREngine.Bots
             }
 
             //delete enrage (if minion is silenced the first time)
+
+            if (m.frozen && m.numAttacksThisTurn == 0 && !(m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst") && !m.playedThisTurn)
+            {
+                m.Ready = true;
+            }
+
+
+            m.frozen = false;
+
             if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst") && !m.playedThisTurn && m.numAttacksThisTurn==0)
             {
                 m.Ready = true;
@@ -1853,6 +1866,7 @@ namespace HREngine.Bots
             }
             m.maxHp = m.card.Health;
             if (m.Hp > m.maxHp) m.Hp = m.maxHp;
+
             getNewEffects(m, own, m.id, false);// minion get effects of others 
 
             m.silenced = true;
@@ -2162,6 +2176,11 @@ namespace HREngine.Bots
 
         private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own)
         {
+            minionGetDamagedOrHealed(m, damages, heals, own, false);
+        }
+
+        private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own, bool dontCalcLostDmg)
+        {
             int damage = damages;
             int heal = heals;
 
@@ -2175,13 +2194,13 @@ namespace HREngine.Bots
             if (damage >= 1 && m.divineshild)
             {
                 m.divineshild = false;
-                if (!own) this.lostDamage += damage;
+                if (!own && !dontCalcLostDmg) this.lostDamage += damage;
                 return;
             }
 
             if (m.cantLowerHPbelowONE && damage >= 1 && damage >= m.Hp) damage = m.Hp - 1;
 
-            if (!own && m.Hp < damage) lostDamage += damage - m.Hp;
+            if (!own && !dontCalcLostDmg && m.Hp < damage) lostDamage += damage - m.Hp;
 
 
             m.Hp = m.Hp - damage;
@@ -2587,7 +2606,7 @@ namespace HREngine.Bots
             }
 
 
-            if (c.card.Silence) //eisenschnabeleule, zauberbrecher, TODO: hueterdeshains
+            if (c.name == "eisenschnabeleule" || c.name == "zauberbrecher") //eisenschnabeleule, zauberbrecher
             {
                 silence = true;
             }
@@ -4343,11 +4362,16 @@ namespace HREngine.Bots
             {
                 int damage = getSpellDamageDamage(2);
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int maxHp = 0;
                 foreach (Minion enemy in temp)
                 {
                     enemy.frozen = true;
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    if (maxHp < enemy.Hp) maxHp = enemy.Hp;
+
+                    minionGetDamagedOrHealed(enemy, damage, 0, false, true);
                 }
+
+                this.lostDamage += Math.Max(0, damage - maxHp); 
 
             }
 
@@ -4406,10 +4430,14 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(4);
+                int maxHp = 0;
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    if (maxHp < enemy.Hp) maxHp = enemy.Hp;
+
+                    minionGetDamagedOrHealed(enemy, damage, 0, false, true);
                 }
+                this.lostDamage += Math.Max(0, damage - maxHp); 
 
             }
 
@@ -4660,10 +4688,15 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(2);
+
+                int maxHp = 0;
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    if (maxHp < enemy.Hp) maxHp = enemy.Hp;
+
+                    minionGetDamagedOrHealed(enemy, damage, 0, false, true);
                 }
+                this.lostDamage += Math.Max(0, damage - maxHp); 
 
             }
             if (c.name == "wildgeist")
@@ -5098,17 +5131,21 @@ namespace HREngine.Bots
 
             if (wilderpyro)
             {
-                foreach (Minion m in this.ownMinions)
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion m in temp)
                 {
                     if (m.silenced) continue;
 
                     if (m.name == "wilderpyromant")
                     {
-                        foreach (Minion mnn in this.ownMinions)
+                        List<Minion> temp2 = new List<Minion>(this.ownMinions);
+                        foreach (Minion mnn in temp2)
                         {
                             minionGetDamagedOrHealed(mnn, 1, 0, true);
                         }
-                        foreach (Minion mnn in this.enemyMinions)
+                        temp2.Clear();
+                        temp2.AddRange(this.enemyMinions);
+                        foreach (Minion mnn in temp2)
                         {
                             minionGetDamagedOrHealed(mnn, 1, 0, false);
                         }
@@ -5214,7 +5251,8 @@ namespace HREngine.Bots
 
         private void triggerACardGetPlayed(CardDB.Card c)
         {
-            foreach (Minion mnn in this.ownMinions)
+            List<Minion> temp = new List<Minion>(this.ownMinions);
+            foreach (Minion mnn in temp)
             {
                 if (mnn.silenced) continue;
                 if (mnn.name == "illidansturmgrimm")

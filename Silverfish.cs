@@ -130,7 +130,10 @@ namespace HREngine.Bots
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             this.currentMana = ownPlayer.GetNumAvailableResources();
             this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);//ownPlayer.GetRealTimeTempMana();
-
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss"));
+            Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemyPlayer.GetSecretDefinitions().Count);
@@ -287,6 +290,8 @@ namespace HREngine.Bots
 
                     m.immune = (entitiy.IsImmune()) ? true : false;
 
+                    m.silenced = (entitiy.GetTag(HRGameTag.SILENCED)>=1) ? true:false;
+
 
                     m.zonepos = zp;
                     m.id = m.zonepos - 1;
@@ -301,6 +306,11 @@ namespace HREngine.Bots
                     {
                         //m.exhausted = false;
                         m.Ready = true;
+                    }
+
+                    if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst"))
+                    {
+                        m.Ready = false;
                     }
 
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN minion

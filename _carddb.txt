@@ -28747,20 +28747,6 @@ u$   final/data/cards/ex1_598_xml.unity3d         n��$   final/data/cards/ex
 </Entity>              EX1_279 (  <?xml version="1.0" encoding="UTF-8"?>
 <Entity version="2" CardID="EX1_279">
   <MasterPower>89cdadf1-6077-479c-b2e8-4ecec39cfe07</MasterPower>
-  <Tag name="CardTextInHand" enumID="184" type="String">
-    <enUS>Deal $10 damage.</enUS>
-    <frFR>Inflige $10 |4(point,points) de dégâts.</frFR>
-    <zhTW>造成$10點傷害</zhTW>
-    <zhCN>造成$10点伤害。</zhCN>
-    <ruRU>Наносит $10 ед. урона.</ruRU>
-    <ptBR>Cause $10 de dano.</ptBR>
-    <plPL>Zadaj $10 pkt. obrażeń.</plPL>
-    <koKR>피해를 $10 줍니다.</koKR>
-    <itIT>Infligge $10 danni.</itIT>
-    <esMX>Inflige $10 de daño.</esMX>
-    <esES>Inflige $10 p. de daño.</esES>
-    <deDE>Verursacht $10 Schaden.</deDE>
-  </Tag>
   <Tag name="CardName" enumID="185" type="String">
     <enUS>Pyroblast</enUS>
     <frFR>Explosion pyrotechnique</frFR>
@@ -28780,6 +28766,20 @@ u$   final/data/cards/ex1_598_xml.unity3d         n��$   final/data/cards/ex
   <Tag name="CardType" enumID="202" type="CardType" value="5" />
   <Tag name="Cost" enumID="48" type="Number" value="10" />
   <Tag name="Class" enumID="199" type="Class" value="4" />
+  <Tag name="CardTextInHand" enumID="184" type="String">
+    <enUS>Deal $10 damage.</enUS>
+    <frFR>Inflige $10 |4(point,points) de dégâts.</frFR>
+    <zhTW>造成$10點傷害</zhTW>
+    <zhCN>造成$10点伤害。</zhCN>
+    <ruRU>Наносит $10 ед. урона.</ruRU>
+    <ptBR>Cause $10 de dano.</ptBR>
+    <plPL>Zadaj $10 pkt. obrażeń.</plPL>
+    <koKR>피해를 $10 줍니다.</koKR>
+    <itIT>Infligge $10 danni.</itIT>
+    <esMX>Inflige $10 de daño.</esMX>
+    <esES>Inflige $10 p. de daño.</esES>
+    <deDE>Verursacht $10 Schaden.</deDE>
+  </Tag>
   <Tag name="AttackVisualType" enumID="251" type="AttackVisualType" value="3" />
   <Tag name="Faction" enumID="201" type="Faction" value="3" />
   <Tag name="DevState" enumID="268" type="DevState" value="2" />

@@ -291,13 +291,9 @@ namespace HREngine.Bots
 
             }
             help.loggonoff(true);
-            help.logg("############################################");
+            help.logg("-------------------------------------");
             help.logg("bestPlayvalue " + bestval);
 
-            if (!test)
-            {
-                bestplay.doAction();
-            }
             bestplay.printActions();
             this.bestmove = bestplay.getNextAction();
         }
@@ -373,12 +369,12 @@ namespace HREngine.Bots
         {
             help.logg("simulating board ");
             //setup cards in hand
-            this.hm.loadPreparedBattlefield(4);
+            this.hm.loadPreparedBattlefield(5);
 
 
             this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
             //setup minions on field
-            this.hp.loadPreparedBattlefield(3);
+            this.hp.loadPreparedBattlefield(5);
 
             //calculate the stuff
             posmoves.Clear();

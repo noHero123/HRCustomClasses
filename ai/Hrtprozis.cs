@@ -347,7 +347,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+ CardDB.Instance.getCardDataFromID(e.CARDID).name);
@@ -362,6 +362,10 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg(e.CARDID + " " + CardDB.Instance.getCardDataFromID(e.CARDID).name);
+                }
             }
 
         }
@@ -475,6 +479,20 @@ namespace HREngine.Bots
                 own1.enchantments.Add(e);
                 own1.Ready = false;
                 this.ownMinions.Add(own1);
+
+            }
+
+            if (bfield == 5)
+            {
+                // testing silence
+
+                Minion own1 = createNewMinion(cdb.getCardData("goblinleibwaechter"), 0); // wichtelmeisterin
+                own1.Ready = true;
+                this.ownMinions.Add(own1);
+
+                own1 = createNewMinion(cdb.getCardData("goblinleibwaechter"), 0); // wichtelmeisterin
+                own1.Hp = 20;
+                this.enemyMinions.Add(own1);
 
             }
 

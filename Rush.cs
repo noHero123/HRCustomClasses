@@ -32,7 +32,6 @@ namespace HREngine.Bots
           int retval = 0;
           retval += p.owncards.Count * 1;
 
-
           retval += p.ownHeroHp + p.ownHeroDefence;
           retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
@@ -45,11 +44,18 @@ namespace HREngine.Bots
           retval += p.ownMaxMana;
 
 
+          foreach (Action a in p.playactions)
+          {
+              if (!a.cardplay) continue;
+              if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated  
+          }
+
           foreach (Minion m in p.ownMinions)
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
               if (m.windfury) retval += m.Angr;
+              if (m.taunt) retval += 1;
           }
 
           foreach (Minion m in p.enemyMinions)
@@ -59,10 +65,14 @@ namespace HREngine.Bots
                   retval -= m.Hp;
                   retval -= m.Angr * 2;
                   if (m.windfury) retval -= m.Angr;
+                  if (m.taunt) retval -= 5;
+                  if (m.divineshild) retval -= 1;
+                  if (m.frozen) retval += 1; // because its bad for enemy :D
+                  if (m.poisonous) retval -= 4;
               }
 
 
-              if (m.taunt) retval -= 5;
+              
               if (m.name == "schlachtzugsleiter") retval -= 50;
               if (m.name == "grimmschuppenorakel") retval -= 50;
               if (m.name == "terrorwolfalpha") retval -= 20;
@@ -79,6 +89,7 @@ namespace HREngine.Bots
               if (m.Angr >= 7) retval -= 50;
           }
 
+          retval -= p.enemySecretCount;
           retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
           retval -= p.lostWeaponDamage;
           if (p.ownMinions.Count == 0) retval -= 20;
