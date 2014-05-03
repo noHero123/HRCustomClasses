@@ -84,7 +84,8 @@ namespace HREngine.Bots
               if (m.name == "klerikerinvonnordhain") retval -= 50;
               if (m.name == "zauberlehrling") retval -= 30;
               if (m.name == "winzigebeschwoererin") retval -= 30;
-              if (m.name == "beschwoerungsportal") retval -= 5;
+              if (m.name == "beschwoerungsportal") retval -= 50;
+              if (m.name == "aasfressendehyaene") retval -= 50;
               if (m.Angr >= 4) retval -= 50;
               if (m.Angr >= 7) retval -= 50;
           }

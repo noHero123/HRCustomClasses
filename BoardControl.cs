@@ -97,6 +97,7 @@ namespace HREngine.Bots
               if (m.name == "zauberlehrling") retval -= 3;
               if (m.name == "beschwoerungsportal") retval -= 5;
               if (m.name == "winzigebeschwoererin") retval -= 3;
+              if (m.name == "aasfressendehyaene") retval -= 20;
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }

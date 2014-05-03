@@ -423,16 +423,16 @@ namespace HREngine.Bots
                 switch (this.name)
                 {
                     case "schreckenskorsar":
-                        retval = retval + offset + p.ownWeaponAttack - p.ownWeaponAttackStarted; // if weapon attack change we change manacost
+                        retval = retval + offset - p.ownWeaponAttack + p.ownWeaponAttackStarted; // if weapon attack change we change manacost
                         break;
                     case "meeresriese":
-                        retval = retval + offset + p.ownMinions.Count - p.ownMobsCountStarted;
+                        retval = retval + offset - p.ownMinions.Count + p.ownMobsCountStarted;
                         break;
                     case "bergriese":
-                        retval = retval + offset + p.owncards.Count - p.ownCardsCountStarted;
+                        retval = retval + offset - p.owncards.Count + p.ownCardsCountStarted;
                         break;
                     case "geschmolzenerriese":
-                        retval = retval + offset + p.ownHeroHp - p.ownHeroHpStarted;
+                        retval = retval + offset - p.ownHeroHp + p.ownHeroHpStarted;
                         break;
                     default:
                         retval = retval + offset;

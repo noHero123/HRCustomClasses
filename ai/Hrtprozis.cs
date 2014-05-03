@@ -347,7 +347,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+ CardDB.Instance.getCardDataFromID(e.CARDID).name);
@@ -361,7 +361,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + CardDB.Instance.getCardDataFromID(e.CARDID).name);
