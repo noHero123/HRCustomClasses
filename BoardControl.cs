@@ -55,7 +55,7 @@ namespace HREngine.Bots
               if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
               if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for mage:
-              if (a.card.type == CardDB.cardtype.SPELL && a.numEnemysBeforePlayed == 0) retval -= 11;
+              if ( p.ownHeroName == "mage" && a.card.type == CardDB.cardtype.SPELL && a.numEnemysBeforePlayed == 0) retval -= 11;
           }
 
 
