@@ -37,6 +37,7 @@ namespace HREngine.Bots
         public int enemytarget = -1; // target where red arrow is placed
         public int enemyEntitiy = -1;
         public int druidchoice = 0; // 1 left card, 2 right card
+        public int numEnemysBeforePlayed = 0;
 
         public void print()
         {
@@ -605,6 +606,7 @@ namespace HREngine.Bots
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
                     this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr,1));
+                    this.ownHeroDefence += this.enemyMinions.Count;// the more the enemy minions has on board, the more the posibility to destroy something other :D
                 }
 
                 //mage secrets############
@@ -2270,12 +2272,13 @@ namespace HREngine.Bots
             target.maxHp = source.maxHp;
             target.playedThisTurn = source.playedThisTurn;
             target.poisonous = source.poisonous;
-            target.Ready = source.Ready;
             target.silenced = source.silenced;
             target.stealth = source.stealth;
             target.taunt = source.taunt;
             target.windfury = source.windfury;
             target.wounded = source.wounded;
+            target.Ready = false;
+            if (target.charge) target.Ready = true;
             foreach (Enchantment e in source.enchantments)
             {
                 Enchantment ne = CardDB.getEnchantmentFromCardID(e.CARDID);
@@ -2406,6 +2409,7 @@ namespace HREngine.Bots
             a.ownEntitiy = ownMinion.entitiyID;
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
+            a.numEnemysBeforePlayed = this.enemyMinions.Count;
             this.playactions.Add(a);
             if (logging) help.logg("attck with" + ownMinion.name + " " + ownMinion.id + " trgt " + target + " A " + ownMinion.Angr + " H " + ownMinion.Hp);
 
@@ -3125,12 +3129,13 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//destroys the weakest
-                temp.AddRange(Helpfunctions.TakeList(temp2, 1));
+                temp.AddRange(temp2);
                 foreach (Minion enemy in temp)
                 {
-                    if (enemy.Hp <= 2)
+                    if (enemy.Angr <= 2)
                     {
                         minionGetDestroyed(enemy, false);
+                        break;
                     }
                 }
             }
@@ -3339,6 +3344,7 @@ namespace HREngine.Bots
             Action a = new Action();
             a.cardplay = true;
             a.card = c;
+            a.numEnemysBeforePlayed = this.enemyMinions.Count;
 
             //we place him on the right!
             int mobplace = ownMinions.Count;
@@ -4277,12 +4283,14 @@ namespace HREngine.Bots
 
             if (c.name == "scharmuetzel")
             {
-                foreach (Minion mnn in this.ownMinions)
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn, true);
                 }
-
-                foreach (Minion mnn in this.enemyMinions)
+                temp.Clear();
+                temp.AddRange(this.enemyMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn,false);
                 }
@@ -4390,7 +4398,7 @@ namespace HREngine.Bots
                     hp += enemy.Hp;
                     if (i == ammount) break;
                 }
-                if (hp < ammount) attackOrHealHero(ammount - hp, false);
+                if (i < ammount) attackOrHealHero(ammount - i, false);
 
             }
             if (c.name == "arkaneintelligenz")
@@ -5201,6 +5209,7 @@ namespace HREngine.Bots
                 a.cardplay = true;
                 a.card = c;
                 a.cardEntitiy = cardEntity;
+                a.numEnemysBeforePlayed = this.enemyMinions.Count;
 
                 a.owntarget = 0;
                 if (target >= 0)
@@ -5285,6 +5294,7 @@ namespace HREngine.Bots
             a.enemyEntitiy = targetEntity;
             a.owntarget = 100;
             a.ownEntitiy = this.ownHeroEntity;
+            a.numEnemysBeforePlayed = this.enemyMinions.Count;
             this.playactions.Add(a);
 
             if (this.ownWeaponName == "echtsilberchampion")
@@ -5334,6 +5344,7 @@ namespace HREngine.Bots
             a.useability = true;
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
+            a.numEnemysBeforePlayed = this.enemyMinions.Count;
             this.playactions.Add(a);
 
             if (logging) help.logg("play ability on target " + target);

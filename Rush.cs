@@ -47,13 +47,15 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated  
+              if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
+              if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
 
           foreach (Minion m in p.ownMinions)
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
+              retval += m.card.rarity;
               if (m.windfury) retval += m.Angr;
               if (m.taunt) retval += 1;
           }
@@ -69,6 +71,7 @@ namespace HREngine.Bots
                   if (m.divineshild) retval -= 1;
                   if (m.frozen) retval += 1; // because its bad for enemy :D
                   if (m.poisonous) retval -= 4;
+                  retval -= m.card.rarity;
               }
 
 

@@ -313,6 +313,8 @@ namespace HREngine.Bots
                         m.Ready = false;
                     }
 
+                    if (m.exhausted) m.Ready = false;
+
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN minion
                     {
 

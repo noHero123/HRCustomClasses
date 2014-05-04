@@ -93,6 +93,7 @@ namespace HREngine.Bots
             public int entityID = 0;
             public string name = "";
             public int race = 0;
+            public int rarity = 0;
             public int cost = 0;
             public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
@@ -146,6 +147,7 @@ namespace HREngine.Bots
 
             public Card(Card c)
             {
+                this.rarity = c.rarity;
                 this.AdjacentBuff = c.AdjacentBuff;
                 this.Attack = c.Attack;
                 this.Aura = c.Aura;
@@ -578,6 +580,13 @@ namespace HREngine.Bots
                     string temp = s.Split(new string[] { "value=\"" }, StringSplitOptions.RemoveEmptyEntries)[1];
                     temp = temp.Split('\"')[0];
                     c.race = Convert.ToInt32(temp);
+                    continue;
+                }
+                if (s.Contains("<Tag name=\"Rarity\""))
+                {
+                    string temp = s.Split(new string[] { "value=\"" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                    temp = temp.Split('\"')[0];
+                    c.rarity = Convert.ToInt32(temp);
                     continue;
                 }
                 if (s.Contains("<Tag name=\"Cost\""))
