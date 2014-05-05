@@ -301,6 +301,27 @@ namespace HREngine.Bots
                 this.handCards.Add(hc1);*/
 
             }
+            if (bfield == 6)
+            {
+               
+                enemyAnzCards = 0;
+                this.handCards.Clear();
+                Handcard hc1 = new Handcard();
+                hc1.position = 1;
+                hc1.card = cdb.getCardData("azurblauerdrache");
+                this.handCards.Add(hc1);
+
+                hc1 = new Handcard();
+                hc1.position = 2;
+                hc1.card = cdb.getCardData("gurubashiberserker");
+                this.handCards.Add(hc1);
+
+                hc1 = new Handcard();
+                hc1.position = 3;
+                hc1.card = cdb.getCardData("flammenstoss");
+                this.handCards.Add(hc1);
+
+            }
             if (bfield == 10)
             {
                 enemyAnzCards = 0;

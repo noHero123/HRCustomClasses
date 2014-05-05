@@ -407,7 +407,7 @@ namespace HREngine.Bots
                 //Manacosts changes with the zauberlehrling summoner
                 if (p.zauberlehrling != p.startedWithZauberlehrling && this.type == cardtype.SPELL)
                 { //if the number of zauberlehrlings change
-                    offset += (p.startedWithWinzigebeschwoererin - p.winzigebeschwoererin);
+                    offset += (p.startedWithZauberlehrling - p.zauberlehrling);
                 }
 
 
@@ -516,7 +516,7 @@ namespace HREngine.Bots
             try
             {
                 string path = Settings.Instance.path;
-                lines = System.IO.File.ReadAllLines(path + "_carddb.txt");//C:\\Users\\Thele\\Documents\\_SHearth\\hrtData\\
+                lines = System.IO.File.ReadAllLines(path + "_carddb.txt");
             }
             catch
             {

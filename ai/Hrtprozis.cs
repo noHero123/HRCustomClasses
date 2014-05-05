@@ -334,10 +334,18 @@ namespace HREngine.Bots
             help.logg(this.currentMana + " " + this.ownMaxMana + " " + this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung);
 
             help.logg("ownhero:");
-            help.logg(this.heroname + " " + heroHp + " " + heroDefence);
-            help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " attack: " + heroAtk + " weapon attk: " + heroWeaponAttack);
+            help.logg(this.heroname + " " + heroHp + " " + heroDefence + " immn " + this.heroImmuneToDamageWhileAttacking);
+            help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon );
+            help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
+            string secs = "";
+            foreach (string sec in this.ownSecretList)
+            {
+                secs += sec + " ";
+            }
+            help.logg("osecrets: " + secs);
             help.logg("enemyhero:");
-            help.logg(this.enemyHeroname + " " + enemyHp + " " + heroAtk);
+            help.logg(this.enemyHeroname + " " + enemyHp + " " + heroAtk + " " + this.enemyfrozen);
+            help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
 
         }
 
@@ -347,10 +355,10 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn);
                 foreach (Enchantment e in m.enchantments)
                 {
-                    help.logg(e.CARDID +" "+ CardDB.Instance.getCardDataFromID(e.CARDID).name);
+                    help.logg(e.CARDID +" "+e.creator + " " +e.controllerOfCreator);
                 }
             }
 
@@ -361,7 +369,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " rdy:" + m.Ready + " tnk:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild + " wndfr:" + m.windfury);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + CardDB.Instance.getCardDataFromID(e.CARDID).name);
@@ -377,18 +385,19 @@ namespace HREngine.Bots
             if (bfield == 0)
             {
                 
-                currentMana = 10;
-                heroHp = 30;
-                enemyHp = 5;
+                currentMana = 5;
+                ownMaxMana = 7;
+                heroHp = 22;
+                enemyHp = 25;
                 heroAtk = 0;
                 enemyAtk = 0;
                 heroDefence = 0;
                 enemyDefence = 0;
                 ownheroisread = false;
-                ownAbilityisReady = false;
-                heroname = "druid";
-                enemyHeroname = "warrior";
-                this.heroAbility = this.cdb.getCardDataFromID("CS2_017");
+                ownAbilityisReady = true;
+                heroname = "mage";
+                enemyHeroname = "druid";
+                this.heroAbility = this.cdb.getCardDataFromID("CS2_034");
                 anzEnemys = 0;
                 anzOwn = 0;
                 herofrozen = false;
@@ -482,18 +491,19 @@ namespace HREngine.Bots
 
             }
 
-            if (bfield == 5)
+            if (bfield == 6)
             {
-                // testing silence
 
-                Minion own1 = createNewMinion(cdb.getCardData("goblinleibwaechter"), 0); // wichtelmeisterin
+                Minion own1 = createNewMinion(cdb.getCardData("ruchloserunteroffizier"), 0); 
                 own1.Ready = true;
                 this.ownMinions.Add(own1);
 
-                own1 = createNewMinion(cdb.getCardData("goblinleibwaechter"), 0); // wichtelmeisterin
-                own1.Hp = 20;
-                this.enemyMinions.Add(own1);
+                own1 = createNewMinion(cdb.getCardData("messerjongleur"), 0);
+                this.ownMinions.Add(own1);
 
+                own1 = createNewMinion(cdb.getCardData("argentumkommandant"), 0);
+                own1.divineshild = false;
+                this.enemyMinions.Add(own1);
             }
 
             if(bfield ==10)

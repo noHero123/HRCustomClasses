@@ -398,6 +398,34 @@ namespace HREngine.Bots
             }
         }
 
+        public void autoTester(BotBase botbase)
+        {
+            help.logg("simulating board ");
+
+            BoardTester bt = new BoardTester();
+
+            //calculate the stuff
+            posmoves.Clear();
+            posmoves.Add(new Playfield());
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+            help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
+            help.logg("owncardscount " + posmoves[0].owncards.Count);
+
+            foreach (var item in this.posmoves[0].owncards)
+            {
+                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
+            }
+
+            doallmoves(true, botbase);
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+        }
+
     }
 
 

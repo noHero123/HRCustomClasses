@@ -24,6 +24,9 @@ namespace HREngine.Bots
           int retval = 0;
           retval += p.owncards.Count * 1;
 
+          retval += p.ownMaxMana;
+          retval -= p.enemyMaxMana;
+
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
@@ -73,7 +76,7 @@ namespace HREngine.Bots
 
           foreach (Minion m in p.enemyMinions)
           {
-              retval -= m.Hp;
+              retval -= m.Hp*2;
               if (!m.frozen)
               {
                   retval -= m.Angr * 2;

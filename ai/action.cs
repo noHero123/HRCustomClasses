@@ -2347,6 +2347,7 @@ namespace HREngine.Bots
             }
 
             if (logging) help.logg(".attck with" + m.name + " A " + m.Angr + " H " + m.Hp);
+            
             if (target == 200)//target is hero
             {
                 attackOrHealHero(m.Angr, false);
@@ -2367,10 +2368,11 @@ namespace HREngine.Bots
                 enemyOwn = false;
             }
 
-            
 
 
 
+            int ownAttack = m.Angr;
+            int enemyAttack = enemy.Angr;
             // defender take damage
             if (m.card.poisionous)
             {
@@ -2379,7 +2381,7 @@ namespace HREngine.Bots
             else
             {
                 int oldHP = enemy.Hp;
-                minionGetDamagedOrHealed(enemy, m.Angr, 0, enemyOwn);
+                minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
                 if (oldHP > enemy.Hp && m.name == "wasserelementar") enemy.frozen = true;
             }
 
@@ -2394,7 +2396,7 @@ namespace HREngine.Bots
                 else
                 {
                     int oldHP = m.Hp;
-                    minionGetDamagedOrHealed(m, enemy.Angr, 0, attackOwn);
+                    minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
                     if (oldHP > m.Hp && enemy.name == "wasserelementar") m.frozen = true;
                 }
             }

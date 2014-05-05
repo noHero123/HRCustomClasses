@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ai\BoardTester.cs" />
     <Compile Include="BasicBot.cs" />
     <Compile Include="BotBase.cs" />
     <Compile Include="BoardControl.cs" />

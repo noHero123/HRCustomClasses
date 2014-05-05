@@ -73,9 +73,21 @@ namespace HREngine.Bots
                   if (m.poisonous) retval -= 4;
                   retval -= m.card.rarity;
               }
+              else
+              {
+                  if (m.taunt)
+                  {
+                      retval -= m.Hp;
+                      retval -= m.Angr * 2;
+                      if (m.windfury) retval -= m.Angr;
+                      if (m.taunt) retval -= 5;
+                      if (m.divineshild) retval -= 1;
+                      if (m.frozen) retval += 1; // because its bad for enemy :D
+                      if (m.poisonous) retval -= 4;
+                      retval -= m.card.rarity;
+                  }
+              }
 
-
-              
               if (m.name == "schlachtzugsleiter") retval -= 50;
               if (m.name == "grimmschuppenorakel") retval -= 50;
               if (m.name == "terrorwolfalpha") retval -= 20;
@@ -89,7 +101,7 @@ namespace HREngine.Bots
               if (m.name == "winzigebeschwoererin") retval -= 30;
               if (m.name == "beschwoerungsportal") retval -= 50;
               if (m.name == "aasfressendehyaene") retval -= 50;
-              if (m.Angr >= 4) retval -= 50;
+              if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }
 
