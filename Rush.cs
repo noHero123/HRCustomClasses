@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-   public class Rushi : BotBase
+   public class Rushi : Bot
    {
       protected override HRCard GetMinionByPriority(HRCard lastMinion)
       {
@@ -46,6 +46,7 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
+              if (a.useability && a.card.name == "geringeheilung" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
               if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
               if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
@@ -88,6 +89,7 @@ namespace HREngine.Bots
                   }
               }
 
+              if (m.name == "flammenzungentotem") retval -= 5;
               if (m.name == "schlachtzugsleiter") retval -= 50;
               if (m.name == "grimmschuppenorakel") retval -= 50;
               if (m.name == "terrorwolfalpha") retval -= 20;

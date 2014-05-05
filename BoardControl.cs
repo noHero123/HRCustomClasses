@@ -8,7 +8,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-   public class BoardControli : BotBase
+   public class BoardControli : Bot
    {
       protected override API.HRCard GetMinionByPriority(HRCard lastMinion)
       {
@@ -53,10 +53,12 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
+              if (a.useability && a.card.name == "geringeheilung" && ( (a.enemytarget >= 10 && a.enemytarget <=20) || a.enemytarget==200)) retval -= 5;
               if (!a.cardplay) continue;
               if (a.card.name == "arkanegeschosse" && a.numEnemysBeforePlayed==0) retval -= 10; // arkane missles on enemy hero is bad :D
               if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
               if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              
               //save spell for mage:
               if ( p.ownHeroName == "mage" && a.card.type == CardDB.cardtype.SPELL && a.numEnemysBeforePlayed == 0) retval -= 11;
           }
@@ -88,7 +90,7 @@ namespace HREngine.Bots
               if (m.stealth) retval -= 1;
               
               if (m.poisonous) retval -= 4;
-
+              if (m.name == "flammenzungentotem") retval -= 5;
               if (m.name == "schlachtzugsleiter") retval -= 5;
               if (m.name == "grimmschuppenorakel") retval -= 5;
               if (m.name == "terrorwolfalpha") retval -= 2;

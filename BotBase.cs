@@ -16,13 +16,13 @@ namespace HREngine.Bots
 
 
 
-   public abstract class BotBase : API.IBot
+   public abstract class Bot : API.IBot
    {
        
        private int dirtytarget=-1;
        Silverfish sf;
 
-      public BotBase()
+      public Bot()
       {
           OnBattleStateUpdate = HandleOnBattleStateUpdate;
           OnMulliganStateUpdate = HandleBattleMulliganPhase;
@@ -93,12 +93,21 @@ namespace HREngine.Bots
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
                     Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                    if (moveTodo.card.type == CardDB.cardtype.MOB)
+                    {
+                        return new HREngine.API.Actions.PlayCardAction(cardtoplay, target, moveTodo.owntarget + 1);
+                    }
+                    
                     return new HREngine.API.Actions.PlayCardAction(cardtoplay,target);
 
                 }
                 else
                 {
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                    if (moveTodo.card.type == CardDB.cardtype.MOB)
+                    {
+                        return new HREngine.API.Actions.PlayCardAction(cardtoplay, null, moveTodo.owntarget + 1);
+                    }
                     return new HREngine.API.Actions.PlayCardAction(cardtoplay);
                 }
                 

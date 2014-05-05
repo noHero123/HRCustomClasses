@@ -7,9 +7,9 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-   public class Bot : IBot
+   public class BotBB : IBot
    {
-      public Bot()
+      public BotBB()
       {
          OnBattleStateUpdate = UpdateBattleState;
          OnMulliganStateUpdate = UpdateMulliganState;

@@ -516,6 +516,329 @@ namespace HREngine.Bots
 
         }
 
+        public int getBestPlace(CardDB.Card card)
+        {
+            if (card.type != CardDB.cardtype.MOB) return 0;
+            if (this.ownMinions.Count <= 1) return 0;
+
+            int[] places = new int[this.ownMinions.Count];
+            int i = 0;
+            int tempval = 0;
+            if (card.name == "sonnenzornbeschuetzerin" || card.name == "verteidigervonargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
+            {
+                i = 0;
+                foreach (Minion m in this.ownMinions)
+                {
+
+                    places[i] = 0;
+                    tempval = 0;
+                    if (!m.taunt)
+                    {
+                        tempval -= m.Hp;
+                    }
+                    else
+                    {
+                        tempval = 30;
+                    }
+
+                    if (m.name == "flammenzungentotem") tempval += 50;
+                    if (m.name == "schlachtzugsleiter") tempval += 30;
+                    if (m.name == "grimmschuppenorakel") tempval += 30;
+                    if (m.name == "terrorwolfalpha") tempval += 50;
+                    if (m.name == "murlocanfuehrer") tempval += 30;
+                    if (m.name == "suedmeerkapitaen") tempval += 30;
+                    if (m.name == "championvonsturmwind") tempval += 30;
+                    if (m.name == "waldwolf") tempval += 30;
+                    if (m.name == "leokk") tempval += 30;
+                    if (m.name == "klerikerinvonnordhain") tempval += 30;
+                    if (m.name == "zauberlehrling") tempval += 20;
+                    if (m.name == "winzigebeschwoererin") tempval += 10;
+                    if (m.name == "beschwoerungsportal") tempval += 20;
+                    if (m.name == "aasfressendehyaene") tempval += 20;
+
+                    places[i] = tempval;
+
+                    i++;
+                }
+
+
+                i = 0;
+                int bestpl = 7;
+                int bestval = 10000;
+                foreach (Minion m in this.ownMinions)
+                {
+                    int prev = 0;
+                    int next = 0;
+                    if (i >= 1) prev = places[i - 1];
+                    next = places[i];
+                    if(bestval > prev + next) 
+                    {
+                        bestval = prev + next;
+                        bestpl = i;
+                    }
+                    i++;
+                }
+                return bestpl;
+            }
+            // normal placement
+            int cardvalue = card.Attack * 2 + card.Health;
+            if (card.tank)
+            {
+                cardvalue += 5;
+                cardvalue += card.Health;
+            }
+
+            if (card.name == "flammenzungentotem") cardvalue += 50;
+            if (card.name == "schlachtzugsleiter") cardvalue += 10;
+            if (card.name == "grimmschuppenorakel") cardvalue += 10;
+            if (card.name == "terrorwolfalpha") cardvalue += 50;
+            if (card.name == "murlocanfuehrer") cardvalue += 10;
+            if (card.name == "suedmeerkapitaen") cardvalue += 10;
+            if (card.name == "championvonsturmwind") cardvalue += 10;
+            if (card.name == "waldwolf") cardvalue += 10;
+            if (card.name == "leokk") cardvalue += 10;
+            if (card.name == "cardvalue") cardvalue += 10;
+            if (card.name == "zauberlehrling") cardvalue += 10;
+            if (card.name == "winzigebeschwoererin") cardvalue += 10;
+            if (card.name == "beschwoerungsportal") cardvalue += 10;
+            if (card.name == "aasfressendehyaene") cardvalue += 10;
+
+
+            i = 0;
+            foreach(Minion m in this.ownMinions)
+            {
+                places[i] = 0;
+                tempval = m.Angr * 2 + m.maxHp;
+                if (m.taunt)
+                {
+                    tempval += 6;
+                    tempval += m.maxHp;
+                }
+
+                if (m.name == "flammenzungentotem") tempval += 50;
+                if (m.name == "schlachtzugsleiter") tempval += 10;
+                if (m.name == "grimmschuppenorakel") tempval += 10;
+                if (m.name == "terrorwolfalpha") tempval += 50;
+                if (m.name == "murlocanfuehrer") tempval += 10;
+                if (m.name == "suedmeerkapitaen") tempval += 10;
+                if (m.name == "championvonsturmwind") tempval += 10;
+                if (m.name == "waldwolf") tempval += 10;
+                if (m.name == "leokk") tempval += 10;
+                if (m.name == "klerikerinvonnordhain") tempval += 10;
+                if (m.name == "zauberlehrling") tempval += 10;
+                if (m.name == "winzigebeschwoererin") tempval += 10;
+                if (m.name == "beschwoerungsportal") tempval += 10;
+                if (m.name == "aasfressendehyaene") tempval += 10;
+
+                places[i] = tempval;
+
+                i++;
+            }
+
+            //bigminion if >=10
+            int bestplace = 0;
+            int bestvale = 0;
+            tempval=0;
+            i=0;
+            for (int j = 0; j <= this.ownMinions.Count; j++ )
+            {
+                int prev = cardvalue;
+                int next = cardvalue;
+                if (i >= 1) prev = places[i - 1];
+                if (i < this.ownMinions.Count) next = places[i];
+
+
+                if (cardvalue >= prev && cardvalue >= next)
+                {
+                    tempval = 2 * cardvalue - prev - next;
+                    if (tempval > bestvale)
+                    {
+                        bestplace = i;
+                        bestvale = tempval;
+                    }
+                }
+                if (cardvalue <= prev && cardvalue <= next)
+                {
+                    tempval = -2 * cardvalue + prev + next;
+                    if (tempval > bestvale)
+                    {
+                        bestplace = i ;
+                        bestvale = tempval;
+                    }
+                }
+
+                i++;
+            }
+
+            return bestplace;
+        }
+
+        public int getBestPlacePrint(CardDB.Card card)
+        {
+            if (card.type != CardDB.cardtype.MOB) return 0;
+            if (this.ownMinions.Count <= 1) return 0;
+
+            int[] places = new int[this.ownMinions.Count];
+            int i = 0;
+            int tempval = 0;
+            if (card.name == "sonnenzornbeschuetzerin" || card.name == "verteidigervonargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
+            {
+                i = 0;
+                foreach (Minion m in this.ownMinions)
+                {
+
+                    places[i] = 0;
+                    tempval = 0;
+                    if (!m.taunt)
+                    {
+                        tempval -= m.Hp;
+                    }
+                    else
+                    {
+                        tempval = 30;
+                    }
+
+                    if (m.name == "flammenzungentotem") tempval += 50;
+                    if (m.name == "schlachtzugsleiter") tempval += 30;
+                    if (m.name == "grimmschuppenorakel") tempval += 30;
+                    if (m.name == "terrorwolfalpha") tempval += 50;
+                    if (m.name == "murlocanfuehrer") tempval += 30;
+                    if (m.name == "suedmeerkapitaen") tempval += 30;
+                    if (m.name == "championvonsturmwind") tempval += 30;
+                    if (m.name == "waldwolf") tempval += 30;
+                    if (m.name == "leokk") tempval += 30;
+                    if (m.name == "klerikerinvonnordhain") tempval += 30;
+                    if (m.name == "zauberlehrling") tempval += 20;
+                    if (m.name == "winzigebeschwoererin") tempval += 10;
+                    if (m.name == "beschwoerungsportal") tempval += 20;
+                    if (m.name == "aasfressendehyaene") tempval += 20;
+
+                    places[i] = tempval;
+
+                    i++;
+                }
+
+
+                i = 0;
+                int bestpl = 7;
+                int bestval = 10000;
+                foreach (Minion m in this.ownMinions)
+                {
+                    help.logg(places[i]+"");
+                    int prev = 0;
+                    int next = 0;
+                    if (i >= 1) prev = places[i - 1];
+                    next = places[i];
+                    if (bestval > prev + next)
+                    {
+                        bestval = prev + next;
+                        bestpl = i ;
+                    }
+                    i++;
+                }
+                return bestpl;
+            }
+
+            // normal placement
+            int cardvalue = card.Attack * 2 + card.Health;
+            if (card.tank)
+            {
+                cardvalue += 5;
+                cardvalue += card.Health;
+            }
+
+            if (card.name == "flammenzungentotem") tempval += 50;
+            if (card.name == "schlachtzugsleiter") cardvalue += 10;
+            if (card.name == "grimmschuppenorakel") cardvalue += 10;
+            if (card.name == "terrorwolfalpha") cardvalue += 50;
+            if (card.name == "murlocanfuehrer") cardvalue += 10;
+            if (card.name == "suedmeerkapitaen") cardvalue += 10;
+            if (card.name == "championvonsturmwind") cardvalue += 10;
+            if (card.name == "waldwolf") cardvalue += 10;
+            if (card.name == "leokk") cardvalue += 10;
+            if (card.name == "cardvalue") cardvalue += 10;
+            if (card.name == "zauberlehrling") cardvalue += 10;
+            if (card.name == "winzigebeschwoererin") cardvalue += 10;
+            if (card.name == "beschwoerungsportal") cardvalue += 10;
+            if (card.name == "aasfressendehyaene") cardvalue += 10;
+
+
+            i = 0;
+            foreach (Minion m in this.ownMinions)
+            {
+                places[i] = 0;
+                tempval = m.Angr * 2 + m.maxHp;
+                if (m.taunt)
+                {
+                    tempval += 6;
+                    tempval += m.maxHp;
+                }
+
+                if (m.name == "flammenzungentotem") tempval += 50;
+                if (m.name == "schlachtzugsleiter") tempval += 10;
+                if (m.name == "grimmschuppenorakel") tempval += 10;
+                if (m.name == "terrorwolfalpha") tempval += 50;
+                if (m.name == "murlocanfuehrer") tempval += 10;
+                if (m.name == "suedmeerkapitaen") tempval += 10;
+                if (m.name == "championvonsturmwind") tempval += 10;
+                if (m.name == "waldwolf") tempval += 10;
+                if (m.name == "leokk") tempval += 10;
+                if (m.name == "klerikerinvonnordhain") tempval += 10;
+                if (m.name == "zauberlehrling") tempval += 10;
+                if (m.name == "winzigebeschwoererin") tempval += 10;
+                if (m.name == "beschwoerungsportal") tempval += 10;
+                if (m.name == "aasfressendehyaene") tempval += 10;
+
+                places[i] = tempval;
+                help.logg(places[i] + "");
+
+                i++;
+            }
+
+            //bigminion if >=10
+            int bestplace = 0;
+            int bestvale = 0;
+            tempval = 0;
+            i = 0;
+            help.logg(cardvalue + " (own)");
+            i = 0;
+            for (int j = 0; j <= this.ownMinions.Count; j++)
+            {
+                int prev = cardvalue;
+                int next = cardvalue;
+                if (i >= 1) prev = places[i - 1];
+                if (i < this.ownMinions.Count)
+                {
+                    next = places[i];
+                }
+
+
+                if (cardvalue >= prev && cardvalue >= next)
+                {
+                    tempval = 2 * cardvalue - prev - next;
+                    if (tempval > bestvale)
+                    {
+                        bestplace = i ;
+                        bestvale = tempval;
+                    }
+                }
+                if (cardvalue <= prev && cardvalue <= next)
+                {
+                    tempval = -2 * cardvalue + prev + next;
+                    if (tempval > bestvale)
+                    {
+                        bestplace = i;
+                        bestvale = tempval;
+                    }
+                }
+
+                i++;
+            }
+            help.logg(bestplace + " (best)");
+            return bestplace;
+        }
+
+
         public void endTurn()
         {
             this.complete = true;
@@ -3340,7 +3663,7 @@ namespace HREngine.Bots
 
         }
 
-        private Action placeAmobSomewhere(CardDB.Card c, int cardpos, int target, int choice)
+        private Action placeAmobSomewhere(CardDB.Card c, int cardpos, int target, int choice, int placepos)
         {
 
             Action a = new Action();
@@ -3349,10 +3672,7 @@ namespace HREngine.Bots
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
 
             //we place him on the right!
-            int mobplace = ownMinions.Count;
-            if (this.ownMinions.Count >= 1)
-            {
-            }
+            int mobplace = placepos;
 
 
             //create the minion out of the card + effects from other minions, which higher his hp/angr
@@ -5179,7 +5499,7 @@ namespace HREngine.Bots
 
         }
 
-        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice)
+        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos)
         {
             // lock at frostnova (click) / frostblitz (no click)
             this.mana = this.mana - c.getManaCost(this);
@@ -5196,8 +5516,9 @@ namespace HREngine.Bots
 
             if (c.type == CardDB.cardtype.MOB)
             {
-                Action b = this.placeAmobSomewhere(c, cardpos, target, choice);
+                Action b = this.placeAmobSomewhere(c, cardpos, target, choice,placepos);
                 b.druidchoice = choice;
+                b.owntarget = placepos;
                 b.enemyEntitiy = targetEntity;
                 b.cardEntitiy = cardEntity;
                 this.playactions.Add(b);
@@ -5344,6 +5665,7 @@ namespace HREngine.Bots
             this.mana -= 2;
             Action a = new Action();
             a.useability = true;
+            a.card = c;
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
@@ -5433,6 +5755,7 @@ namespace HREngine.Bots
             {
                 this.owncarddraw++;
                 drawACard("unknown");
+                this.attackOrHealHero(2, true);
             }
 
 

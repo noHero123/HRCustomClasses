@@ -74,7 +74,7 @@ namespace HREngine.Bots
             NextFixedAction = null;*/
         }
 
-        public void updateEverything(BotBase botbase)
+        public void updateEverything(Bot botbase)
         {
             
 

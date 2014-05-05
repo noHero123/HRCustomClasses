@@ -17,6 +17,7 @@ namespace HREngine.Bots
         Helpfunctions help = Helpfunctions.Instance;
 
         public Action bestmove = new Action();
+        public int bestmoveValue = 0;
 
         private static Ai instance;
 
@@ -73,14 +74,14 @@ namespace HREngine.Bots
 
 
 
-
+                    int bestplace = p.getBestPlace(c);
                     List<targett> trgts = c.getTargetsForCard(p);
 
                     if (trgts.Count == 0)
                     {
                         Playfield pf = new Playfield(p);
 
-                        pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i);
+                        pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace);
                         this.posmoves.Add(pf);
                     }
                     else
@@ -88,7 +89,7 @@ namespace HREngine.Bots
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
-                            pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i);
+                            pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace);
                             this.posmoves.Add(pf);
                         }
                     }
@@ -103,7 +104,7 @@ namespace HREngine.Bots
 
 
 
-        private void doallmoves(bool test, BotBase botBase)
+        private void doallmoves(bool test, Bot botBase)
         {
 
             bool havedonesomething = true;
@@ -112,6 +113,7 @@ namespace HREngine.Bots
             while (havedonesomething)
             {
                 help.logg("ailoop");
+                GC.Collect();
                 temp.Clear();
                 temp.AddRange(this.posmoves);
                 havedonesomething = false;
@@ -142,7 +144,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-
+                            int bestplace = p.getBestPlace(c);
                             if (c.canplayCard(p))
                             {
                                 havedonesomething = true;
@@ -151,7 +153,7 @@ namespace HREngine.Bots
                                 if (trgts.Count == 0)
                                 {
                                     Playfield pf = new Playfield(p);
-                                    pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0);
+                                    pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0,bestplace);
                                     this.posmoves.Add(pf);
                                 }
                                 else
@@ -159,7 +161,7 @@ namespace HREngine.Bots
                                     foreach (targett trgt in trgts)
                                     {
                                         Playfield pf = new Playfield(p);
-                                        pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0);
+                                        pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0,bestplace);
                                         this.posmoves.Add(pf);
                                     }
 
@@ -296,10 +298,18 @@ namespace HREngine.Bots
 
             bestplay.printActions();
             this.bestmove = bestplay.getNextAction();
+            this.bestmoveValue = bestval;
+            if (bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
+            {
+                Playfield pf = new Playfield();
+                help.logg("bestplaces:");
+                pf.getBestPlacePrint(bestmove.card);
+            }
+
         }
 
 
-        private void cuttingposibilities(BotBase botBase)
+        private void cuttingposibilities(Bot botBase)
         {
             // take the x best values
             int takenumber = this.maxwide;
@@ -313,7 +323,7 @@ namespace HREngine.Bots
 
 
 
-        public void dosomethingclever(BotBase botbase)
+        public void dosomethingclever(Bot botbase)
         {
             //return;
             //turncheck
@@ -336,7 +346,7 @@ namespace HREngine.Bots
 
         }
 
-        public void doBenchmark(BotBase botbase)
+        public void doBenchmark(Bot botbase)
         {
             help.logg("do benchmark, dont cry");
             //setup cards in hand
@@ -365,7 +375,7 @@ namespace HREngine.Bots
             doallmoves(true, botbase);
         }
 
-        public void simulatorTester(BotBase botbase)
+        public void simulatorTester(Bot botbase)
         {
             help.logg("simulating board ");
             //setup cards in hand
@@ -398,7 +408,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void autoTester(BotBase botbase)
+        public void autoTester(Bot botbase)
         {
             help.logg("simulating board ");
 
