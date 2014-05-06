@@ -22,6 +22,7 @@ namespace HREngine.Bots
        protected override int evaluatePlayfield(Playfield p)
       {
           int retval = 0;
+          retval -= p.evaluatePenality;
           retval += p.owncards.Count * 1;
 
           retval += p.ownMaxMana;
@@ -34,7 +35,17 @@ namespace HREngine.Bots
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
           retval += p.ownWeaponAttack; ;// +ownWeaponDurability;
-          retval -= p.enemyWeaponDurability;
+          if (!p.enemyHeroFrozen)
+          {
+              retval -= p.enemyWeaponDurability*p.enemyWeaponAttack;
+          }
+          else
+          {
+              if (p.enemyHeroName != "mage" && p.enemyHeroName != "priest")
+              {
+                  retval += 11;
+              }
+          }
 
           retval += p.owncarddraw * 5;
           retval -= p.enemycarddraw * 5;

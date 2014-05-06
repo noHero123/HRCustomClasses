@@ -85,6 +85,7 @@ namespace HREngine.Bots
     {
         public bool logging = false;
 
+        public int evaluatePenality = 0;
         public int ownController = 0;
 
         public int ownHeroEntity = -1;
@@ -198,7 +199,7 @@ namespace HREngine.Bots
             this.mana = Hrtprozis.Instance.currentMana;
             this.ownMaxMana = Hrtprozis.Instance.ownMaxMana;
             this.enemyMaxMana = Hrtprozis.Instance.enemyMaxMana;
-
+            this.evaluatePenality = 0;
             this.ownSecretsIDList = Hrtprozis.Instance.ownSecretList;
             this.enemySecretCount = Hrtprozis.Instance.enemySecretCount;
 
@@ -319,6 +320,7 @@ namespace HREngine.Bots
             this.ownHeroEntity = p.ownHeroEntity;
             this.enemyHeroEntity = p.enemyHeroEntity;
 
+            this.evaluatePenality = p.evaluatePenality;
 
             foreach(string s in p.ownSecretsIDList)
             { this.ownSecretsIDList.Add(s); }
@@ -1902,6 +1904,9 @@ namespace HREngine.Bots
                 {
                     CardDB.Card c = CardDB.Instance.getCardData("bainebluthuf");
                     callKid(c, m.id - 1, own);
+                    //penaltity for summon this thing :D (so we dont kill it only to have a new minion)
+                    this.evaluatePenality += 5;
+
 
                 }
 
@@ -4715,10 +4720,14 @@ namespace HREngine.Bots
                 int hp = 0;
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
-                    i++;
-                    hp += enemy.Hp;
-                    if (i == ammount) break;
+                    if (enemy.Hp >= 2)
+                    {
+                        minionGetDamagedOrHealed(enemy, damage, 0, false);
+                        i++;
+                        hp += enemy.Hp;
+                        if (i == ammount) break;
+                    }
+                    
                 }
                 if (i < ammount) attackOrHealHero(ammount - i, false);
 
