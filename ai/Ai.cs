@@ -299,7 +299,7 @@ namespace HREngine.Bots
             bestplay.printActions();
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
-            if (bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
+            if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
             {
                 Playfield pf = new Playfield();
                 help.logg("bestplaces:");
@@ -414,6 +414,10 @@ namespace HREngine.Bots
 
             BoardTester bt = new BoardTester();
 
+            hp.printHero();
+            hp.printOwnMinions();
+            hp.printEnemyMinions();
+            hm.printcards();
             //calculate the stuff
             posmoves.Clear();
             posmoves.Add(new Playfield());
@@ -429,7 +433,7 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
 
-            doallmoves(true, botbase);
+            doallmoves(false, botbase);
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();

@@ -58,9 +58,9 @@ namespace HREngine.Bots
               if (a.card.name == "arkanegeschosse" && a.numEnemysBeforePlayed==0) retval -= 10; // arkane missles on enemy hero is bad :D
               if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
               if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
-              
+              if (a.card.name == "heiligeslicht" && a.enemytarget == 200) retval -= 5;
               //save spell for mage:
-              if ( p.ownHeroName == "mage" && a.card.type == CardDB.cardtype.SPELL && a.numEnemysBeforePlayed == 0) retval -= 11;
+              if (p.ownHeroName == "mage" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
           }
 
 
