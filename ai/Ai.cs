@@ -44,7 +44,7 @@ namespace HREngine.Bots
             for (int i = 1; i < 3; i++)
             {
                 CardDB.Card c = card;
-                if (card.name == "sternenregen")
+                if (card.name == "starfall")
                 {
                     if (i == 1)
                     {
@@ -56,7 +56,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (card.name == "urtumderlehren")
+                if (card.name == "ancientoflore")
                 {
                     if (i == 1)
                     {

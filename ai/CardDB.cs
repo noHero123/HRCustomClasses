@@ -221,12 +221,12 @@ namespace HREngine.Bots
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == "feendrache" || m.name == "lachendeschwester")) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == "faeriedragon" || m.name == "laughingsister")) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == "feendrache" || m.name == "lachendeschwester")) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == "faeriedragon" || m.name == "laughingsister")) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -424,16 +424,16 @@ namespace HREngine.Bots
 
                 switch (this.name)
                 {
-                    case "schreckenskorsar":
+                    case "dreadcorsair":
                         retval = retval + offset - p.ownWeaponAttack + p.ownWeaponAttackStarted; // if weapon attack change we change manacost
                         break;
-                    case "meeresriese":
+                    case "seagiant":
                         retval = retval + offset - p.ownMinions.Count + p.ownMobsCountStarted;
                         break;
-                    case "bergriese":
+                    case "mountaingiant":
                         retval = retval + offset - p.owncards.Count + p.ownCardsCountStarted;
                         break;
-                    case "geschmolzenerriese":
+                    case "moltengiant":
                         retval = retval + offset - p.ownHeroHp + p.ownHeroHpStarted;
                         break;
                     default:
@@ -546,6 +546,7 @@ namespace HREngine.Bots
 
                     if (c.name != "")
                     {
+                        //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
                     }
 
@@ -630,26 +631,26 @@ namespace HREngine.Bots
                     continue;
                 }
 
-                if (s.Contains("<deDE>"))
+                if (s.Contains("<enUS>"))
                 {
-                    string temp = s.Replace("<deDE>", "");
+                    string temp = s.Replace("<enUS>", "");
 
-                    temp = temp.Replace("</deDE>", "");
+                    temp = temp.Replace("</enUS>", "");
                     temp = temp.Replace("&lt;", "");
                     temp = temp.Replace("b&gt;", "");
                     temp = temp.Replace("/b&gt;", "");
                     temp = temp.ToLower();
                     if (de == 0)
                     {
+                        temp = temp.Replace("'", "");
                         temp = temp.Replace(" ", "");
                         temp = temp.Replace(":", "");
                         temp = temp.Replace(".", "");
                         temp = temp.Replace("!", "");
-                        temp = temp.Replace("'", "");
-                        temp = temp.Replace("ß", "ss");
-                        temp = temp.Replace("ü", "ue");
-                        temp = temp.Replace("ä", "ae");
-                        temp = temp.Replace("ö", "oe");
+                        //temp = temp.Replace("ß", "ss");
+                        //temp = temp.Replace("ü", "ue");
+                        //temp = temp.Replace("ä", "ae");
+                        //temp = temp.Replace("ö", "oe");
 
                         //Helpfunctions.Instance.logg(temp);
                         c.name = temp;
@@ -657,7 +658,7 @@ namespace HREngine.Bots
                     if (de == 1)
                     {
                         c.description = temp;
-                        if (c.description.Contains("wählt aus"))
+                        if (c.description.Contains("choose one"))
                         {
                             c.choice = true;
                             //Helpfunctions.Instance.logg(c.name + " is choice");
@@ -770,13 +771,13 @@ namespace HREngine.Bots
                     int ti = Convert.ToInt32(temp);
                     if (ti == 1) c.Recall = true;
                     c.recallValue = 1;
-                    if (c.name == "gabelblitzschlag") c.recallValue = 2;
-                    if (c.name == "staubteufel") c.recallValue = 2;
-                    if (c.name == "gewittersturm") c.recallValue = 2;
-                    if (c.name == "lavaeruption") c.recallValue = 2;
-                    if (c.name == "wildgeist") c.recallValue = 2;
-                    if (c.name == "schicksalshammer") c.recallValue = 2;
-                    if (c.name == "erdelementar") c.recallValue = 3;
+                    if (c.name == "forkedlightning") c.recallValue = 2;
+                    if (c.name == "dustdevil") c.recallValue = 2;
+                    if (c.name == "lightningstorm") c.recallValue = 2;
+                    if (c.name == "lavaburst") c.recallValue = 2;
+                    if (c.name == "feralspirit") c.recallValue = 2;
+                    if (c.name == "doomhammer") c.recallValue = 2;
+                    if (c.name == "earthelemental") c.recallValue = 3;
                     continue;
                 }
 
@@ -859,7 +860,7 @@ namespace HREngine.Bots
                     int ti = Convert.ToInt32(temp);
                     if (ti == 1) c.Spellpower = true;
                     c.spellpowervalue = 1;
-                    if (c.name == "uraltermagier") c.spellpowervalue = 0;
+                    if (c.name == "ancientmage") c.spellpowervalue = 0;
                     if (c.name == "malygos") c.spellpowervalue = 5;
                     continue;
                 }

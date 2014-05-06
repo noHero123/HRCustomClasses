@@ -56,7 +56,7 @@ namespace HREngine.Bots
           {
               int anz = p.enemyMinions.Count;
               int owntaunt = p.ownMinions.FindAll(x => x.taunt == true).Count;
-              int froggs = p.ownMinions.FindAll(x => x.name == "frosch").Count;
+              int froggs = p.ownMinions.FindAll(x => x.name == "frog").Count;
               owntaunt -= froggs;
               if (owntaunt == 0) retval -= 10 * anz;
               retval += owntaunt * 10 - 11 * anz;
@@ -64,12 +64,11 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.card.name == "geringeheilung" && ( (a.enemytarget >= 10 && a.enemytarget <=20) || a.enemytarget==200)) retval -= 5;
+              if (a.useability && a.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.card.name == "arkanegeschosse" && a.numEnemysBeforePlayed==0) retval -= 10; // arkane missles on enemy hero is bad :D
-              if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
-              if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
-              if (a.card.name == "heiligeslicht" && a.enemytarget == 200) retval -= 5;
+              if (a.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
+              if (a.card.name == "execute") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
+              if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for mage:
               if (p.ownHeroName == "mage" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
           }
@@ -101,20 +100,22 @@ namespace HREngine.Bots
               if (m.stealth) retval -= 1;
               
               if (m.poisonous) retval -= 4;
-              if (m.name == "flammenzungentotem") retval -= 5;
-              if (m.name == "schlachtzugsleiter") retval -= 5;
-              if (m.name == "grimmschuppenorakel") retval -= 5;
-              if (m.name == "terrorwolfalpha") retval -= 2;
-              if (m.name == "murlocanfuehrer") retval -= 5;
-              if (m.name == "suedmeerkapitaen") retval -= 5;
-              if (m.name == "championvonsturmwind") retval -= 10;
-              if (m.name == "waldwolf") retval -= 5;
+              if (m.name == "prophetvelen") retval -= 5;
+              if (m.name == "archmageantonidas") retval -= 5;
+              if (m.name == "flametonguetotem") retval -= 5;
+              if (m.name == "raidleader") retval -= 5;
+              if (m.name == "grimscaleoracle") retval -= 5;
+              if (m.name == "direwolfalpha") retval -= 2;
+              if (m.name == "murlocwarleader") retval -= 5;
+              if (m.name == "southseacaptain") retval -= 5;
+              if (m.name == "stormwindchampion") retval -= 10;
+              if (m.name == "timberwolf") retval -= 5;
               if (m.name == "leokk") retval -= 5;
-              if (m.name == "klerikerinvonnordhain") retval -= 5;
-              if (m.name == "zauberlehrling") retval -= 3;
-              if (m.name == "beschwoerungsportal") retval -= 5;
-              if (m.name == "winzigebeschwoererin") retval -= 3;
-              if (m.name == "aasfressendehyaene") retval -= 20;
+              if (m.name == "northshirecleric") retval -= 5;
+              if (m.name == "sorcerersapprentice") retval -= 3;
+              if (m.name == "summoningportal") retval -= 5;
+              if (m.name == "pint-sizedsummoner") retval -= 3;
+              if (m.name == "scavenginghyena") retval -= 20;
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }

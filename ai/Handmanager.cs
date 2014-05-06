@@ -292,7 +292,7 @@ namespace HREngine.Bots
                 this.handCards.Clear();
                 Handcard hc1 = new Handcard();
                 hc1.position = 1;
-                hc1.card = cdb.getCardData("eisenschnabeleule");
+                hc1.card = cdb.getCardData("ironbeakowl");
                 this.handCards.Add(hc1);
 
                 /*hc1 = new Handcard();
@@ -308,7 +308,7 @@ namespace HREngine.Bots
                 this.handCards.Clear();
                 Handcard hc1 = new Handcard();
                 hc1.position = 1;
-                hc1.card = cdb.getCardData("azurblauerdrache");
+                hc1.card = cdb.getCardData("azuredrake");
                 this.handCards.Add(hc1);
 
                 hc1 = new Handcard();
@@ -318,7 +318,7 @@ namespace HREngine.Bots
 
                 hc1 = new Handcard();
                 hc1.position = 3;
-                hc1.card = cdb.getCardData("flammenstoss");
+                hc1.card = cdb.getCardData("flamestrike");
                 this.handCards.Add(hc1);
 
             }

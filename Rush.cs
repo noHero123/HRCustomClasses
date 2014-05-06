@@ -57,10 +57,10 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.card.name == "geringeheilung" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.card.name == "hinrichten") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
-              if (a.card.name == "flammenstoss" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.card.name == "execute") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
+              if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
 
           foreach (Minion m in p.ownMinions)
@@ -100,20 +100,22 @@ namespace HREngine.Bots
                   }
               }
 
-              if (m.name == "flammenzungentotem") retval -= 5;
-              if (m.name == "schlachtzugsleiter") retval -= 50;
-              if (m.name == "grimmschuppenorakel") retval -= 50;
-              if (m.name == "terrorwolfalpha") retval -= 20;
-              if (m.name == "murlocanfuehrer") retval -= 50;
-              if (m.name == "suedmeerkapitaen") retval -= 50;
-              if (m.name == "championvonsturmwind") retval -= 100;
-              if (m.name == "waldwolf") retval -= 50;
+              if (m.name == "prophetvelen") retval -= 50;
+              if (m.name == "archmageantonidas") retval -= 50;
+              if (m.name == "flametonguetotem") retval -= 50;
+              if (m.name == "raidleader") retval -= 50;
+              if (m.name == "grimscaleoracle") retval -= 50;
+              if (m.name == "direwolfalpha") retval -= 20;
+              if (m.name == "murlocwarleader") retval -= 50;
+              if (m.name == "southseacaptain") retval -= 50;
+              if (m.name == "stormwindchampion") retval -= 50;
+              if (m.name == "timberwolf") retval -= 50;
               if (m.name == "leokk") retval -= 50;
-              if (m.name == "klerikerinvonnordhain") retval -= 50;
-              if (m.name == "zauberlehrling") retval -= 30;
-              if (m.name == "winzigebeschwoererin") retval -= 30;
-              if (m.name == "beschwoerungsportal") retval -= 50;
-              if (m.name == "aasfressendehyaene") retval -= 50;
+              if (m.name == "northshirecleric") retval -= 50;
+              if (m.name == "sorcerersapprentice") retval -= 30;
+              if (m.name == "summoningportal") retval -= 50;
+              if (m.name == "pint-sizedsummoner") retval -= 30;
+              if (m.name == "scavenginghyena") retval -= 50;
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }

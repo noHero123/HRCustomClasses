@@ -267,29 +267,29 @@ namespace HREngine.Bots
 
                 if (m.name == "prophetvelen") this.doublepriest++;
                 spellpower = spellpower + m.card.spellpowervalue;
-                if (m.name == "auchenaisoulpriest") this.auchenaiseelenpriesterin = true;
+                if (m.name == "auchenaiseelenpriesterin") this.auchenaiseelenpriesterin = true;
 
-                if (m.name == "pint-sizedsummoner")
+                if (m.name == "winzigebeschwoererin")
                 {
                     this.winzigebeschwoererin++;
                     this.startedWithWinzigebeschwoererin++;
                 }
-                if (m.name == "sorcerersapprentice")
+                if (m.name == "zauberlehrling")
                 {
                     this.zauberlehrling++;
                     this.startedWithZauberlehrling++;
                 }
-                if (m.name == "manawraith")
+                if (m.name == "managespenst")
                 {
                     this.managespenst++;
                     this.startedWithManagespenst++;
                 }
-                if (m.name == "venturecomercenary")
+                if (m.name == "soeldnerderventureco")
                 {
                     this.soeldnerDerVenture++;
                     this.startedWithsoeldnerDerVenture++;
                 }
-                if (m.name == "summoningportal")
+                if (m.name == "beschwoerungsportal")
                 {
                     this.beschwoerungsportal++;
                     this.startedWithbeschwoerungsportal++;
@@ -304,7 +304,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.silenced) continue;
-                if (m.name == "manawraith")
+                if (m.name == "managespenst")
                 {
                     this.managespenst++;
                     this.startedWithManagespenst++;
@@ -393,13 +393,13 @@ namespace HREngine.Bots
                 if (m.silenced) continue;
                 if (m.name == "prophetvelen") this.doublepriest++;
                 spellpower = spellpower + m.card.spellpowervalue;
-                if (m.name == "auchenaisoulpriest") this.auchenaiseelenpriesterin = true;
+                if (m.name == "auchenaiseelenpriesterin") this.auchenaiseelenpriesterin = true;
 
-                if (m.name == "pint-sizedsummoner") this.winzigebeschwoererin++;
-                if (m.name == "sorcerersapprentice") this.zauberlehrling++;
-                if (m.name == "manawraith") this.managespenst++;
-                if (m.name == "venturecomercenary") this.soeldnerDerVenture++;
-                if (m.name == "summoningportal") this.beschwoerungsportal++;
+                if (m.name == "winzigebeschwoererin") this.winzigebeschwoererin++;
+                if (m.name == "zauberlehrling") this.zauberlehrling++;
+                if (m.name == "managespenst") this.managespenst++;
+                if (m.name == "soeldnerderventureco") this.soeldnerDerVenture++;
+                if (m.name == "beschwoerungsportal") this.beschwoerungsportal++;
 
 
             }
@@ -407,7 +407,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.silenced) continue;
-                if (m.name == "manawraith") this.managespenst++;
+                if (m.name == "managespenst") this.managespenst++;
             }
 
         }
@@ -436,7 +436,7 @@ namespace HREngine.Bots
             {
                 int anz = enemyMinions.Count;
                 int owntaunt = ownMinions.FindAll(x => x.taunt == true).Count;
-                int froggs = ownMinions.FindAll(x => x.name == "frog").Count;
+                int froggs = ownMinions.FindAll(x => x.name == "frosch").Count;
                 owntaunt -= froggs;
                 if (owntaunt == 0) retval -= 10 * anz;
                 retval += owntaunt * 10 - 11 * anz;
@@ -467,17 +467,17 @@ namespace HREngine.Bots
 
                 if (m.windfury) retval -= m.Angr;
                 if (m.taunt) retval -= 5;
-                if (m.name == "raidleader") retval -= 5;
-                if (m.name == "grimscaleoracle") retval -= 5;
-                if (m.name == "direwolfalpha") retval -= 2;
-                if (m.name == "murlocwarleader") retval -= 5;
-                if (m.name == "southseacaptain") retval -= 5;
-                if (m.name == "stormwindchampion") retval -= 10;
-                if (m.name == "timberwolf") retval -= 5;
+                if (m.name == "schlachtzugsleiter") retval -= 5;
+                if (m.name == "grimmschuppenorakel") retval -= 5;
+                if (m.name == "terrorwolfalpha") retval -= 2;
+                if (m.name == "murlocanfuehrer") retval -= 5;
+                if (m.name == "suedmeerkapitaen") retval -= 5;
+                if (m.name == "championvonsturmwind") retval -= 10;
+                if (m.name == "waldwolf") retval -= 5;
                 if (m.name == "leokk") retval -= 5;
-                if (m.name == "northshirecleric") retval -= 5;
-                if (m.name == "sorcerersapprentice") retval -= 3;
-                if (m.name == "pint-sizedsummoner") retval -= 3;
+                if (m.name == "klerikerinvonnordhain") retval -= 5;
+                if (m.name == "zauberlehrling") retval -= 3;
+                if (m.name == "winzigebeschwoererin") retval -= 3;
             }
 
             retval -= lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
@@ -526,7 +526,7 @@ namespace HREngine.Bots
             int[] places = new int[this.ownMinions.Count];
             int i = 0;
             int tempval = 0;
-            if (card.name == "sunfuryprotector" || card.name == "defenderofargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
+            if (card.name == "sonnenzornbeschuetzerin" || card.name == "verteidigervonargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
             {
                 i = 0;
                 foreach (Minion m in this.ownMinions)
@@ -543,20 +543,20 @@ namespace HREngine.Bots
                         tempval = 30;
                     }
 
-                    if (m.name == "flametonguetotem") tempval += 50;
-                    if (m.name == "raidleader") tempval += 10;
-                    if (m.name == "grimscaleoracle") tempval += 10;
-                    if (m.name == "direwolfalpha") tempval += 50;
-                    if (m.name == "murlocwarleader") tempval += 10;
-                    if (m.name == "southseacaptain") tempval += 10;
-                    if (m.name == "stormwindchampion") tempval += 10;
-                    if (m.name == "timberwolf") tempval += 10;
-                    if (m.name == "leokk") tempval += 10;
-                    if (m.name == "northshirecleric") tempval += 10;
-                    if (m.name == "sorcerersapprentice") tempval += 10;
-                    if (m.name == "pint-sizedsummoner") tempval += 10;
-                    if (m.name == "summoningportal") tempval += 10;
-                    if (m.name == "scavenginghyena") tempval += 10;
+                    if (m.name == "flammenzungentotem") tempval += 50;
+                    if (m.name == "schlachtzugsleiter") tempval += 30;
+                    if (m.name == "grimmschuppenorakel") tempval += 30;
+                    if (m.name == "terrorwolfalpha") tempval += 50;
+                    if (m.name == "murlocanfuehrer") tempval += 30;
+                    if (m.name == "suedmeerkapitaen") tempval += 30;
+                    if (m.name == "championvonsturmwind") tempval += 30;
+                    if (m.name == "waldwolf") tempval += 30;
+                    if (m.name == "leokk") tempval += 30;
+                    if (m.name == "klerikerinvonnordhain") tempval += 30;
+                    if (m.name == "zauberlehrling") tempval += 20;
+                    if (m.name == "winzigebeschwoererin") tempval += 10;
+                    if (m.name == "beschwoerungsportal") tempval += 20;
+                    if (m.name == "aasfressendehyaene") tempval += 20;
 
                     places[i] = tempval;
 
@@ -590,20 +590,20 @@ namespace HREngine.Bots
                 cardvalue += card.Health;
             }
 
-            if (card.name == "flametonguetotem") tempval += 50;
-            if (card.name == "raidleader") tempval += 10;
-            if (card.name == "grimscaleoracle") tempval += 10;
-            if (card.name == "direwolfalpha") tempval += 50;
-            if (card.name == "murlocwarleader") tempval += 10;
-            if (card.name == "southseacaptain") tempval += 10;
-            if (card.name == "stormwindchampion") tempval += 10;
-            if (card.name == "timberwolf") tempval += 10;
-            if (card.name == "leokk") tempval += 10;
-            if (card.name == "northshirecleric") tempval += 10;
-            if (card.name == "sorcerersapprentice") tempval += 10;
-            if (card.name == "pint-sizedsummoner") tempval += 10;
-            if (card.name == "summoningportal") tempval += 10;
-            if (card.name == "scavenginghyena") tempval += 10;
+            if (card.name == "flammenzungentotem") cardvalue += 50;
+            if (card.name == "schlachtzugsleiter") cardvalue += 10;
+            if (card.name == "grimmschuppenorakel") cardvalue += 10;
+            if (card.name == "terrorwolfalpha") cardvalue += 50;
+            if (card.name == "murlocanfuehrer") cardvalue += 10;
+            if (card.name == "suedmeerkapitaen") cardvalue += 10;
+            if (card.name == "championvonsturmwind") cardvalue += 10;
+            if (card.name == "waldwolf") cardvalue += 10;
+            if (card.name == "leokk") cardvalue += 10;
+            if (card.name == "cardvalue") cardvalue += 10;
+            if (card.name == "zauberlehrling") cardvalue += 10;
+            if (card.name == "winzigebeschwoererin") cardvalue += 10;
+            if (card.name == "beschwoerungsportal") cardvalue += 10;
+            if (card.name == "aasfressendehyaene") cardvalue += 10;
 
 
             i = 0;
@@ -617,20 +617,20 @@ namespace HREngine.Bots
                     tempval += m.maxHp;
                 }
 
-                if (m.name == "flametonguetotem") tempval += 50;
-                if (m.name == "raidleader") tempval += 10;
-                if (m.name == "grimscaleoracle") tempval += 10;
-                if (m.name == "direwolfalpha") tempval += 50;
-                if (m.name == "murlocwarleader") tempval += 10;
-                if (m.name == "southseacaptain") tempval += 10;
-                if (m.name == "stormwindchampion") tempval += 10;
-                if (m.name == "timberwolf") tempval += 10;
+                if (m.name == "flammenzungentotem") tempval += 50;
+                if (m.name == "schlachtzugsleiter") tempval += 10;
+                if (m.name == "grimmschuppenorakel") tempval += 10;
+                if (m.name == "terrorwolfalpha") tempval += 50;
+                if (m.name == "murlocanfuehrer") tempval += 10;
+                if (m.name == "suedmeerkapitaen") tempval += 10;
+                if (m.name == "championvonsturmwind") tempval += 10;
+                if (m.name == "waldwolf") tempval += 10;
                 if (m.name == "leokk") tempval += 10;
-                if (m.name == "northshirecleric") tempval += 10;
-                if (m.name == "sorcerersapprentice") tempval += 10;
-                if (m.name == "pint-sizedsummoner") tempval += 10;
-                if (m.name == "summoningportal") tempval += 10;
-                if (m.name == "scavenginghyena") tempval += 10;
+                if (m.name == "klerikerinvonnordhain") tempval += 10;
+                if (m.name == "zauberlehrling") tempval += 10;
+                if (m.name == "winzigebeschwoererin") tempval += 10;
+                if (m.name == "beschwoerungsportal") tempval += 10;
+                if (m.name == "aasfressendehyaene") tempval += 10;
 
                 places[i] = tempval;
 
@@ -683,7 +683,7 @@ namespace HREngine.Bots
             int[] places = new int[this.ownMinions.Count];
             int i = 0;
             int tempval = 0;
-            if (card.name == "sunfuryprotector" || card.name == "defenderofargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
+            if (card.name == "sonnenzornbeschuetzerin" || card.name == "verteidigervonargus") // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
             {
                 i = 0;
                 foreach (Minion m in this.ownMinions)
@@ -700,20 +700,20 @@ namespace HREngine.Bots
                         tempval = 30;
                     }
 
-                    if (m.name == "flametonguetotem") tempval += 50;
-                    if (m.name == "raidleader") tempval += 10;
-                    if (m.name == "grimscaleoracle") tempval += 10;
-                    if (m.name == "direwolfalpha") tempval += 50;
-                    if (m.name == "murlocwarleader") tempval += 10;
-                    if (m.name == "southseacaptain") tempval += 10;
-                    if (m.name == "stormwindchampion") tempval += 10;
-                    if (m.name == "timberwolf") tempval += 10;
-                    if (m.name == "leokk") tempval += 10;
-                    if (m.name == "northshirecleric") tempval += 10;
-                    if (m.name == "sorcerersapprentice") tempval += 10;
-                    if (m.name == "pint-sizedsummoner") tempval += 10;
-                    if (m.name == "summoningportal") tempval += 10;
-                    if (m.name == "scavenginghyena") tempval += 10;
+                    if (m.name == "flammenzungentotem") tempval += 50;
+                    if (m.name == "schlachtzugsleiter") tempval += 30;
+                    if (m.name == "grimmschuppenorakel") tempval += 30;
+                    if (m.name == "terrorwolfalpha") tempval += 50;
+                    if (m.name == "murlocanfuehrer") tempval += 30;
+                    if (m.name == "suedmeerkapitaen") tempval += 30;
+                    if (m.name == "championvonsturmwind") tempval += 30;
+                    if (m.name == "waldwolf") tempval += 30;
+                    if (m.name == "leokk") tempval += 30;
+                    if (m.name == "klerikerinvonnordhain") tempval += 30;
+                    if (m.name == "zauberlehrling") tempval += 20;
+                    if (m.name == "winzigebeschwoererin") tempval += 10;
+                    if (m.name == "beschwoerungsportal") tempval += 20;
+                    if (m.name == "aasfressendehyaene") tempval += 20;
 
                     places[i] = tempval;
 
@@ -749,20 +749,20 @@ namespace HREngine.Bots
                 cardvalue += card.Health;
             }
 
-            if (card.name == "flametonguetotem") tempval += 50;
-            if (card.name == "raidleader") tempval += 10;
-            if (card.name == "grimscaleoracle") tempval += 10;
-            if (card.name == "direwolfalpha") tempval += 50;
-            if (card.name == "murlocwarleader") tempval += 10;
-            if (card.name == "southseacaptain") tempval += 10;
-            if (card.name == "stormwindchampion") tempval += 10;
-            if (card.name == "timberwolf") tempval += 10;
-            if (card.name == "leokk") tempval += 10;
-            if (card.name == "northshirecleric") tempval += 10;
-            if (card.name == "sorcerersapprentice") tempval += 10;
-            if (card.name == "pint-sizedsummoner") tempval += 10;
-            if (card.name == "summoningportal") tempval += 10;
-            if (card.name == "scavenginghyena") tempval += 10;
+            if (card.name == "flammenzungentotem") tempval += 50;
+            if (card.name == "schlachtzugsleiter") cardvalue += 10;
+            if (card.name == "grimmschuppenorakel") cardvalue += 10;
+            if (card.name == "terrorwolfalpha") cardvalue += 50;
+            if (card.name == "murlocanfuehrer") cardvalue += 10;
+            if (card.name == "suedmeerkapitaen") cardvalue += 10;
+            if (card.name == "championvonsturmwind") cardvalue += 10;
+            if (card.name == "waldwolf") cardvalue += 10;
+            if (card.name == "leokk") cardvalue += 10;
+            if (card.name == "cardvalue") cardvalue += 10;
+            if (card.name == "zauberlehrling") cardvalue += 10;
+            if (card.name == "winzigebeschwoererin") cardvalue += 10;
+            if (card.name == "beschwoerungsportal") cardvalue += 10;
+            if (card.name == "aasfressendehyaene") cardvalue += 10;
 
 
             i = 0;
@@ -776,20 +776,20 @@ namespace HREngine.Bots
                     tempval += m.maxHp;
                 }
 
-                if (m.name == "flametonguetotem") tempval += 50;
-                if (m.name == "raidleader") tempval += 10;
-                if (m.name == "grimscaleoracle") tempval += 10;
-                if (m.name == "direwolfalpha") tempval += 50;
-                if (m.name == "murlocwarleader") tempval += 10;
-                if (m.name == "southseacaptain") tempval += 10;
-                if (m.name == "stormwindchampion") tempval += 10;
-                if (m.name == "timberwolf") tempval += 10;
+                if (m.name == "flammenzungentotem") tempval += 50;
+                if (m.name == "schlachtzugsleiter") tempval += 10;
+                if (m.name == "grimmschuppenorakel") tempval += 10;
+                if (m.name == "terrorwolfalpha") tempval += 50;
+                if (m.name == "murlocanfuehrer") tempval += 10;
+                if (m.name == "suedmeerkapitaen") tempval += 10;
+                if (m.name == "championvonsturmwind") tempval += 10;
+                if (m.name == "waldwolf") tempval += 10;
                 if (m.name == "leokk") tempval += 10;
-                if (m.name == "northshirecleric") tempval += 10;
-                if (m.name == "sorcerersapprentice") tempval += 10;
-                if (m.name == "pint-sizedsummoner") tempval += 10;
-                if (m.name == "summoningportal") tempval += 10;
-                if (m.name == "scavenginghyena") tempval += 10;
+                if (m.name == "klerikerinvonnordhain") tempval += 10;
+                if (m.name == "zauberlehrling") tempval += 10;
+                if (m.name == "winzigebeschwoererin") tempval += 10;
+                if (m.name == "beschwoerungsportal") tempval += 10;
+                if (m.name == "aasfressendehyaene") tempval += 10;
 
                 places[i] = tempval;
                 help.logg(places[i] + "");
@@ -890,7 +890,7 @@ namespace HREngine.Bots
 
                     //call 3 snakes (if possible)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardData("schlange");
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
@@ -956,7 +956,7 @@ namespace HREngine.Bots
                 {
                     //summon snake ( a weak minion)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardData("schlange");
                     callKid(kid, posi, true);
                 }
                 if (secretID == "tt_010") //spellbender
@@ -1134,7 +1134,7 @@ namespace HREngine.Bots
 
                 }
 
-                if (m.name == "bloodimp" || m.name == "youngpriestess") // buff a minion
+                if (m.name == "blutwichtel" || m.name == "jungepriesterin") // buff a minion
                 {
                     List<Minion> temp2 = new List<Minion>(ownmins);
                     temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//buff the weakest
@@ -1144,7 +1144,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "masterswordsmith") // buff a minion
+                if (m.name == "meisterschwertschmied") // buff a minion
                 {
                     List<Minion> temp2 = new List<Minion>(ownmins);
                     temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));//buff the weakest
@@ -1154,7 +1154,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "emboldener3000") // buff a minion
+                if (m.name == "kraftverstaerker3000") // buff a minion
                 {
                     List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                     temp2.Sort((a, b) => -a.Angr.CompareTo(b.Angr));//buff the strongest enemy
@@ -1169,7 +1169,7 @@ namespace HREngine.Bots
                     minionGetBuffed(m, 1, 1, own);
                 }
 
-                if (m.name == "etherealarcanist") // gain +2/+2
+                if (m.name == "astralerarkanist") // gain +2/+2
                 {
                     if (own && this.ownSecretsIDList.Count>=1)
                     {
@@ -1180,9 +1180,9 @@ namespace HREngine.Bots
                         minionGetBuffed(m, 2, 2, own);
                     }
                 }
+                
 
-
-                if (m.name == "manatidetotem") // draw card
+                if (m.name == "manafluttotem") // draw card
                 {
                     if (own)
                     {
@@ -1195,7 +1195,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "healingtotem") // heal
+                if (m.name == "heiltotem") // heal
                 {
                     List<Minion> temp2 = new List<Minion>(ownmins);
                     foreach (Minion mins in temp2)
@@ -1211,13 +1211,13 @@ namespace HREngine.Bots
                     callKid(kid, posi, own);
                 }
 
-                if (m.name == "impmaster") // damage itself and summon 
+                if (m.name == "wichtelmeisterin") // damage itself and summon 
                 {
                     int posi = m.id;
                     if (m.Hp == 1) posi--;
                     minionGetDamagedOrHealed(m, 1, 0, own);
 
-                    CardDB.Card kid = CardDB.Instance.getCardData("imp");
+                    CardDB.Card kid = CardDB.Instance.getCardData("wichtel");
                     callKid(kid, posi, own);
                 }
 
@@ -1234,7 +1234,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "ragnarosthefirelord") // summon
+                if (m.name == "ragnarosderfeuerfuerst") // summon
                 {
                     if (this.enemyMinions.Count >= 1)
                     {
@@ -1252,7 +1252,7 @@ namespace HREngine.Bots
                 }
 
 
-                if (m.name == "repairbot") // heal damaged char
+                if (m.name == "reparaturbot") // heal damaged char
                 {
 
                     attackOrHealHero(-6, false);
@@ -1267,7 +1267,7 @@ namespace HREngine.Bots
                     if (own)
                     {
                         this.owncarddraw++;
-                        this.drawACard("yseraawakens");
+                        this.drawACard("yseraerwacht");
                     }
                     else
                     {
@@ -1300,7 +1300,7 @@ namespace HREngine.Bots
             foreach (Minion m in temp)
             {
                 if (m.silenced) continue;
-                if (m.name == "demolisher") // deal 2 dmg
+                if (m.name == "verwuester") // deal 2 dmg
                 {
                     List<Minion> temp2 = new List<Minion>(enemymins);
                     foreach (Minion mins in temp2)
@@ -1309,12 +1309,12 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "doomsayer") // destroy
+                if (m.name == "untergangsverkuender") // destroy
                 {
                     untergang = true;
                 }
 
-                if (m.name == "homingchicken") // ok
+                if (m.name == "zielsuchendeshuhn") // ok
                 {
                     minionGetDestroyed(m, own);
                     if (own)
@@ -1330,7 +1330,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "lightwell") // heal
+                if (m.name == "lichtbrunnen") // heal
                 {
                     if (ownmins.Count >= 1)
                     {
@@ -1354,7 +1354,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "poultryizer") // 
+                if (m.name == "gefluegelisierer") // 
                 {
                     if (this.ownMinions.Count >= 1)
                     {
@@ -1680,33 +1680,33 @@ namespace HREngine.Bots
 
         private void endEffectsDueToDeath(Minion m, bool own)
         { // minion which grants effect died
-            if (m.name == "raidleader") // if he dies, lower attack of all minions of his side
+            if (m.name == "schlachtzugsleiter") // if he dies, lower attack of all minions of his side
             {
                 deleteEffectOf("CS2_122e", m.entitiyID);
             }
 
-            if (m.name == "grimscaleoracle")
+            if (m.name == "grimmschuppenorakel")
             {
                 deleteEffectOf("EX1_508o", m.entitiyID);
             }
 
-            if (m.name == "direwolfalpha")
+            if (m.name == "terrorwolfalpha")
             {
                 deleteEffectOf("EX1_162o", m.entitiyID);
             }
-            if (m.name == "murlocwarleader")
+            if (m.name == "murlocanfuehrer")
             {
                 deleteEffectOf("EX1_507e", m.entitiyID);
             }
-            if (m.name == "southseacaptain")
+            if (m.name == "suedmeerkapitaen")
             {
                 deleteEffectOf("NEW1_027e", m.entitiyID);
             }
-            if (m.name == "stormwindchampion")
+            if (m.name == "championvonsturmwind")
             {
                 deleteEffectOf("CS2_222o", m.entitiyID);
             }
-            if (m.name == "timberwolf")
+            if (m.name == "waldwolf")
             {
                 deleteEffectOf("DS1_175o", m.entitiyID);
             }
@@ -1719,21 +1719,21 @@ namespace HREngine.Bots
 
             foreach (Minion mnn in this.ownMinions)
             {
-                if (mnn.name == "oldmurk-eye" && m.card.race == 14)
+                if (mnn.name == "truebaugederalte" && m.card.race == 14)
                 {
                     minionGetBuffed(mnn, -1, 0, true);
                 }
             }
             foreach (Minion mnn in this.enemyMinions)
             {
-                if (mnn.name == "oldmurk-eye" && m.card.race == 14)
+                if (mnn.name == "truebaugederalte" && m.card.race == 14)
                 {
                     minionGetBuffed(mnn, -1, 0, false);
                 }
             }
 
             //no deathrattle, but lowering the weapon
-            if (m.name == "spitefulsmith" && m.wounded)// remove weapon changes form hasserfuelleschmiedin
+            if (m.name == "hasserfuellteschmiedin" && m.wounded)// remove weapon changes form hasserfuelleschmiedin
             {
                 if (own && this.ownWeaponDurability >= 1)
                 {
@@ -1758,7 +1758,7 @@ namespace HREngine.Bots
             }
             int ownanz = temp.Count;
 
-            if (own && isSummon && this.ownWeaponName == "swordofjustice")
+            if (own && isSummon && this.ownWeaponName == "schwertdergerechtigkeit")
             {
                 minionGetBuffed(m, 1, 1, own);
                 this.lowerWeaponDurability(1, true);
@@ -1768,12 +1768,12 @@ namespace HREngine.Bots
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (isSummon && ownm.name == "warsongcommander")
+                if (isSummon && ownm.name == "kriegshymnenanfuehrerin")
                 {
                     havekriegshymnenanfuehrerin = true;
                 }
 
-                if (ownm.name == "raidleader")
+                if (ownm.name == "schlachtzugsleiter")
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_122e");
                     e.creator = ownm.entitiyID;
@@ -1789,35 +1789,35 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.name == "stormwindchampion")
+                if (ownm.name == "championvonsturmwind")
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_222o");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimmschuppenorakel" && m.card.race == 14)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "murlocwarleader" && m.card.race == 14)
+                if (ownm.name == "murlocanfuehrer" && m.card.race == 14)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "southseacaptain" && m.card.race == 23)
+                if (ownm.name == "suedmeerkapitaen" && m.card.race == 23)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_027e");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "direwolfalpha")
+                if (ownm.name == "terrorwolfalpha")
                 {
                     if (ownm.id == placeOfNewMob + 1 || ownm.id == placeOfNewMob - 1)
                     {
@@ -1827,7 +1827,7 @@ namespace HREngine.Bots
                         addEffectToMinionNoDoubles(m, e, own);
                     }
                 }
-                if (ownm.name == "flametonguetotem")
+                if (ownm.name == "flammenzungentotem")
                 {
                     if (ownm.id == placeOfNewMob + 1 || ownm.id == placeOfNewMob - 1)
                     {
@@ -1839,7 +1839,7 @@ namespace HREngine.Bots
 
                 }
 
-                if (ownm.name == "timberwolf" && (TAG_RACE)m.card.race == TAG_RACE.PET)
+                if (ownm.name == "waldwolf" && (TAG_RACE)m.card.race == TAG_RACE.PET)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("DS1_175o");
                     e.creator = ownm.entitiyID;
@@ -1847,7 +1847,7 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
-                if (isSummon && ownm.name == "tundrarhino" && (TAG_RACE)m.card.race == TAG_RACE.PET)
+                if (isSummon && ownm.name == "tundranashorn" && (TAG_RACE)m.card.race == TAG_RACE.PET)
                 {
                     minionGetCharge(m);
                 }
@@ -1870,7 +1870,7 @@ namespace HREngine.Bots
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimmschuppenorakel" && m.card.race == 14)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
@@ -1895,21 +1895,21 @@ namespace HREngine.Bots
                 //real deathrattles
                 if (m.card.CardID == "EX1_534")//m.name == "savannenhochmaehne"
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("hyena");
+                    CardDB.Card c = CardDB.Instance.getCardData("hyaene");
                     callKid(c, m.id - 1, own);
                     callKid(c, m.id - 1, own);
                 }
 
-                if (m.name == "harvestgolem")
+                if (m.name == "erntegolem")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("damagedgolem");
+                    CardDB.Card c = CardDB.Instance.getCardData("beschaedigtergolem");
                     callKid(c, m.id - 1, own);
 
                 }
 
-                if (m.name == "cairnebloodhoof")
+                if (m.name == "cairnebluthuf")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("bainebloodhoof");
+                    CardDB.Card c = CardDB.Instance.getCardData("bainebluthuf");
                     callKid(c, m.id - 1, own);
                     //penaltity for summon this thing :D (so we dont kill it only to have a new minion)
                     this.evaluatePenality += 5;
@@ -1917,24 +1917,24 @@ namespace HREngine.Bots
 
                 }
 
-                if (m.name == "thebeast")
+                if (m.name == "diebestie")
                 {
                     CardDB.Card c = CardDB.Instance.getCardData("finkleeinhorn");
                     callKid(c, m.id - 1, own);
 
                 }
 
-                if (m.name == "lepergnome")
+                if (m.name == "lepragnom")
                 {
                     attackOrHealHero(2, !own);
                 }
 
-                if (m.name == "loothoarder")
+                if (m.name == "beutehamsterer")
                 {
                     if (own)
                     {
                         this.owncarddraw++;
-                        drawACard("");
+                        drawACard("unknown");
                     }
                     else
                     {
@@ -1945,12 +1945,12 @@ namespace HREngine.Bots
 
 
 
-                if (m.name == "bloodmagethalnos")
+                if (m.name == "blutmagierthalnos")
                 {
                     if (own)
                     {
                         this.owncarddraw++;
-                        drawACard("");
+                        drawACard("unknown");
                     }
                     else
                     {
@@ -1958,7 +1958,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "abomination")
+                if (m.name == "monstrositaet")
                 {
                     if (logging) help.logg("deathrattle monstrositaet:");
                     attackOrHealHero(2, false);
@@ -1982,7 +1982,7 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        CardDB.Card c = CardDB.Instance.getCardData("ashbringer");
+                        CardDB.Card c = CardDB.Instance.getCardData("aschenbringer");
                         this.equipWeapon(c);
                     }
                     else
@@ -1992,7 +1992,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "sylvanaswindrunner")
+                if (m.name == "sylvanaswindlaeufer")
                 {
                     List<Minion> temp = new List<Minion>();
                     if (own)
@@ -2082,20 +2082,20 @@ namespace HREngine.Bots
             {
                 if (mnn.silenced) continue;
 
-                if (mnn.name == "scavenginghyena" && m.card.race == 20)
+                if (mnn.name == "aasfressendehyaene" && m.card.race == 20)
                 {
                     mnn.Angr += 2; mnn.Hp += 1;
                 }
-                if (mnn.name == "flesheatingghoul")
+                if (mnn.name == "fleischfressenderghul")
                 {
                     mnn.Angr += 1;
                 }
-                if (mnn.name == "cultmaster")
+                if (mnn.name == "kultmeisterin")
                 {
                     if (own)
                     {
                         this.owncarddraw++;
-                        drawACard("");
+                        drawACard("unknown");
                     }
                     else
                     {
@@ -2107,7 +2107,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in temp2)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "flesheatingghoul")
+                if (mnn.name == "fleischfressenderghul")
                 {
                     mnn.Angr += 1;
                 }
@@ -2178,7 +2178,7 @@ namespace HREngine.Bots
 
             //delete enrage (if minion is silenced the first time)
 
-            if (m.frozen && m.numAttacksThisTurn == 0 && !(m.name == "ancientwatcher" || m.name == "ragnarosthefirelord") && !m.playedThisTurn)
+            if (m.frozen && m.numAttacksThisTurn == 0 && !(m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst") && !m.playedThisTurn)
             {
                 m.Ready = true;
             }
@@ -2186,7 +2186,7 @@ namespace HREngine.Bots
 
             m.frozen = false;
 
-            if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord") && !m.playedThisTurn && m.numAttacksThisTurn == 0)
+            if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst") && !m.playedThisTurn && m.numAttacksThisTurn==0)
             {
                 m.Ready = true;
             }
@@ -2270,7 +2270,7 @@ namespace HREngine.Bots
 
         private void minionGetReady(Minion m) // minion get ready due to attack-buff
         {
-            if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) return;
+            if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst")) return;
 
             if (!m.playedThisTurn && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
             {
@@ -2309,7 +2309,7 @@ namespace HREngine.Bots
                 m.wounded = true;
             }
 
-            if (m.name == "lightspawn" && !m.silenced)
+            if (m.name == "lichtbrut" && !m.silenced)
             {
                 m.Angr = m.Hp;
             }
@@ -2332,7 +2332,7 @@ namespace HREngine.Bots
 
         private void deleteWutanfall(Minion m, bool own)
         {
-            if (m.name == "angrychicken")
+            if (m.name == "wuetendeshuhn")
             {
                 minionGetBuffed(m, -5, 0, own);
             }
@@ -2340,20 +2340,20 @@ namespace HREngine.Bots
             {
                 minionGetBuffed(m, -3, 0, own);
             }
-            if (m.name == "taurenwarrior")
+            if (m.name == "taurenkrieger")
             {
                 minionGetBuffed(m, -3, 0, own);
             }
-            if (m.name == "grommashhellscream")
+            if (m.name == "grommashhoellschrei")
             {
                 minionGetBuffed(m, -6, 0, own);
             }
-            if (m.name == "ragingworgen")
+            if (m.name == "tobenderworgen")
             {
                 minionGetBuffed(m, -1, 0, own);
                 minionGetWindfurry(m);
             }
-            if (m.name == "spitefulsmith")
+            if (m.name == "hasserfuellteschmiedin")
             {
                 if (own && this.ownWeaponDurability >= 1)
                 {
@@ -2371,7 +2371,7 @@ namespace HREngine.Bots
 
             if (m.wounded && m.Hp >= 1) //is wounded, wasnt wounded before, grant wutanfall
             {
-                if (m.name == "angrychicken")
+                if (m.name == "wuetendeshuhn")
                 {
                     minionGetBuffed(m, 5, 0, own);
                 }
@@ -2379,20 +2379,20 @@ namespace HREngine.Bots
                 {
                     minionGetBuffed(m, 3, 0, own);
                 }
-                if (m.name == "taurenwarrior")
+                if (m.name == "taurenkrieger")
                 {
                     minionGetBuffed(m, 3, 0, own);
                 }
-                if (m.name == "grommashhellscream")
+                if (m.name == "grommashhoellschrei")
                 {
                     minionGetBuffed(m, 6, 0, own);
                 }
-                if (m.name == "ragingworgen")
+                if (m.name == "tobenderworgen")
                 {
                     minionGetBuffed(m, 1, 0, own);
                     minionGetWindfurry(m);
                 }
-                if (m.name == "spitefulsmith")
+                if (m.name == "hasserfuellteschmiedin")
                 {
                     if (own && this.ownWeaponDurability >= 1)
                     {
@@ -2415,7 +2415,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "lightwarden")
+                if (mnn.name == "lichtwaechterin")
                 {
                     minionGetBuffed(mnn, 2, 0, true);
                 }
@@ -2423,7 +2423,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "lightwarden")
+                if (mnn.name == "lichtwaechterin")
                 {
                     minionGetBuffed(mnn, 2, 0, false);
                 }
@@ -2435,12 +2435,12 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "northshirecleric")
+                if (mnn.name == "klerikerinvonnordhain")
                 {
                     this.owncarddraw++;
-                    drawACard("");
+                    drawACard("unknown");
                 }
-                if (mnn.name == "lightwarden")
+                if (mnn.name == "lichtwaechterin")
                 {
                     minionGetBuffed(mnn, 2, 0, true);
                 }
@@ -2448,11 +2448,11 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "northshirecleric")
+                if (mnn.name == "klerikerinvonnordhain")
                 {
                     this.enemycarddraw++;
                 }
-                if (mnn.name == "lightwarden")
+                if (mnn.name == "lichtwaechterin")
                 {
                     minionGetBuffed(mnn, 2, 0, false);
                 }
@@ -2463,12 +2463,12 @@ namespace HREngine.Bots
         private void triggerAMinionGetDamage(Minion m, bool own)
         {
             //minion take dmg
-            if (m.name == "acolyteofpain" && !m.silenced)
+            if (m.name == "akolythdesschmerzes" && !m.silenced)
             {
                 if (own)
                 {
                     this.owncarddraw++;
-                    drawACard("");
+                    drawACard("unknown");
                 }
                 else
                 {
@@ -2482,13 +2482,13 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "frothingberserker")
+                if (mnn.name == "wuetenderberserker")
                 {
                     mnn.Angr++;
                 }
                 if (own)
                 {
-                    if (mnn.name == "armorsmith")
+                    if (mnn.name == "ruestungsschmiedin")
                     {
                         this.ownHeroDefence++;
                     }
@@ -2497,13 +2497,13 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "frothingberserker")
+                if (mnn.name == "wuetenderberserker")
                 {
                     mnn.Angr++;
                 }
                 if (!own)
                 {
-                    if (mnn.name == "armorsmith")
+                    if (mnn.name == "ruestungsschmiedin")
                     {
                         this.enemyHeroDefence++;
                     }
@@ -2572,7 +2572,7 @@ namespace HREngine.Bots
 
             this.wutanfall(m, woundedbefore, own);
 
-            if (m.name == "lightspawn" && !m.silenced)
+            if (m.name == "lichtbrut" && !m.silenced)
             {
                 m.Angr = m.Hp;
             }
@@ -2717,7 +2717,7 @@ namespace HREngine.Bots
             {
                 int oldHP = enemy.Hp;
                 minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
-                if (oldHP > enemy.Hp && m.name == "waterelemental") enemy.frozen = true;
+                if (oldHP > enemy.Hp && m.name == "wasserelementar") enemy.frozen = true;
             }
 
 
@@ -2732,7 +2732,7 @@ namespace HREngine.Bots
                 {
                     int oldHP = m.Hp;
                     minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
-                    if (oldHP > m.Hp && enemy.name == "waterelemental") m.frozen = true;
+                    if (oldHP > m.Hp && enemy.name == "wasserelementar") m.frozen = true;
                 }
             }
         }
@@ -2834,7 +2834,7 @@ namespace HREngine.Bots
 
             if (c.Stealth) m.stealth = true;
 
-            if (m.name == "lightspawn" && !m.silenced)
+            if (m.name == "lichtbrut" && !m.silenced)
             {
                 m.Angr = m.Hp;
             }
@@ -2878,7 +2878,7 @@ namespace HREngine.Bots
             }
 
 
-            if (c.name == "ancientoflore")
+            if (c.name == "urtumderlehren")
             {
                 if (choice == 2)
                 {
@@ -2887,7 +2887,7 @@ namespace HREngine.Bots
             }
 
 
-            if (c.name == "keeperofthegrove")
+            if (c.name == "hueterdeshains")
             {
                 if (choice == 1)
                 {
@@ -2900,7 +2900,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "crazedalchemist")
+            if (c.name == "verrueckteralchemist")
             {
                 if (target < 10)
                 {
@@ -2928,46 +2928,46 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "si7agent" && this.cardsPlayedThisTurn >= 1)
+            if (c.name == "si7-agent" && this.cardsPlayedThisTurn >= 1)
             {
                 damage = 2;
             }
-            if (c.name == "kidnapper" && this.cardsPlayedThisTurn >= 1)
+            if (c.name == "entfuehrer" && this.cardsPlayedThisTurn >= 1)
             {
                 backtohand = true;
             }
-            if (c.name == "masterofdisguise")
+            if (c.name == "meisterindertarnung")
             {
                 stealth = true;
             }
 
-            if (c.name == "cabalshadowpriest")
+            if (c.name == "kabaleschattenpriesterin")
             {
                 minionGetControlled(m, true, false);
             }
 
 
-            if (c.name == "ironbeakowl" || c.name == "spellbreaker") //eisenschnabeleule, zauberbrecher
+            if (c.name == "eisenschnabeleule" || c.name == "zauberbrecher") //eisenschnabeleule, zauberbrecher
             {
                 silence = true;
             }
 
-            if (c.name == "shatteredsuncleric")
+            if (c.name == "blutelfenklerikerin")
             {
                 attackbuff = 1;
                 hpbuff = 1;
             }
 
-            if (c.name == "ancientbrewmaster")
+            if (c.name == "uralterbraumeister")
             {
                 backtohand = true;
             }
-            if (c.name == "youthfulbrewmaster")
+            if (c.name == "jungerbraumeister")
             {
                 backtohand = true;
             }
 
-            if (c.name == "darkirondwarf")
+            if (c.name == "dunkeleisenzwerg")
             {
                 //attackbuff = 2;
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_046e");
@@ -2976,7 +2976,7 @@ namespace HREngine.Bots
                 addEffectToMinionNoDoubles(m, e, own);
             }
 
-            if (c.name == "hungrycrab")
+            if (c.name == "hungrigekrabbe")
             {
                 destroy = true;
                 /*Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_017e");
@@ -2986,79 +2986,79 @@ namespace HREngine.Bots
                 minionGetBuffed(c, 2, 2, true);
             }
 
-            if (c.name == "abusivesergeant")
+            if (c.name == "ruchloserunteroffizier")
             {
                 Enchantment e = CardDB.getEnchantmentFromCardID("CS2_188o");
                 e.creator = c.entitiyID;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, own);
             }
-            if (c.name == "crueltaskmaster")
+            if (c.name == "fieserzuchtmeister")
             {
                 attackbuff = 2;
                 damage = 1;
             }
 
-            if (c.name == "frostelemental")
+            if (c.name == "frostelementar")
             {
                 frozen = true;
             }
 
-            if (c.name == "elvenarcher")
+            if (c.name == "elfenbogenschuetzin")
             {
                 damage = 1;
             }
-            if (c.name == "voodoodoctor")
+            if (c.name == "voodoodoktor")
             {
                 heal = 2;
             }
-            if (c.name == "templeenforcer")
+            if (c.name == "vollstreckerdestempels")
             {
                 hpbuff = 3;
             }
-            if (c.name == "ironforgerifleman")
+            if (c.name == "schuetzevoneisenschmiede")
             {
                 damage = 1;
             }
-            if (c.name == "stormpikecommando")
+            if (c.name == "sturmlanzenkommando")
             {
                 damage = 2;
             }
-            if (c.name == "houndmaster")
+            if (c.name == "hundemeister")
             {
                 attackbuff = 2;
                 hpbuff = 2;
                 spott = true;
             }
 
-            if (c.name == "aldorpeacekeeper")
+            if (c.name == "friedensbewahrer")
             {
                 attackbuff = 1 - m.Angr;
             }
 
-            if (c.name == "theblackknight")
+            if (c.name == "derschwarzeritter")
             {
                 destroy = true;
             }
 
-            if (c.name == "argentprotector")
+            if (c.name == "argentumbeschuetzer")
             {
                 divineshild = true; // Grants NO buff
             }
 
-            if (c.name == "windspeaker")
+            if (c.name == "windsprecher")
             {
                 windfury = true;
             }
-            if (c.name == "fireelemental")
+            if (c.name == "feuerelementar")
             {
                 damage = 3;
             }
-            if (c.name == "earthenringfarseer")
+            if (c.name == "seherdesirdenenrings")
             {
                 heal = 3;
             }
-            if (c.name == "biggamehunter")
+            if (c.name == "grosswildjaeger")
             {
                 destroy = true;
             }
@@ -3076,7 +3076,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "facelessmanipulator")
+            if (c.name == "gesichtslosermanipulator")
             {//todo, test this :D
 
                 copyMinion(c, m);
@@ -3146,7 +3146,7 @@ namespace HREngine.Bots
             //druid choices
 
             //urtum des krieges:
-            if (c.name == "ancientofwar")
+            if (c.name == "urtumdeskrieges")
             {
                 if (choice == 1)
                 {
@@ -3159,7 +3159,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "ancientoflore")
+            if (c.name == "urtumderlehren")
             {
                 if (choice == 1)
                 {
@@ -3170,7 +3170,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "druidoftheclaw")
+            if (c.name == "druidederklaue")
             {
                 if (choice == 1)
                 {
@@ -3197,7 +3197,7 @@ namespace HREngine.Bots
 
             //normal ones
 
-            if (c.name == "mindcontroltech")
+            if (c.name == "gedankenkontrolleur")
             {
                 if (this.enemyMinions.Count >= 4)
                 {
@@ -3215,11 +3215,11 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "felguard")
+            if (c.name == "teufelswache")
             {
                 this.ownMaxMana--;
             }
-            if (c.name == "arcanegolem")
+            if (c.name == "arkangolem")
             {
                 this.enemyMaxMana++;
             }
@@ -3229,13 +3229,13 @@ namespace HREngine.Bots
                 minionGetBuffed(c, this.cardsPlayedThisTurn * 2, this.cardsPlayedThisTurn * 2, own);
             }
 
-            if (c.name == "doomguard")
+            if (c.name == "verdammniswache")
             {
                 this.owncarddraw -= Math.Min(2, this.owncards.Count);
                 this.owncards.RemoveRange(0, Math.Min(2, this.owncards.Count));
             }
 
-            if (c.name == "succubus")
+            if (c.name == "sukkubus")
             {
                 this.owncarddraw -= Math.Min(1, this.owncards.Count);
                 this.owncards.RemoveRange(0, Math.Min(1, this.owncards.Count));
@@ -3248,16 +3248,16 @@ namespace HREngine.Bots
                 this.ownHeroHp = c.Hp;
             }
 
-            if (c.name == "flameimp")
+            if (c.name == "flammenwichtel")
             {
                 attackOrHealHero(3, own);
             }
-            if (c.name == "pitlord")
+            if (c.name == "grubenlord")
             {
                 attackOrHealHero(5, own);
             }
 
-            if (c.name == "voidterror")
+            if (c.name == "schreckenderleere")
             {
                 List<Minion> temp = new List<Minion>();
                 if (own)
@@ -3290,23 +3290,23 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "frostwolfwarlord")
+            if (c.name == "frostwolfkriegsfuerst")
             {
                 minionGetBuffed(c, this.ownMinions.Count, this.ownMinions.Count, own);
             }
-            if (c.name == "bloodsailraider")
+            if (c.name == "blutsegelraeuberin")
             {
                 c.Angr += this.ownWeaponAttack;
             }
 
-            if (c.name == "southseadeckhand" && this.ownWeaponDurability >= 1)
+            if (c.name == "suedmeerdeckmatrose" && this.ownWeaponDurability >= 1)
             {
                 minionGetCharge(c);
             }
 
 
 
-            if (c.name == "bloodknight")
+            if (c.name == "blutritter")
             {
                 int shilds = 0;
                 foreach (Minion m in this.ownMinions)
@@ -3329,47 +3329,47 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "kingmukla")
+            if (c.name == "koenigmukla")
             {
                 this.enemycarddraw += 2;
             }
 
-            if (c.name == "coldlightoracle")
+            if (c.name == "tiefenlichtorakel")
             {
                 this.enemycarddraw += 2;
                 this.owncarddraw += 2;
-                drawACard("");
-                drawACard("");
+                drawACard("unknown");
+                drawACard("unknown");
             }
 
-            if (c.name == "arathiweaponsmith")
+            if (c.name == "arathiwaffenschmiedin")
             {
-                CardDB.Card wcard = CardDB.Instance.getCardData("battleaxe");
+                CardDB.Card wcard = CardDB.Instance.getCardData("streitaxt");
                 this.equipWeapon(wcard);
                 
 
             }
-            if (c.name == "bloodsailcorsair")
+            if (c.name == "blutsegelkorsar")
             {
                 this.lowerWeaponDurability(1, false);
             }
 
-            if (c.name == "acidicswampooze")
+            if (c.name == "saeurehaltigerschlamm")
             {
                 this.lowerWeaponDurability(1000, false);
             }
-            if (c.name == "noviceengineer")
+            if (c.name == "ingenieurslehrling")
             {
                 this.owncarddraw++;
-                drawACard("");
+                drawACard("unknown");
             }
-            if (c.name == "gnomishinventor")
+            if (c.name == "gnomischeerfinderin")
             {
                 this.owncarddraw++;
-                drawACard("");
+                drawACard("unknown");
             }
 
-            if (c.name == "darkscalehealer")
+            if (c.name == "dunkelschuppenheilerin")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3380,20 +3380,20 @@ namespace HREngine.Bots
                 }
                 attackOrHealHero(-2, true);
             }
-            if (c.name == "nightblade")
+            if (c.name == "nachtklinge")
             {
                 attackOrHealHero(3, !own);
             }
 
-            if (c.name == "twilightdrake")
+            if (c.name == "zwielichtdrache")
             {
                 minionGetBuffed(c, 0, this.owncards.Count, true);
             }
 
-            if (c.name == "azuredrake")
+            if (c.name == "azurblauerdrache")
             {
                 this.owncarddraw++;
-                drawACard("");
+                drawACard("unknown");
             }
 
             if (c.name == "harrisonjones")
@@ -3402,17 +3402,17 @@ namespace HREngine.Bots
                 this.owncarddraw += enemyWeaponDurability;
                 for (int i = 0; i < enemyWeaponDurability; i++)
                 {
-                    drawACard("");
+                    drawACard("unknown");
                 }
                 this.enemyWeaponDurability = 0;
             }
 
-            if (c.name == "guardianofkings")
+            if (c.name == "waechterderkoenige")
             {
                 attackOrHealHero(-6, true);
             }
 
-            if (c.name == "captaingreenskin")
+            if (c.name == "kapitaengruenhaut")
             {
                 if (this.ownWeaponName != "")
                 {
@@ -3422,16 +3422,16 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "priestessofelune")
+            if (c.name == "priesteringvonelune")
             {
                 attackOrHealHero(-4, true);
             }
-            if (c.name == "injuredblademaster")
+            if (c.name == "verletzterklingenmeister")
             {
                 minionGetDamagedOrHealed(c, 4, 0, true);
             }
 
-            if (c.name == "dreadinfernal")
+            if (c.name == "schreckenshoellenbestie")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3448,7 +3448,7 @@ namespace HREngine.Bots
                 attackOrHealHero(1, true);
             }
 
-            if (c.name == "tundrarhino")
+            if (c.name == "tundranashorn")
             {
                 minionGetCharge(c);
                 List<Minion> temp = new List<Minion>(this.ownMinions);
@@ -3461,7 +3461,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "stampedingkodo")
+            if (c.name == "panischerkodo")
             {
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
@@ -3477,7 +3477,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "sunfuryprotector")
+            if (c.name == "sonnenzornbeschuetzerin")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3489,7 +3489,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "ancientmage")
+            if (c.name == "uraltermagier")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3501,7 +3501,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "defenderofargus")
+            if (c.name == "verteidigervonargus")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3516,7 +3516,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "coldlightseer")
+            if (c.name == "tiefenlichtseher")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -3537,7 +3537,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "deathwing")
+            if (c.name == "todesschwinge")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion enemy in temp)
@@ -3554,7 +3554,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "captainsparrot")
+            if (c.name == "papageideskapitaens")
             {
                 this.owncarddraw++;
                 this.drawACard("");
@@ -3568,31 +3568,31 @@ namespace HREngine.Bots
         private int spawnKids(CardDB.Card c, int position, bool own, int choice)
         {
             int kids = 0;
-            if (c.name == "murloctidehunter")
+            if (c.name == "murlocgezeitenjaeger")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("murlocscout");
+                CardDB.Card kid = CardDB.Instance.getCardData("mulocspaeher");
                 callKid(kid, position, own);
 
             }
-            if (c.name == "razorfenhunter")
+            if (c.name == "jaegerderklingenhauer")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("boar");
+                CardDB.Card kid = CardDB.Instance.getCardData("eber");
                 callKid(kid, position, own);
 
             }
-            if (c.name == "dragonlingmechanic")
+            if (c.name == "drachlingmechanikerin")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("mechanicaldragonling");
+                CardDB.Card kid = CardDB.Instance.getCardData("mechanischerdrachling");
                 callKid(kid, position, own);
 
             }
             if (c.name == "leeroyjenkins")
             {
                 kids = 2;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardData("welpling");
                 int pos = this.ownMinions.Count - 1;
                 if (own) pos = this.enemyMinions.Count - 1;
                 callKid(kid, pos, !own);
@@ -3610,32 +3610,32 @@ namespace HREngine.Bots
                 callKid(kid, pos, own);
 
             }
-            if (c.name == "silverhandknight")
+            if (c.name == "ritterdersilbernenhand")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("squire");
+                CardDB.Card kid = CardDB.Instance.getCardData("knappe");
                 callKid(kid, position, own);
 
             }
-            if (c.name == "gelbinmekkatorque")
+            if (c.name == "gelbinmekkadrill")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("homingchicken");
+                CardDB.Card kid = CardDB.Instance.getCardData("zielsuchendeshuhn");
                 callKid(kid, position, own);
 
             }
 
-            if (c.name == "defiasringleader" && this.cardsPlayedThisTurn >= 1) //needs combo for spawn
+            if (c.name == "raedelsfuehrerderdefias" && this.cardsPlayedThisTurn >= 1) //needs combo for spawn
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("defiasbandit");
+                CardDB.Card kid = CardDB.Instance.getCardData("banditderdefias");
                 callKid(kid, position, own);
 
             }
             if (c.name == "onyxia")
             {
                 kids = 7 - this.ownMinions.Count;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardData("Welpling");
                 for (int i = 0; i < kids; i++)
                 {
                     callKid(kid, position, own);
@@ -3754,7 +3754,7 @@ namespace HREngine.Bots
             this.ownheroAngr = c.Attack;
             this.ownWeaponAttack = c.Attack;
             this.ownWeaponDurability = c.Durability;
-            if (c.name == "doomhammer")
+            if (c.name == "schicksalshammer")
             {
                 this.ownHeroWindfury = true;
             }
@@ -3766,7 +3766,7 @@ namespace HREngine.Bots
             {
                 this.ownHeroReady = true;
             }
-            if (c.name == "gladiatorslongbow")
+            if (c.name == "langbogendesgladiators")
             {
                 this.heroImmuneWhileAttacking = true;
             }
@@ -3777,7 +3777,7 @@ namespace HREngine.Bots
 
             foreach (Minion m in this.ownMinions)
             {
-                if (m.name == "southseadeckhand")
+                if (m.name == "suedmeerdeckmatrose")
                 {
                     minionGetCharge(m);
                 }
@@ -3829,18 +3829,18 @@ namespace HREngine.Bots
 
             //warrior###########################################################################
 
-            if (c.name == "execute")
+            if (c.name == "hinrichten")
             {
                 destroy = true;
             }
 
-            if (c.name == "innerrage")
+            if (c.name == "innerewut")
             {
                 damage = 1;
                 attackbuff = 2;
             }
 
-            if (c.name == "slam")
+            if (c.name == "zerschmettern")
             {
                 damage = 2;
                 if (m.Hp >= 3)
@@ -3850,24 +3850,24 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "mortalstrike")
+            if (c.name == "toedlicherstoss")
             {
                 damage = 4;
                 if (ownHeroHp <= 12) damage = 6;
             }
 
-            if (c.name == "shieldslam")
+            if (c.name == "schildschlag")
             {
                 damage = this.ownHeroDefence;
             }
 
-            if (c.name == "charge")
+            if (c.name == "sturmangriff")
             {
                 charge = true;
                 attackbuff = 2;
             }
 
-            if (c.name == "rampage")
+            if (c.name == "toben")
             {
                 attackbuff = 3;
                 hpbuff = 3;
@@ -3875,15 +3875,15 @@ namespace HREngine.Bots
 
             //hunter#################################################################################
 
-            if (c.name == "huntersmark")
+            if (c.name == "maldesjaegers")
             {
                 setHPtoONE = true;
             }
-            if (c.name == "arcaneshot")
+            if (c.name == "arkanerschuss")
             {
                 damage = 2;
             }
-            if (c.name == "killcommand")
+            if (c.name == "fass")
             {
                 damage = 3;
                 foreach (Minion mnn in this.ownMinions)
@@ -3894,7 +3894,7 @@ namespace HREngine.Bots
                     }
                 }
             }
-            if (c.name == "bestialwrath")
+            if (c.name == "zorndeswildtiers")
             {
 
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_549o");
@@ -3903,7 +3903,7 @@ namespace HREngine.Bots
                 addEffectToMinionNoDoubles(m, e, own);
             }
 
-            if (c.name == "explosiveshot")
+            if (c.name == "explosivschuss")
             {
                 damage = 5;
                 adjacentDamage = 1;
@@ -3911,34 +3911,34 @@ namespace HREngine.Bots
 
             //mage###############################################################################
 
-            if (c.name == "icelance")
+            if (c.name == "eislanze")
             {
                 if (m.frozen)
                 { damage = 4; }
                 else { frozen = true; }
             }
 
-            if (c.name == "coneofcold")
+            if (c.name == "kaeltekegel")
             {
                 damage = 1;
                 adjacentDamage = 1;
                 frozen = true;
             }
-            if (c.name == "fireball")
+            if (c.name == "feuerball")
             {
                 damage = 6;
             }
-            if (c.name == "polymorph")
+            if (c.name == "verwandlung")
             {
                 sheep = true;
             }
 
-            if (c.name == "pyroblast")
+            if (c.name == "pyroschlag")
             {
                 damage = 10;
             }
 
-            if (c.name == "frostbolt")
+            if (c.name == "frostblitz")
             {
                 damage = 3;
                 frozen = true;
@@ -3946,37 +3946,37 @@ namespace HREngine.Bots
 
             //pala######################################################################
 
-            if (c.name == "humility")
+            if (c.name == "demut")
             {
                 m.Angr = 1;
             }
-            if (c.name == "handofprotection")
+            if (c.name == "handdesschutzes")
             {
                 divineshild = true;
             }
-            if (c.name == "blessingofmight")
+            if (c.name == "segendermacht")
             {
                 attackbuff = 3;
             }
-            if (c.name == "holylight")
+            if (c.name == "heiligeslicht")
             {
                 heal = 6;
             }
 
-            if (c.name == "hammerofwrath")
+            if (c.name == "hammerdeszorns")
             {
                 damage = 3;
                 this.owncarddraw++;
                 drawACard("");
             }
 
-            if (c.name == "blessingofkings")
+            if (c.name == "segenderkoenige")
             {
                 attackbuff = 4;
                 hpbuff = 4;
             }
 
-            if (c.name == "blessingofwisdom")
+            if (c.name == "segenderweisheit")
             {
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_363e2");
                 e.creator = c.entityID;
@@ -3984,17 +3984,17 @@ namespace HREngine.Bots
                 m.enchantments.Add(e);
             }
 
-            if (c.name == "blessedchampion")
+            if (c.name == "gesegneterchampion")
             {
                 m.Angr *= 2;
             }
-            if (c.name == "holywrath")
+            if (c.name == "heiligerzorn")
             {
                 damage = 2;
                 this.owncarddraw++;
                 drawACard("");
             }
-            if (c.name == "layonhands")
+            if (c.name == "handauflegung")
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -4006,7 +4006,7 @@ namespace HREngine.Bots
 
             //priest ##########################################
 
-            if (c.name == "shadowmadness")
+            if (c.name == "dunklerwahnsinn")
             {
 
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_334e");
@@ -4016,78 +4016,78 @@ namespace HREngine.Bots
                 this.minionGetControlled(m, true, true);
             }
 
-            if (c.name == "mindcontrol")
+            if (c.name == "gedankenkontrolle")
             {
                 this.minionGetControlled(m, true, false);
             }
 
-            if (c.name == "holysmite")
+            if (c.name == "heiligepein")
             {
                 damage = 2;
             }
-            if (c.name == "powerwordshield")
+            if (c.name == "machtwortschild")
             {
                 hpbuff = 2;
                 this.owncarddraw++;
                 this.drawACard("");
             }
-            if (c.name == "silence")
+            if (c.name == "stille")
             {
                 silence = true;
             }
-            if (c.name == "divinespirit")
+            if (c.name == "goettlicherwiller")
             {
                 hpbuff = m.Hp;
             }
-            if (c.name == "innerfire")
+            if (c.name == "inneresfeuer")
             {
                 m.Angr = m.Hp;
             }
-            if (c.name == "holyfire")
+            if (c.name == "heiligesfeuer")
             {
                 damage = 5;
                 int ownheal = getSpellHeal(5);
                 attackOrHealHero(-ownheal, true);
             }
-            if (c.name == "shadowwordpain")
+            if (c.name == "schattenwortschmerz")
             {
                 destroy = true;
             }
-            if (c.name == "shadowworddeath")
+            if (c.name == "schattenworttod")
             {
                 destroy = true;
             }
             //rogue ##########################################
-            if (c.name == "shadowstep")
+            if (c.name == "schattenschritt")
             {
                 backtohand = true;
                 m.card.cost = Math.Max(0, m.card.cost -= 2);
             }
-            if (c.name == "sap")
+            if (c.name == "kopfnuss")
             {
                 backtohand = true;
             }
-            if (c.name == "shiv")
+            if (c.name == "tueckischeklinge")
             {
                 damage = 1;
                 this.owncarddraw++;
                 this.drawACard("");
             }
-            if (c.name == "coldblood")
+            if (c.name == "kaltbluetigkeit")
             {
                 attackbuff = 2;
                 if (this.cardsPlayedThisTurn >= 1) attackbuff = 4;
             }
-            if (c.name == "conceal")
+            if (c.name == "verhuellen")
             {
                 stealth = true;
             }
-            if (c.name == "eviscerate")
+            if (c.name == "ausweiden")
             {
                 damage = 2;
                 if (this.cardsPlayedThisTurn >= 1) damage = 4;
             }
-            if (c.name == "betrayal")
+            if (c.name == "verrat")
             {
                 //attack right neightbor
                 if (target >= 10 && target < 20 && target < this.enemyMinions.Count + 10 - 1)
@@ -4107,32 +4107,32 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "perditionsblade")
+            if (c.name == "klingedesverderbens")
             {
                 damage = 1;
                 if (this.cardsPlayedThisTurn >= 1) damage = 2;
             }
 
-            if (c.name == "backstab")
+            if (c.name == "meucheln")
             {
                 damage = 2;
             }
 
-            if (c.name == "assassinate")
+            if (c.name == "attentat")
             {
                 destroy = true;
             }
             //shaman ##########################################
-            if (c.name == "lightningbolt")
+            if (c.name == "blitzschlag")
             {
                 damage = 3;
             }
-            if (c.name == "frostshock")
+            if (c.name == "frostschock")
             {
                 frozen = true;
                 damage = 1;
             }
-            if (c.name == "rockbiterweapon")
+            if (c.name == "waffedesfelsbeissers")
             {
                 if (target <= 20)
                 {
@@ -4153,29 +4153,29 @@ namespace HREngine.Bots
                     }
                 }
             }
-            if (c.name == "windfury")
+            if (c.name == "windzorn")
             {
                 windfury = true;
             }
-            if (c.name == "hex")
+            if (c.name == "verhexung")
             {
                 frogg = true;
             }
-            if (c.name == "earthshock")
+            if (c.name == "erdschock")
             {
                 silence = true;
                 damage = 1;
             }
-            if (c.name == "ancestralspirit")
+            if (c.name == "geistderahnen")
             {
                 geistderahnen = true;
             }
-            if (c.name == "lavaburst")
+            if (c.name == "lavaeruption")
             {
                 damage = 5;
             }
 
-            if (c.name == "ancestralhealing")
+            if (c.name == "heilungderahnen")
             {
                 heal = 1000;
                 spott = true;
@@ -4183,20 +4183,20 @@ namespace HREngine.Bots
 
             //hexenmeister ##########################################
 
-            if (c.name == "sacrificialpact")
+            if (c.name == "opferpakt")
             {
                 destroy = true;
                 this.attackOrHealHero(getSpellHeal(5), true); // heal own hero
             }
 
-            if (c.name == "soulfire")
+            if (c.name == "seelenfeuer")
             {
                 damage = 4;
                 this.owncarddraw--;
                 this.owncards.RemoveRange(0, Math.Min(1, this.owncards.Count));
 
             }
-            if (c.name == "poweroverwhelming")
+            if (c.name == "ueberwaeltigendemacht")
             {
                 //only to own mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_316e");
@@ -4204,7 +4204,7 @@ namespace HREngine.Bots
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, true);
             }
-            if (c.name == "corruption")
+            if (c.name == "verderbnis")
             {
                 //only to enemy mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("CS2_063e");
@@ -4212,7 +4212,7 @@ namespace HREngine.Bots
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, false);
             }
-            if (c.name == "mortalcoil")
+            if (c.name == "weltlicheaengste")
             {
                 damage = 1;
                 if (getSpellDamageDamage(1) >= m.Hp && !m.divineshild && !m.immune)
@@ -4221,16 +4221,16 @@ namespace HREngine.Bots
                     this.drawACard("");
                 }
             }
-            if (c.name == "drainlife")
+            if (c.name == "blutsauger")
             {
                 damage = 2;
                 attackOrHealHero(2, true);
             }
-            if (c.name == "shadowbolt")
+            if (c.name == "schattenblitz")
             {
                 damage = 4;
             }
-            if (c.name == "shadowflame")
+            if (c.name == "schattenflamme")
             {
                 int damage1 = getSpellDamageDamage(m.Angr);
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
@@ -4242,7 +4242,7 @@ namespace HREngine.Bots
                 destroy = true;
             }
 
-            if (c.name == "demonfire")
+            if (c.name == "daemonenfeuer")
             {
                 if (m.card.race == 15 && own)
                 {
@@ -4254,18 +4254,18 @@ namespace HREngine.Bots
                     damage = 2;
                 }
             }
-            if (c.name == "baneofdoom")
+            if (c.name == "omenderverdammnis")
             {
                 damage = 2;
                 if (getSpellDamageDamage(2) >= m.Hp && !m.divineshild && !m.immune)
                 {
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("bloodimp");
+                    CardDB.Card kid = CardDB.Instance.getCardData("blutwichtel");
                     callKid(kid, posi, true);
                 }
             }
 
-            if (c.name == "siphonsoul")
+            if (c.name == "seeleentziehen")
             {
                 destroy = true;
                 attackOrHealHero(3, true);
@@ -4275,42 +4275,42 @@ namespace HREngine.Bots
 
             //druid #######################################################################
 
-            if (c.name == "moonfire" && c.CardID == "CS2_008")// nicht zu verwechseln mit cenarius choice nummer 1
+            if (c.name == "mondfeuer" && c.CardID == "CS2_008")// nicht zu verwechseln mit cenarius choice nummer 1
             {
                 damage = 1;
             }
 
-            if (c.name == "markofthewild")
+            if (c.name == "malderwildnis")
             {
                 spott = true;
                 attackbuff = 2;
                 hpbuff = 2;
             }
 
-            if (c.name == "healingtouch")
+            if (c.name == "heilendeberuehrung")
             {
                 heal = 8;
             }
 
-            if (c.name == "starfire")
+            if (c.name == "sternenfeuer")
             {
                 damage = 5;
                 this.owncarddraw++;
                 this.drawACard("");
             }
 
-            if (c.name == "naturalize")
+            if (c.name == "kreislaufdernatur")
             {
                 destroy = true;
                 this.enemycarddraw += 2;
             }
 
-            if (c.name == "savagery")
+            if (c.name == "unbaendigkeit")
             {
                 damage = this.ownheroAngr;
             }
 
-            if (c.name == "swipe")
+            if (c.name == "prankenhieb")
             {
                 damage = 4;
                 // all others get 1 spelldamage
@@ -4330,7 +4330,7 @@ namespace HREngine.Bots
             }
 
             //druid choices##################################################################################
-            if (c.name == "wrath")
+            if (c.name == "zorn")
             {
                 if (choice == 1)
                 {
@@ -4344,7 +4344,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "markofnature")
+            if (c.name == "maldernatur")
             {
                 if (choice == 1)
                 {
@@ -4357,7 +4357,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "starfall")
+            if (c.name == "sternenregen")
             {
                 if (choice == 1)
                 {
@@ -4369,7 +4369,7 @@ namespace HREngine.Bots
 
             //special cards#########################################################################################
 
-            if (c.name == "nightmare")
+            if (c.name == "alptraum")
             {
                 //only to own mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_316e");
@@ -4378,18 +4378,18 @@ namespace HREngine.Bots
                 addEffectToMinionNoDoubles(m, e, true);
             }
 
-            if (c.name == "dream")
+            if (c.name == "traum")
             {
                 backtohand = true;
             }
 
-            if (c.name == "bananas")
+            if (c.name == "banane")
             {
                 attackbuff = 1;
                 hpbuff = 1;
             }
 
-            if (c.name == "barreltoss")
+            if (c.name == "fasswurf")
             {
                 damage = 2;
             }
@@ -4400,7 +4400,7 @@ namespace HREngine.Bots
                 this.owncarddraw++;
                 this.drawACard("");
 
-            } if (c.name == "willofmukla")
+            } if (c.name == "derwillemuklas")
             {
                 heal = 6 ;
             }
@@ -4516,13 +4516,13 @@ namespace HREngine.Bots
             //todo faehrtenlesen!
 
             //play card without target
-            if (c.name == "thecoin")
+            if (c.name == "diemuenze")
             {
                 this.mana++;
 
             }
             //hunter#########################################################################
-            if (c.name == "multi-shot" && this.enemyMinions.Count >= 2)
+            if (c.name == "mehrfachschuss" && this.enemyMinions.Count >= 2)
             {
                 List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(3);
@@ -4535,14 +4535,14 @@ namespace HREngine.Bots
                 }
 
             }
-            if (c.name == "animalcompanion")
+            if (c.name == "tierbegleiter")
             {
                 CardDB.Card c2 = CardDB.Instance.getCardData("misha");
                 int placeoffather = this.ownMinions.Count - 1;
                 callKid(c2, placeoffather, true);
             }
 
-            if (c.name == "flare")
+            if (c.name == "leuchtfeuer")
             {
                 foreach (Minion m in this.ownMinions)
                 {
@@ -4557,18 +4557,18 @@ namespace HREngine.Bots
                 this.enemySecretCount = 0;
             }
 
-            if (c.name == "unleashthehounds")
+            if (c.name == "lasstdiehundelos")
             {
                 int anz = this.enemyMinions.Count;
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("hound");
+                CardDB.Card kid = CardDB.Instance.getCardData("jagdhund");
                 for (int i = 0; i < anz; i++)
                 {
                     callKid(kid, posi, true);
                 }
             }
 
-            if (c.name == "deadlyshot" && this.enemyMinions.Count >= 1)
+            if (c.name == "toedlicherschuss" && this.enemyMinions.Count >= 1)
             {
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
@@ -4582,7 +4582,7 @@ namespace HREngine.Bots
             }
 
             //warrior#########################################################################
-            if (c.name == "commandingshout")
+            if (c.name == "befehlsruf")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 Enchantment e1 = CardDB.getEnchantmentFromCardID("NEW1_036e");
@@ -4600,7 +4600,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "battlerage")
+            if (c.name == "kampfeswut")
             {
                 foreach (Minion mnn in this.ownMinions)
                 {
@@ -4613,7 +4613,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "brawl")
+            if (c.name == "scharmuetzel")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion mnn in temp)
@@ -4630,7 +4630,7 @@ namespace HREngine.Bots
             }
 
 
-            if (c.name == "cleave" && this.enemyMinions.Count >= 2)
+            if (c.name == "spalten" && this.enemyMinions.Count >= 2)
             {
                 List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(2);
@@ -4644,7 +4644,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "upgrade")
+            if (c.name == "aufwertung" )
             {
                 if (this.ownWeaponName != "")
                 {
@@ -4654,7 +4654,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    CardDB.Card wcard = CardDB.Instance.getCardData("heavyaxe");
+                    CardDB.Card wcard = CardDB.Instance.getCardData("schwereaxt");
                     this.equipWeapon(wcard);
                 }
 
@@ -4662,7 +4662,7 @@ namespace HREngine.Bots
 
 
 
-            if (c.name == "whirlwind")
+            if (c.name == "wirbelwind")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(1);
@@ -4678,7 +4678,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "heroicstrike")
+            if (c.name == "heldenhafterstoss")
             {
                 this.ownheroAngr = this.ownheroAngr + 4;
                 if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen) 
@@ -4687,11 +4687,11 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "shieldblock")
+            if (c.name == "schildblock")
             {
                 this.ownHeroDefence = this.ownHeroDefence + 5;
                 this.owncarddraw++;
-                drawACard("");
+                drawACard("unknown");
             }
 
 
@@ -4715,7 +4715,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "arcanemissiles")
+            if (c.name == "arkanegeschosse")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
@@ -4737,22 +4737,22 @@ namespace HREngine.Bots
                 if (i < ammount) attackOrHealHero(ammount - i, false);
 
             }
-            if (c.name == "arcaneintellect")
+            if (c.name == "arkaneintelligenz")
             {
                 this.owncarddraw++;
                 this.drawACard("");
                 this.drawACard("");
             }
 
-            if (c.name == "mirrorimage")
+            if (c.name == "spiegelbild")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_mirror");
+                CardDB.Card kid = CardDB.Instance.getCardData("spiegelbildminion");
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
 
-            if (c.name == "arcaneexplosion")
+            if (c.name == "arkaneexplosion")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(1);
@@ -4770,7 +4770,7 @@ namespace HREngine.Bots
                 }
 
             }
-            if (c.name == "flamestrike")
+            if (c.name == "flammenstoss")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(4);
@@ -4786,7 +4786,7 @@ namespace HREngine.Bots
             }
 
             //pala#################################################################
-            if (c.name == "consecration")
+            if (c.name == "weihe")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(2);
@@ -4798,7 +4798,7 @@ namespace HREngine.Bots
                 attackOrHealHero(damage, false);
             }
 
-            if (c.name == "equality")
+            if (c.name == "gleichheit")
             {
                 foreach (Minion m in this.ownMinions)
                 {
@@ -4812,7 +4812,7 @@ namespace HREngine.Bots
                 }
 
             }
-            if (c.name == "divinefavor")
+            if (c.name == "goettlichegunst")
             {
                 int enemcardsanz = this.enemyAnzCards + this.enemycarddraw;
                 int diff = enemcardsanz - this.owncards.Count;
@@ -4826,7 +4826,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "avengingwrath")
+            if (c.name == "zornigevergeltung")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = 1;
@@ -4850,7 +4850,7 @@ namespace HREngine.Bots
 
 
             //priest ####################################################
-            if (c.name == "circleofhealing")
+            if (c.name == "kreisderheilung")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int heal = getSpellHeal(4);
@@ -4866,14 +4866,14 @@ namespace HREngine.Bots
                 }
 
             }
-            if (c.name == "thoughtsteal")
+            if (c.name == "gedankenraub")
             {
                 this.owncarddraw++;
                 this.drawACard("enemycard");
                 this.owncarddraw++;
                 this.drawACard("enemycard");
             }
-            if (c.name == "mindvision")
+            if (c.name == "gedankensicht")
             {
                 if (this.enemyAnzCards >= 1)
                 {
@@ -4882,7 +4882,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "shadowform")
+            if (c.name == "schattengestalt")
             {
                 if (this.ownHeroAblility.CardID == "CS1h_001") // lesser heal becomes mind spike
                 {
@@ -4894,26 +4894,26 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "mindgames")
+            if (c.name == "gedankenspiele")
             {
                 CardDB.Card copymin = CardDB.Instance.getCardDataFromID("CS2_152"); //we draw a knappe :D (worst case)
                 callKid(copymin, this.ownMinions.Count - 1, true);
             }
 
-            if (c.name == "massdispel")
+            if (c.name == "massenbannung")
             {
                 foreach (Minion m in this.enemyMinions)
                 {
                     minionGetSilenced(m, false);
                 }
             }
-            if (c.name == "mindblast")
+            if (c.name == "gedankenschlag")
             {
                 int damage = getSpellDamageDamage(5);
                 attackOrHealHero(damage, false);
             }
 
-            if (c.name == "holynova")
+            if (c.name == "kreisderheilung")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int heal = getSpellHeal(2);
@@ -4933,11 +4933,11 @@ namespace HREngine.Bots
 
             }
             //rogue #################################################
-            if (c.name == "preparation")
+            if (c.name == "vorbereitung")
             {
                 this.playedPreparation = true;
             }
-            if (c.name == "bladeflurry")
+            if (c.name == "klingenwirbel")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = this.ownWeaponAttack;
@@ -4950,18 +4950,18 @@ namespace HREngine.Bots
                 //destroy own weapon
                 this.lowerWeaponDurability(1000, true);
             }
-            if (c.name == "headcrack")
+            if (c.name == "schaedelbruch")
             {
                 int damage = getSpellDamageDamage(2);
                 attackOrHealHero(damage, false);
                 if (this.cardsPlayedThisTurn >= 1) this.owncarddraw++; // DONT DRAW A CARD WITH (drawAcard()) because we get this NEXT turn 
             }
-            if (c.name == "sinisterstrike")
+            if (c.name == "finstererstoss")
             {
                 int damage = getSpellDamageDamage(3);
                 attackOrHealHero(damage, false);
             }
-            if (c.name == "deadlypoison")
+            if (c.name == "toedlichesgift")
             {
                 if (this.ownWeaponName != "")
                 {
@@ -4969,7 +4969,7 @@ namespace HREngine.Bots
                     this.ownheroAngr += 2;
                 }
             }
-            if (c.name == "fanofknives")
+            if (c.name == "dolchfaecher")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(1);
@@ -4979,7 +4979,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "sprint")
+            if (c.name == "sprinten")
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -4989,7 +4989,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "vanish")
+            if (c.name == "verschwinden")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int heal = getSpellHeal(4);
@@ -5007,7 +5007,7 @@ namespace HREngine.Bots
             }
 
             //shaman #################################################
-            if (c.name == "forkedlightning" && this.enemyMinions.Count >= 2)
+            if (c.name == "gabelblitzschlag" && this.enemyMinions.Count >= 2)
             {
                 List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(2);
@@ -5021,14 +5021,14 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "farsight")
+            if (c.name == "fernsicht")
             {
                 this.owncarddraw++;
                 this.drawACard("");
 
             }
 
-            if (c.name == "lightningstorm")
+            if (c.name == "gewittersturm")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(2);
@@ -5043,15 +5043,15 @@ namespace HREngine.Bots
                 this.lostDamage += Math.Max(0, damage - maxHp); 
 
             }
-            if (c.name == "feralspirit")
+            if (c.name == "wildgeist")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("spiritwolf");
+                CardDB.Card kid = CardDB.Instance.getCardData("geisterwolf");
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
 
-            if (c.name == "totemicmight")
+            if (c.name == "machtdertotems")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -5064,7 +5064,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "bloodlust")
+            if (c.name == "kampfrausch")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
@@ -5078,7 +5078,7 @@ namespace HREngine.Bots
 
 
             //hexenmeister #################################################
-            if (c.name == "sensedemons")
+            if (c.name == "daemonenwahrnehmen")
             {
                 this.owncarddraw += 2;
                 this.drawACard("");
@@ -5086,7 +5086,7 @@ namespace HREngine.Bots
 
 
             }
-            if (c.name == "twistingnether")
+            if (c.name == "wirbelndernether")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 foreach (Minion enemy in temp)
@@ -5102,7 +5102,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "hellfire")
+            if (c.name == "hoellenfeuer")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(3);
@@ -5123,7 +5123,7 @@ namespace HREngine.Bots
 
 
             //druid #################################################
-            if (c.name == "souloftheforest")
+            if (c.name == "seeledeswaldes")
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_158e");
@@ -5135,13 +5135,13 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "innervate")
+            if (c.name == "anregen")
             {
                 this.mana = Math.Min(this.mana + 2  ,10);
 
             }
 
-            if (c.name == "bite")
+            if (c.name == "biss")
             {
                 this.ownheroAngr += 4;
                 this.ownHeroDefence += 4;
@@ -5152,7 +5152,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "claw")
+            if (c.name == "klaue")
             {
                 this.ownheroAngr += 2;
                 this.ownHeroDefence += 2;
@@ -5163,7 +5163,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "forceofnature")
+            if (c.name == "naturgewalt")
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk9");//Treant
@@ -5172,7 +5172,7 @@ namespace HREngine.Bots
                 callKid(kid, posi, true);
             }
 
-            if (c.name == "powerofthewild")// macht der wildnis with summoning
+            if (c.name == "machtderwildnis")// macht der wildnis with summoning
             {
                 if (choice == 1)
                 {
@@ -5189,7 +5189,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (c.name == "starfall")
+            if (c.name == "sternenregen")
             {
                 if (choice == 2)
                 {
@@ -5203,14 +5203,14 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "nourish")
+            if (c.name == "pflege")
             {
                 if (choice == 1)
                 {
                     if (this.ownMaxMana == 10)
                     {
                         this.owncarddraw++;
-                        this.drawACard("excessmana");
+                        this.drawACard("ueberschuessigesmana");
                     }
                     else
                     {
@@ -5220,7 +5220,7 @@ namespace HREngine.Bots
                     if (this.ownMaxMana == 10)
                     {
                         this.owncarddraw++;
-                        this.drawACard("excessmana");
+                        this.drawACard("ueberschuessigesmana");
                     }
                     else
                     {
@@ -5257,12 +5257,12 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "wildgrowth")
+            if (c.name == "wildwuchs")
             {
                 if (this.ownMaxMana == 10)
                 {
                     this.owncarddraw++;
-                    this.drawACard("excessmana");
+                    this.drawACard("ueberschuessigesmana");
                 }
                 else
                 {
@@ -5271,13 +5271,13 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "excessmana")
+            if (c.name == "ueberschuessigesmana")
             {
                 this.owncarddraw++;
                 this.drawACard("");
             }
 
-            if (c.name == "yseraawakens")
+            if (c.name == "yseraerwacht")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(5);
@@ -5302,7 +5302,7 @@ namespace HREngine.Bots
 
             }
 
-            if (c.name == "stomp")
+            if (c.name == "stampfen" )
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getSpellDamageDamage(2);
@@ -5332,9 +5332,9 @@ namespace HREngine.Bots
                 hc.position = this.owncards.Count + 1;
                 this.owncards.Add(hc);
             }
-            if (s == "fireball")
+            if (s == "feuerball")
             {
-                CardDB.Card c = CardDB.Instance.getCardData("fireball");
+                CardDB.Card c = CardDB.Instance.getCardData("feuerball");
                 Handmanager.Handcard hc = new Handmanager.Handcard();
                 hc.card = c;
                 hc.position = this.owncards.Count + 1;
@@ -5351,7 +5351,7 @@ namespace HREngine.Bots
                 {
                     if (m.silenced) continue;
 
-                    if (m.name == "knifejuggler") 
+                    if (m.name == "messerjongleur") 
                     {
                         if (this.enemyMinions.Count >= 1)
                         {
@@ -5372,7 +5372,7 @@ namespace HREngine.Bots
                         }
                     }
 
-                    if (own && m.name == "starvingbuzzard" && (TAG_RACE)c.race == TAG_RACE.PET)
+                    if (own && m.name == "verhungernderbussard" && (TAG_RACE)c.race == TAG_RACE.PET)
                     {
                         this.owncarddraw++;
                         this.drawACard("");
@@ -5388,11 +5388,11 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 if (m.silenced) continue;
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murlocgezeitenrufer" && c.race == 14)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "truebaugederalte" && c.race == 14)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
@@ -5402,11 +5402,11 @@ namespace HREngine.Bots
             {
                 if (m.silenced) continue;
                 //truebaugederalte
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murlocgezeitenrufer" && c.race == 14)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "truebaugederalte" && c.race == 14)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
@@ -5428,7 +5428,7 @@ namespace HREngine.Bots
                     minionGetBuffed(m, 1, 0, true);
                 }
 
-                if (m.name == "manaaddict")
+                if (m.name == "manasuechtige")
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_055o");
                     e.creator = m.entitiyID;
@@ -5436,29 +5436,29 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, true);
                 }
 
-                if (m.name == "secretkeeper" && c.Secret)
+                if (m.name == "geheimnisbewahrerin" && c.Secret)
                 {
                     minionGetBuffed(m, 1, 1, true);
                 }
 
-                if (m.name == "archmageantonidas")
+                if (m.name == "erzmagierantonidas")
                 {
-                    drawACard("fireball");
+                    drawACard("feuerball");
                 }
 
-                if (m.name == "violetteacher")
+                if (m.name == "violetteausbilderin")
                 {
 
-                    CardDB.Card d = CardDB.Instance.getCardData("violetapprentice");
+                    CardDB.Card d = CardDB.Instance.getCardData("violetterlehrling");
                     callKid(d, m.id, true);
                 }
 
-                if (m.name == "gadgetzanauctioneer")
+                if (m.name == "goblinauktionator")
                 {
                     this.owncarddraw++;
-                    drawACard("");
+                    drawACard("unknown");
                 }
-                if (m.name == "wildpyromancer")
+                if (m.name == "wilderpyromant")
                 {
                     wilderpyro = true;
                 }
@@ -5467,7 +5467,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
 
-                if (m.name == "secretkeeper" && c.Secret)
+                if (m.name == "geheimnisbewahrerin" && c.Secret)
                 {
                     minionGetBuffed(m, 1, 1, true);
                 }
@@ -5480,7 +5480,7 @@ namespace HREngine.Bots
                 {
                     if (m.silenced) continue;
 
-                    if (m.name == "wildpyromancer")
+                    if (m.name == "wilderpyromant")
                     {
                         List<Minion> temp2 = new List<Minion>(this.ownMinions);
                         foreach (Minion mnn in temp2)
@@ -5537,7 +5537,7 @@ namespace HREngine.Bots
                 b.cardEntitiy = cardEntity;
                 this.playactions.Add(b);
                 this.mobsplayedThisTurn++;
-                if (c.name == "kirintormage") this.playedmagierinderkirintor = true;
+                if (c.name == "magierinderkirintor") this.playedmagierinderkirintor = true;
 
             }
             else
@@ -5601,16 +5601,16 @@ namespace HREngine.Bots
             foreach (Minion mnn in temp)
             {
                 if (mnn.silenced) continue;
-                if (mnn.name == "illidanstormrage")
+                if (mnn.name == "illidansturmgrimm")
                 {
-                    CardDB.Card d = CardDB.Instance.getCardData("flameofazzinoth");
+                    CardDB.Card d = CardDB.Instance.getCardData("flammevonazzinoth");
                     callKid(d, mnn.id, true);
                 }
-                if (mnn.name == "questingadventurer")
+                if (mnn.name == "rastloserabenteurer")
                 {
                     minionGetBuffed(mnn, 1, 1, true);
                 }
-                if (mnn.name == "unboundelemental" && c.recallValue >= 1)
+                if (mnn.name == "entfesselterelementar" && c.recallValue >= 1)
                 {
                     minionGetBuffed(mnn, 1, 1, true);
                 }
@@ -5634,7 +5634,7 @@ namespace HREngine.Bots
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
             this.playactions.Add(a);
 
-            if (this.ownWeaponName == "truesilverchampion")
+            if (this.ownWeaponName == "echtsilberchampion")
             {
                 this.attackOrHealHero(-2, true);
             }
@@ -5653,14 +5653,14 @@ namespace HREngine.Bots
             if (!this.heroImmuneWhileAttacking)
             {
                 attackOrHealHero(enemy.Angr, true);
-                if (enemy.name == "waterelemental")
+                if (enemy.name == "wasserelementar")
                 {
                     this.ownHeroFrozen = true;
                 }
             }
 
             //todo
-            if (ownWeaponName == "gorehowl")
+            if (ownWeaponName == "blutschrei")
             {
                 this.ownWeaponAttack--;
                 this.ownheroAngr--;
@@ -5723,11 +5723,11 @@ namespace HREngine.Bots
                 int heal = 2;
                 if (this.auchenaiseelenpriesterin) heal = -2;
 
-                if (c.name == "mindspike")
+                if (c.name == "gedankenstachel")
                 {
                     heal = -1 * 2;
                 }
-                if (c.name == "mindshatter")
+                if (c.name == "gedankenzersplitterung")
                 {
                     heal = -1 * 3;
                 }
@@ -5768,7 +5768,7 @@ namespace HREngine.Bots
             if (heroname == "warlock")
             {
                 this.owncarddraw++;
-                drawACard("");
+                drawACard("unknown");
                 this.attackOrHealHero(2, true);
             }
 
@@ -5776,7 +5776,7 @@ namespace HREngine.Bots
             if (heroname == "thief")
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                CardDB.Card wcard = CardDB.Instance.getCardData("tueckischesmesser");
                 this.equipWeapon(wcard);
             }
 
@@ -5799,21 +5799,21 @@ namespace HREngine.Bots
             if (heroname == "pala")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                CardDB.Card kid = CardDB.Instance.getCardData("rekrutdersilbernenhand");
                 callKid(kid, posi, true);
             }
 
             if (heroname == "shaman")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardData("heiltotem");
                 callKid(kid, posi, true);
             }
 
             if (heroname == "lordjaraxxus")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                CardDB.Card kid = CardDB.Instance.getCardData("hoellenbestie");
                 callKid(kid, posi, true);
             }
 

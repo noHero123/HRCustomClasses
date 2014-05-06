@@ -494,14 +494,14 @@ namespace HREngine.Bots
             if (bfield == 6)
             {
 
-                Minion own1 = createNewMinion(cdb.getCardData("ruchloserunteroffizier"), 0); 
+                Minion own1 = createNewMinion(cdb.getCardData("abusivesergeant"), 0); 
                 own1.Ready = true;
                 this.ownMinions.Add(own1);
 
-                own1 = createNewMinion(cdb.getCardData("messerjongleur"), 0);
+                own1 = createNewMinion(cdb.getCardData("knifejuggler"), 0);
                 this.ownMinions.Add(own1);
 
-                own1 = createNewMinion(cdb.getCardData("argentumkommandant"), 0);
+                own1 = createNewMinion(cdb.getCardData("argentcommander"), 0);
                 own1.divineshild = false;
                 this.enemyMinions.Add(own1);
             }
