@@ -101,6 +101,7 @@ namespace HREngine.Bots
                     this.overdrive = Convert.ToInt32(s.Split(' ')[4]);
                     this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[2]);
                     this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[3]);
+                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[5]);
                 }
 
                 if (readstate == 1 && counter == 1) // class + hp + defence + immune
@@ -209,6 +210,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        if (maxhp > hp) tempminion.wounded = true;
 
 
 
@@ -270,6 +272,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        if (maxhp > hp) tempminion.wounded = true;
 
 
                     }
@@ -402,7 +405,7 @@ namespace HREngine.Bots
 
             if (c.Stealth) m.stealth = true;
 
-            if (m.name == "lichtbrut" && !m.silenced)
+            if (m.name == "lightspawn" && !m.silenced)
             {
                 m.Angr = m.Hp;
             }

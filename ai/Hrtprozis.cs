@@ -318,7 +318,7 @@ namespace HREngine.Bots
 
             if (c.Stealth) m.stealth = true;
 
-            if (m.name == "lichtbrut" && !m.silenced)
+            if (m.name == "lightspawn" && !m.silenced)
             {
                 m.Angr = m.Hp;
             }
@@ -355,7 +355,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID +" " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID +" " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+e.creator + " " +e.controllerOfCreator);
@@ -369,7 +369,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield " + m.divineshild + " wndfr:" + m.windfury);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury  + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);

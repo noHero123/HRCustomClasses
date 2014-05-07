@@ -18,6 +18,7 @@ namespace HREngine.Bots
 
         public Action bestmove = new Action();
         public int bestmoveValue = 0;
+        Playfield bestboard = new Playfield();
 
         private static Ai instance;
 
@@ -299,6 +300,7 @@ namespace HREngine.Bots
             bestplay.printActions();
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
+            this.bestboard = new Playfield(bestplay);
             if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
             {
                 Playfield pf = new Playfield();
@@ -438,6 +440,8 @@ namespace HREngine.Bots
             {
                 p.printBoard();
             }
+            help.logg("bestfield");
+            bestboard.printBoard();
         }
 
     }

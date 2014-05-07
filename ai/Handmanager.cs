@@ -209,6 +209,7 @@ namespace HREngine.Bots
                 h1.card = new CardDB.Card(h.card);
                 h1.entity = h.entity;
                 h1.position = h.position;
+                h1.card.entityID = h.entity;
                 this.handCards.Add(h1);
             }
             //this.handCards.AddRange(hc);
@@ -224,7 +225,7 @@ namespace HREngine.Bots
             help.logg("Own Handcards: ");
             foreach (Handmanager.Handcard c in this.handCards)
             {
-                help.logg("pos " + c.position + " " + c.card.name + " " + c.card.cost + " entity " + c.entity );
+                help.logg("pos " + c.position + " " + c.card.name + " " + c.card.cost + " entity " + c.entity);
             }
         }
 

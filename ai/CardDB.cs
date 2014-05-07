@@ -147,6 +147,7 @@ namespace HREngine.Bots
 
             public Card(Card c)
             {
+                this.entityID = c.entityID;
                 this.rarity = c.rarity;
                 this.AdjacentBuff = c.AdjacentBuff;
                 this.Attack = c.Attack;
