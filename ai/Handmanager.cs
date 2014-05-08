@@ -177,6 +177,13 @@ namespace HREngine.Bots
 
         }
 
+        public void clearAll()
+        {
+            this.handCards.Clear();
+            this.anzcards = 0;
+            this.enemyAnzCards = 0;
+            this.ownPlayerController = 0;
+        }
 
         public void setOwnPlayer(int player)
         {

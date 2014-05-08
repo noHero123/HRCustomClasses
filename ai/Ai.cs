@@ -193,12 +193,14 @@ namespace HREngine.Bots
                                         cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
                                         if (cardplayPenality <= 499)
                                         {
+                                            havedonesomething = true;
                                             pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
                                     }
                                     else
                                     {
+                                        havedonesomething = true;
                                         pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                         this.posmoves.Add(pf);
                                     }
@@ -216,12 +218,14 @@ namespace HREngine.Bots
                                             cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
                                             if (cardplayPenality <= 499)
                                             {
+                                                havedonesomething = true;
                                                 pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                                 this.posmoves.Add(pf);
                                             }
                                         }
                                         else
                                         {
+                                            havedonesomething = true;
                                             pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
@@ -242,7 +246,7 @@ namespace HREngine.Bots
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
                             List<targett> trgts = p.getAttackTargets();
-                            havedonesomething = true;
+                            
                             foreach (targett trgt in trgts)
                             {
                                 Playfield pf = new Playfield(p);
@@ -254,12 +258,14 @@ namespace HREngine.Bots
                                     attackPenality = penman.getAttackWithMininonPenality(m, pf, trgt.target);
                                     if (attackPenality <= 499)
                                     {
+                                        havedonesomething = true;
                                         pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                                         this.posmoves.Add(pf);
                                     }
                                 }
                                 else
                                 {
+                                    havedonesomething = true;
                                     pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                                     this.posmoves.Add(pf);
                                 }
@@ -298,7 +304,7 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
-                                havedonesomething = true;
+                                
                                 Playfield pf = new Playfield(p);
 
                                 if (usePenalityManager)
@@ -306,12 +312,14 @@ namespace HREngine.Bots
                                     abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
                                     if (abilityPenality <= 499)
                                     {
+                                        havedonesomething = true;
                                         pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                         this.posmoves.Add(pf);
                                     }
                                 }
                                 else
                                 {
+                                    havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                     this.posmoves.Add(pf);
                                 }
@@ -320,7 +328,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            havedonesomething = true;
+                            
                             Playfield pf = new Playfield(p);
 
                             if (usePenalityManager)
@@ -328,12 +336,14 @@ namespace HREngine.Bots
                                 abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
                                 if (abilityPenality <= 499)
                                 {
+                                    havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
                                     this.posmoves.Add(pf);
                                 }
                             }
                             else
                             {
+                                havedonesomething = true;
                                 pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
                                 this.posmoves.Add(pf);
                             }
@@ -377,10 +387,6 @@ namespace HREngine.Bots
                     cuttingposibilities(botBase);
                 }
                 help.logg("cut to len " + this.posmoves.Count);
-                /*if ((deep + 1) % 4 == 0)
-                {
-                    help.logg("cut");
-                }*/
                 help.loggonoff(false);
                 deep++;
 
@@ -410,12 +416,12 @@ namespace HREngine.Bots
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
             this.bestboard = new Playfield(bestplay);
-            if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
+            /*if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
             {
                 Playfield pf = new Playfield();
                 help.logg("bestplaces:");
                 pf.getBestPlacePrint(bestmove.card);
-            }
+            }*/
 
         }
 

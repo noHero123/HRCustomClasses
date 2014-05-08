@@ -89,6 +89,45 @@ namespace HREngine.Bots
 
         }
 
+        public void clearAll()
+        {
+            ownHeroEntity = -1;
+            enemyHeroEntitiy = -1;
+            tempwounded = false;
+            currentMana = 0;
+            heroHp = 30;
+            enemyHp = 30;
+            heroAtk = 0;
+            enemyAtk = 0;
+            heroDefence = 0; enemyDefence = 0;
+            ownheroisread = false;
+            ownAbilityisReady = false;
+            ownHeroNumAttacksThisTurn = 0;
+            ownHeroWindfury = false;
+            ownSecretList.Clear();
+            enemySecretCount = 0;
+            heroname = "druid";
+            enemyHeroname = "druid";
+            heroAbility = new CardDB.Card();
+            anzEnemys = 0;
+            anzOwn = 0;
+            herofrozen = false;
+            enemyfrozen = false;
+            numMinionsPlayedThisTurn = 0;
+            cardsPlayedThisTurn = 0;
+            ueberladung = 0;
+            ownMaxMana = 0;
+            enemyMaxMana = 0;
+            enemyWeaponDurability = 0;
+            enemyWeaponAttack = 0;
+            enemyHeroWeapon = "";
+            heroWeaponDurability = 0;
+            heroWeaponAttack = 0;
+            ownHeroWeapon = "";
+            heroImmuneToDamageWhileAttacking = false;
+            ownMinions.Clear();
+            enemyMinions.Clear();
+        }
 
 
         public void setOwnPlayer(int player)

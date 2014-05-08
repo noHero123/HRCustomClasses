@@ -24,6 +24,7 @@ namespace HREngine.Bots
           OnBattleStateUpdate = HandleOnBattleStateUpdate;
           OnMulliganStateUpdate = HandleBattleMulliganPhase;
           this.sf = new Silverfish();
+          sf.setnewLoggFile();
           //Ai.Instance.autoTester(this);
       }
 
@@ -89,7 +90,7 @@ namespace HREngine.Bots
               retval += m.Angr * 2;
               retval += m.card.rarity;
               if (m.windfury) retval += m.Angr;
-              //if (m.divineshild) retval += 1;
+              if (m.divineshild) retval += 1;
               if (m.stealth) retval += 1;
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;
@@ -158,7 +159,7 @@ namespace HREngine.Bots
                   HRMulligan.ToggleCard(item);
                }
             }
-
+            sf.setnewLoggFile();
             return null;
             //HRMulligan.EndMulligan();
          }
@@ -352,7 +353,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        string path = (HRSettings.Get.CustomRuleFilePath).Split(new string[] { "Common" }, StringSplitOptions.RemoveEmptyEntries)[0];
+
         Settings sttngs = Settings.Instance;
 
         List<Minion> ownMinions = new List<Minion>();
@@ -407,11 +408,20 @@ namespace HREngine.Bots
         public Silverfish()
         {
             HRLog.Write("init Silverfish");
-            sttngs.setFilePath(this.path);
+            string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
+            System.IO.Directory.CreateDirectory(path);
+            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+            sttngs.setLoggPath(path);
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
             RejectedCardList = new Dictionary<int, HRCard>();
             NextFixedAction = null;*/
+        }
+
+        public void setnewLoggFile()
+        {
+            sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
+            Helpfunctions.Instance.createNewLoggfile();
         }
 
         public void updateEverything(Bot botbase)
@@ -430,6 +440,9 @@ namespace HREngine.Bots
             getHandcards();
 
             // send ai the data:
+            Hrtprozis.Instance.clearAll();
+            Handmanager.Instance.clearAll();
+
             Hrtprozis.Instance.setOwnPlayer(ownPlayerController);
             Handmanager.Instance.setOwnPlayer(ownPlayerController);
 
@@ -842,7 +855,6 @@ namespace HREngine.Bots
         }
 
     }
-
     public class Playfield
     {
         public bool logging = false;
@@ -6737,7 +6749,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Ai
     {
 
@@ -6926,12 +6937,14 @@ namespace HREngine.Bots
                                         cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
                                         if (cardplayPenality <= 499)
                                         {
+                                            havedonesomething = true;
                                             pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
                                     }
                                     else
                                     {
+                                        havedonesomething = true;
                                         pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                         this.posmoves.Add(pf);
                                     }
@@ -6949,12 +6962,14 @@ namespace HREngine.Bots
                                             cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
                                             if (cardplayPenality <= 499)
                                             {
+                                                havedonesomething = true;
                                                 pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                                 this.posmoves.Add(pf);
                                             }
                                         }
                                         else
                                         {
+                                            havedonesomething = true;
                                             pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
@@ -6975,7 +6990,7 @@ namespace HREngine.Bots
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
                             List<targett> trgts = p.getAttackTargets();
-                            havedonesomething = true;
+
                             foreach (targett trgt in trgts)
                             {
                                 Playfield pf = new Playfield(p);
@@ -6987,12 +7002,14 @@ namespace HREngine.Bots
                                     attackPenality = penman.getAttackWithMininonPenality(m, pf, trgt.target);
                                     if (attackPenality <= 499)
                                     {
+                                        havedonesomething = true;
                                         pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                                         this.posmoves.Add(pf);
                                     }
                                 }
                                 else
                                 {
+                                    havedonesomething = true;
                                     pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                                     this.posmoves.Add(pf);
                                 }
@@ -7031,7 +7048,7 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
-                                havedonesomething = true;
+
                                 Playfield pf = new Playfield(p);
 
                                 if (usePenalityManager)
@@ -7039,12 +7056,14 @@ namespace HREngine.Bots
                                     abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
                                     if (abilityPenality <= 499)
                                     {
+                                        havedonesomething = true;
                                         pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                         this.posmoves.Add(pf);
                                     }
                                 }
                                 else
                                 {
+                                    havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                     this.posmoves.Add(pf);
                                 }
@@ -7053,7 +7072,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            havedonesomething = true;
+
                             Playfield pf = new Playfield(p);
 
                             if (usePenalityManager)
@@ -7061,12 +7080,14 @@ namespace HREngine.Bots
                                 abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
                                 if (abilityPenality <= 499)
                                 {
+                                    havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
                                     this.posmoves.Add(pf);
                                 }
                             }
                             else
                             {
+                                havedonesomething = true;
                                 pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
                                 this.posmoves.Add(pf);
                             }
@@ -7110,10 +7131,6 @@ namespace HREngine.Bots
                     cuttingposibilities(botBase);
                 }
                 help.logg("cut to len " + this.posmoves.Count);
-                /*if ((deep + 1) % 4 == 0)
-                {
-                    help.logg("cut");
-                }*/
                 help.loggonoff(false);
                 deep++;
 
@@ -7143,12 +7160,12 @@ namespace HREngine.Bots
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
             this.bestboard = new Playfield(bestplay);
-            if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
+            /*if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
             {
                 Playfield pf = new Playfield();
                 help.logg("bestplaces:");
                 pf.getBestPlacePrint(bestmove.card);
-            }
+            }*/
 
         }
 
@@ -7458,6 +7475,13 @@ namespace HREngine.Bots
 
         }
 
+        public void clearAll()
+        {
+            this.handCards.Clear();
+            this.anzcards = 0;
+            this.enemyAnzCards = 0;
+            this.ownPlayerController = 0;
+        }
 
         public void setOwnPlayer(int player)
         {
@@ -7704,6 +7728,45 @@ namespace HREngine.Bots
 
         }
 
+        public void clearAll()
+        {
+            ownHeroEntity = -1;
+            enemyHeroEntitiy = -1;
+            tempwounded = false;
+            currentMana = 0;
+            heroHp = 30;
+            enemyHp = 30;
+            heroAtk = 0;
+            enemyAtk = 0;
+            heroDefence = 0; enemyDefence = 0;
+            ownheroisread = false;
+            ownAbilityisReady = false;
+            ownHeroNumAttacksThisTurn = 0;
+            ownHeroWindfury = false;
+            ownSecretList.Clear();
+            enemySecretCount = 0;
+            heroname = "druid";
+            enemyHeroname = "druid";
+            heroAbility = new CardDB.Card();
+            anzEnemys = 0;
+            anzOwn = 0;
+            herofrozen = false;
+            enemyfrozen = false;
+            numMinionsPlayedThisTurn = 0;
+            cardsPlayedThisTurn = 0;
+            ueberladung = 0;
+            ownMaxMana = 0;
+            enemyMaxMana = 0;
+            enemyWeaponDurability = 0;
+            enemyWeaponAttack = 0;
+            enemyHeroWeapon = "";
+            heroWeaponDurability = 0;
+            heroWeaponAttack = 0;
+            ownHeroWeapon = "";
+            heroImmuneToDamageWhileAttacking = false;
+            ownMinions.Clear();
+            enemyMinions.Clear();
+        }
 
 
         public void setOwnPlayer(int player)
@@ -8227,19 +8290,24 @@ namespace HREngine.Bots
             }
         }
 
-        string path = Settings.Instance.path;
+        string path = Settings.Instance.logpath;
 
 
         private Helpfunctions()
         {
 
-            System.IO.File.WriteAllText(path + "Logg.txt", "");
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
         }
 
         private bool writelogg = true;
         public void loggonoff(bool onoff)
         {
             //writelogg = onoff;
+        }
+
+        public void createNewLoggfile()
+        {
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
         }
 
         public void logg(string s)
@@ -8249,7 +8317,7 @@ namespace HREngine.Bots
             if (!writelogg) return;
             try
             {
-                using (StreamWriter sw = File.AppendText(path + "Logg.txt"))
+                using (StreamWriter sw = File.AppendText(path + Settings.Instance.logfile))
                 {
                     sw.WriteLine(s);
                 }
@@ -11837,10 +11905,13 @@ namespace HREngine.Bots
         GENERAL
     }
 
+
     class Settings
     {
 
         public string path = "";
+        public string logpath = "";
+        public string logfile = "Logg.txt";
         private static Settings instance;
 
         public static Settings Instance
@@ -11863,6 +11934,15 @@ namespace HREngine.Bots
         public void setFilePath(string path)
         {
             this.path = path;
+        }
+        public void setLoggPath(string path)
+        {
+            this.logpath = path;
+        }
+
+        public void setLoggFile(string path)
+        {
+            this.logfile = path;
         }
     }
 

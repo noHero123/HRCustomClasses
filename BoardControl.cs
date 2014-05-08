@@ -80,7 +80,7 @@ namespace HREngine.Bots
               retval += m.Angr * 2;
               retval += m.card.rarity;
               if (m.windfury) retval += m.Angr;
-              //if (m.divineshild) retval += 1;
+              if (m.divineshild) retval += 1;
               if (m.stealth) retval += 1;
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;

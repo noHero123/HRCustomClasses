@@ -27,6 +27,7 @@ namespace HREngine.Bots
           OnBattleStateUpdate = HandleOnBattleStateUpdate;
           OnMulliganStateUpdate = HandleBattleMulliganPhase;
           this.sf = new Silverfish();
+          sf.setnewLoggFile();
           //Ai.Instance.autoTester(this);
       }
 
@@ -46,6 +47,7 @@ namespace HREngine.Bots
                }
             }
 
+            sf.setnewLoggFile();
             return null;
             //HRMulligan.EndMulligan();
          }

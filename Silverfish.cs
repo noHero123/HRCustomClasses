@@ -12,7 +12,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        string path = (HRSettings.Get.CustomRuleFilePath).Split(new string[] { "Common" }, StringSplitOptions.RemoveEmptyEntries)[0];
+        
         Settings sttngs = Settings.Instance;
 
         List<Minion> ownMinions = new List<Minion>();
@@ -67,11 +67,21 @@ namespace HREngine.Bots
         public Silverfish()
         {
             HRLog.Write("init Silverfish");
-            sttngs.setFilePath(this.path);
+            string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
+            System.IO.Directory.CreateDirectory(path);
+            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+            sttngs.setLoggPath(path);
+            
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
             RejectedCardList = new Dictionary<int, HRCard>();
             NextFixedAction = null;*/
+        }
+
+        public void setnewLoggFile()
+        {
+            sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
+            Helpfunctions.Instance.createNewLoggfile();
         }
 
         public void updateEverything(Bot botbase)
@@ -90,6 +100,9 @@ namespace HREngine.Bots
             getHandcards();
 
             // send ai the data:
+            Hrtprozis.Instance.clearAll();
+            Handmanager.Instance.clearAll();
+
             Hrtprozis.Instance.setOwnPlayer(ownPlayerController);
             Handmanager.Instance.setOwnPlayer(ownPlayerController);
 

@@ -47,19 +47,24 @@ namespace HREngine.Bots
             }
         }
 
-        string path = Settings.Instance.path;
+        string path = Settings.Instance.logpath;
 
 
         private Helpfunctions()
         {
 
-            System.IO.File.WriteAllText(path + "Logg.txt", "");
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
         }
 
         private bool writelogg = true;
         public void loggonoff(bool onoff)
         {
             //writelogg = onoff;
+        }
+
+        public void createNewLoggfile()
+        {
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
         }
 
         public void logg(string s)
@@ -69,7 +74,7 @@ namespace HREngine.Bots
             if (!writelogg) return;
             try
             {
-                using (StreamWriter sw = File.AppendText(path + "Logg.txt"))
+                using (StreamWriter sw = File.AppendText(path + Settings.Instance.logfile))
                 {
                     sw.WriteLine(s);
                 }
