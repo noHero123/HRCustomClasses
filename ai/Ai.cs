@@ -10,6 +10,10 @@ namespace HREngine.Bots
 
         private int maxdeep = 12;
         private int maxwide = 7000;
+        private bool usePenalityManager = true;
+
+        PenalityManager penman = PenalityManager.Instance;
+
         List<Playfield> posmoves = new List<Playfield>();
 
         Hrtprozis hp = Hrtprozis.Instance;
@@ -77,21 +81,47 @@ namespace HREngine.Bots
 
                     int bestplace = p.getBestPlace(c);
                     List<targett> trgts = c.getTargetsForCard(p);
-
+                    int cardplayPenality = 0;
                     if (trgts.Count == 0)
                     {
                         Playfield pf = new Playfield(p);
 
-                        pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace);
-                        this.posmoves.Add(pf);
+                        if (usePenalityManager)
+                        {
+                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                            if (cardplayPenality <= 499)
+                            {
+                                pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                                this.posmoves.Add(pf);
+                            }
+                        }
+                        else
+                        {
+                            pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                            this.posmoves.Add(pf);
+                        }
+                       
                     }
                     else
                     {
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
-                            pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace);
-                            this.posmoves.Add(pf);
+                            if (usePenalityManager)
+                            {
+                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                                if (cardplayPenality <= 499)
+                                {
+                                    pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                    this.posmoves.Add(pf);
+                                }
+                            }
+                            else
+                            {
+                                pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                this.posmoves.Add(pf);
+                            }
+
                         }
                     }
 
@@ -130,6 +160,7 @@ namespace HREngine.Bots
 
                     //take a card and play it
                     List<string> playedcards = new List<string>();
+
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
                         CardDB.Card c = hc.card;
@@ -151,19 +182,50 @@ namespace HREngine.Bots
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
+                                int cardplayPenality = 0;
+
                                 if (trgts.Count == 0)
                                 {
                                     Playfield pf = new Playfield(p);
-                                    pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0,bestplace);
-                                    this.posmoves.Add(pf);
+
+                                    if (usePenalityManager)
+                                    {
+                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                        if (cardplayPenality <= 499)
+                                        {
+                                            pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            this.posmoves.Add(pf);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+
+                                    
                                 }
                                 else
                                 {
                                     foreach (targett trgt in trgts)
                                     {
                                         Playfield pf = new Playfield(p);
-                                        pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0,bestplace);
-                                        this.posmoves.Add(pf);
+
+                                        if (usePenalityManager)
+                                        {
+                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                            if (cardplayPenality <= 499)
+                                            {
+                                                pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                this.posmoves.Add(pf);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                            this.posmoves.Add(pf);
+                                        }
+
                                     }
 
                                 }
@@ -184,8 +246,25 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
                                 Playfield pf = new Playfield(p);
-                                pf.attackWithMinion(m, trgt.target, trgt.targetEntity);
-                                this.posmoves.Add(pf);
+
+                                int attackPenality = 0;
+
+                                if (usePenalityManager)
+                                {
+                                    attackPenality = penman.getAttackWithMininonPenality(m, pf, trgt.target);
+                                    if (attackPenality <= 499)
+                                    {
+                                        pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                    this.posmoves.Add(pf);
+                                }
+
+                                
                             }
 
                         }
@@ -209,6 +288,8 @@ namespace HREngine.Bots
                     /// TODO check if ready after manaup
                     if (p.ownAbilityReady && p.mana >= 2)
                     {
+                        int abilityPenality = 0;
+
                         havedonesomething = true;
                         if (this.hp.heroname == "mage" || this.hp.heroname == "priest")
                         {
@@ -219,16 +300,44 @@ namespace HREngine.Bots
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
                                 havedonesomething = true;
                                 Playfield pf = new Playfield(p);
-                                pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity);
-                                this.posmoves.Add(pf);
+
+                                if (usePenalityManager)
+                                {
+                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                    if (abilityPenality <= 499)
+                                    {
+                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                    this.posmoves.Add(pf);
+                                }
+
                             }
                         }
                         else
                         {
                             havedonesomething = true;
                             Playfield pf = new Playfield(p);
-                            pf.activateAbility(p.ownHeroAblility, -1, -1);
-                            this.posmoves.Add(pf);
+
+                            if (usePenalityManager)
+                            {
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                                if (abilityPenality <= 499)
+                                {
+                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                    this.posmoves.Add(pf);
+                                }
+                            }
+                            else
+                            {
+                                pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                this.posmoves.Add(pf);
+                            }
+
                         }
 
                     }

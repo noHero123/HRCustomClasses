@@ -6,7 +6,7 @@ using System.Text;
 namespace HREngine.Bots
 {
     // reads the board and simulates it
-    class BoardTester
+    public class BoardTester
     {
         int ownPlayer = 1;
 

@@ -123,7 +123,6 @@ namespace HREngine.Bots
 
             retval -= p.enemySecretCount;
             retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
-            retval -= p.lostHeal;
             retval -= p.lostWeaponDamage;
             if (p.ownMinions.Count == 0) retval -= 20;
             if (p.enemyMinions.Count >= 4) retval -= 200;
@@ -532,7 +531,7 @@ namespace HREngine.Bots
                 this.heroWeaponAttack = weapon.GetATK();
                 this.heroWeaponDurability = weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
-                if (this.ownHeroWeapon == "langbogendesgladiators")
+                if (this.ownHeroWeapon == "gladiatorslongbow")
                 {
                     this.heroImmuneToDamageWhileAttacking = true;
                 }
@@ -641,7 +640,7 @@ namespace HREngine.Bots
                         m.Ready = true;
                     }
 
-                    if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst"))
+                    if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
                     {
                         m.Ready = false;
                     }
@@ -836,7 +835,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Playfield
     {
         public bool logging = false;
@@ -905,6 +903,7 @@ namespace HREngine.Bots
         public int ownMobsCountStarted = 0;
         public int ownCardsCountStarted = 0;
         public int ownHeroHpStarted = 30;
+        public int enemyHeroHpStarted = 30;
 
         public int mobsplayedThisTurn = 0;
         public int startedWithMobsPlayedThisTurn = 0;
@@ -997,6 +996,7 @@ namespace HREngine.Bots
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = this.ownHeroHp;
+            this.enemyHeroHpStarted = this.enemyHeroHp;
             this.ownWeaponAttackStarted = this.ownWeaponAttack;
             this.ownCardsCountStarted = this.owncards.Count;
             this.ownMobsCountStarted = this.ownMinions.Count;
@@ -1127,6 +1127,7 @@ namespace HREngine.Bots
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = p.ownHeroHpStarted;
+            this.enemyHeroHp = p.enemyHeroHp;
             this.ownWeaponAttackStarted = p.ownWeaponAttackStarted;
             this.ownCardsCountStarted = p.ownCardsCountStarted;
             this.ownMobsCountStarted = p.ownMobsCountStarted;
@@ -3040,7 +3041,7 @@ namespace HREngine.Bots
         {
             if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) return;
 
-            if (!m.playedThisTurn && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+            if (!m.playedThisTurn && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
             {
                 m.Ready = true;
             }
@@ -3510,9 +3511,9 @@ namespace HREngine.Bots
             }
         }
 
-        public void attackWithMinion(Minion ownMinion, int target, int targetEntity)
+        public void attackWithMinion(Minion ownMinion, int target, int targetEntity, int penality)
         {
-
+            this.evaluatePenality += penality;
             Action a = new Action();
             a.minionplay = true;
             a.owntarget = ownMinion.id;
@@ -4465,11 +4466,7 @@ namespace HREngine.Bots
 
             // but before additional minions span next to it! (because we buff the minion in createNewMinion and swordofjustice gives summeond minons his buff first!
             int spawnkids = spawnKids(c, mobplace - 1, true, choice); //  if a mob targets something, it doesnt spawn minions!?
-            if (target >= 0)
-            {
-                // the OWNtargets right of the placed mobs are going up :D
-                if (target < 10 && target > mobplace + spawnkids) target++;
-            }
+
 
             //create the new minion
             Minion m = createNewMinion(c, mobplace, true);
@@ -4489,9 +4486,12 @@ namespace HREngine.Bots
             addMiniontoList(m, this.ownMinions, mobplace, true);
             if (logging) help.logg("added " + m.card.name);
 
-
-
-
+            //only for fun :D
+            if (target >= 0)
+            {
+                // the OWNtargets right of the placed mobs are going up :D
+                if (target < 10 && target > mobplace + spawnkids) target++;
+            }
 
             a.enemytarget = target;
             a.owntarget = mobplace + 1; //1==before the 1.minion on board , 2 ==before the 2. minion o board (from left)
@@ -5715,7 +5715,7 @@ namespace HREngine.Bots
             if (c.name == "bladeflurry")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
-                int damage = this.ownWeaponAttack;
+                int damage = this.getSpellDamageDamage(this.ownWeaponAttack);
                 foreach (Minion enemy in temp)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -6288,8 +6288,9 @@ namespace HREngine.Bots
 
         }
 
-        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos)
+        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos, int penality)
         {
+            this.evaluatePenality += penality;
             // lock at frostnova (click) / frostblitz (no click)
             this.mana = this.mana - c.getManaCost(this);
 
@@ -6447,8 +6448,9 @@ namespace HREngine.Bots
 
         }
 
-        public void activateAbility(CardDB.Card c, int target, int targetEntity)
+        public void activateAbility(CardDB.Card c, int target, int targetEntity, int penality)
         {
+            this.evaluatePenality += penality;
             string heroname = this.ownHeroName;
             this.ownAbilityReady = false;
             this.mana -= 2;
@@ -6728,11 +6730,16 @@ namespace HREngine.Bots
 
     }
 
+
     public class Ai
     {
 
         private int maxdeep = 12;
         private int maxwide = 7000;
+        private bool usePenalityManager = true;
+
+        PenalityManager penman = PenalityManager.Instance;
+
         List<Playfield> posmoves = new List<Playfield>();
 
         Hrtprozis hp = Hrtprozis.Instance;
@@ -6800,21 +6807,47 @@ namespace HREngine.Bots
 
                     int bestplace = p.getBestPlace(c);
                     List<targett> trgts = c.getTargetsForCard(p);
-
+                    int cardplayPenality = 0;
                     if (trgts.Count == 0)
                     {
                         Playfield pf = new Playfield(p);
 
-                        pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace);
-                        this.posmoves.Add(pf);
+                        if (usePenalityManager)
+                        {
+                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                            if (cardplayPenality <= 499)
+                            {
+                                pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                                this.posmoves.Add(pf);
+                            }
+                        }
+                        else
+                        {
+                            pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                            this.posmoves.Add(pf);
+                        }
+
                     }
                     else
                     {
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
-                            pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace);
-                            this.posmoves.Add(pf);
+                            if (usePenalityManager)
+                            {
+                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                                if (cardplayPenality <= 499)
+                                {
+                                    pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                    this.posmoves.Add(pf);
+                                }
+                            }
+                            else
+                            {
+                                pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                this.posmoves.Add(pf);
+                            }
+
                         }
                     }
 
@@ -6853,6 +6886,7 @@ namespace HREngine.Bots
 
                     //take a card and play it
                     List<string> playedcards = new List<string>();
+
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
                         CardDB.Card c = hc.card;
@@ -6869,26 +6903,55 @@ namespace HREngine.Bots
                         else
                         {
                             int bestplace = p.getBestPlace(c);
-                            //help.logg("bestplace for " + c.name + " " + bestplace);
-                            //p.getBestPlacePrint(c);
                             if (c.canplayCard(p))
                             {
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
+                                int cardplayPenality = 0;
+
                                 if (trgts.Count == 0)
                                 {
                                     Playfield pf = new Playfield(p);
-                                    pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace);
-                                    this.posmoves.Add(pf);
+
+                                    if (usePenalityManager)
+                                    {
+                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                        if (cardplayPenality <= 499)
+                                        {
+                                            pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            this.posmoves.Add(pf);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+
+
                                 }
                                 else
                                 {
                                     foreach (targett trgt in trgts)
                                     {
                                         Playfield pf = new Playfield(p);
-                                        pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace);
-                                        this.posmoves.Add(pf);
+
+                                        if (usePenalityManager)
+                                        {
+                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                            if (cardplayPenality <= 499)
+                                            {
+                                                pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                this.posmoves.Add(pf);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                            this.posmoves.Add(pf);
+                                        }
+
                                     }
 
                                 }
@@ -6909,8 +6972,25 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
                                 Playfield pf = new Playfield(p);
-                                pf.attackWithMinion(m, trgt.target, trgt.targetEntity);
-                                this.posmoves.Add(pf);
+
+                                int attackPenality = 0;
+
+                                if (usePenalityManager)
+                                {
+                                    attackPenality = penman.getAttackWithMininonPenality(m, pf, trgt.target);
+                                    if (attackPenality <= 499)
+                                    {
+                                        pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                    this.posmoves.Add(pf);
+                                }
+
+
                             }
 
                         }
@@ -6934,6 +7014,8 @@ namespace HREngine.Bots
                     /// TODO check if ready after manaup
                     if (p.ownAbilityReady && p.mana >= 2)
                     {
+                        int abilityPenality = 0;
+
                         havedonesomething = true;
                         if (this.hp.heroname == "mage" || this.hp.heroname == "priest")
                         {
@@ -6944,16 +7026,44 @@ namespace HREngine.Bots
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
                                 havedonesomething = true;
                                 Playfield pf = new Playfield(p);
-                                pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity);
-                                this.posmoves.Add(pf);
+
+                                if (usePenalityManager)
+                                {
+                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                    if (abilityPenality <= 499)
+                                    {
+                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                        this.posmoves.Add(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                    this.posmoves.Add(pf);
+                                }
+
                             }
                         }
                         else
                         {
                             havedonesomething = true;
                             Playfield pf = new Playfield(p);
-                            pf.activateAbility(p.ownHeroAblility, -1, -1);
-                            this.posmoves.Add(pf);
+
+                            if (usePenalityManager)
+                            {
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                                if (abilityPenality <= 499)
+                                {
+                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                    this.posmoves.Add(pf);
+                                }
+                            }
+                            else
+                            {
+                                pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                this.posmoves.Add(pf);
+                            }
+
                         }
 
                     }
@@ -8150,6 +8260,1083 @@ namespace HREngine.Bots
 
     }
 
+    public class PenalityManager
+    {
+        //todo acolyteofpain
+        //todo better aoe-penality
+
+        Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> HealTargetDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> HealHeroDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> HealAllDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> DamageTargetDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> DamageTargetSpecialDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> DamageAllDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> DamageHeroDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> DamageRandomDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> DamageAllEnemysDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> enrageDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> silenceDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> heroAttackBuffDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> attackBuffDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> healthBuffDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> tauntBuffDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> cardDrawBattleCryDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
+
+
+        private static PenalityManager instance;
+
+        public static PenalityManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new PenalityManager();
+                }
+                return instance;
+            }
+        }
+
+        private PenalityManager()
+        {
+            setupHealDatabase();
+            setupEnrageDatabase();
+            setupDamageDatabase();
+            setupPriorityList();
+            setupsilenceDatabase();
+            setupAttackBuff();
+            setupHealthBuff();
+            setupCardDrawBattlecry();
+            setupDiscardCards();
+            setupDestroyOwnCards();
+        }
+
+        public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
+        {
+            int pen = 0;
+            pen = getAttackSecretPenality(m, p, target);
+            return pen;
+        }
+
+        public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice)
+        {
+            int retval = 0;
+            string name = card.name;
+            //there is no reason to buff HP of minon (because it is not healed)
+
+            int abuff = getAttackBuffPenality(name, target, p, choice);
+            int tbuff = getTauntBuffPenality(name, target, p, choice);
+            if (name == "markofthewild" && ((abuff == 500 || tbuff == 0) || (abuff == 0 || tbuff == 500)))
+            {
+                retval = 0;
+            }
+            else
+            {
+                retval += abuff + tbuff;
+            }
+
+            retval += getSilencePenality(name, target, p, choice);
+            retval += getDamagePenality(name, target, p, choice);
+            retval += getHealPenality(name, target, p, choice);
+            retval += getCardDrawPenality(name, target, p, choice);
+            retval += getCardDrawofEffectMinions(card, p);
+            retval += getCardDiscardPenality(name, p);
+            retval += getDestroyPenality(name, target, p);
+            retval += getSpecialCardComboPenalitys(name, target, p);
+            retval += playSecretPenality(card, p);
+            retval += getPlayCardSecretPenality(card, p);
+
+            return retval;
+        }
+
+        private int getAttackBuffPenality(string name, int target, Playfield p, int choice)
+        {
+            int pen = 0;
+            //buff enemy?
+            if (target >= 10 && target <= 19)
+            {
+                //allow it if you have biggamehunter
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "biggamehunter") return pen;
+                    if (hc.card.name == "shadowworddeath") return pen;
+                }
+
+                pen = 500;
+            }
+
+            return pen;
+        }
+
+        private int getTauntBuffPenality(string name, int target, Playfield p, int choice)
+        {
+            int pen = 0;
+            //buff enemy?
+            if (!this.tauntBuffDatabase.ContainsKey(name)) return 0;
+            if (name == "markofnature" && choice != 2) return 0;
+
+            if (target >= 10 && target <= 19)
+            {
+                //allow it if you have black knight
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "theblackknight") return 0;
+                }
+
+                // allow taunting if target is priority and others have taunt
+                bool enemyhasTaunts = false;
+                foreach (Minion mnn in p.enemyMinions)
+                {
+                    if (mnn.taunt)
+                    {
+                        enemyhasTaunts = true;
+                        break;
+                    }
+                }
+                Minion m = p.enemyMinions[target - 10];
+                if (enemyhasTaunts && this.priorityDatabase.ContainsKey(m.name))
+                {
+                    return 0;
+                }
+
+                pen = 500;
+            }
+
+            return pen;
+        }
+
+        private int getSilencePenality(string name, int target, Playfield p, int choice)
+        {
+            int pen = 0;
+            if (name == "earthshock") return 0;//earthshock is handled in damage stuff
+            if (name == "keeperofthegrove" && choice != 2) return 0; // look at damage penality in this case
+
+            if (target >= 0 && target <= 9)
+            {
+                if (this.silenceDatabase.ContainsKey(name))
+                {
+                    // no pen if own is enrage
+                    Minion m = p.ownMinions[target];
+
+                    if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.card.Attack || m.maxHp < m.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
+                    {
+                        return 0;
+                    }
+
+
+                    pen += 500;
+                }
+            }
+
+            if (target >= 10 && target <= 19)
+            {
+                if (this.silenceDatabase.ContainsKey(name))
+                {
+                    // no pen if own is enrage
+                    Minion m = p.ownMinions[target];
+
+                    if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
+                    {
+                        return 500;
+                    }
+
+                    //silence nothing
+                    if ((m.Angr < m.card.Attack || m.maxHp < m.card.Health) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
+                    {
+                        return 30;
+                    }
+
+                    if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
+                    {
+                        return 0;
+                    }
+
+                    pen = 0;
+                }
+            }
+
+            return pen;
+
+        }
+
+        private int getDamagePenality(string name, int target, Playfield p, int choice)
+        {
+            int pen = 0;
+
+            if (name == "shieldslam" && p.ownHeroDefence == 0) return 500;
+            if (name == "savagery" && p.ownheroAngr == 0) return 500;
+            if (name == "keeperofthegrove" && choice != 1) return 0; // look at silence penality
+
+            if (this.DamageAllDatabase.ContainsKey(name)) // aoe penality
+            {
+                if (p.enemyMinions.Count <= 1 || p.enemyMinions.Count + 1 <= p.ownMinions.Count || p.ownMinions.Count >= 3)
+                {
+                    return 20;
+                }
+            }
+
+            if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
+            {
+                if (p.enemyMinions.Count <= 2)
+                {
+                    return 20;
+                }
+            }
+
+            if (target >= 0 && target <= 9)
+            {
+                if (DamageTargetDatabase.ContainsKey(name))
+                {
+                    // no pen if own is enrage
+                    Minion m = p.ownMinions[target];
+
+                    //standard ones :D (mostly carddraw
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    {
+                        return pen;
+                    }
+
+                    // no pen if we have battlerage for example
+                    int dmg = DamageTargetDatabase[name];
+                    if (m.card.deathrattle) return 10;
+                    if (m.Hp > dmg)
+                    {
+                        if (m.name == "acolyteofpain" && p.owncards.Count <= 3) return 0;
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == "battlerage") return pen;
+                            if (hc.card.name == "rampage") return pen;
+                        }
+                    }
+
+
+                    pen = 500;
+                }
+
+                //special cards
+                if (DamageTargetSpecialDatabase.ContainsKey(name))
+                {
+                    int dmg = DamageTargetDatabase[name];
+
+
+                    Minion m = p.ownMinions[target];
+
+                    if (name == "demonfire" && (TAG_RACE)m.card.race == TAG_RACE.DEMON) return 0;
+                    if (name == "earthshock" && m.Hp >= 2)
+                    {
+                        if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
+                        {
+                            return 500;
+                        }
+
+                        if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.card.Attack || m.maxHp < m.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
+                            return 0;
+                    }
+                    if (name == "earthshock")//dont silence other own minions
+                    {
+                        return 500;
+                    }
+
+                    // no pen if own is enrage
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    {
+                        return pen;
+                    }
+
+                    // no pen if we have battlerage for example
+
+                    if (m.Hp > dmg)
+                    {
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == "battlerage") return pen;
+                            if (hc.card.name == "rampage") return pen;
+                        }
+                    }
+
+                    pen = 500;
+                }
+            }
+
+
+            return pen;
+        }
+
+        private int getHealPenality(string name, int target, Playfield p, int choice)
+        {
+            ///Todo healpenality for aoe heal
+            ///todo auchenai soulpriest
+
+            if (name == "ancientoflore" && choice != 2) return 0;
+            int pen = 0;
+            int heal = 0;
+            if (HealHeroDatabase.ContainsKey(name))
+            {
+                heal = HealHeroDatabase[name];
+                if (target == 200) pen = 500; // dont heal enemy
+                if ((target == 100 || target == -1) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
+            }
+
+            if (HealTargetDatabase.ContainsKey(name))
+            {
+                heal = HealTargetDatabase[name];
+                if (target == 200) pen = 500; // dont heal enemy
+                if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
+                Minion m = new Minion();
+
+                if (target >= 0 && target < 10)
+                {
+                    m = p.ownMinions[target];
+                    int wasted = 0;
+                    if (m.Hp + heal > m.maxHp) wasted = m.Hp + heal - m.maxHp;
+                    pen = wasted;
+                    if (m.taunt && wasted <= 2 && m.Hp < m.maxHp) pen -= 5; // if we heal a taunt, its good :D
+                }
+
+                if (target >= 10 && target < 20)
+                {
+                    m = p.enemyMinions[target - 10];
+                    // no penality if we heal enrage enemy
+                    if (enrageDatabase.ContainsKey(m.name))
+                    {
+                        return pen;
+                    }
+                    // no penality if we have heal-trigger :D
+                    int i = 0;
+                    foreach (Minion mnn in p.ownMinions)
+                    {
+                        if (mnn.name == "northshirecleric") i++;
+                        if (mnn.name == "lightwarden") i++;
+                    }
+                    foreach (Minion mnn in p.enemyMinions)
+                    {
+                        if (mnn.name == "northshirecleric") i--;
+                        if (mnn.name == "lightwarden") i--;
+                    }
+                    if (i >= 1) return pen;
+
+                    // no pen if we have slam
+
+                    foreach (Handmanager.Handcard hc in p.owncards)
+                    {
+                        if (hc.card.name == "slam") return pen;
+                        if (hc.card.name == "backstab") return pen;
+                    }
+
+                    pen = 500;
+                }
+
+                if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
+
+
+            }
+
+            return pen;
+        }
+
+        private int getCardDrawPenality(string name, int target, Playfield p, int choice)
+        {
+            // penality if carddraw is late or you have enough cards
+            int pen = 0;
+            if (!cardDrawBattleCryDatabase.ContainsKey(name)) return 0;
+            if (name == "ancientoflore" && choice != 1) return 0;
+            if (name == "wrath" && choice != 2) return 0;
+            if (name == "nourish" && choice != 2) return 0;
+            int carddraw = cardDrawBattleCryDatabase[name];
+            if (name == "harrisonjones") carddraw = p.enemyWeaponDurability;
+            if (name == "divinefavor") carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+            if (name == "battlerage")
+            {
+                carddraw = 0;
+                foreach (Minion mnn in p.ownMinions)
+                {
+                    if (mnn.wounded) carddraw++;
+                }
+            }
+
+            if (name == "slam")
+            {
+                Minion m = new Minion();
+                if (target >= 0 && target <= 9)
+                {
+                    m = p.ownMinions[target];
+                }
+                if (target >= 10 && target <= 19)
+                {
+                    m = p.enemyMinions[target - 10];
+                }
+                carddraw = 0;
+                if (m.Hp >= 3) carddraw = 1;
+                if (carddraw == 0) return 2;
+            }
+
+            if (name == "mortalcoil")
+            {
+                Minion m = new Minion();
+                if (target >= 0 && target <= 9)
+                {
+                    m = p.ownMinions[target];
+                }
+                if (target >= 10 && target <= 19)
+                {
+                    m = p.enemyMinions[target - 10];
+                }
+                carddraw = 0;
+                if (m.Hp == 1) carddraw = 1;
+                if (carddraw == 0) return 2;
+            }
+
+            if (p.owncards.Count >= 5) return 0;
+            pen = -carddraw + p.ownMaxMana - p.mana;
+            return pen;
+        }
+
+        private int getCardDrawofEffectMinions(CardDB.Card card, Playfield p)
+        {
+            int pen = 0;
+            int carddraw = 0;
+            if (card.type == CardDB.cardtype.SPELL)
+            {
+                foreach (Minion mnn in p.ownMinions)
+                {
+                    if (mnn.name == "gadgetzanauctioneer") carddraw++;
+                }
+            }
+
+            if (card.type == CardDB.cardtype.MOB && (TAG_RACE)card.race == TAG_RACE.PET)
+            {
+                foreach (Minion mnn in p.ownMinions)
+                {
+                    if (mnn.name == "starvingbuzzard") carddraw++;
+                }
+            }
+
+            if (carddraw == 0) return 0;
+
+            if (p.owncards.Count >= 5) return 0;
+            pen = -carddraw + p.ownMaxMana - p.mana;
+
+            return pen;
+        }
+
+        private int getCardDiscardPenality(string name, Playfield p)
+        {
+            if (p.owncards.Count == 0) return 0;
+            int pen = 0;
+            if (this.cardDiscardDatabase.ContainsKey(name))
+            {
+                int newmana = p.mana - cardDiscardDatabase[name];
+                bool canplayanothercard = false;
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.cost <= newmana)
+                    {
+                        canplayanothercard = true;
+                    }
+                }
+                if (canplayanothercard) pen += 10;
+
+            }
+
+            return pen;
+        }
+
+        private int getDestroyPenality(string name, int target, Playfield p)
+        {
+            if (!this.destroyOwnDatabase.ContainsKey(name)) return 0;
+            int pen = 0;
+            if ((name == "brawl" || name == "deathwing" || name == "twistingnether") && p.mobsplayedThisTurn >= 1) return 500;
+
+            if (target >= 0 && target <= 9)
+            {
+                // dont destroy owns ;_; (except mins with deathrattle effects)
+
+                Minion m = p.ownMinions[target];
+                if (m.card.deathrattle) return 10;
+
+                return 500;
+            }
+
+            return pen;
+        }
+
+        private int getSpecialCardComboPenalitys(string name, int target, Playfield p)
+        {
+            //some effects, which are bad :D
+            int pen = 0;
+            Minion m = null;
+            if (target >= 0 && target <= 9)
+            {
+                m = p.ownMinions[target];
+            }
+            if (target >= 10 && target <= 19)
+            {
+                m = p.enemyMinions[target - 10];
+            }
+
+            if (name == "innerfire")
+            {
+                if (m.name == "lightspawn") pen = 500;
+            }
+
+            if (name == "huntersmark")
+            {
+                if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+            }
+
+            if (name == "aldorpeacekeeper" || name == "humility")
+            {
+                if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+                if (m.name == "lightspawn") pen = 500;
+            }
+
+            if (returnHandDatabase.ContainsKey(name))
+            {
+                if (name == "vanish")
+                {
+                    //dont vanish if we have minons on board wich are ready
+                    bool haveready = false;
+                    foreach (Minion mins in p.ownMinions)
+                    {
+                        if (mins.Ready) haveready = true;
+                    }
+                    if (haveready) pen += 10;
+                }
+
+                if (target >= 0 && target <= 9)
+                {
+                    Minion mnn = p.ownMinions[target];
+                    if (mnn.Ready) pen += 10;
+                }
+            }
+
+
+            return pen;
+        }
+
+        private int playSecretPenality(CardDB.Card card, Playfield p)
+        {
+            //penality if we play secret and have playable kirintormage
+            int pen = 0;
+            if (card.Secret)
+            {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "kirintormage" && p.mana >= hc.card.cost)
+                    {
+                        pen = 500;
+                    }
+                }
+            }
+
+            return pen;
+        }
+
+        ///secret strategys pala
+        /// -Attack lowest enemy. If you can’t, use noncombat means to kill it. 
+        /// -attack with something able to withstand 2 damage. 
+        /// -Then play something that had low health to begin with to dodge Repentance. 
+        /// 
+        ///secret strategys hunter
+        /// - kill enemys with your minions with 2 or less heal.
+        ///  - Use the smallest minion available for the first attack 
+        ///  - Then smack them in the face with whatever’s left. 
+        ///  - If nothing triggered until then, it’s a Snipe, so throw something in front of it that won’t die or is expendable.
+        /// 
+        ///secret strategys mage
+        /// - Play a small minion to trigger Mirror Entity.
+        /// Then attack the mage directly with the smallest minion on your side. 
+        /// If nothing triggered by that point, it’s either Spellbender or Counterspell, so hold your spells until you can (and have to!) deal with either. 
+
+        private int getPlayCardSecretPenality(CardDB.Card c, Playfield p)
+        {
+            int pen = 0;
+            if (p.enemySecretCount == 0)
+            {
+                return 0;
+            }
+
+            int attackedbefore = 0;
+
+            foreach (Minion mnn in p.ownMinions)
+            {
+                if (mnn.numAttacksThisTurn >= 1) attackedbefore++;
+            }
+
+
+            if (p.enemyHeroName == "hunter")
+            {
+                if (c.type == CardDB.cardtype.MOB && (attackedbefore == 0 || c.Health <= 4 || (p.enemyHeroHp >= p.enemyHeroHpStarted && attackedbefore >= 1)))
+                {
+                    pen += 10;
+                }
+            }
+
+            if (p.enemyHeroName == "mage")
+            {
+                if (c.type == CardDB.cardtype.MOB)
+                {
+                    Minion m = new Minion();
+                    m.Hp = c.Health;
+                    m.maxHp = c.Health;
+                    m.Angr = c.Attack;
+                    m.taunt = c.tank;
+                    m.name = c.name;
+                    //play first the small minion:
+                    if ((!isOwnLowestInHand(m, p) && p.mobsplayedThisTurn == 0) || (p.mobsplayedThisTurn == 0 && attackedbefore >= 1)) pen += 10;
+                }
+
+                if (c.type == CardDB.cardtype.SPELL && p.cardsPlayedThisTurn == p.mobsplayedThisTurn)
+                {
+                    pen += 10;
+                }
+
+            }
+
+            if (p.enemyHeroName == "pala")
+            {
+                if (c.type == CardDB.cardtype.MOB)
+                {
+                    Minion m = new Minion();
+                    m.Hp = c.Health;
+                    m.maxHp = c.Health;
+                    m.Angr = c.Attack;
+                    m.taunt = c.tank;
+                    m.name = c.name;
+                    if ((!isOwnLowestInHand(m, p) && p.mobsplayedThisTurn == 0) || attackedbefore == 0) pen += 10;
+                }
+
+
+            }
+
+
+
+            return pen;
+        }
+
+        private int getAttackSecretPenality(Minion m, Playfield p, int target)
+        {
+            if (p.enemySecretCount == 0)
+            {
+                return 0;
+            }
+
+            int pen = 0;
+
+            int attackedbefore = 0;
+
+            foreach (Minion mnn in p.ownMinions)
+            {
+                if (mnn.numAttacksThisTurn >= 1) attackedbefore++;
+            }
+
+            if (p.enemyHeroName == "hunter")
+            {
+                bool islow = isOwnLowest(m, p);
+                if (attackedbefore == 0 && islow) pen -= 20;
+                if (attackedbefore == 0 && !islow) pen += 10;
+
+                if (target == 200 && p.enemyMinions.Count >= 1)
+                {
+                    //penality if we doestn attacked before
+                    if (hasMinionsWithLowHeal(p)) pen += 10; //penality if we doestn attacked minions before
+                }
+            }
+
+            if (p.enemyHeroName == "mage")
+            {
+                if (p.mobsplayedThisTurn == 0) pen += 10;
+
+                bool islow = isOwnLowest(m, p);
+
+                if (target == 200 && !islow)
+                {
+                    pen += 10;
+                }
+                if (target == 200 && islow && p.mobsplayedThisTurn >= 1)
+                {
+                    pen -= 20;
+                }
+
+            }
+
+            if (p.enemyHeroName == "pala")
+            {
+
+                bool islow = isOwnLowest(m, p);
+
+                if (target >= 10 && target <= 20 && attackedbefore == 0)
+                {
+                    Minion enem = p.enemyMinions[target - 10];
+                    if (!isEnemyLowest(enem, p) || m.Hp <= 2) pen += 5;
+                }
+
+                if (target == 200 && !islow)
+                {
+                    pen += 5;
+                }
+
+                if (target == 200 && p.enemyMinions.Count >= 1 && attackedbefore == 0)
+                {
+                    pen += 5;
+                }
+
+            }
+
+
+            return pen;
+        }
+
+
+
+
+
+
+        private int getValueOfMinion(Minion m)
+        {
+            int ret = 0;
+            ret += 2 * m.Angr + m.Hp;
+            if (m.taunt) ret += 2;
+            if (this.priorityDatabase.ContainsKey(m.name)) ret += 20 + priorityDatabase[m.name];
+            return ret;
+        }
+
+        private bool isOwnLowest(Minion mnn, Playfield p)
+        {
+            bool ret = true;
+            int val = getValueOfMinion(mnn);
+            foreach (Minion m in p.ownMinions)
+            {
+                if (!m.Ready) continue;
+                if (getValueOfMinion(m) < val) ret = false;
+            }
+            return ret;
+        }
+
+        private bool isOwnLowestInHand(Minion mnn, Playfield p)
+        {
+            bool ret = true;
+            Minion m = new Minion();
+            int val = getValueOfMinion(mnn);
+            foreach (Handmanager.Handcard card in p.owncards)
+            {
+                if (card.card.type != CardDB.cardtype.MOB) continue;
+                CardDB.Card c = card.card;
+                m.Hp = c.Health;
+                m.maxHp = c.Health;
+                m.Angr = c.Attack;
+                m.taunt = c.tank;
+                m.name = c.name;
+                if (getValueOfMinion(m) < val) ret = false;
+            }
+            return ret;
+        }
+
+        private int getValueOfEnemyMinion(Minion m)
+        {
+            int ret = 0;
+            ret += m.Hp;
+            if (m.taunt) ret -= 2;
+            return ret;
+        }
+
+        private bool isEnemyLowest(Minion mnn, Playfield p)
+        {
+            bool ret = true;
+            List<targett> litt = p.getAttackTargets();
+            int val = getValueOfEnemyMinion(mnn);
+            foreach (Minion m in p.enemyMinions)
+            {
+                if (litt.Find(x => x.target == m.id) == null) continue;
+                if (getValueOfEnemyMinion(m) < val) ret = false;
+            }
+            return ret;
+        }
+
+        private bool hasMinionsWithLowHeal(Playfield p)
+        {
+            bool ret = false;
+            foreach (Minion m in p.ownMinions)
+            {
+                if (m.Hp <= 2 && (m.Ready || this.priorityDatabase.ContainsKey(m.name))) ret = true;
+            }
+            return ret;
+        }
+
+
+
+        private void setupEnrageDatabase()
+        {
+            enrageDatabase.Add("amaniberserker", 0);
+            enrageDatabase.Add("angrychicken", 0);
+            enrageDatabase.Add("grommashhellscream", 0);
+            enrageDatabase.Add("ragingworgen", 0);
+            enrageDatabase.Add("spitefulsmith", 0);
+            enrageDatabase.Add("taurenwarrior", 0);
+        }
+
+        private void setupHealDatabase()
+        {
+            HealAllDatabase.Add("holynova", 2);//to all own minions
+            HealAllDatabase.Add("circleofhealing", 4);//allminions
+            HealAllDatabase.Add("darkscalehealer", 2);//all friends
+
+            HealHeroDatabase.Add("drainlife", 2);//tohero
+            HealHeroDatabase.Add("guardianofkings", 6);//tohero
+            HealHeroDatabase.Add("holyfire", 5);//tohero
+            HealHeroDatabase.Add("priestessofelune", 4);//tohero
+            HealHeroDatabase.Add("sacrificialpact", 5);//tohero
+            HealHeroDatabase.Add("siphonsoul", 3); //tohero
+
+            HealTargetDatabase.Add("ancestralhealing", 1000);
+            HealTargetDatabase.Add("ancientsecrets", 5);
+            HealTargetDatabase.Add("holylight", 6);
+            HealTargetDatabase.Add("earthenringfarseer", 3);
+            HealTargetDatabase.Add("healingtouch", 8);
+            HealTargetDatabase.Add("layonhands", 8);
+            HealTargetDatabase.Add("lesserheal", 2);
+            HealTargetDatabase.Add("voodoodoctor", 2);
+            HealTargetDatabase.Add("willofmukla", 8);
+        }
+
+        private void setupDamageDatabase()
+        {
+
+            DamageHeroDatabase.Add("headcrack", 2);
+
+            DamageAllDatabase.Add("abomination", 2);
+            DamageAllDatabase.Add("dreadinfernal", 1);
+            DamageAllDatabase.Add("hellfire", 3);
+            DamageAllDatabase.Add("whirlwind", 1);
+
+            DamageAllEnemysDatabase.Add("arcaneexplosion", 1);
+            DamageAllEnemysDatabase.Add("consecration", 1);
+            DamageAllEnemysDatabase.Add("fanofknives", 1);
+            DamageAllEnemysDatabase.Add("flamestrike", 4);
+            DamageAllEnemysDatabase.Add("holynova", 2);
+            DamageAllEnemysDatabase.Add("lightningstorm", 2);
+            DamageAllEnemysDatabase.Add("stomp", 1);
+            DamageAllEnemysDatabase.Add("madbomber", 1);
+            DamageAllEnemysDatabase.Add("swipe", 4);//1 to others
+            DamageAllEnemysDatabase.Add("yseraawakens", 5);
+
+            DamageRandomDatabase.Add("arcanemissiles", 1);
+            DamageRandomDatabase.Add("avengingwrath", 1);
+            DamageRandomDatabase.Add("cleave", 2);
+            DamageRandomDatabase.Add("forkedlightning", 2);
+            DamageRandomDatabase.Add("multi-shot", 3);
+
+            DamageTargetSpecialDatabase.Add("crueltaskmaster", 1); // gives 2 attack
+            DamageTargetSpecialDatabase.Add("innerrage", 1); // gives 2 attack
+
+            DamageTargetSpecialDatabase.Add("demonfire", 2); // friendly demon get +2/+2
+            DamageTargetSpecialDatabase.Add("earthshock", 1); //SILENCE /good for raggy etc or iced
+            DamageTargetSpecialDatabase.Add("hammerofwrath", 3); //draw a card
+            DamageTargetSpecialDatabase.Add("holywrath", 2);//draw a card
+            DamageTargetSpecialDatabase.Add("roguesdoit...", 4);//draw a card
+            DamageTargetSpecialDatabase.Add("shiv", 1);//draw a card
+            DamageTargetSpecialDatabase.Add("savagery", 1);//dmg=herodamage
+            DamageTargetSpecialDatabase.Add("shieldslam", 1);//dmg=armor
+            DamageTargetSpecialDatabase.Add("slam", 2);//draw card if it survives
+            DamageTargetSpecialDatabase.Add("soulfire", 4);//delete a card
+
+
+            DamageTargetDatabase.Add("keeperofthegrove", 2); // or silence
+            DamageTargetDatabase.Add("wrath", 3);//or 1 + card
+
+            DamageTargetDatabase.Add("coneofcold", 1);
+            DamageTargetDatabase.Add("arcaneshot", 2);
+            DamageTargetDatabase.Add("backstab", 2);
+            DamageTargetDatabase.Add("baneofdoom", 2);
+            DamageTargetDatabase.Add("barreltoss", 2);
+            DamageTargetDatabase.Add("blizzard", 2);
+            DamageTargetDatabase.Add("drainlife", 2);
+            DamageTargetDatabase.Add("elvenarcher", 1);
+            DamageTargetDatabase.Add("eviscerate", 3);
+            DamageTargetDatabase.Add("explosiveshot", 5);
+            DamageTargetDatabase.Add("fireelemental", 3);
+            DamageTargetDatabase.Add("fireball", 6);
+            DamageTargetDatabase.Add("fireblast", 1);
+            DamageTargetDatabase.Add("frostshock", 1);
+            DamageTargetDatabase.Add("frostbolt", 1);
+            DamageTargetDatabase.Add("hoggersmash", 4);
+            DamageTargetDatabase.Add("holyfire", 5);
+            DamageTargetDatabase.Add("holysmite", 2);
+            DamageTargetDatabase.Add("icelance", 4);//only if iced
+            DamageTargetDatabase.Add("ironforgerifleman", 1);
+            DamageTargetDatabase.Add("killcommand", 3);//or 5
+            DamageTargetDatabase.Add("lavaburst", 5);
+            DamageTargetDatabase.Add("lightningbolt", 2);
+            DamageTargetDatabase.Add("mindshatter", 3);
+            DamageTargetDatabase.Add("mindspike", 2);
+            DamageTargetDatabase.Add("moonfire", 1);
+            DamageTargetDatabase.Add("mortalcoil", 1);
+            DamageTargetDatabase.Add("mortalstrike", 4);
+            DamageTargetDatabase.Add("perditionsblade", 1);
+            DamageTargetDatabase.Add("pyroblast", 10);
+            DamageTargetDatabase.Add("shadowbolt", 4);
+            DamageTargetDatabase.Add("shotgunblast", 1);
+            DamageTargetDatabase.Add("si7agent", 2);
+            DamageTargetDatabase.Add("starfall", 5);
+            DamageTargetDatabase.Add("starfire", 5);//draw a card, but its to strong
+            DamageTargetDatabase.Add("stormpikecommando", 5);
+
+
+
+
+
+
+        }
+
+        private void setupsilenceDatabase()
+        {
+            this.silenceDatabase.Add("dispel", 1);
+            this.silenceDatabase.Add("earthshock", 1);
+            this.silenceDatabase.Add("massdispel", 1);
+            this.silenceDatabase.Add("silence", 1);
+            this.silenceDatabase.Add("keeperofthegrove", 1);
+            this.silenceDatabase.Add("ironbeakowl", 1);
+            this.silenceDatabase.Add("spellbreaker", 1);
+        }
+
+        private void setupPriorityList()
+        {
+            this.priorityDatabase.Add("prophetvelen", 5);
+            this.priorityDatabase.Add("archmageantonidas", 5);
+            this.priorityDatabase.Add("flametonguetotem", 6);
+            this.priorityDatabase.Add("raidleader", 5);
+            this.priorityDatabase.Add("grimscaleoracle", 5);
+            this.priorityDatabase.Add("direwolfalpha", 6);
+            this.priorityDatabase.Add("murlocwarleader", 5);
+            this.priorityDatabase.Add("southseacaptain", 5);
+            this.priorityDatabase.Add("stormwindchampion", 5);
+            this.priorityDatabase.Add("timberwolf", 5);
+            this.priorityDatabase.Add("leokk", 5);
+            this.priorityDatabase.Add("northshirecleric", 5);
+            this.priorityDatabase.Add("sorcerersapprentice", 3);
+            this.priorityDatabase.Add("summoningportal", 5);
+            this.priorityDatabase.Add("pint-sizedsummoner", 3);
+            this.priorityDatabase.Add("scavenginghyena", 5);
+        }
+
+        private void setupAttackBuff()
+        {
+            heroAttackBuffDatabase.Add("bite", 4);
+            heroAttackBuffDatabase.Add("claw", 2);
+            heroAttackBuffDatabase.Add("heroicstrike", 2);
+
+            this.attackBuffDatabase.Add("abusivesergeant", 2);
+            this.attackBuffDatabase.Add("ancientofwar", 5); //choice1
+            this.attackBuffDatabase.Add("bananas", 1);
+            this.attackBuffDatabase.Add("bestialwrath", 2); // NEVER ON enemy MINION
+            this.attackBuffDatabase.Add("blessingofkings", 4);
+            this.attackBuffDatabase.Add("blessingofmight", 3);
+            this.attackBuffDatabase.Add("coldblood", 2);
+            this.attackBuffDatabase.Add("crueltaskmaster", 2);
+            this.attackBuffDatabase.Add("darkirondwarf", 2);
+            this.attackBuffDatabase.Add("innerrage", 2);
+            this.attackBuffDatabase.Add("markofnature", 4);//choice1 
+            this.attackBuffDatabase.Add("markofthewild", 2);
+            this.attackBuffDatabase.Add("nightmare", 5); //destroy minion on next turn
+            this.attackBuffDatabase.Add("rampage", 3);//only damaged minion 
+            this.attackBuffDatabase.Add("uproot", 5);
+
+        }
+
+        private void setupHealthBuff()
+        {
+
+            this.healthBuffDatabase.Add("ancientofwar", 5);//choice2
+            this.healthBuffDatabase.Add("bananas", 1);
+            this.healthBuffDatabase.Add("blessingofkings", 4);
+            this.healthBuffDatabase.Add("markofnature", 4);//choice2
+            this.healthBuffDatabase.Add("markofthewild", 2);
+            this.healthBuffDatabase.Add("nightmare", 5);
+            this.healthBuffDatabase.Add("powerwordshield", 2);
+            this.healthBuffDatabase.Add("rampage", 3);
+            this.healthBuffDatabase.Add("rooted", 5);
+
+            tauntBuffDatabase.Add("markofnature", 1);
+            tauntBuffDatabase.Add("markofthewild", 1);
+            tauntBuffDatabase.Add("rooted", 1);
+
+
+        }
+
+        private void setupCardDrawBattlecry()
+        {
+            cardDrawBattleCryDatabase.Add("wrath", 1); //choice=2
+            cardDrawBattleCryDatabase.Add("ancientoflore", 2);// choice =1
+            cardDrawBattleCryDatabase.Add("nourish", 3); //choice = 2
+            cardDrawBattleCryDatabase.Add("ancientteachings", 2);
+            cardDrawBattleCryDatabase.Add("excessmana", 1);
+            cardDrawBattleCryDatabase.Add("starfire", 1);
+            cardDrawBattleCryDatabase.Add("azuredrake", 1);
+            cardDrawBattleCryDatabase.Add("coldlightoracle", 2);
+            cardDrawBattleCryDatabase.Add("gnomishinventor", 1);
+            cardDrawBattleCryDatabase.Add("harrisonjones", 0);
+            cardDrawBattleCryDatabase.Add("noviceengineer", 1);
+            cardDrawBattleCryDatabase.Add("roguesdoit...", 1);
+            cardDrawBattleCryDatabase.Add("arcaneintellect", 1);
+            cardDrawBattleCryDatabase.Add("hammerofwrath", 1);
+            cardDrawBattleCryDatabase.Add("holywrath", 1);
+            cardDrawBattleCryDatabase.Add("layonhands", 3);
+            cardDrawBattleCryDatabase.Add("massdispel", 1);
+            cardDrawBattleCryDatabase.Add("powerwordshield", 1);
+            cardDrawBattleCryDatabase.Add("fanofknives", 1);
+            cardDrawBattleCryDatabase.Add("shiv", 1);
+            cardDrawBattleCryDatabase.Add("sprint", 4);
+            cardDrawBattleCryDatabase.Add("farsight", 1);
+            cardDrawBattleCryDatabase.Add("lifetap", 1);
+            cardDrawBattleCryDatabase.Add("commandingshout", 1);
+            cardDrawBattleCryDatabase.Add("shieldblock", 1);
+            cardDrawBattleCryDatabase.Add("slam", 1); //if survives
+            cardDrawBattleCryDatabase.Add("mortalcoil", 1);//only if kills
+            cardDrawBattleCryDatabase.Add("battlerage", 1);//only if wounded own minions
+            cardDrawBattleCryDatabase.Add("divinefavor", 1);//only if enemy has more cards than you
+        }
+
+        private void setupDiscardCards()
+        {
+            cardDiscardDatabase.Add("doomguard", 5);
+            cardDiscardDatabase.Add("soulfire", 0);
+            cardDiscardDatabase.Add("succubus", 2);
+        }
+
+        private void setupDestroyOwnCards()
+        {
+            this.destroyOwnDatabase.Add("brawl", 0);
+            this.destroyOwnDatabase.Add("deathwing", 0);
+            this.destroyOwnDatabase.Add("twistingnether", 0);
+            this.destroyOwnDatabase.Add("naturalize", 0);//not own mins
+            this.destroyOwnDatabase.Add("shadowworddeath", 0);//not own mins
+            this.destroyOwnDatabase.Add("shadowwordpain", 0);//not own mins
+            this.destroyOwnDatabase.Add("siphonsoul", 0);//not own mins
+            this.destroyOwnDatabase.Add("biggamehunter", 0);//not own mins
+            this.destroyOwnDatabase.Add("hungrycrab", 0);//not own mins
+        }
+
+        private void setupReturnBackToHandCards()
+        {
+            returnHandDatabase.Add("ancientbrewmaster", 0);
+            returnHandDatabase.Add("dream", 0);
+            returnHandDatabase.Add("kidnapper", 0);//if combo
+            returnHandDatabase.Add("shadowstep", 0);
+            returnHandDatabase.Add("vanish", 0);
+            returnHandDatabase.Add("youthfulbrewmaster", 0);
+        }
+    }
+
+
     public class CardDB
     {
         // Data is stored in hearthstone-folder -> data->win cardxml0
@@ -8213,7 +9400,7 @@ namespace HREngine.Bots
             REQ_TARGET_MIN_ATTACK,//=41
             REQ_CAN_BE_TARGETED_BY_HERO_POWERS,
             REQ_ENEMY_TARGET_NOT_IMMUNE,
-            REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY,//44
+            REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY,//44 (totemic call)
             REQ_MINIMUM_TOTAL_MINIONS,//45 (scharmuetzel)
             REQ_MUST_TARGET_TAUNTER,//=46
             REQ_UNDAMAGED_TARGET//=47
@@ -8347,6 +9534,8 @@ namespace HREngine.Bots
             public List<targett> getTargetsForCard(Playfield p)
             {
                 List<targett> retval = new List<targett>();
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO) && p.cardsPlayedThisTurn == 0) return retval;
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE))
                 {
@@ -8600,10 +9789,19 @@ namespace HREngine.Bots
                 {
                     if (p.enemyMinions.Count < this.needMinNumberOfEnemy) return false;
                 }
+                if (isRequirementInList(CardDB.ErrorType2.REQ_NUM_MINION_SLOTS))
+                {
+                    if (p.ownMinions.Count > 7 - this.needEmptyPlacesForPlaying) return false;
+                }
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_WEAPON_EQUIPPED))
                 {
                     if (p.ownWeaponName == "") return false;
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MINIMUM_TOTAL_MINIONS))
+                {
+                    if (this.needMinTotalMinions > p.ownMinions.Count + p.enemyMinions.Count) return false;
                 }
 
                 if (haveToDoRequires)
@@ -8612,6 +9810,22 @@ namespace HREngine.Bots
 
                     //it requires a target-> return false if 
                 }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) && isRequirementInList(CardDB.ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE))
+                {
+                    if (this.getTargetsForCard(p).Count >= 1 && p.ownMinions.Count > 7 - this.needMinionsCapIfAvailable) return false;
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY))
+                {
+                    int difftotem = 0;
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.name == "healingtotem" || m.name == "wrathofairtotem" || m.name == "searingtotem" || m.name == "stoneclawtotem") difftotem++;
+                    }
+                    if (difftotem == 4) return false;
+                }
+
 
                 if (this.Secret)
                 {
@@ -9688,6 +10902,419 @@ namespace HREngine.Bots
 
     }
 
+    public class BoardTester
+    {
+        int ownPlayer = 1;
+
+        int mana = 0;
+        int maxmana = 0;
+        string ownheroname = "";
+        int ownherohp = 0;
+        int ownherodefence = 0;
+        bool ownheroready = false;
+        bool ownHeroimmunewhileattacking = false;
+        int ownheroattacksThisRound = 0;
+        int ownHeroAttack = 0;
+        string ownHeroWeapon = "";
+        int ownHeroWeaponAttack = 0;
+        int ownHeroWeaponDurability = 0;
+        int numMinionsPlayedThisTurn = 0;
+        int cardsPlayedThisTurn = 0;
+        int overdrive = 0;
+
+        int enemySecrets = 0;
+
+        bool ownHeroFrozen = false;
+
+        List<string> ownsecretlist = new List<string>();
+        string enemyheroname = "";
+        int enemyherohp = 0;
+        int enemyherodefence = 0;
+        bool enemyFrozen = false;
+        int enemyWeaponAttack = 0;
+        int enemyWeaponDur = 0;
+        string enemyWeapon = "";
+
+        List<Minion> ownminions = new List<Minion>();
+        List<Minion> enemyminions = new List<Minion>();
+        List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
+
+        public BoardTester()
+        {
+            string[] lines = new string[0] { };
+            try
+            {
+                string path = Settings.Instance.path;
+                lines = System.IO.File.ReadAllLines(path + "test.txt");
+            }
+            catch
+            {
+                Helpfunctions.Instance.logg("cant find test.txt");
+                return;
+            }
+
+            CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
+            bool abilityReady = false;
+
+            int readstate = 0;
+            int counter = 0;
+
+            Minion tempminion = new Minion();
+            int j = 0;
+            foreach (string sss in lines)
+            {
+                string s = sss + " ";
+                Helpfunctions.Instance.logg(s);
+
+                if (s.StartsWith("ailoop"))
+                {
+                    break;
+                }
+                if (s.StartsWith("####"))
+                {
+                    continue;
+                }
+                if (s.StartsWith("start calculations"))
+                {
+                    continue;
+                }
+
+                if (s.StartsWith("enemy secretsCount:"))
+                {
+                    this.enemySecrets = Convert.ToInt32(s.Split(' ')[2]);
+                    continue;
+                }
+
+                if (s.StartsWith("mana "))
+                {
+                    string ss = s.Replace("mana ", "");
+                    mana = Convert.ToInt32(ss.Split('/')[0]);
+                    maxmana = Convert.ToInt32(ss.Split('/')[1]);
+                }
+
+                if (readstate == 42 && counter == 1) // player
+                {
+                    this.overdrive = Convert.ToInt32(s.Split(' ')[4]);
+                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[2]);
+                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[3]);
+                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[5]);
+                }
+
+                if (readstate == 1 && counter == 1) // class + hp + defence + immune
+                {
+                    ownheroname = s.Split(' ')[0];
+                    ownherohp = Convert.ToInt32(s.Split(' ')[1]);
+                    ownherodefence = Convert.ToInt32(s.Split(' ')[2]);
+                    string boolim = s.Split(' ')[4];
+                    this.ownHeroimmunewhileattacking = (boolim == "True") ? true : false;
+
+                }
+
+                if (readstate == 1 && counter == 2) // ready, num attacks this turn, frozen
+                {
+                    string readystate = s.Split(' ')[1];
+                    this.ownheroready = (readystate == "True") ? true : false;
+                    this.ownheroattacksThisRound = Convert.ToInt32(s.Split(' ')[3]);
+
+                    this.ownHeroFrozen = (s.Split(' ')[5] == "True") ? true : false;
+
+                    ownHeroAttack = Convert.ToInt32(s.Split(' ')[7]);
+                    ownHeroWeaponAttack = Convert.ToInt32(s.Split(' ')[8]);
+                    this.ownHeroWeaponDurability = Convert.ToInt32(s.Split(' ')[9]);
+                    if (ownHeroWeaponAttack == 0)
+                    {
+                        ownHeroWeapon = ""; //:D
+                    }
+                    else
+                    {
+                        ownHeroWeapon = s.Split(' ')[10];
+                    }
+                }
+
+                if (readstate == 1 && counter == 3) // ability + abilityready
+                {
+                    abilityReady = (s.Split(' ')[1] == "True") ? true : false;
+                    heroability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                }
+
+                if (readstate == 1 && counter >= 5) // secrets
+                {
+                    if (!s.StartsWith("enemyhero:"))
+                    {
+                        ownsecretlist.Add(s.Replace(" ", ""));
+                    }
+                }
+
+                if (readstate == 2 && counter == 1) // class + hp + defence + frozen
+                {
+                    enemyheroname = s.Split(' ')[0];
+                    enemyherohp = Convert.ToInt32(s.Split(' ')[1]);
+                    enemyherodefence = Convert.ToInt32(s.Split(' ')[2]);
+                    enemyFrozen = (s.Split(' ')[3] == "True") ? true : false;
+                }
+
+                if (readstate == 2 && counter == 2) // wepon + stuff
+                {
+                    this.enemyWeaponAttack = Convert.ToInt32(s.Split(' ')[0]);
+                    this.enemyWeaponDur = Convert.ToInt32(s.Split(' ')[1]);
+                    if (enemyWeaponDur == 0)
+                    {
+                        this.enemyWeapon = "";
+                    }
+                    else
+                    {
+                        this.enemyWeapon = s.Split(' ')[2];
+                    }
+
+                }
+
+                if (readstate == 3) // minion or enchantment
+                {
+                    if (s.Contains(" id "))
+                    {
+                        if (counter >= 2) this.ownminions.Add(tempminion);
+
+                        string minionname = s.Split(' ')[0];
+                        int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool silenced = false;
+                        if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool divshield = false;
+                        if (s.Contains(" divshield:")) divshield = s.Split(new string[] { " divshield:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ptt = false;//played this turn
+                        if (s.Contains(" ptt:")) ptt = s.Split(new string[] { " ptt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool wndfry = false;//windfurry
+                        if (s.Contains(" wndfr:")) wndfry = s.Split(new string[] { " wndfr:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        int natt = 0;
+                        if (s.Contains(" natt:")) natt = Convert.ToInt32(s.Split(new string[] { " natt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+
+                        int ent = 1000 + j;
+                        if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+
+                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
+                        tempminion.Angr = attack;
+                        tempminion.Hp = hp;
+                        tempminion.maxHp = maxhp;
+                        tempminion.Ready = ready;
+                        tempminion.taunt = taunt;
+                        tempminion.divineshild = divshield;
+                        tempminion.playedThisTurn = ptt;
+                        tempminion.windfury = wndfry;
+                        tempminion.numAttacksThisTurn = natt;
+                        tempminion.entitiyID = ent;
+                        if (maxhp > hp) tempminion.wounded = true;
+
+
+
+
+
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
+                            e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
+                            e.creator = Convert.ToInt32(s.Split(' ')[1]);
+                            tempminion.enchantments.Add(e);
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                }
+
+                if (readstate == 4) // minion or enchantment
+                {
+                    if (s.Contains(" id "))
+                    {
+                        if (counter >= 2) this.enemyminions.Add(tempminion);
+
+                        string minionname = s.Split(' ')[0];
+                        int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool silenced = false;
+                        if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool divshield = false;
+                        if (s.Contains(" divshield:")) divshield = s.Split(new string[] { " divshield:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ptt = false;//played this turn
+                        if (s.Contains(" ptt:")) ptt = s.Split(new string[] { " ptt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool wndfry = false;//windfurry
+                        if (s.Contains(" wndfr:")) wndfry = s.Split(new string[] { " wndfr:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        int natt = 0;
+                        if (s.Contains(" natt:")) natt = Convert.ToInt32(s.Split(new string[] { " natt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+
+                        int ent = 1000 + j;
+                        if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+
+
+                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
+                        tempminion.Angr = attack;
+                        tempminion.Hp = hp;
+                        tempminion.maxHp = maxhp;
+                        tempminion.Ready = ready;
+                        tempminion.taunt = taunt;
+                        tempminion.divineshild = divshield;
+                        tempminion.playedThisTurn = ptt;
+                        tempminion.windfury = wndfry;
+                        tempminion.numAttacksThisTurn = natt;
+                        tempminion.entitiyID = ent;
+                        if (maxhp > hp) tempminion.wounded = true;
+
+
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
+                            e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
+                            e.creator = Convert.ToInt32(s.Split(' ')[1]);
+                            tempminion.enchantments.Add(e);
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                }
+
+                if (readstate == 5) // minion or enchantment
+                {
+
+                    Handmanager.Handcard card = new Handmanager.Handcard();
+
+                    string minionname = s.Split(' ')[2];
+                    int pos = Convert.ToInt32(s.Split(' ')[1]);
+                    int mana = Convert.ToInt32(s.Split(' ')[3]);
+                    card.card = CardDB.Instance.getCardData(minionname);
+                    card.entity = Convert.ToInt32(s.Split(' ')[5]);
+                    card.position = pos;
+                    handcards.Add(card);
+
+                }
+
+
+                if (s.StartsWith("ownhero:"))
+                {
+                    readstate = 1;
+                    counter = 0;
+                }
+
+                if (s.StartsWith("enemyhero:"))
+                {
+                    readstate = 2;
+                    counter = 0;
+                }
+
+                if (s.StartsWith("OwnMinions:"))
+                {
+                    readstate = 3;
+                    counter = 0;
+                }
+
+                if (s.StartsWith("EnemyMinions:"))
+                {
+                    if (counter >= 2) this.ownminions.Add(tempminion);
+
+                    readstate = 4;
+                    counter = 0;
+                }
+
+                if (s.StartsWith("Own Handcards:"))
+                {
+                    if (counter >= 2) this.enemyminions.Add(tempminion);
+
+                    readstate = 5;
+                    counter = 0;
+                }
+
+                if (s.StartsWith("player:"))
+                {
+                    readstate = 42;
+                    counter = 0;
+                }
+
+
+
+                counter++;
+                j++;
+            }
+            Helpfunctions.Instance.logg("rdy");
+
+
+            Hrtprozis.Instance.setOwnPlayer(ownPlayer);
+            Handmanager.Instance.setOwnPlayer(ownPlayer);
+
+            Hrtprozis.Instance.updatePlayer(this.maxmana, this.mana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.overdrive, 100, 200);
+            Hrtprozis.Instance.updateSecretStuff(this.ownsecretlist, enemySecrets);
+
+            int numattttHero = 0;
+            bool herowindfury = false;
+            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen);
+
+            Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
+            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
+
+
+        }
+
+
+
+
+        private Minion createNewMinion(CardDB.Card c, int id)
+        {
+            Minion m = new Minion();
+            m.card = c;
+            m.id = id;
+            m.zonepos = id + 1;
+            m.entitiyID = c.entityID;
+            m.Posix = 0;
+            m.Posiy = 0;
+            m.Angr = c.Attack;
+            m.Hp = c.Health;
+            m.maxHp = c.Health;
+            m.name = c.name;
+            m.playedThisTurn = true;
+            m.numAttacksThisTurn = 0;
+
+
+            if (c.windfury) m.windfury = true;
+            if (c.tank) m.taunt = true;
+            if (c.Charge)
+            {
+                m.Ready = true;
+                m.charge = true;
+            }
+
+            if (c.poisionous) m.poisonous = true;
+
+            if (c.Stealth) m.stealth = true;
+
+            if (m.name == "lightspawn" && !m.silenced)
+            {
+                m.Angr = m.Hp;
+            }
+
+
+            return m;
+        }
+
+
+
+    }
+
+
     public class Enchantment
     {
         public bool cantBeDispelled = false;
@@ -10195,7 +11822,6 @@ namespace HREngine.Bots
         GENERAL
     }
 
-
     class Settings
     {
 
@@ -10225,9 +11851,6 @@ namespace HREngine.Bots
         }
     }
 
-
-
-
     public class targett
     {
         public int target = -1;
@@ -10238,418 +11861,6 @@ namespace HREngine.Bots
             this.target = targ;
             this.targetEntity = ent;
         }
-    }
-
-    class BoardTester
-    {
-        int ownPlayer = 1;
-
-        int mana = 0;
-        int maxmana = 0;
-        string ownheroname = "";
-        int ownherohp = 0;
-        int ownherodefence = 0;
-        bool ownheroready = false;
-        bool ownHeroimmunewhileattacking = false;
-        int ownheroattacksThisRound = 0;
-        int ownHeroAttack = 0;
-        string ownHeroWeapon = "";
-        int ownHeroWeaponAttack = 0;
-        int ownHeroWeaponDurability = 0;
-        int numMinionsPlayedThisTurn = 0;
-        int cardsPlayedThisTurn = 0;
-        int overdrive = 0;
-
-        int enemySecrets = 0;
-
-        bool ownHeroFrozen = false;
-
-        List<string> ownsecretlist = new List<string>();
-        string enemyheroname = "";
-        int enemyherohp = 0;
-        int enemyherodefence = 0;
-        bool enemyFrozen = false;
-        int enemyWeaponAttack = 0;
-        int enemyWeaponDur = 0;
-        string enemyWeapon = "";
-
-        List<Minion> ownminions = new List<Minion>();
-        List<Minion> enemyminions = new List<Minion>();
-        List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
-
-        public BoardTester()
-        {
-            string[] lines = new string[0] { };
-            try
-            {
-                string path = Settings.Instance.path;
-                lines = System.IO.File.ReadAllLines(path + "test.txt");
-            }
-            catch
-            {
-                Helpfunctions.Instance.logg("cant find test.txt");
-                return;
-            }
-
-            CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
-            bool abilityReady = false;
-
-            int readstate = 0;
-            int counter = 0;
-
-            Minion tempminion = new Minion();
-            int j = 0;
-            foreach (string sss in lines)
-            {
-                string s = sss + " ";
-                Helpfunctions.Instance.logg(s);
-
-                if (s.StartsWith("ailoop"))
-                {
-                    break;
-                }
-                if (s.StartsWith("####"))
-                {
-                    continue;
-                }
-                if (s.StartsWith("start calculations"))
-                {
-                    continue;
-                }
-
-                if (s.StartsWith("enemy secretsCount:"))
-                {
-                    this.enemySecrets = Convert.ToInt32(s.Split(' ')[2]);
-                    continue;
-                }
-
-                if (s.StartsWith("mana "))
-                {
-                    string ss = s.Replace("mana ", "");
-                    mana = Convert.ToInt32(ss.Split('/')[0]);
-                    maxmana = Convert.ToInt32(ss.Split('/')[1]);
-                }
-
-                if (readstate == 42 && counter == 1) // player
-                {
-                    this.overdrive = Convert.ToInt32(s.Split(' ')[4]);
-                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[2]);
-                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[3]);
-                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[5]);
-                }
-
-                if (readstate == 1 && counter == 1) // class + hp + defence + immune
-                {
-                    ownheroname = s.Split(' ')[0];
-                    ownherohp = Convert.ToInt32(s.Split(' ')[1]);
-                    ownherodefence = Convert.ToInt32(s.Split(' ')[2]);
-                    string boolim = s.Split(' ')[4];
-                    this.ownHeroimmunewhileattacking = (boolim == "True") ? true : false;
-
-                }
-
-                if (readstate == 1 && counter == 2) // ready, num attacks this turn, frozen
-                {
-                    string readystate = s.Split(' ')[1];
-                    this.ownheroready = (readystate == "True") ? true : false;
-                    this.ownheroattacksThisRound = Convert.ToInt32(s.Split(' ')[3]);
-
-                    this.ownHeroFrozen = (s.Split(' ')[5] == "True") ? true : false;
-
-                    ownHeroAttack = Convert.ToInt32(s.Split(' ')[7]);
-                    ownHeroWeaponAttack = Convert.ToInt32(s.Split(' ')[8]);
-                    this.ownHeroWeaponDurability = Convert.ToInt32(s.Split(' ')[9]);
-                    if (ownHeroWeaponAttack == 0)
-                    {
-                        ownHeroWeapon = ""; //:D
-                    }
-                    else
-                    {
-                        ownHeroWeapon = s.Split(' ')[10];
-                    }
-                }
-
-                if (readstate == 1 && counter == 3) // ability + abilityready
-                {
-                    abilityReady = (s.Split(' ')[1] == "True") ? true : false;
-                    heroability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
-                }
-
-                if (readstate == 1 && counter >= 5) // secrets
-                {
-                    if (!s.StartsWith("enemyhero:"))
-                    {
-                        ownsecretlist.Add(s.Replace(" ", ""));
-                    }
-                }
-
-                if (readstate == 2 && counter == 1) // class + hp + defence + frozen
-                {
-                    enemyheroname = s.Split(' ')[0];
-                    enemyherohp = Convert.ToInt32(s.Split(' ')[1]);
-                    enemyherodefence = Convert.ToInt32(s.Split(' ')[2]);
-                    enemyFrozen = (s.Split(' ')[3] == "True") ? true : false;
-                }
-
-                if (readstate == 2 && counter == 2) // wepon + stuff
-                {
-                    this.enemyWeaponAttack = Convert.ToInt32(s.Split(' ')[0]);
-                    this.enemyWeaponDur = Convert.ToInt32(s.Split(' ')[1]);
-                    if (enemyWeaponDur == 0)
-                    {
-                        this.enemyWeapon = "";
-                    }
-                    else
-                    {
-                        this.enemyWeapon = s.Split(' ')[2];
-                    }
-
-                }
-
-                if (readstate == 3) // minion or enchantment
-                {
-                    if (s.Contains(" id "))
-                    {
-                        if (counter >= 2) this.ownminions.Add(tempminion);
-
-                        string minionname = s.Split(' ')[0];
-                        int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool silenced = false;
-                        if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool divshield = false;
-                        if (s.Contains(" divshield:")) divshield = s.Split(new string[] { " divshield:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool ptt = false;//played this turn
-                        if (s.Contains(" ptt:")) ptt = s.Split(new string[] { " ptt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool wndfry = false;//windfurry
-                        if (s.Contains(" wndfr:")) wndfry = s.Split(new string[] { " wndfr:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        int natt = 0;
-                        if (s.Contains(" natt:")) natt = Convert.ToInt32(s.Split(new string[] { " natt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-
-                        int ent = 1000 + j;
-                        if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
-                        tempminion.Angr = attack;
-                        tempminion.Hp = hp;
-                        tempminion.maxHp = maxhp;
-                        tempminion.Ready = ready;
-                        tempminion.taunt = taunt;
-                        tempminion.divineshild = divshield;
-                        tempminion.playedThisTurn = ptt;
-                        tempminion.windfury = wndfry;
-                        tempminion.numAttacksThisTurn = natt;
-                        tempminion.entitiyID = ent;
-                        if (maxhp > hp) tempminion.wounded = true;
-
-
-
-
-
-                    }
-                    else
-                    {
-                        try
-                        {
-                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
-                            e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
-                            e.creator = Convert.ToInt32(s.Split(' ')[1]);
-                            tempminion.enchantments.Add(e);
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                }
-
-                if (readstate == 4) // minion or enchantment
-                {
-                    if (s.Contains(" id "))
-                    {
-                        if (counter >= 2) this.enemyminions.Add(tempminion);
-
-                        string minionname = s.Split(' ')[0];
-                        int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool silenced = false;
-                        if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool divshield = false;
-                        if (s.Contains(" divshield:")) divshield = s.Split(new string[] { " divshield:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool ptt = false;//played this turn
-                        if (s.Contains(" ptt:")) ptt = s.Split(new string[] { " ptt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        bool wndfry = false;//windfurry
-                        if (s.Contains(" wndfr:")) wndfry = s.Split(new string[] { " wndfr:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
-                        int natt = 0;
-                        if (s.Contains(" natt:")) natt = Convert.ToInt32(s.Split(new string[] { " natt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-
-                        int ent = 1000 + j;
-                        if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-
-
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
-                        tempminion.Angr = attack;
-                        tempminion.Hp = hp;
-                        tempminion.maxHp = maxhp;
-                        tempminion.Ready = ready;
-                        tempminion.taunt = taunt;
-                        tempminion.divineshild = divshield;
-                        tempminion.playedThisTurn = ptt;
-                        tempminion.windfury = wndfry;
-                        tempminion.numAttacksThisTurn = natt;
-                        tempminion.entitiyID = ent;
-                        if (maxhp > hp) tempminion.wounded = true;
-
-
-                    }
-                    else
-                    {
-                        try
-                        {
-                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
-                            e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
-                            e.creator = Convert.ToInt32(s.Split(' ')[1]);
-                            tempminion.enchantments.Add(e);
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                }
-
-                if (readstate == 5) // minion or enchantment
-                {
-
-                    Handmanager.Handcard card = new Handmanager.Handcard();
-
-                    string minionname = s.Split(' ')[2];
-                    int pos = Convert.ToInt32(s.Split(' ')[1]);
-                    int mana = Convert.ToInt32(s.Split(' ')[3]);
-                    card.card = CardDB.Instance.getCardData(minionname);
-                    card.entity = Convert.ToInt32(s.Split(' ')[5]);
-                    card.position = pos;
-                    handcards.Add(card);
-
-                }
-
-
-                if (s.StartsWith("ownhero:"))
-                {
-                    readstate = 1;
-                    counter = 0;
-                }
-
-                if (s.StartsWith("enemyhero:"))
-                {
-                    readstate = 2;
-                    counter = 0;
-                }
-
-                if (s.StartsWith("OwnMinions:"))
-                {
-                    readstate = 3;
-                    counter = 0;
-                }
-
-                if (s.StartsWith("EnemyMinions:"))
-                {
-                    if (counter >= 2) this.ownminions.Add(tempminion);
-
-                    readstate = 4;
-                    counter = 0;
-                }
-
-                if (s.StartsWith("Own Handcards:"))
-                {
-                    if (counter >= 2) this.enemyminions.Add(tempminion);
-
-                    readstate = 5;
-                    counter = 0;
-                }
-
-                if (s.StartsWith("player:"))
-                {
-                    readstate = 42;
-                    counter = 0;
-                }
-
-
-
-                counter++;
-                j++;
-            }
-            Helpfunctions.Instance.logg("rdy");
-
-
-            Hrtprozis.Instance.setOwnPlayer(ownPlayer);
-            Handmanager.Instance.setOwnPlayer(ownPlayer);
-
-            Hrtprozis.Instance.updatePlayer(this.maxmana, this.mana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.overdrive, 100, 200);
-            Hrtprozis.Instance.updateSecretStuff(this.ownsecretlist, enemySecrets);
-
-            int numattttHero = 0;
-            bool herowindfury = false;
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen);
-
-            Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
-            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
-
-
-        }
-
-
-
-
-        private Minion createNewMinion(CardDB.Card c, int id)
-        {
-            Minion m = new Minion();
-            m.card = c;
-            m.id = id;
-            m.zonepos = id + 1;
-            m.entitiyID = c.entityID;
-            m.Posix = 0;
-            m.Posiy = 0;
-            m.Angr = c.Attack;
-            m.Hp = c.Health;
-            m.maxHp = c.Health;
-            m.name = c.name;
-            m.playedThisTurn = true;
-            m.numAttacksThisTurn = 0;
-
-
-            if (c.windfury) m.windfury = true;
-            if (c.tank) m.taunt = true;
-            if (c.Charge)
-            {
-                m.Ready = true;
-                m.charge = true;
-            }
-
-            if (c.poisionous) m.poisonous = true;
-
-            if (c.Stealth) m.stealth = true;
-
-            if (m.name == "lightspawn" && !m.silenced)
-            {
-                m.Angr = m.Hp;
-            }
-
-
-            return m;
-        }
-
-
-
     }
 
 

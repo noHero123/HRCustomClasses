@@ -81,7 +81,7 @@ namespace HREngine.Bots
             REQ_TARGET_MIN_ATTACK,//=41
             REQ_CAN_BE_TARGETED_BY_HERO_POWERS,
             REQ_ENEMY_TARGET_NOT_IMMUNE,
-            REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY,//44
+            REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY,//44 (totemic call)
             REQ_MINIMUM_TOTAL_MINIONS,//45 (scharmuetzel)
             REQ_MUST_TARGET_TAUNTER,//=46
             REQ_UNDAMAGED_TARGET//=47
@@ -215,6 +215,8 @@ namespace HREngine.Bots
             public List<targett> getTargetsForCard(Playfield p)
             {
                 List<targett> retval = new List<targett>();
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO) && p.cardsPlayedThisTurn == 0) return retval;
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE))
                 {
@@ -468,10 +470,19 @@ namespace HREngine.Bots
                 {
                     if (p.enemyMinions.Count < this.needMinNumberOfEnemy) return false;
                 }
-
+                if (isRequirementInList(CardDB.ErrorType2.REQ_NUM_MINION_SLOTS))
+                {
+                    if (p.ownMinions.Count > 7 - this.needEmptyPlacesForPlaying) return false;
+                }
+                
                 if (isRequirementInList(CardDB.ErrorType2.REQ_WEAPON_EQUIPPED))
                 {
                     if (p.ownWeaponName == "") return false;
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MINIMUM_TOTAL_MINIONS))
+                {
+                    if (this.needMinTotalMinions > p.ownMinions.Count + p.enemyMinions.Count) return false;
                 }
 
                 if (haveToDoRequires)
@@ -480,6 +491,22 @@ namespace HREngine.Bots
 
                     //it requires a target-> return false if 
                 }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) && isRequirementInList(CardDB.ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE))
+                {
+                    if (this.getTargetsForCard(p).Count >= 1 && p.ownMinions.Count > 7-this.needMinionsCapIfAvailable ) return false;
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY))
+                {
+                    int difftotem = 0;
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.name == "healingtotem" || m.name == "wrathofairtotem" || m.name == "searingtotem" || m.name == "stoneclawtotem") difftotem++;
+                    }
+                    if (difftotem == 4) return false;
+                }
+                
 
                 if (this.Secret)
                 {

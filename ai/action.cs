@@ -17,6 +17,7 @@ using System.Text;
 //faehrtenlesen
 // lehrensucher cho
 //scharmuetzel kills all :D
+//hoggersmash
 
 
 
@@ -149,6 +150,7 @@ namespace HREngine.Bots
         public int ownMobsCountStarted = 0;
         public int ownCardsCountStarted = 0;
         public int ownHeroHpStarted = 30;
+        public int enemyHeroHpStarted = 30;
 
         public int mobsplayedThisTurn = 0;
         public int startedWithMobsPlayedThisTurn = 0;
@@ -241,6 +243,7 @@ namespace HREngine.Bots
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = this.ownHeroHp;
+            this.enemyHeroHpStarted = this.enemyHeroHp;
             this.ownWeaponAttackStarted = this.ownWeaponAttack;
             this.ownCardsCountStarted = this.owncards.Count;
             this.ownMobsCountStarted = this.ownMinions.Count;
@@ -371,6 +374,7 @@ namespace HREngine.Bots
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = p.ownHeroHpStarted;
+            this.enemyHeroHp = p.enemyHeroHp;
             this.ownWeaponAttackStarted = p.ownWeaponAttackStarted;
             this.ownCardsCountStarted = p.ownCardsCountStarted;
             this.ownMobsCountStarted = p.ownMobsCountStarted;
@@ -2284,7 +2288,7 @@ namespace HREngine.Bots
         {
             if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) return;
 
-            if (!m.playedThisTurn && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+            if (!m.playedThisTurn && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
             {
                 m.Ready = true;
             }
@@ -2754,9 +2758,9 @@ namespace HREngine.Bots
             }
         }
 
-        public void attackWithMinion(Minion ownMinion, int target, int targetEntity)
+        public void attackWithMinion(Minion ownMinion, int target, int targetEntity, int penality)
         {
-
+            this.evaluatePenality += penality;
             Action a = new Action();
             a.minionplay = true;
             a.owntarget = ownMinion.id;
@@ -3709,11 +3713,7 @@ namespace HREngine.Bots
 
             // but before additional minions span next to it! (because we buff the minion in createNewMinion and swordofjustice gives summeond minons his buff first!
             int spawnkids = spawnKids(c, mobplace-1, true, choice); //  if a mob targets something, it doesnt spawn minions!?
-            if (target >= 0)
-            {
-                // the OWNtargets right of the placed mobs are going up :D
-                if (target < 10 && target > mobplace + spawnkids) target++;
-            }
+            
 
             //create the new minion
             Minion m = createNewMinion(c, mobplace, true);
@@ -3733,9 +3733,12 @@ namespace HREngine.Bots
             addMiniontoList(m, this.ownMinions, mobplace, true);
             if (logging) help.logg("added " + m.card.name);
 
-
-            
-
+            //only for fun :D
+            if (target >= 0)
+            {
+                // the OWNtargets right of the placed mobs are going up :D
+                if (target < 10 && target > mobplace + spawnkids) target++;
+            }
 
             a.enemytarget = target;
             a.owntarget = mobplace + 1; //1==before the 1.minion on board , 2 ==before the 2. minion o board (from left)
@@ -4959,7 +4962,7 @@ namespace HREngine.Bots
             if (c.name == "bladeflurry")
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
-                int damage = this.ownWeaponAttack;
+                int damage = this.getSpellDamageDamage(this.ownWeaponAttack);
                 foreach (Minion enemy in temp)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -5532,8 +5535,9 @@ namespace HREngine.Bots
 
         }
 
-        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos)
+        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos, int penality)
         {
+            this.evaluatePenality += penality;
             // lock at frostnova (click) / frostblitz (no click)
             this.mana = this.mana - c.getManaCost(this);
 
@@ -5691,8 +5695,9 @@ namespace HREngine.Bots
 
         }
 
-        public void activateAbility(CardDB.Card c, int target, int targetEntity)
+        public void activateAbility(CardDB.Card c, int target, int targetEntity, int penality)
         {
+            this.evaluatePenality += penality;
             string heroname = this.ownHeroName;
             this.ownAbilityReady = false;
             this.mana -= 2;

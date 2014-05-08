@@ -199,7 +199,7 @@ namespace HREngine.Bots
                 this.heroWeaponAttack = weapon.GetATK();
                 this.heroWeaponDurability = weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
-                if (this.ownHeroWeapon == "langbogendesgladiators")
+                if (this.ownHeroWeapon == "gladiatorslongbow")
                 {
                     this.heroImmuneToDamageWhileAttacking = true;
                 }
@@ -308,7 +308,7 @@ namespace HREngine.Bots
                         m.Ready = true;
                     }
 
-                    if (!m.silenced && (m.name == "uralterwaechter" || m.name == "ragnarosderfeuerfuerst"))
+                    if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
                     {
                         m.Ready = false;
                     }
