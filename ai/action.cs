@@ -5521,16 +5521,15 @@ namespace HREngine.Bots
 
         }
 
-        public void removeCard(int cardpos)
+        public void removeCard(CardDB.Card c)
         {
 
-            this.owncards.RemoveAll(x => x.position == (cardpos + 1));
+            this.owncards.RemoveAll(x => x.entity == c.entityID);
+            int i = 1;
             foreach (Handmanager.Handcard hc in this.owncards)
             {
-                if (hc.position > cardpos + 1)
-                {
-                    hc.position--;
-                }
+                hc.position = i;
+                i++;
             }
 
         }
@@ -5608,7 +5607,7 @@ namespace HREngine.Bots
 
             triggerACardGetPlayed(c);
 
-            removeCard(cardpos);// remove card
+            removeCard(c);// remove card
 
 
 

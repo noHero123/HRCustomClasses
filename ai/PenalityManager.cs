@@ -189,7 +189,7 @@ namespace HREngine.Bots
                 if (this.silenceDatabase.ContainsKey(name))
                 {
                     // no pen if own is enrage
-                    Minion m = p.ownMinions[target];
+                    Minion m = p.enemyMinions[target - 10];//
 
                     if ( !m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord") )
                     {

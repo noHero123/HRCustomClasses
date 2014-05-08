@@ -6274,16 +6274,15 @@ namespace HREngine.Bots
 
         }
 
-        public void removeCard(int cardpos)
+        public void removeCard(CardDB.Card c)
         {
 
-            this.owncards.RemoveAll(x => x.position == (cardpos + 1));
+            this.owncards.RemoveAll(x => x.entity == c.entityID);
+            int i = 1;
             foreach (Handmanager.Handcard hc in this.owncards)
             {
-                if (hc.position > cardpos + 1)
-                {
-                    hc.position--;
-                }
+                hc.position = i;
+                i++;
             }
 
         }
@@ -6361,7 +6360,7 @@ namespace HREngine.Bots
 
             triggerACardGetPlayed(c);
 
-            removeCard(cardpos);// remove card
+            removeCard(c);// remove card
 
 
 
@@ -8259,6 +8258,7 @@ namespace HREngine.Bots
         }
 
     }
+
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -8442,7 +8442,7 @@ namespace HREngine.Bots
                 if (this.silenceDatabase.ContainsKey(name))
                 {
                     // no pen if own is enrage
-                    Minion m = p.ownMinions[target];
+                    Minion m = p.enemyMinions[target - 10];//
 
                     if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
                     {
