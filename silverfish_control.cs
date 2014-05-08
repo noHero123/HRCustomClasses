@@ -8267,7 +8267,6 @@ namespace HREngine.Bots
         }
 
     }
-
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -8370,6 +8369,7 @@ namespace HREngine.Bots
         {
             int pen = 0;
             //buff enemy?
+            if (!this.attackBuffDatabase.ContainsKey(name)) return 0;
             if (target >= 10 && target <= 19)
             {
                 //allow it if you have biggamehunter
@@ -8500,6 +8500,13 @@ namespace HREngine.Bots
                 }
             }
 
+            if (target == 100)
+            {
+                if (DamageTargetDatabase.ContainsKey(name) || DamageTargetSpecialDatabase.ContainsKey(name))
+                {
+                    pen = 500;
+                }
+            }
             if (target >= 0 && target <= 9)
             {
                 if (DamageTargetDatabase.ContainsKey(name))
@@ -8533,7 +8540,7 @@ namespace HREngine.Bots
                 //special cards
                 if (DamageTargetSpecialDatabase.ContainsKey(name))
                 {
-                    int dmg = DamageTargetDatabase[name];
+                    int dmg = DamageTargetSpecialDatabase[name];
 
 
                     Minion m = p.ownMinions[target];
