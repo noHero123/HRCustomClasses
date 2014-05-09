@@ -7080,7 +7080,7 @@
   <Tag name="CardSet" enumID="183" type="CardSet" value="3" />
   <Tag name="Rarity" enumID="203" type="Rarity" value="1" />
   <Tag name="CardType" enumID="202" type="CardType" value="5" />
-  <Tag name="Cost" enumID="48" type="Number" value="2" />
+  <Tag name="Cost" enumID="48" type="Number" value="3" />
   <Tag name="Class" enumID="199" type="Class" value="3" />
   <Tag name="CardTextInHand" enumID="184" type="String">
     <enUS>For each enemy minion, summon a 1/1 Hound with &lt;b&gt;Charge&lt;/b&gt;.</enUS>

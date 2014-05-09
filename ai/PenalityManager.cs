@@ -527,7 +527,7 @@ namespace HREngine.Bots
         {
             //some effects, which are bad :D
             int pen = 0;
-            Minion m = null;
+            Minion m = new Minion();
             if (target >= 0 && target <= 9)
             {
                 m = p.ownMinions[target];
@@ -547,7 +547,7 @@ namespace HREngine.Bots
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
             }
 
-            if (name == "aldorpeacekeeper" || name == "humility"  )
+            if ((name == "aldorpeacekeeper" || name == "humility") && target >=0 && target <=19 )
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
                 if (m.name == "lightspawn") pen = 500;

@@ -792,6 +792,7 @@ namespace HREngine.Bots
     // the ai :D
     //please ask/write me if you use this in your project
 
+
     public class Action
     {
         public bool cardplay = false;
@@ -806,6 +807,7 @@ namespace HREngine.Bots
         public int enemyEntitiy = -1;
         public int druidchoice = 0; // 1 left card, 2 right card
         public int numEnemysBeforePlayed = 0;
+        public bool comboBeforePlayed = false;
 
         public void print()
         {
@@ -847,6 +849,8 @@ namespace HREngine.Bots
         }
 
     }
+
+
     public class Playfield
     {
         public bool logging = false;
@@ -3533,6 +3537,7 @@ namespace HREngine.Bots
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
             if (logging) help.logg("attck with" + ownMinion.name + " " + ownMinion.id + " trgt " + target + " A " + ownMinion.Angr + " H " + ownMinion.Hp);
 
@@ -4468,6 +4473,7 @@ namespace HREngine.Bots
             a.cardplay = true;
             a.card = c;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
 
             //we place him on the right!
             int mobplace = placepos;
@@ -6334,7 +6340,7 @@ namespace HREngine.Bots
                 a.card = c;
                 a.cardEntitiy = cardEntity;
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
-
+                a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
                 a.owntarget = 0;
                 if (target >= 0)
                 {
@@ -6419,6 +6425,7 @@ namespace HREngine.Bots
             a.owntarget = 100;
             a.ownEntitiy = this.ownHeroEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
 
             if (this.ownWeaponName == "truesilverchampion")
@@ -6471,6 +6478,7 @@ namespace HREngine.Bots
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
 
             if (logging) help.logg("play ability on target " + target);
@@ -8848,7 +8856,7 @@ namespace HREngine.Bots
         {
             //some effects, which are bad :D
             int pen = 0;
-            Minion m = null;
+            Minion m = new Minion();
             if (target >= 0 && target <= 9)
             {
                 m = p.ownMinions[target];
@@ -8868,7 +8876,7 @@ namespace HREngine.Bots
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
             }
 
-            if (name == "aldorpeacekeeper" || name == "humility")
+            if ((name == "aldorpeacekeeper" || name == "humility") && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
                 if (m.name == "lightspawn") pen = 500;

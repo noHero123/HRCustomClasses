@@ -39,6 +39,7 @@ namespace HREngine.Bots
         public int enemyEntitiy = -1;
         public int druidchoice = 0; // 1 left card, 2 right card
         public int numEnemysBeforePlayed = 0;
+        public bool comboBeforePlayed = false;
 
         public void print()
         {
@@ -2768,6 +2769,7 @@ namespace HREngine.Bots
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
             if (logging) help.logg("attck with" + ownMinion.name + " " + ownMinion.id + " trgt " + target + " A " + ownMinion.Angr + " H " + ownMinion.Hp);
 
@@ -3703,6 +3705,7 @@ namespace HREngine.Bots
             a.cardplay = true;
             a.card = c;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
 
             //we place him on the right!
             int mobplace = placepos;
@@ -5569,7 +5572,7 @@ namespace HREngine.Bots
                 a.card = c;
                 a.cardEntitiy = cardEntity;
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
-
+                a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
                 a.owntarget = 0;
                 if (target >= 0)
                 {
@@ -5654,6 +5657,7 @@ namespace HREngine.Bots
             a.owntarget = 100;
             a.ownEntitiy = this.ownHeroEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
 
             if (this.ownWeaponName == "truesilverchampion")
@@ -5706,6 +5710,7 @@ namespace HREngine.Bots
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
+            a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
 
             if (logging) help.logg("play ability on target " + target);
