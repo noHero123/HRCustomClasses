@@ -351,7 +351,6 @@ namespace HREngine.Bots
       
    }
 
-
     public class Silverfish
     {
 
@@ -413,6 +412,7 @@ namespace HREngine.Bots
             System.IO.Directory.CreateDirectory(path);
             sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
             sttngs.setLoggPath(path);
+
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
             RejectedCardList = new Dictionary<int, HRCard>();
@@ -551,7 +551,7 @@ namespace HREngine.Bots
                 HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
                 this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name;
                 this.heroWeaponAttack = weapon.GetATK();
-                this.heroWeaponDurability = weapon.GetDurability();
+                this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
                 if (this.ownHeroWeapon == "gladiatorslongbow")
                 {
@@ -1176,7 +1176,6 @@ namespace HREngine.Bots
                 if (m.name == "prophetvelen") this.doublepriest++;
                 spellpower = spellpower + m.card.spellpowervalue;
                 if (m.name == "auchenaisoulpriest") this.auchenaiseelenpriesterin = true;
-
                 if (m.name == "pint-sizedsummoner") this.winzigebeschwoererin++;
                 if (m.name == "sorcerersapprentice") this.zauberlehrling++;
                 if (m.name == "manawraith") this.managespenst++;
@@ -2446,6 +2445,7 @@ namespace HREngine.Bots
             }
             foreach (Minion m in lm)
             {
+                /*
                 if (m.name == "direwolfalpha")
                 {
                     string enchantment = "EX1_162o";
@@ -2459,8 +2459,8 @@ namespace HREngine.Bots
                 }
                 before++;
                 after++;
-
-                //getNewEffects(m, own, m.id, false);
+                */
+                getNewEffects(m, own, m.id, false);
 
 
             }
@@ -2537,13 +2537,16 @@ namespace HREngine.Bots
         {
             bool havekriegshymnenanfuehrerin = false;
             List<Minion> temp = new List<Minion>();
+            int controller = 0;
             if (own)
             {
                 temp.AddRange(this.ownMinions);
+                controller = this.ownController;
             }
             else
             {
                 temp.AddRange(this.enemyMinions);
+                controller = 0;
             }
             int ownanz = temp.Count;
 
@@ -2565,19 +2568,19 @@ namespace HREngine.Bots
                     havekriegshymnenanfuehrerin = true;
                 }
 
-                if (ownm.name == "raidleader")
+                if (ownm.name == "raidleader" && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_122e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.name == "leokk")
+                if (ownm.name == "leokk" && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_033o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
@@ -2585,28 +2588,28 @@ namespace HREngine.Bots
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_222o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimscaleoracle" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "murlocwarleader" && m.card.race == 14)
+                if (ownm.name == "murlocwarleader" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
                 if (ownm.name == "southseacaptain" && m.card.race == 23)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_027e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
@@ -2615,7 +2618,7 @@ namespace HREngine.Bots
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("DS1_175o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
@@ -2630,8 +2633,16 @@ namespace HREngine.Bots
                     {
                         Enchantment e = CardDB.getEnchantmentFromCardID("EX1_162o");
                         e.creator = ownm.entitiyID;
-                        e.controllerOfCreator = this.ownController;
+                        e.controllerOfCreator = controller;
                         addEffectToMinionNoDoubles(m, e, own);
+                    }
+                    else
+                    {
+                        //remove effect!!
+                        Enchantment e = CardDB.getEnchantmentFromCardID("EX1_162o");
+                        e.creator = ownm.entitiyID;
+                        e.controllerOfCreator = controller;
+                        debuff(m, e);
                     }
                 }
                 if (ownm.name == "flametonguetotem")
@@ -2640,8 +2651,16 @@ namespace HREngine.Bots
                     {
                         Enchantment e = CardDB.getEnchantmentFromCardID("EX1_565o");
                         e.creator = ownm.entitiyID;
-                        e.controllerOfCreator = this.ownController;
+                        e.controllerOfCreator = controller;
                         addEffectToMinionNoDoubles(m, e, own);
+                    }
+                    else
+                    {
+                        //remove effect!!
+                        Enchantment e = CardDB.getEnchantmentFromCardID("EX1_565o");
+                        e.creator = ownm.entitiyID;
+                        e.controllerOfCreator = controller;
+                        debuff(m, e);
                     }
 
                 }
@@ -2654,20 +2673,30 @@ namespace HREngine.Bots
             if (own)
             {
                 temp.AddRange(this.enemyMinions);
+                controller = 0;
             }
             else
             {
                 temp.AddRange(this.ownMinions);
+                controller = this.ownController;
             }
 
             foreach (Minion ownm in temp) // the enemy grimmschuppenorakel!
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimscaleoracle" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
+                    e.controllerOfCreator = controller;
+                    addEffectToMinionNoDoubles(m, e, own);
+                }
+                if (ownm.name == "murlocwarleader" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                {
+                    Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
+                    e.creator = ownm.entitiyID;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
@@ -6190,11 +6219,11 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 if (m.silenced) continue;
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murloctidecaller" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "oldmurk-eye" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
@@ -6204,11 +6233,11 @@ namespace HREngine.Bots
             {
                 if (m.silenced) continue;
                 //truebaugederalte
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murloctidecaller" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "oldmurk-eye" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
@@ -6698,6 +6727,10 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg("name,ang, hp: " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
             }
 
             help.logg("ENEMY MINIONS############");
@@ -7045,7 +7078,7 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2)
+                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p))
                     {
                         int abilityPenality = 0;
 
@@ -7302,7 +7335,7 @@ namespace HREngine.Bots
             {
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
-
+            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0]) + " cost/mana: " + posmoves[0].ownHeroAblility.cost + "/" + posmoves[0].mana);
             doallmoves(false, botbase);
             foreach (Playfield p in this.posmoves)
             {
@@ -7313,6 +7346,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
     public class Handmanager
     {
@@ -8417,7 +8451,7 @@ namespace HREngine.Bots
             string name = card.name;
             //there is no reason to buff HP of minon (because it is not healed)
 
-            int abuff = getAttackBuffPenality(name, target, p, choice);
+            int abuff = getAttackBuffPenality(card, target, p, choice);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
             if (name == "markofthewild" && ((abuff == 500 || tbuff == 0) || (abuff == 0 || tbuff == 500)))
             {
@@ -8435,20 +8469,22 @@ namespace HREngine.Bots
             retval += getCardDrawofEffectMinions(card, p);
             retval += getCardDiscardPenality(name, p);
             retval += getDestroyPenality(name, target, p);
-            retval += getSpecialCardComboPenalitys(name, target, p);
+            retval += getSpecialCardComboPenalitys(card, target, p);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
 
             return retval;
         }
 
-        private int getAttackBuffPenality(string name, int target, Playfield p, int choice)
+        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
         {
+            string name = card.name;
             int pen = 0;
             //buff enemy?
             if (!this.attackBuffDatabase.ContainsKey(name)) return 0;
             if (target >= 10 && target <= 19)
             {
+                if (card.type == CardDB.cardtype.MOB && p.ownMinions.Count == 0) return 0;
                 //allow it if you have biggamehunter
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
@@ -8563,6 +8599,11 @@ namespace HREngine.Bots
 
             if (this.DamageAllDatabase.ContainsKey(name)) // aoe penality
             {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "execute") return 0;
+                }
+
                 if (p.enemyMinions.Count <= 1 || p.enemyMinions.Count + 1 <= p.ownMinions.Count || p.ownMinions.Count >= 3)
                 {
                     return 20;
@@ -8571,6 +8612,10 @@ namespace HREngine.Bots
 
             if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
             {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "execute") return 0;
+                }
                 if (p.enemyMinions.Count <= 2)
                 {
                     return 20;
@@ -8861,8 +8906,9 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(string name, int target, Playfield p)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p)
         {
+            string name = card.name;
             //some effects, which are bad :D
             int pen = 0;
             Minion m = new Minion();
@@ -8873,6 +8919,25 @@ namespace HREngine.Bots
             if (target >= 10 && target <= 19)
             {
                 m = p.enemyMinions[target - 10];
+            }
+
+            if (name == "bloodsailraider" && p.ownWeaponDurability == 0)
+            {
+                //if you have bloodsailraider and no weapon equiped, but own a weapon:
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.type == CardDB.cardtype.WEAPON) return 10;
+                }
+            }
+
+            if (name == "theblackknight")
+            {
+
+                foreach (Minion mnn in p.enemyMinions)
+                {
+                    if (mnn.taunt && (m.Angr >= 3 || m.Hp >= 3)) return 0;
+                }
+                return 10;
             }
 
             if (name == "innerfire")
@@ -9209,6 +9274,7 @@ namespace HREngine.Bots
             DamageAllDatabase.Add("dreadinfernal", 1);
             DamageAllDatabase.Add("hellfire", 3);
             DamageAllDatabase.Add("whirlwind", 1);
+            DamageAllDatabase.Add("yseraawakens", 5);
 
             DamageAllEnemysDatabase.Add("arcaneexplosion", 1);
             DamageAllEnemysDatabase.Add("consecration", 1);
@@ -9219,7 +9285,6 @@ namespace HREngine.Bots
             DamageAllEnemysDatabase.Add("stomp", 1);
             DamageAllEnemysDatabase.Add("madbomber", 1);
             DamageAllEnemysDatabase.Add("swipe", 4);//1 to others
-            DamageAllEnemysDatabase.Add("yseraawakens", 5);
 
             DamageRandomDatabase.Add("arcanemissiles", 1);
             DamageRandomDatabase.Add("avengingwrath", 1);
@@ -9427,7 +9492,6 @@ namespace HREngine.Bots
             returnHandDatabase.Add("youthfulbrewmaster", 0);
         }
     }
-
 
     public class CardDB
     {

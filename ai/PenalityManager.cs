@@ -79,7 +79,7 @@ namespace HREngine.Bots
             string name = card.name;
             //there is no reason to buff HP of minon (because it is not healed)
 
-            int abuff = getAttackBuffPenality(name, target, p, choice);
+            int abuff = getAttackBuffPenality(card, target, p, choice);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
             if (name == "markofthewild" && ( (abuff == 500 || tbuff == 0) || (abuff == 0 || tbuff == 500)) )
             {
@@ -97,20 +97,22 @@ namespace HREngine.Bots
             retval += getCardDrawofEffectMinions( card,  p);
             retval += getCardDiscardPenality( name,  p);
             retval += getDestroyPenality( name,  target,  p);
-            retval += getSpecialCardComboPenalitys( name,  target,  p);
+            retval += getSpecialCardComboPenalitys( card,  target,  p);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
 
             return retval;
         }
 
-        private int getAttackBuffPenality(string name, int target, Playfield p, int choice)
+        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
         {
+            string name = card.name;
             int pen = 0;
             //buff enemy?
             if (!this.attackBuffDatabase.ContainsKey(name)) return 0;
             if (target >= 10 && target <= 19)
             {
+                if (card.type == CardDB.cardtype.MOB && p.ownMinions.Count == 0) return 0;
                 //allow it if you have biggamehunter
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
@@ -225,6 +227,11 @@ namespace HREngine.Bots
 
             if (this.DamageAllDatabase.ContainsKey(name)) // aoe penality
             {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "execute") return 0;
+                }
+
                 if( p.enemyMinions.Count <=1 || p.enemyMinions.Count +1 <= p.ownMinions.Count || p.ownMinions.Count >=3)
                 {
                     return 20;
@@ -233,6 +240,10 @@ namespace HREngine.Bots
 
             if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
             {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == "execute") return 0;
+                }
                 if (p.enemyMinions.Count <= 2)
                 {
                     return 20;
@@ -523,8 +534,9 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(string name, int target, Playfield p)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p)
         {
+            string name = card.name;
             //some effects, which are bad :D
             int pen = 0;
             Minion m = new Minion();
@@ -535,6 +547,25 @@ namespace HREngine.Bots
             if (target >= 10 && target <= 19)
             {
                 m = p.enemyMinions[target-10];
+            }
+
+            if (name == "bloodsailraider" && p.ownWeaponDurability==0)
+            {
+                //if you have bloodsailraider and no weapon equiped, but own a weapon:
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.type == CardDB.cardtype.WEAPON) return 10;
+                }
+            }
+
+            if (name == "theblackknight")
+            {
+
+                foreach (Minion mnn in p.enemyMinions)
+                {
+                    if (mnn.taunt && (m.Angr >= 3 || m.Hp >= 3)) return 0;
+                }
+                return 10;
             }
 
             if (name == "innerfire")
@@ -871,6 +902,7 @@ namespace HREngine.Bots
             DamageAllDatabase.Add("dreadinfernal", 1);
             DamageAllDatabase.Add("hellfire", 3);
             DamageAllDatabase.Add("whirlwind", 1);
+            DamageAllDatabase.Add("yseraawakens", 5);
 
             DamageAllEnemysDatabase.Add("arcaneexplosion",1);
             DamageAllEnemysDatabase.Add("consecration", 1);
@@ -881,8 +913,7 @@ namespace HREngine.Bots
             DamageAllEnemysDatabase.Add("stomp", 1);
             DamageAllEnemysDatabase.Add("madbomber", 1);
             DamageAllEnemysDatabase.Add("swipe", 4);//1 to others
-            DamageAllEnemysDatabase.Add("yseraawakens", 5);
-
+            
             DamageRandomDatabase.Add("arcanemissiles",1);
             DamageRandomDatabase.Add("avengingwrath", 1);
             DamageRandomDatabase.Add("cleave", 2);

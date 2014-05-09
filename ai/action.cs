@@ -399,7 +399,6 @@ namespace HREngine.Bots
                 if (m.name == "prophetvelen") this.doublepriest++;
                 spellpower = spellpower + m.card.spellpowervalue;
                 if (m.name == "auchenaisoulpriest") this.auchenaiseelenpriesterin = true;
-
                 if (m.name == "pint-sizedsummoner") this.winzigebeschwoererin++;
                 if (m.name == "sorcerersapprentice") this.zauberlehrling++;
                 if (m.name == "manawraith") this.managespenst++;
@@ -1669,6 +1668,7 @@ namespace HREngine.Bots
             }
             foreach (Minion m in lm)
             {
+                /*
                 if (m.name == "direwolfalpha")
                 {
                     string enchantment = "EX1_162o";
@@ -1682,8 +1682,8 @@ namespace HREngine.Bots
                 }
                 before++;
                 after++;
-
-                //getNewEffects(m, own, m.id, false);
+                */
+                getNewEffects(m, own, m.id, false);
 
 
             }
@@ -1760,13 +1760,16 @@ namespace HREngine.Bots
         {
             bool havekriegshymnenanfuehrerin = false;
             List<Minion> temp = new List<Minion>();
+            int controller = 0;
             if (own)
             {
                 temp.AddRange(this.ownMinions);
+                controller = this.ownController;
             }
             else
             {
                 temp.AddRange(this.enemyMinions);
+                controller = 0;
             }
             int ownanz = temp.Count;
 
@@ -1788,19 +1791,19 @@ namespace HREngine.Bots
                     havekriegshymnenanfuehrerin = true;
                 }
 
-                if (ownm.name == "raidleader")
+                if (ownm.name == "raidleader" && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_122e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.name == "leokk")
+                if (ownm.name == "leokk" && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_033o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
@@ -1808,28 +1811,28 @@ namespace HREngine.Bots
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_222o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimscaleoracle" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.name == "murlocwarleader" && m.card.race == 14)
+                if (ownm.name == "murlocwarleader" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
                 if (ownm.name == "southseacaptain" && m.card.race == 23)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_027e");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
                 
@@ -1838,7 +1841,7 @@ namespace HREngine.Bots
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("DS1_175o");
                     e.creator = ownm.entitiyID;
-                    e.controllerOfCreator = this.ownController;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
@@ -1853,8 +1856,16 @@ namespace HREngine.Bots
                     {
                         Enchantment e = CardDB.getEnchantmentFromCardID("EX1_162o");
                         e.creator = ownm.entitiyID;
-                        e.controllerOfCreator = this.ownController;
+                        e.controllerOfCreator = controller;
                         addEffectToMinionNoDoubles(m, e, own);
+                    }
+                    else
+                    {
+                        //remove effect!!
+                        Enchantment e = CardDB.getEnchantmentFromCardID("EX1_162o");
+                        e.creator = ownm.entitiyID;
+                        e.controllerOfCreator = controller;
+                        debuff(m, e);
                     }
                 }
                 if (ownm.name == "flametonguetotem")
@@ -1863,8 +1874,16 @@ namespace HREngine.Bots
                     {
                         Enchantment e = CardDB.getEnchantmentFromCardID("EX1_565o");
                         e.creator = ownm.entitiyID;
-                        e.controllerOfCreator = this.ownController;
+                        e.controllerOfCreator = controller;
                         addEffectToMinionNoDoubles(m, e, own);
+                    }
+                    else 
+                    {
+                        //remove effect!!
+                        Enchantment e = CardDB.getEnchantmentFromCardID("EX1_565o");
+                        e.creator = ownm.entitiyID;
+                        e.controllerOfCreator = controller;
+                        debuff(m, e);
                     }
 
                 }
@@ -1877,20 +1896,30 @@ namespace HREngine.Bots
             if (own)
             {
                 temp.AddRange(this.enemyMinions);
+                controller = 0;
             }
             else
             {
                 temp.AddRange(this.ownMinions);
+                controller = this.ownController;
             }
 
             foreach (Minion ownm in temp) // the enemy grimmschuppenorakel!
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (ownm.name == "grimscaleoracle" && m.card.race == 14)
+                if (ownm.name == "grimscaleoracle" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
+                    e.controllerOfCreator = controller;
+                    addEffectToMinionNoDoubles(m, e, own);
+                }
+                if (ownm.name == "murlocwarleader" && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                {
+                    Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
+                    e.creator = ownm.entitiyID;
+                    e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
@@ -5413,11 +5442,11 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 if (m.silenced) continue;
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murloctidecaller" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "oldmurk-eye" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
@@ -5427,11 +5456,11 @@ namespace HREngine.Bots
             {
                 if (m.silenced) continue;
                 //truebaugederalte
-                if (m.name == "murloctidecaller" && c.race == 14)
+                if (m.name == "murloctidecaller" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
-                if (m.name == "oldmurk-eye" && c.race == 14)
+                if (m.name == "oldmurk-eye" && c.race == 14 && m.entitiyID != c.entityID)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
@@ -5921,6 +5950,10 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg("name,ang, hp: " + e.CARDID + " "+ e.creator + " "+ e.controllerOfCreator);
+                }
             }
 
             help.logg("ENEMY MINIONS############");

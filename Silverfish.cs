@@ -210,7 +210,7 @@ namespace HREngine.Bots
                 HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
                 this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name;
                 this.heroWeaponAttack = weapon.GetATK();
-                this.heroWeaponDurability = weapon.GetDurability();
+                this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
                 if (this.ownHeroWeapon == "gladiatorslongbow")
                 {

@@ -292,7 +292,7 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2)
+                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p))
                     {
                         int abilityPenality = 0;
 
@@ -549,7 +549,7 @@ namespace HREngine.Bots
             {
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
-
+            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0]) + " cost/mana: " + posmoves[0].ownHeroAblility.cost + "/" + posmoves[0].mana);
             doallmoves(false, botbase);
             foreach (Playfield p in this.posmoves)
             {
