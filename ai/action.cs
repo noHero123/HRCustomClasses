@@ -2038,7 +2038,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "sylvanaswindrunner")
+                if (m.name == "sylvanaswindrunnerr")
                 {
                     List<Minion> temp = new List<Minion>();
                     if (own)
