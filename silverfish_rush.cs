@@ -2806,7 +2806,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (m.name == "sylvanaswindrunnerr")
+                if (m.name == "sylvanaswindrunner")
                 {
                     List<Minion> temp = new List<Minion>();
                     if (own)
@@ -5250,7 +5250,8 @@ namespace HREngine.Bots
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
-                    foreach (Minion mnn in this.ownMinions)
+                    List<Minion> tempolist = new List<Minion>(this.ownMinions);
+                    foreach (Minion mnn in tempolist)
                     {
                         if (mnn.id == target + 1 || mnn.id == target - 1)
                         {
@@ -5293,7 +5294,8 @@ namespace HREngine.Bots
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
-                    foreach (Minion mnn in this.enemyMinions)
+                    List<Minion> tempolist = new List<Minion>(this.enemyMinions);
+                    foreach (Minion mnn in tempolist)
                     {
                         if (mnn.id + 10 == target + 1 || mnn.id + 10 == target - 1)
                         {
@@ -6169,7 +6171,8 @@ namespace HREngine.Bots
         {
             if (own) // effects only for OWN minons
             {
-                foreach (Minion m in this.ownMinions)
+                List<Minion> tempo = new List<Minion>(this.ownMinions);
+                foreach (Minion m in tempo)
                 {
                     if (m.silenced) continue;
 
@@ -6207,7 +6210,8 @@ namespace HREngine.Bots
 
 
             //effects for ALL minons
-            foreach (Minion m in this.ownMinions)
+            List<Minion> tempoo = new List<Minion>(this.ownMinions);
+            foreach (Minion m in tempoo)
             {
                 if (m.silenced) continue;
                 if (m.name == "murloctidecaller" && c.race == 14 && m.entitiyID != c.entityID)
@@ -6219,8 +6223,9 @@ namespace HREngine.Bots
                     minionGetBuffed(m, 1, 0, true);
                 }
             }
-
-            foreach (Minion m in this.enemyMinions)
+            tempoo.Clear();
+            tempoo.AddRange(this.enemyMinions);
+            foreach (Minion m in tempoo)
             {
                 if (m.silenced) continue;
                 //truebaugederalte
@@ -6236,7 +6241,6 @@ namespace HREngine.Bots
 
 
         }
-
         private void triggerPlayedASpell(CardDB.Card c)
         {
 
