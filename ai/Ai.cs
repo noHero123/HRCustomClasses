@@ -470,7 +470,7 @@ namespace HREngine.Bots
             List<targett> retvalues = new List<targett>();
             List<Minion> addedmins = new List<Minion>(8);
 
-            bool priomins=false;
+            bool priomins = false;
             List<targett> retvaluesPrio = new List<targett>();
             foreach (targett t in oldlist)
             {
@@ -488,16 +488,16 @@ namespace HREngine.Bots
                         priomins = true;
                         continue;
                     }
-                    bool dontown = false;
+                    bool allreadyadded = false;
                     List<Minion> temp = new List<Minion>(addedmins);
                     foreach (Minion mnn in temp)
                     {
-                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced ) continue;
+                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced) continue;
                         if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                        dontown = false;
+                        allreadyadded = true;
                     }
 
-                    if (dontown)
+                    if (!allreadyadded)
                     {
                         addedmins.Add(m);
                         retvalues.Add(t);

@@ -7296,16 +7296,16 @@ namespace HREngine.Bots
                         priomins = true;
                         continue;
                     }
-                    bool dontown = false;
+                    bool allreadyadded = false;
                     List<Minion> temp = new List<Minion>(addedmins);
                     foreach (Minion mnn in temp)
                     {
                         if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced) continue;
                         if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                        dontown = false;
+                        allreadyadded = true;
                     }
 
-                    if (dontown)
+                    if (!allreadyadded)
                     {
                         addedmins.Add(m);
                         retvalues.Add(t);
@@ -8600,7 +8600,7 @@ namespace HREngine.Bots
             int pen = 0;
             //buff enemy?
             if (!this.healthBuffDatabase.ContainsKey(name)) return 0;
-            if (target >= 0 && target <= 9 && !this.tauntBuffDatabase.ContainsKey(name))
+            if (target >= 10 && target <= 19 && !this.tauntBuffDatabase.ContainsKey(name))
             {
                 pen = 500;
             }
@@ -9721,7 +9721,6 @@ namespace HREngine.Bots
             this.specialMinions.Add("waterelemental", 0);
         }
     }
-
 
     public class CardDB
     {

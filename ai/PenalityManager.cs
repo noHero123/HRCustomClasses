@@ -135,7 +135,7 @@ namespace HREngine.Bots
             int pen = 0;
             //buff enemy?
             if (!this.healthBuffDatabase.ContainsKey(name)) return 0;
-            if (target >= 0 && target <= 9 && !this.tauntBuffDatabase.ContainsKey(name))
+            if (target >= 10 && target <= 19 && !this.tauntBuffDatabase.ContainsKey(name))
             {
                 pen = 500;
             }
