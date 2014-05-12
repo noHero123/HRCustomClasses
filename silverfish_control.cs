@@ -137,6 +137,14 @@ namespace HREngine.Bots
           if (p.ownMinions.Count == 0) retval -= 20;
           if (p.enemyMinions.Count == 0) retval += 20;
           if (p.enemyHeroHp <= 0) retval = 10000;
+              //soulfire etc
+              int deletecardsAtLast = 0;
+              foreach (Action a in p.playactions)
+              {
+                  if (!a.cardplay) continue;
+                  if (a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus") deletecardsAtLast = 1;
+                  if (deletecardsAtLast == 1 && !(a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus")) retval -= 20;
+              }
           if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
 
