@@ -862,6 +862,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class Playfield
     {
         public bool logging = false;
@@ -1294,6 +1295,7 @@ namespace HREngine.Bots
                     trgts2.Add(new targett(m.id + 10, m.entitiyID));
                 }
             }
+
             if (hastanks) return trgts;
 
             return trgts2;
@@ -6810,12 +6812,14 @@ namespace HREngine.Bots
 
     }
 
+
     public class Ai
     {
 
         private int maxdeep = 12;
         private int maxwide = 7000;
         private bool usePenalityManager = true;
+        private bool useCutingTargets = true;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -7045,12 +7049,34 @@ namespace HREngine.Bots
                     }
 
                     //attack with a minion
+
+                    List<Minion> playedMinions = new List<Minion>(8);
+
                     foreach (Minion m in p.ownMinions)
                     {
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
+                            List<Minion> tempoo = new List<Minion>(playedMinions);
+                            bool dontattacked = true;
+                            foreach (Minion mnn in tempoo)
+                            {
+                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt == m.taunt) continue;
+                                if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
+                                dontattacked = false;
+                            }
+
+                            if (dontattacked)
+                            {
+                                playedMinions.Add(m);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
                             List<targett> trgts = p.getAttackTargets();
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
 
                             foreach (targett trgt in trgts)
                             {
@@ -7077,7 +7103,10 @@ namespace HREngine.Bots
 
 
                             }
-
+                            if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            {
+                                break;
+                            }
                         }
 
                     }
@@ -7244,6 +7273,50 @@ namespace HREngine.Bots
         }
 
 
+        private List<targett> cutAttackTargets(List<targett> oldlist, Playfield p)
+        {
+            List<targett> retvalues = new List<targett>();
+            List<Minion> addedmins = new List<Minion>(8);
+
+            bool priomins = false;
+            List<targett> retvaluesPrio = new List<targett>();
+            foreach (targett t in oldlist)
+            {
+                if (t.target == 200)
+                {
+                    retvalues.Add(t);
+                    continue;
+                }
+                if (t.target >= 10 && t.target <= 20)
+                {
+                    Minion m = p.enemyMinions[t.target - 10];
+                    if (penman.priorityDatabase.ContainsKey(m.name))
+                    {
+                        retvaluesPrio.Add(t);
+                        priomins = true;
+                        continue;
+                    }
+                    bool dontown = false;
+                    List<Minion> temp = new List<Minion>(addedmins);
+                    foreach (Minion mnn in temp)
+                    {
+                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced) continue;
+                        if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
+                        dontown = false;
+                    }
+
+                    if (dontown)
+                    {
+                        addedmins.Add(m);
+                        retvalues.Add(t);
+                    }
+                }
+            }
+
+            if (priomins) return retvaluesPrio;
+
+            return retvalues;
+        }
 
         public void dosomethingclever(Bot botbase)
         {
@@ -8403,7 +8476,7 @@ namespace HREngine.Bots
         //todo acolyteofpain
         //todo better aoe-penality
 
-        Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealTargetDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealHeroDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealAllDatabase = new Dictionary<string, int>();
@@ -8428,6 +8501,8 @@ namespace HREngine.Bots
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
+
+        public Dictionary<string, int> specialMinions = new Dictionary<string, int>(); //minions with cardtext, but no battlecry
 
 
         private static PenalityManager instance;
@@ -8456,6 +8531,7 @@ namespace HREngine.Bots
             setupCardDrawBattlecry();
             setupDiscardCards();
             setupDestroyOwnCards();
+            setupSpecialMins();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
@@ -9561,6 +9637,88 @@ namespace HREngine.Bots
             returnHandDatabase.Add("shadowstep", 0);
             returnHandDatabase.Add("vanish", 0);
             returnHandDatabase.Add("youthfulbrewmaster", 0);
+        }
+
+        private void setupSpecialMins()
+        {
+            this.specialMinions.Add("amaniberserker", 0);
+            this.specialMinions.Add("angrychicken", 0);
+            this.specialMinions.Add("abomination", 0);
+            this.specialMinions.Add("acolyteofpain", 0);
+            this.specialMinions.Add("alarm-o-bot", 0);
+            this.specialMinions.Add("archmage", 0);
+            this.specialMinions.Add("archmageantonidas", 0);
+            this.specialMinions.Add("armorsmith", 0);
+            this.specialMinions.Add("auchenaisoulpriest", 0);
+            this.specialMinions.Add("azuredrake", 0);
+            this.specialMinions.Add("barongeddon", 0);
+            this.specialMinions.Add("bloodimp", 0);
+            this.specialMinions.Add("bloodmagethalnos", 0);
+            this.specialMinions.Add("cairnebloodhoof", 0);
+            this.specialMinions.Add("cultmaster", 0);
+            this.specialMinions.Add("dalaranmage", 0);
+            this.specialMinions.Add("demolisher", 0);
+            this.specialMinions.Add("direwolfalpha", 0);
+            this.specialMinions.Add("doomsayer", 0);
+            this.specialMinions.Add("emperorcobra", 0);
+            this.specialMinions.Add("etherealarcanist", 0);
+            this.specialMinions.Add("flametonguetotem", 0);
+            this.specialMinions.Add("flesheatingghoul", 0);
+            this.specialMinions.Add("gadgetzanauctioneer", 0);
+            this.specialMinions.Add("grimscaleoracle", 0);
+            this.specialMinions.Add("grommashhellscream", 0);
+            this.specialMinions.Add("gruul", 0);
+            this.specialMinions.Add("gurubashiberserker", 0);
+            this.specialMinions.Add("harvestgolem", 0);
+            this.specialMinions.Add("hogger", 0);
+            this.specialMinions.Add("illidanstormrage", 0);
+            this.specialMinions.Add("impmaster", 0);
+            this.specialMinions.Add("knifejuggler", 0);
+            this.specialMinions.Add("koboldgeomancer", 0);
+            this.specialMinions.Add("lepergnome", 0);
+            this.specialMinions.Add("lightspawn", 0);
+            this.specialMinions.Add("lighwarden", 0);
+            this.specialMinions.Add("lightwell", 0);
+            this.specialMinions.Add("loothoader", 0);
+            this.specialMinions.Add("lorewalkercho", 0);
+            this.specialMinions.Add("malygos", 0);
+            this.specialMinions.Add("manaaddict", 0);
+            this.specialMinions.Add("manatidetotem", 0);
+            this.specialMinions.Add("manawraith", 0);
+            this.specialMinions.Add("manawyrm", 0);
+            this.specialMinions.Add("masterswordsmith", 0);
+            this.specialMinions.Add("murloctidecaller", 0);
+            this.specialMinions.Add("murlocwarleader", 0);
+            this.specialMinions.Add("natpagle", 0);
+            this.specialMinions.Add("northshirecleric", 0);
+            this.specialMinions.Add("ogremagi", 0);
+            this.specialMinions.Add("oldmurk-eye", 0);
+            this.specialMinions.Add("patientassasin", 0);
+            this.specialMinions.Add("pint-sizedsummoner", 0);
+            this.specialMinions.Add("prophetvelen", 0);
+            this.specialMinions.Add("questingadventurer", 0);
+            this.specialMinions.Add("ragingworgen", 0);
+            this.specialMinions.Add("raidleader", 0);
+            this.specialMinions.Add("savannahhighmane", 0);
+            this.specialMinions.Add("scavenginghyena", 0);
+            this.specialMinions.Add("secretkeeper", 0);
+            this.specialMinions.Add("sorcerersapprentice", 0);
+            this.specialMinions.Add("southseacaptain", 0);
+            this.specialMinions.Add("spitefulsmith", 0);
+            this.specialMinions.Add("starvingbuzzard", 0);
+            this.specialMinions.Add("stormwindchampion", 0);
+            this.specialMinions.Add("summoningportal", 0);
+            this.specialMinions.Add("sylvanaswindrunner", 0);
+            this.specialMinions.Add("taurenwarrior", 0);
+            this.specialMinions.Add("thebeast", 0);
+            this.specialMinions.Add("timberwolf", 0);
+            this.specialMinions.Add("tirionfordring", 0);
+            this.specialMinions.Add("tundrarhino", 0);
+            this.specialMinions.Add("unboundelemental", 0);
+            this.specialMinions.Add("venturecomercenary", 0);
+            this.specialMinions.Add("violentteacher", 0);
+            this.specialMinions.Add("warsongcommander", 0);
+            this.specialMinions.Add("waterelemental", 0);
         }
     }
 

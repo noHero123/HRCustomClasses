@@ -11,7 +11,7 @@ namespace HREngine.Bots
         //todo acolyteofpain
         //todo better aoe-penality
 
-        Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealTargetDatabase= new Dictionary<string,int>();
         Dictionary<string, int> HealHeroDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealAllDatabase = new Dictionary<string, int>();
@@ -36,6 +36,8 @@ namespace HREngine.Bots
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
+
+        public Dictionary<string, int> specialMinions = new Dictionary<string, int>(); //minions with cardtext, but no battlecry
 
 
         private static PenalityManager instance;
@@ -63,7 +65,8 @@ namespace HREngine.Bots
             setupHealthBuff(); 
             setupCardDrawBattlecry(); 
             setupDiscardCards(); 
-            setupDestroyOwnCards(); 
+            setupDestroyOwnCards();
+            setupSpecialMins();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
@@ -1169,6 +1172,88 @@ namespace HREngine.Bots
             returnHandDatabase.Add("shadowstep",0);
             returnHandDatabase.Add("vanish",0);
             returnHandDatabase.Add("youthfulbrewmaster",0);
+        }
+
+        private void setupSpecialMins()
+        {
+            this.specialMinions.Add("amaniberserker", 0);
+            this.specialMinions.Add("angrychicken", 0);
+            this.specialMinions.Add("abomination", 0);
+            this.specialMinions.Add("acolyteofpain", 0);
+            this.specialMinions.Add("alarm-o-bot", 0);
+            this.specialMinions.Add("archmage", 0);
+            this.specialMinions.Add("archmageantonidas", 0);
+            this.specialMinions.Add("armorsmith", 0);
+            this.specialMinions.Add("auchenaisoulpriest", 0);
+            this.specialMinions.Add("azuredrake", 0);
+            this.specialMinions.Add("barongeddon", 0);
+            this.specialMinions.Add("bloodimp", 0);
+            this.specialMinions.Add("bloodmagethalnos", 0);
+            this.specialMinions.Add("cairnebloodhoof", 0);
+            this.specialMinions.Add("cultmaster", 0);
+            this.specialMinions.Add("dalaranmage", 0);
+            this.specialMinions.Add("demolisher", 0);
+            this.specialMinions.Add("direwolfalpha", 0);
+            this.specialMinions.Add("doomsayer", 0);
+            this.specialMinions.Add("emperorcobra", 0);
+            this.specialMinions.Add("etherealarcanist", 0);
+            this.specialMinions.Add("flametonguetotem", 0);
+            this.specialMinions.Add("flesheatingghoul", 0);
+            this.specialMinions.Add("gadgetzanauctioneer", 0);
+            this.specialMinions.Add("grimscaleoracle", 0);
+            this.specialMinions.Add("grommashhellscream", 0);
+            this.specialMinions.Add("gruul", 0);
+            this.specialMinions.Add("gurubashiberserker", 0);
+            this.specialMinions.Add("harvestgolem", 0);
+            this.specialMinions.Add("hogger", 0);
+            this.specialMinions.Add("illidanstormrage", 0);
+            this.specialMinions.Add("impmaster", 0);
+            this.specialMinions.Add("knifejuggler", 0);
+            this.specialMinions.Add("koboldgeomancer", 0);
+            this.specialMinions.Add("lepergnome", 0);
+            this.specialMinions.Add("lightspawn", 0);
+            this.specialMinions.Add("lighwarden", 0);
+            this.specialMinions.Add("lightwell", 0);
+            this.specialMinions.Add("loothoader", 0);
+            this.specialMinions.Add("lorewalkercho", 0);
+            this.specialMinions.Add("malygos", 0);
+            this.specialMinions.Add("manaaddict", 0);
+            this.specialMinions.Add("manatidetotem", 0);
+            this.specialMinions.Add("manawraith", 0);
+            this.specialMinions.Add("manawyrm", 0);
+            this.specialMinions.Add("masterswordsmith", 0);
+            this.specialMinions.Add("murloctidecaller", 0);
+            this.specialMinions.Add("murlocwarleader", 0);
+            this.specialMinions.Add("natpagle", 0);
+            this.specialMinions.Add("northshirecleric", 0);
+            this.specialMinions.Add("ogremagi", 0);
+            this.specialMinions.Add("oldmurk-eye", 0);
+            this.specialMinions.Add("patientassasin", 0);
+            this.specialMinions.Add("pint-sizedsummoner", 0);
+            this.specialMinions.Add("prophetvelen", 0);
+            this.specialMinions.Add("questingadventurer", 0);
+            this.specialMinions.Add("ragingworgen", 0);
+            this.specialMinions.Add("raidleader", 0);
+            this.specialMinions.Add("savannahhighmane", 0);
+            this.specialMinions.Add("scavenginghyena", 0);
+            this.specialMinions.Add("secretkeeper", 0);
+            this.specialMinions.Add("sorcerersapprentice", 0);
+            this.specialMinions.Add("southseacaptain", 0);
+            this.specialMinions.Add("spitefulsmith", 0);
+            this.specialMinions.Add("starvingbuzzard", 0);
+            this.specialMinions.Add("stormwindchampion", 0);
+            this.specialMinions.Add("summoningportal", 0);
+            this.specialMinions.Add("sylvanaswindrunner", 0);
+            this.specialMinions.Add("taurenwarrior", 0);
+            this.specialMinions.Add("thebeast", 0);
+            this.specialMinions.Add("timberwolf", 0);
+            this.specialMinions.Add("tirionfordring", 0);
+            this.specialMinions.Add("tundrarhino", 0);
+            this.specialMinions.Add("unboundelemental", 0);
+            this.specialMinions.Add("venturecomercenary", 0);
+            this.specialMinions.Add("violentteacher", 0);
+            this.specialMinions.Add("warsongcommander", 0);
+            this.specialMinions.Add("waterelemental", 0);
         }
     }
 

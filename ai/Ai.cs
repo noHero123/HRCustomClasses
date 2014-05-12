@@ -11,6 +11,7 @@ namespace HREngine.Bots
         private int maxdeep = 12;
         private int maxwide = 7000;
         private bool usePenalityManager = true;
+        private bool useCutingTargets = true;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -240,12 +241,34 @@ namespace HREngine.Bots
                     }
 
                     //attack with a minion
+
+                    List<Minion> playedMinions = new List<Minion>(8);
+
                     foreach (Minion m in p.ownMinions)
                     {
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
+                            List<Minion> tempoo = new List<Minion>(playedMinions);
+                            bool dontattacked = true;
+                            foreach (Minion mnn in tempoo)
+                            {
+                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt==m.taunt) continue;
+                                if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
+                                dontattacked = false;
+                            }
+
+                            if (dontattacked)
+                            {
+                                playedMinions.Add(m);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
                             List<targett> trgts = p.getAttackTargets();
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                             
                             foreach (targett trgt in trgts)
                             {
@@ -272,7 +295,10 @@ namespace HREngine.Bots
 
                                 
                             }
-
+                            if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            {
+                                break;
+                            }
                         }
 
                     }
@@ -439,6 +465,50 @@ namespace HREngine.Bots
         }
 
 
+        private List<targett> cutAttackTargets(List<targett> oldlist, Playfield p)
+        {
+            List<targett> retvalues = new List<targett>();
+            List<Minion> addedmins = new List<Minion>(8);
+
+            bool priomins=false;
+            List<targett> retvaluesPrio = new List<targett>();
+            foreach (targett t in oldlist)
+            {
+                if (t.target == 200)
+                {
+                    retvalues.Add(t);
+                    continue;
+                }
+                if (t.target >= 10 && t.target <= 20)
+                {
+                    Minion m = p.enemyMinions[t.target - 10];
+                    if (penman.priorityDatabase.ContainsKey(m.name))
+                    {
+                        retvaluesPrio.Add(t);
+                        priomins = true;
+                        continue;
+                    }
+                    bool dontown = false;
+                    List<Minion> temp = new List<Minion>(addedmins);
+                    foreach (Minion mnn in temp)
+                    {
+                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced ) continue;
+                        if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
+                        dontown = false;
+                    }
+
+                    if (dontown)
+                    {
+                        addedmins.Add(m);
+                        retvalues.Add(t);
+                    }
+                }
+            }
+
+            if (priomins) return retvaluesPrio;
+
+            return retvalues;
+        }
 
         public void dosomethingclever(Bot botbase)
         {

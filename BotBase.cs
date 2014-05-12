@@ -241,6 +241,12 @@ namespace HREngine.Bots
           return evaluatePlayfield(p);
       }
 
+      public int getRulesEditorPenality(string cardId, Playfield p)
+      {
+          
+          return 0;
+      }
+
       protected virtual int evaluatePlayfield(Playfield p)
       {
           return 0;

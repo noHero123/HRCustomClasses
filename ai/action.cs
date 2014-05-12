@@ -515,6 +515,7 @@ namespace HREngine.Bots
                     trgts2.Add(new targett(m.id + 10, m.entitiyID));
                 }
             }
+
             if (hastanks) return trgts;
 
             return trgts2;
