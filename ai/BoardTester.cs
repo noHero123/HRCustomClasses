@@ -302,6 +302,7 @@ namespace HREngine.Bots
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
                     card.card = CardDB.Instance.getCardData(minionname);
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
+                    card.card.cost = mana;
                     card.position = pos;
                     handcards.Add(card);
 

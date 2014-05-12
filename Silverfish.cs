@@ -149,7 +149,9 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
-            Helpfunctions.Instance.logg("enemy secretsCount: " + enemyPlayer.GetSecretDefinitions().Count);
+            enemySecretCount=HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
+            enemySecretCount = 0;
+            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
@@ -326,7 +328,6 @@ namespace HREngine.Bots
                         m.Ready = false;
                     }
 
-                    if (m.exhausted) m.Ready = false;
 
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN minion
                     {
@@ -435,6 +436,7 @@ namespace HREngine.Bots
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
                     c.cost = entitiy.GetCost();
                     c.entityID = entitiy.GetEntityId();
+                    
                     Handmanager.Handcard hc = new Handmanager.Handcard();
                     hc.card = c;
                     hc.position = entitiy.GetZonePosition();

@@ -89,7 +89,7 @@ namespace HREngine.Bots
             {
                 retval += abuff + tbuff;
             }
-            
+            retval += getHPBuffPenality(card, target, p, choice);
             retval += getSilencePenality( name,  target,  p,  choice);
             retval += getDamagePenality( name,  target,  p,  choice);
             retval += getHealPenality( name,  target,  p,  choice);
@@ -125,6 +125,21 @@ namespace HREngine.Bots
 
             return pen;
         }
+
+        private int getHPBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
+        {
+            string name = card.name;
+            int pen = 0;
+            //buff enemy?
+            if (!this.healthBuffDatabase.ContainsKey(name)) return 0;
+            if (target >= 0 && target <= 9 && !this.tauntBuffDatabase.ContainsKey(name))
+            {
+                pen = 500;
+            }
+
+            return pen;
+        }
+
 
         private int getTauntBuffPenality(string name, int target, Playfield p, int choice)
         {
@@ -206,7 +221,7 @@ namespace HREngine.Bots
 
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
-                        return 0;
+                        return -10;
                     }
 
                     pen = 0;
@@ -549,6 +564,32 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+            if ((name == "biggamehunter") && target == -1)
+            {
+                return 17;
+            }
+
+            if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
+            {
+                return 10;
+            }
+
+            if (name == "unleashthehounds") 
+            {
+                if (p.enemyMinions.Count <= 1)
+                {
+                    return 20;
+                }
+            }
+
+            if (name == "equality") // aoe penality
+            {
+                if (p.enemyMinions.Count <= 2 || (p.ownMinions.Count - p.enemyMinions.Count  >= 1))
+                {
+                    return 20;
+                }
+            }
+
             if (name == "bloodsailraider" && p.ownWeaponDurability==0)
             {
                 //if you have bloodsailraider and no weapon equiped, but own a weapon:
@@ -576,13 +617,22 @@ namespace HREngine.Bots
             if (name == "huntersmark")
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                {
+                    pen = 20;
+                }
             }
 
-            if ((name == "aldorpeacekeeper" || name == "humility") && target >=0 && target <=19 )
+            if ((name == "aldorpeacekeeper" || name == "humility" ) && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                {
+                    pen = 20;
+                }
                 if (m.name == "lightspawn") pen = 500;
             }
+
 
             if (returnHandDatabase.ContainsKey(name))
             {
@@ -1011,6 +1061,7 @@ namespace HREngine.Bots
              this.priorityDatabase.Add("summoningportal", 5);
             this.priorityDatabase.Add("pint-sizedsummoner", 3);
             this.priorityDatabase.Add("scavenginghyena", 5);
+            this.priorityDatabase.Add("manatidetotem ", 5);
         }
 
         private void setupAttackBuff()
@@ -1050,9 +1101,9 @@ namespace HREngine.Bots
             this.healthBuffDatabase.Add("rampage",3);
             this.healthBuffDatabase.Add("rooted",5);
 
-            tauntBuffDatabase.Add("markofnature",1);
-            tauntBuffDatabase.Add("markofthewild", 1);
-            tauntBuffDatabase.Add("rooted", 1);
+            this.tauntBuffDatabase.Add("markofnature", 1);
+            this.tauntBuffDatabase.Add("markofthewild", 1);
+            this.tauntBuffDatabase.Add("rooted", 1);
 
 
         }

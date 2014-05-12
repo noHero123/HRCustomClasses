@@ -1887,10 +1887,23 @@ namespace HREngine.Bots
                     }
 
                 }
-
-                
-
             }
+            //buff oldmurk
+            if (isSummon && m.name == "oldmurk-eye" && own)
+            {
+                int murlocs = 0;
+                foreach (Minion mnn in this.ownMinions)
+                {
+                    if (mnn.card.race == 14) murlocs++;
+                }
+                foreach (Minion mnn in this.enemyMinions)
+                {
+                    if (mnn.card.race == 14) murlocs++;
+                }
+
+                minionGetBuffed(m, murlocs, 0, true);
+            }
+
             // minions that gave ALL minions buffs
             temp.Clear();
             if (own)

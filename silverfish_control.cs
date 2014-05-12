@@ -351,6 +351,7 @@ namespace HREngine.Bots
       
    }
 
+
     public class Silverfish
     {
 
@@ -490,7 +491,9 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
-            Helpfunctions.Instance.logg("enemy secretsCount: " + enemyPlayer.GetSecretDefinitions().Count);
+            enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
+            enemySecretCount = 0;
+            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
@@ -667,7 +670,6 @@ namespace HREngine.Bots
                         m.Ready = false;
                     }
 
-                    if (m.exhausted) m.Ready = false;
 
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN minion
                     {
@@ -776,6 +778,7 @@ namespace HREngine.Bots
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
                     c.cost = entitiy.GetCost();
                     c.entityID = entitiy.GetEntityId();
+
                     Handmanager.Handcard hc = new Handmanager.Handcard();
                     hc.card = c;
                     hc.position = entitiy.GetZonePosition();
@@ -2663,10 +2666,23 @@ namespace HREngine.Bots
                     }
 
                 }
-
-
-
             }
+            //buff oldmurk
+            if (isSummon && m.name == "oldmurk-eye" && own)
+            {
+                int murlocs = 0;
+                foreach (Minion mnn in this.ownMinions)
+                {
+                    if (mnn.card.race == 14) murlocs++;
+                }
+                foreach (Minion mnn in this.enemyMinions)
+                {
+                    if (mnn.card.race == 14) murlocs++;
+                }
+
+                minionGetBuffed(m, murlocs, 0, true);
+            }
+
             // minions that gave ALL minions buffs
             temp.Clear();
             if (own)
@@ -7695,6 +7711,7 @@ namespace HREngine.Bots
     }
 
 
+
     public class Hrtprozis
     {
 
@@ -8068,7 +8085,7 @@ namespace HREngine.Bots
             }
             help.logg("osecrets: " + secs);
             help.logg("enemyhero:");
-            help.logg(this.enemyHeroname + " " + enemyHp + " " + heroAtk + " " + this.enemyfrozen);
+            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
 
         }
@@ -8464,7 +8481,7 @@ namespace HREngine.Bots
             {
                 retval += abuff + tbuff;
             }
-
+            retval += getHPBuffPenality(card, target, p, choice);
             retval += getSilencePenality(name, target, p, choice);
             retval += getDamagePenality(name, target, p, choice);
             retval += getHealPenality(name, target, p, choice);
@@ -8500,6 +8517,21 @@ namespace HREngine.Bots
 
             return pen;
         }
+
+        private int getHPBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
+        {
+            string name = card.name;
+            int pen = 0;
+            //buff enemy?
+            if (!this.healthBuffDatabase.ContainsKey(name)) return 0;
+            if (target >= 0 && target <= 9 && !this.tauntBuffDatabase.ContainsKey(name))
+            {
+                pen = 500;
+            }
+
+            return pen;
+        }
+
 
         private int getTauntBuffPenality(string name, int target, Playfield p, int choice)
         {
@@ -8581,7 +8613,7 @@ namespace HREngine.Bots
 
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
-                        return 0;
+                        return -10;
                     }
 
                     pen = 0;
@@ -8924,6 +8956,32 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target - 10];
             }
 
+            if ((name == "biggamehunter") && target == -1)
+            {
+                return 17;
+            }
+
+            if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
+            {
+                return 10;
+            }
+
+            if (name == "unleashthehounds")
+            {
+                if (p.enemyMinions.Count <= 1)
+                {
+                    return 20;
+                }
+            }
+
+            if (name == "equality") // aoe penality
+            {
+                if (p.enemyMinions.Count <= 2 || (p.ownMinions.Count - p.enemyMinions.Count >= 1))
+                {
+                    return 20;
+                }
+            }
+
             if (name == "bloodsailraider" && p.ownWeaponDurability == 0)
             {
                 //if you have bloodsailraider and no weapon equiped, but own a weapon:
@@ -8951,13 +9009,22 @@ namespace HREngine.Bots
             if (name == "huntersmark")
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                {
+                    pen = 20;
+                }
             }
 
             if ((name == "aldorpeacekeeper" || name == "humility") && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
+                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                {
+                    pen = 20;
+                }
                 if (m.name == "lightspawn") pen = 500;
             }
+
 
             if (returnHandDatabase.ContainsKey(name))
             {
@@ -9386,6 +9453,7 @@ namespace HREngine.Bots
             this.priorityDatabase.Add("summoningportal", 5);
             this.priorityDatabase.Add("pint-sizedsummoner", 3);
             this.priorityDatabase.Add("scavenginghyena", 5);
+            this.priorityDatabase.Add("manatidetotem ", 5);
         }
 
         private void setupAttackBuff()
@@ -9425,9 +9493,9 @@ namespace HREngine.Bots
             this.healthBuffDatabase.Add("rampage", 3);
             this.healthBuffDatabase.Add("rooted", 5);
 
-            tauntBuffDatabase.Add("markofnature", 1);
-            tauntBuffDatabase.Add("markofthewild", 1);
-            tauntBuffDatabase.Add("rooted", 1);
+            this.tauntBuffDatabase.Add("markofnature", 1);
+            this.tauntBuffDatabase.Add("markofthewild", 1);
+            this.tauntBuffDatabase.Add("rooted", 1);
 
 
         }
@@ -9495,6 +9563,7 @@ namespace HREngine.Bots
             returnHandDatabase.Add("youthfulbrewmaster", 0);
         }
     }
+
 
     public class CardDB
     {
@@ -10063,6 +10132,16 @@ namespace HREngine.Bots
                     de = 0;
                     targettext = false;
                     string temp = s.Replace("<Entity version=\"2\" CardID=\"", "");
+                    temp = temp.Replace("\">", "");
+                    c.CardID = temp;
+                    continue;
+                }
+                if (s.Contains("<Entity version=\"1\" CardID=\""))
+                {
+                    c = new Card();
+                    de = 0;
+                    targettext = false;
+                    string temp = s.Replace("<Entity version=\"1\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
                     c.CardID = temp;
                     continue;
@@ -11060,7 +11139,6 @@ namespace HREngine.Bots
 
 
     }
-
     public class BoardTester
     {
         int ownPlayer = 1;
@@ -11357,6 +11435,7 @@ namespace HREngine.Bots
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
                     card.card = CardDB.Instance.getCardData(minionname);
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
+                    card.card.cost = mana;
                     card.position = pos;
                     handcards.Add(card);
 

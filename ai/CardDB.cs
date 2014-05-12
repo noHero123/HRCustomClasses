@@ -589,6 +589,16 @@ namespace HREngine.Bots
                     c.CardID = temp;
                     continue;
                 }
+                if (s.Contains("<Entity version=\"1\" CardID=\""))
+                {
+                    c = new Card();
+                    de = 0;
+                    targettext = false;
+                    string temp = s.Replace("<Entity version=\"1\" CardID=\"", "");
+                    temp = temp.Replace("\">", "");
+                    c.CardID = temp;
+                    continue;
+                }
 
                 if (s.Contains("<Tag name=\"Health\""))
                 {

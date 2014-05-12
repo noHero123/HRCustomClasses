@@ -383,7 +383,7 @@ namespace HREngine.Bots
             }
             help.logg("osecrets: " + secs);
             help.logg("enemyhero:");
-            help.logg(this.enemyHeroname + " " + enemyHp + " " + heroAtk + " " + this.enemyfrozen);
+            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
 
         }
