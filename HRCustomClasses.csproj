@@ -51,6 +51,7 @@
     <Compile Include="BoardControl.cs" />
     <Compile Include="ai\PenalityManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ruler.cs" />
     <Compile Include="Rush.cs" />
     <Compile Include="ai\Settings.cs" />
     <Compile Include="Silverfish.cs" />

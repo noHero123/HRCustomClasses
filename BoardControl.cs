@@ -10,6 +10,9 @@ namespace HREngine.Bots
 {
    public class BoardControli : Bot
    {
+
+       PenalityManager penman = PenalityManager.Instance;
+
       protected override API.HRCard GetMinionByPriority(HRCard lastMinion)
       {
          var result = HRBattle.GetNextMinionByPriority(MinionPriority.LowestHealth);
@@ -31,7 +34,14 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
-          retval += p.ownHeroHp + p.ownHeroDefence;
+          if (p.ownHeroHp + p.ownHeroDefence > 10)
+          {
+              retval += p.ownHeroHp + p.ownHeroDefence;
+          }
+          else
+          {
+              retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
+          }
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
           retval += p.ownWeaponAttack; ;// +ownWeaponDurability;
@@ -101,22 +111,9 @@ namespace HREngine.Bots
               if (m.stealth) retval -= 1;
               
               if (m.poisonous) retval -= 4;
-              if (m.name == "prophetvelen") retval -= 5;
-              if (m.name == "archmageantonidas") retval -= 5;
-              if (m.name == "flametonguetotem") retval -= 5;
-              if (m.name == "raidleader") retval -= 5;
-              if (m.name == "grimscaleoracle") retval -= 5;
-              if (m.name == "direwolfalpha") retval -= 2;
-              if (m.name == "murlocwarleader") retval -= 5;
-              if (m.name == "southseacaptain") retval -= 5;
-              if (m.name == "stormwindchampion") retval -= 10;
-              if (m.name == "timberwolf") retval -= 5;
-              if (m.name == "leokk") retval -= 5;
-              if (m.name == "northshirecleric") retval -= 5;
-              if (m.name == "sorcerersapprentice") retval -= 3;
-              if (m.name == "summoningportal") retval -= 5;
-              if (m.name == "pint-sizedsummoner") retval -= 3;
-              if (m.name == "scavenginghyena") retval -= 20;
+
+              if (penman.priorityTargets.ContainsKey(m.name)) retval -= penman.priorityTargets[m.name];
+
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }

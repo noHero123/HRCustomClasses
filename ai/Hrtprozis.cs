@@ -394,7 +394,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID +" " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID +" " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+e.creator + " " +e.controllerOfCreator);

@@ -281,7 +281,7 @@ namespace HREngine.Bots
                     m.wounded = false;
                     if (m.maxHp > m.Hp) m.wounded = true;
 
-                    m.Ready = (entitiy.IsExhausted()) ? false : true; // if exhausted, he is NOT ready
+                   
                     m.exhausted = entitiy.IsExhausted();
 
                     m.taunt = (entitiy.HasTaunt()) ? true : false;
@@ -316,6 +316,13 @@ namespace HREngine.Bots
                     m.enchantments.Clear();
 
                     //HRLog.Write(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
+
+                    m.Ready = false; // if exhausted, he is NOT ready
+
+                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    {
+                        m.Ready = true;
+                    }
 
                     if ( m.playedThisTurn && m.charge && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {

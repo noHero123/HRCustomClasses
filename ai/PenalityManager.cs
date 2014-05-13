@@ -36,6 +36,7 @@ namespace HREngine.Bots
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> priorityTargets = new Dictionary<string, int>();
 
         public Dictionary<string, int> specialMinions = new Dictionary<string, int>(); //minions with cardtext, but no battlecry
 
@@ -67,6 +68,7 @@ namespace HREngine.Bots
             setupDiscardCards(); 
             setupDestroyOwnCards();
             setupSpecialMins();
+            setupEnemyTargetPriority();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
@@ -569,7 +571,7 @@ namespace HREngine.Bots
 
             if ((name == "biggamehunter") && target == -1)
             {
-                return 17;
+                return 19;
             }
 
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
@@ -629,9 +631,9 @@ namespace HREngine.Bots
             if ((name == "aldorpeacekeeper" || name == "humility" ) && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
-                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                if (target >= 10 && target <= 19 && p.enemyMinions[target - 10].Angr <= 3) // only use on strong minions
                 {
-                    pen = 20;
+                    pen = 30;
                 }
                 if (m.name == "lightspawn") pen = 500;
             }
@@ -1255,6 +1257,80 @@ namespace HREngine.Bots
             this.specialMinions.Add("warsongcommander", 0);
             this.specialMinions.Add("waterelemental", 0);
         }
+
+        private void setupEnemyTargetPriority()
+        {
+            priorityTargets.Add("angrychicken", 10);
+            priorityTargets.Add("lightwarden", 10);
+            priorityTargets.Add("secretkeeper",10);
+            priorityTargets.Add("youngdragonhawk", 10);
+            priorityTargets.Add("bloodmagethalnos", 10);
+            priorityTargets.Add("direwolfalpha", 10);
+            priorityTargets.Add("doomsayer", 10);
+            priorityTargets.Add("knifejuggler", 10);
+            priorityTargets.Add("koboldgeomancer", 10);
+            priorityTargets.Add("manaaddict", 10);
+            priorityTargets.Add("masterswordsmith",10);
+            priorityTargets.Add("natpagle", 10);
+            priorityTargets.Add("murloctidehunter", 10);
+            priorityTargets.Add("pint-sizedsummoner", 10);
+            priorityTargets.Add("wildpyromancer", 10);
+            priorityTargets.Add("alarm-o-bot", 10);
+            priorityTargets.Add("acolyteofpain", 10);
+            priorityTargets.Add("demolisher", 10);
+            priorityTargets.Add("flesheatingghoul", 10);
+            priorityTargets.Add("impmaster", 10);
+            priorityTargets.Add("questingadventurer", 10);
+            priorityTargets.Add("raidleader", 10);
+            priorityTargets.Add("thrallmarfarseer", 10);
+            priorityTargets.Add("cultmaster", 10);
+            priorityTargets.Add("leeroyjenkins", 10);
+            priorityTargets.Add("violetteacher", 10);
+            priorityTargets.Add("gadgetzanauctioneer", 10);
+            priorityTargets.Add("hogger", 10);
+            priorityTargets.Add("illidanstormrage", 10);
+            priorityTargets.Add("barongeddon", 10);
+            priorityTargets.Add("stormwindchampion", 10);
+
+            //warrior cards
+            priorityTargets.Add("frothingberserker", 10);
+            priorityTargets.Add("warsongcommander", 10);
+
+            //warlock cards
+            priorityTargets.Add("summoningportal", 10);
+
+            //shaman cards
+            priorityTargets.Add("dustdevil", 10);
+            priorityTargets.Add("wrathofairtotem", 10);
+            priorityTargets.Add("flametonguetotem", 10);
+            priorityTargets.Add("manatidetotem", 10);
+            priorityTargets.Add("unboundelemental", 10);
+
+            //rogue cards
+
+            //priest cards
+            priorityTargets.Add("northshirecleric", 10);
+            priorityTargets.Add("lightwell", 10);
+            priorityTargets.Add("auchenaisoulpriest", 10);
+            priorityTargets.Add("prophetvelen", 10);
+
+            //paladin cards
+
+            //mage cards
+            priorityTargets.Add("manawyrm", 10);
+            priorityTargets.Add("sorcererapprentice", 10);
+            priorityTargets.Add("etherealarcanist", 10);
+            priorityTargets.Add("archmageantonidas", 10);
+
+            //hunter cards
+            priorityTargets.Add("timberwolf", 10);
+            priorityTargets.Add("scavenginghyena", 10);
+            priorityTargets.Add("starvingbuzzard", 10);
+            priorityTargets.Add("leokk", 10);
+            priorityTargets.Add("tundrarhino", 10);
+        }
+
+
     }
 
 }

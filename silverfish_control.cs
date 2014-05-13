@@ -17,6 +17,7 @@ namespace HREngine.Bots
    {
        
        private int dirtytarget=-1;
+       PenalityManager penman = PenalityManager.Instance;
        Silverfish sf;
 
       public Bot()
@@ -41,7 +42,14 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
-          retval += p.ownHeroHp + p.ownHeroDefence;
+          if (p.ownHeroHp + p.ownHeroDefence > 10)
+          {
+              retval += p.ownHeroHp + p.ownHeroDefence;
+          }
+          else
+          {
+              retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
+          }
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
           retval += p.ownWeaponAttack; ;// +ownWeaponDurability;
@@ -111,22 +119,9 @@ namespace HREngine.Bots
               if (m.stealth) retval -= 1;
 
               if (m.poisonous) retval -= 4;
-              if (m.name == "prophetvelen") retval -= 5;
-              if (m.name == "archmageantonidas") retval -= 5;
-              if (m.name == "flametonguetotem") retval -= 5;
-              if (m.name == "raidleader") retval -= 5;
-              if (m.name == "grimscaleoracle") retval -= 5;
-              if (m.name == "direwolfalpha") retval -= 2;
-              if (m.name == "murlocwarleader") retval -= 5;
-              if (m.name == "southseacaptain") retval -= 5;
-              if (m.name == "stormwindchampion") retval -= 10;
-              if (m.name == "timberwolf") retval -= 5;
-              if (m.name == "leokk") retval -= 5;
-              if (m.name == "northshirecleric") retval -= 5;
-              if (m.name == "sorcerersapprentice") retval -= 3;
-              if (m.name == "summoningportal") retval -= 5;
-              if (m.name == "pint-sizedsummoner") retval -= 3;
-              if (m.name == "scavenginghyena") retval -= 20;
+
+              if (penman.priorityTargets.ContainsKey(m.name)) retval -= penman.priorityTargets[m.name];
+
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }
@@ -137,14 +132,14 @@ namespace HREngine.Bots
           if (p.ownMinions.Count == 0) retval -= 20;
           if (p.enemyMinions.Count == 0) retval += 20;
           if (p.enemyHeroHp <= 0) retval = 10000;
-              //soulfire etc
-              int deletecardsAtLast = 0;
-              foreach (Action a in p.playactions)
-              {
-                  if (!a.cardplay) continue;
-                  if (a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus") deletecardsAtLast = 1;
-                  if (deletecardsAtLast == 1 && !(a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus")) retval -= 20;
-              }
+          //soulfire etc
+          int deletecardsAtLast = 0;
+          foreach (Action a in p.playactions)
+          {
+              if (!a.cardplay) continue;
+              if (a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus") deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus")) retval -= 20;
+          }
           if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
 
@@ -358,7 +353,6 @@ namespace HREngine.Bots
 
       
    }
-
 
     public class Silverfish
     {
@@ -631,7 +625,7 @@ namespace HREngine.Bots
                     m.wounded = false;
                     if (m.maxHp > m.Hp) m.wounded = true;
 
-                    m.Ready = (entitiy.IsExhausted()) ? false : true; // if exhausted, he is NOT ready
+
                     m.exhausted = entitiy.IsExhausted();
 
                     m.taunt = (entitiy.HasTaunt()) ? true : false;
@@ -666,6 +660,13 @@ namespace HREngine.Bots
                     m.enchantments.Clear();
 
                     //HRLog.Write(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
+
+                    m.Ready = false; // if exhausted, he is NOT ready
+
+                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    {
+                        m.Ready = true;
+                    }
 
                     if (m.playedThisTurn && m.charge && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
@@ -869,7 +870,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class Playfield
     {
@@ -1206,80 +1206,10 @@ namespace HREngine.Bots
 
         public int getValuee()
         {
+
+            //isnt used anymore :D
             //if (value >= -200000) return value;
             int retval = 0;
-            retval += owncards.Count * 1;
-
-            retval += ownMinions.Count * 10;
-            retval -= enemyMinions.Count * 10;
-
-            retval += ownHeroHp + ownHeroDefence;
-            retval += -enemyHeroHp - enemyHeroDefence;
-
-            retval += ownheroAngr;// +ownWeaponDurability;
-            retval -= enemyWeaponDurability;
-
-            retval += owncarddraw * 5;
-            retval -= enemycarddraw * 5;
-
-            retval += this.ownMaxMana;
-
-            if (enemyMinions.Count >= 0)
-            {
-                int anz = enemyMinions.Count;
-                int owntaunt = ownMinions.FindAll(x => x.taunt == true).Count;
-                int froggs = ownMinions.FindAll(x => x.name == "frog").Count;
-                owntaunt -= froggs;
-                if (owntaunt == 0) retval -= 10 * anz;
-                retval += owntaunt * 10 - 11 * anz;
-            }
-
-            foreach (Minion m in this.ownMinions)
-            {
-                retval += m.Hp * 1;
-                retval += m.Angr * 2;
-                if (m.Angr >= m.maxHp + 1)
-                {
-                    //is a tanky minion
-                    retval += m.Hp;
-                }
-                if (m.windfury) retval += m.Angr;
-            }
-
-            foreach (Minion m in this.enemyMinions)
-            {
-
-                retval -= m.Hp;
-                retval -= m.Angr * 2;
-                if (m.Angr >= m.maxHp + 1)
-                {
-                    //is a tanky minion
-                    retval -= m.Hp;
-                }
-
-                if (m.windfury) retval -= m.Angr;
-                if (m.taunt) retval -= 5;
-                if (m.name == "raidleader") retval -= 5;
-                if (m.name == "grimscaleoracle") retval -= 5;
-                if (m.name == "direwolfalpha") retval -= 2;
-                if (m.name == "murlocwarleader") retval -= 5;
-                if (m.name == "southseacaptain") retval -= 5;
-                if (m.name == "stormwindchampion") retval -= 10;
-                if (m.name == "timberwolf") retval -= 5;
-                if (m.name == "leokk") retval -= 5;
-                if (m.name == "northshirecleric") retval -= 5;
-                if (m.name == "sorcerersapprentice") retval -= 3;
-                if (m.name == "pint-sizedsummoner") retval -= 3;
-            }
-
-            retval -= lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
-            retval -= lostWeaponDamage;
-            if (ownMinions.Count == 0) retval -= 20;
-            if (enemyMinions.Count == 0) retval += 20;
-            if (enemyHeroHp <= 0) retval = 10000;
-            if (ownHeroHp <= 0) retval = -10000;
-
-            this.value = retval;
             return retval;
         }
 
@@ -3379,13 +3309,13 @@ namespace HREngine.Bots
             if (damage >= 1 && m.divineshild)
             {
                 m.divineshild = false;
-                if (!own && !dontCalcLostDmg) this.lostDamage += damage;
+                if (!own && !dontCalcLostDmg) this.lostDamage += damage * damage;
                 return;
             }
 
             if (m.cantLowerHPbelowONE && damage >= 1 && damage >= m.Hp) damage = m.Hp - 1;
 
-            if (!own && !dontCalcLostDmg && m.Hp < damage) lostDamage += damage - m.Hp;
+            if (!own && !dontCalcLostDmg && m.Hp < damage) this.lostDamage += (damage - m.Hp) * (damage - m.Hp);
 
             int hpcopy = m.Hp;
 
@@ -8177,7 +8107,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -8509,6 +8439,7 @@ namespace HREngine.Bots
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> priorityTargets = new Dictionary<string, int>();
 
         public Dictionary<string, int> specialMinions = new Dictionary<string, int>(); //minions with cardtext, but no battlecry
 
@@ -8540,6 +8471,7 @@ namespace HREngine.Bots
             setupDiscardCards();
             setupDestroyOwnCards();
             setupSpecialMins();
+            setupEnemyTargetPriority();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
@@ -9042,7 +8974,7 @@ namespace HREngine.Bots
 
             if ((name == "biggamehunter") && target == -1)
             {
-                return 17;
+                return 19;
             }
 
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
@@ -9102,9 +9034,9 @@ namespace HREngine.Bots
             if ((name == "aldorpeacekeeper" || name == "humility") && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
-                if (target >= 10 && target <= 19 && (p.enemyMinions[target - 10].Hp <= 4) && p.enemyMinions[target - 10].Angr <= 4) // only use on strong minions
+                if (target >= 10 && target <= 19 && p.enemyMinions[target - 10].Angr <= 3) // only use on strong minions
                 {
-                    pen = 20;
+                    pen = 30;
                 }
                 if (m.name == "lightspawn") pen = 500;
             }
@@ -9728,6 +9660,80 @@ namespace HREngine.Bots
             this.specialMinions.Add("warsongcommander", 0);
             this.specialMinions.Add("waterelemental", 0);
         }
+
+        private void setupEnemyTargetPriority()
+        {
+            priorityTargets.Add("angrychicken", 10);
+            priorityTargets.Add("lightwarden", 10);
+            priorityTargets.Add("secretkeeper", 10);
+            priorityTargets.Add("youngdragonhawk", 10);
+            priorityTargets.Add("bloodmagethalnos", 10);
+            priorityTargets.Add("direwolfalpha", 10);
+            priorityTargets.Add("doomsayer", 10);
+            priorityTargets.Add("knifejuggler", 10);
+            priorityTargets.Add("koboldgeomancer", 10);
+            priorityTargets.Add("manaaddict", 10);
+            priorityTargets.Add("masterswordsmith", 10);
+            priorityTargets.Add("natpagle", 10);
+            priorityTargets.Add("murloctidehunter", 10);
+            priorityTargets.Add("pint-sizedsummoner", 10);
+            priorityTargets.Add("wildpyromancer", 10);
+            priorityTargets.Add("alarm-o-bot", 10);
+            priorityTargets.Add("acolyteofpain", 10);
+            priorityTargets.Add("demolisher", 10);
+            priorityTargets.Add("flesheatingghoul", 10);
+            priorityTargets.Add("impmaster", 10);
+            priorityTargets.Add("questingadventurer", 10);
+            priorityTargets.Add("raidleader", 10);
+            priorityTargets.Add("thrallmarfarseer", 10);
+            priorityTargets.Add("cultmaster", 10);
+            priorityTargets.Add("leeroyjenkins", 10);
+            priorityTargets.Add("violetteacher", 10);
+            priorityTargets.Add("gadgetzanauctioneer", 10);
+            priorityTargets.Add("hogger", 10);
+            priorityTargets.Add("illidanstormrage", 10);
+            priorityTargets.Add("barongeddon", 10);
+            priorityTargets.Add("stormwindchampion", 10);
+
+            //warrior cards
+            priorityTargets.Add("frothingberserker", 10);
+            priorityTargets.Add("warsongcommander", 10);
+
+            //warlock cards
+            priorityTargets.Add("summoningportal", 10);
+
+            //shaman cards
+            priorityTargets.Add("dustdevil", 10);
+            priorityTargets.Add("wrathofairtotem", 10);
+            priorityTargets.Add("flametonguetotem", 10);
+            priorityTargets.Add("manatidetotem", 10);
+            priorityTargets.Add("unboundelemental", 10);
+
+            //rogue cards
+
+            //priest cards
+            priorityTargets.Add("northshirecleric", 10);
+            priorityTargets.Add("lightwell", 10);
+            priorityTargets.Add("auchenaisoulpriest", 10);
+            priorityTargets.Add("prophetvelen", 10);
+
+            //paladin cards
+
+            //mage cards
+            priorityTargets.Add("manawyrm", 10);
+            priorityTargets.Add("sorcererapprentice", 10);
+            priorityTargets.Add("etherealarcanist", 10);
+            priorityTargets.Add("archmageantonidas", 10);
+
+            //hunter cards
+            priorityTargets.Add("timberwolf", 10);
+            priorityTargets.Add("scavenginghyena", 10);
+            priorityTargets.Add("starvingbuzzard", 10);
+            priorityTargets.Add("leokk", 10);
+            priorityTargets.Add("tundrarhino", 10);
+        }
+
+
     }
 
 
@@ -11305,6 +11311,7 @@ namespace HREngine.Bots
 
 
     }
+    
     public class BoardTester
     {
         int ownPlayer = 1;

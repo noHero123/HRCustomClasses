@@ -9,6 +9,8 @@ namespace HREngine.Bots
 {
    public class Rushi : Bot
    {
+       PenalityManager penman = PenalityManager.Instance;
+
       protected override HRCard GetMinionByPriority(HRCard lastMinion)
       {
          HREntity result = null;
@@ -100,22 +102,7 @@ namespace HREngine.Bots
                   }
               }
 
-              if (m.name == "prophetvelen") retval -= 50;
-              if (m.name == "archmageantonidas") retval -= 50;
-              if (m.name == "flametonguetotem") retval -= 50;
-              if (m.name == "raidleader") retval -= 50;
-              if (m.name == "grimscaleoracle") retval -= 50;
-              if (m.name == "direwolfalpha") retval -= 20;
-              if (m.name == "murlocwarleader") retval -= 50;
-              if (m.name == "southseacaptain") retval -= 50;
-              if (m.name == "stormwindchampion") retval -= 50;
-              if (m.name == "timberwolf") retval -= 50;
-              if (m.name == "leokk") retval -= 50;
-              if (m.name == "northshirecleric") retval -= 50;
-              if (m.name == "sorcerersapprentice") retval -= 30;
-              if (m.name == "summoningportal") retval -= 50;
-              if (m.name == "pint-sizedsummoner") retval -= 30;
-              if (m.name == "scavenginghyena") retval -= 50;
+              if (penman.priorityTargets.ContainsKey(m.name)) retval -= penman.priorityTargets[m.name];
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;
           }

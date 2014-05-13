@@ -418,80 +418,10 @@ namespace HREngine.Bots
 
         public int getValuee()
         {
+
+            //isnt used anymore :D
             //if (value >= -200000) return value;
             int retval = 0;
-            retval += owncards.Count * 1;
-            
-            retval += ownMinions.Count * 10;
-            retval -= enemyMinions.Count * 10;
-
-            retval += ownHeroHp + ownHeroDefence;
-            retval += -enemyHeroHp - enemyHeroDefence;
-
-            retval += ownheroAngr;// +ownWeaponDurability;
-            retval -= enemyWeaponDurability;
-
-            retval += owncarddraw * 5;
-            retval -= enemycarddraw * 5;
-
-            retval += this.ownMaxMana;
-
-            if (enemyMinions.Count >= 0)
-            {
-                int anz = enemyMinions.Count;
-                int owntaunt = ownMinions.FindAll(x => x.taunt == true).Count;
-                int froggs = ownMinions.FindAll(x => x.name == "frog").Count;
-                owntaunt -= froggs;
-                if (owntaunt == 0) retval -= 10 * anz;
-                retval += owntaunt * 10 - 11 * anz;
-            }
-
-            foreach (Minion m in this.ownMinions)
-            {
-                retval += m.Hp * 1;
-                retval += m.Angr * 2;
-                if (m.Angr >= m.maxHp + 1)
-                {
-                    //is a tanky minion
-                    retval += m.Hp;
-                }
-                if (m.windfury) retval += m.Angr;
-            }
-
-            foreach (Minion m in this.enemyMinions)
-            {
-
-                retval -= m.Hp;
-                retval -= m.Angr*2;
-                if (m.Angr >= m.maxHp + 1)
-                {
-                    //is a tanky minion
-                    retval -= m.Hp;
-                }
-
-                if (m.windfury) retval -= m.Angr;
-                if (m.taunt) retval -= 5;
-                if (m.name == "raidleader") retval -= 5;
-                if (m.name == "grimscaleoracle") retval -= 5;
-                if (m.name == "direwolfalpha") retval -= 2;
-                if (m.name == "murlocwarleader") retval -= 5;
-                if (m.name == "southseacaptain") retval -= 5;
-                if (m.name == "stormwindchampion") retval -= 10;
-                if (m.name == "timberwolf") retval -= 5;
-                if (m.name == "leokk") retval -= 5;
-                if (m.name == "northshirecleric") retval -= 5;
-                if (m.name == "sorcerersapprentice") retval -= 3;
-                if (m.name == "pint-sizedsummoner") retval -= 3;
-            }
-
-            retval -= lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
-            retval -= lostWeaponDamage;
-            if (ownMinions.Count == 0) retval -= 20;
-            if (enemyMinions.Count == 0) retval += 20;
-            if (enemyHeroHp <= 0) retval = 10000;
-            if (ownHeroHp <= 0) retval = -10000;
-
-            this.value = retval;
             return retval;
         }
 
@@ -2591,13 +2521,13 @@ namespace HREngine.Bots
             if (damage >= 1 && m.divineshild)
             {
                 m.divineshild = false;
-                if (!own && !dontCalcLostDmg) this.lostDamage += damage;
+                if (!own && !dontCalcLostDmg) this.lostDamage += damage*damage;
                 return;
             }
 
             if (m.cantLowerHPbelowONE && damage >= 1 && damage >= m.Hp) damage = m.Hp - 1;
 
-            if (!own && !dontCalcLostDmg  && m.Hp < damage) lostDamage += damage - m.Hp;
+            if (!own && !dontCalcLostDmg && m.Hp < damage) this.lostDamage += (damage - m.Hp) * (damage - m.Hp);
 
             int hpcopy = m.Hp;
 
