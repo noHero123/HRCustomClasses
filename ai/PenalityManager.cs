@@ -78,6 +78,23 @@ namespace HREngine.Bots
             return pen;
         }
 
+        public int getAttackWithHeroPenality(int target, Playfield p)
+        {
+            int retval = 0;
+
+            //no penality, but a bonus, if he has weapon on hand!
+            if (p.ownWeaponDurability == 1)
+            {
+                bool hasweapon = false;
+                foreach (Handmanager.Handcard c in p.owncards)
+                {
+                    if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
+                }
+                if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
+            }
+            return retval;
+        }
+
         public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice)
         {
             int retval = 0;

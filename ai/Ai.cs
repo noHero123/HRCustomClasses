@@ -12,6 +12,7 @@ namespace HREngine.Bots
         private int maxwide = 7000;
         private bool usePenalityManager = true;
         private bool useCutingTargets = true;
+        private bool dontRecalc = true;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -42,8 +43,8 @@ namespace HREngine.Bots
 
         private Ai()
         {
-            Playfield nextMoveGuess = new Playfield();
-            nextMoveGuess.mana = -1;
+            this.nextMoveGuess = new Playfield();
+            this.nextMoveGuess.mana = -1;
         }
 
         private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc)
@@ -314,7 +315,12 @@ namespace HREngine.Bots
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
-                            pf.attackWithWeapon(trgt.target, trgt.targetEntity);
+                            int heroAttackPen = 0;
+                            if (usePenalityManager)
+                            {
+                                heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
+                            }
+                            pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             this.posmoves.Add(pf);
                         }
                     }
@@ -473,7 +479,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy,0);
                 }
 
                 if (bestmove.useability)
@@ -577,7 +583,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy,0);
                 }
 
                 if (bestmove.useability)
@@ -615,7 +621,7 @@ namespace HREngine.Bots
 
             help.loggonoff(false);
             //do we need to recalc?
-            if (posmoves[0].isEqual(this.nextMoveGuess))
+            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess))
             {
                 doNextCalcedMove();
             }

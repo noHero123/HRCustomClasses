@@ -353,7 +353,7 @@ namespace HREngine.Bots
 
       
    }
-
+    
     public class Silverfish
     {
 
@@ -403,6 +403,11 @@ namespace HREngine.Bots
 
         int anzcards = 0;
         int enemyAnzCards = 0;
+
+        int ownHeroFatigue = 0;
+        int enemyHeroFatigue = 0;
+        int ownDecksize = 0;
+        int enemyDecksize = 0;
 
         private Dictionary<int, HRCard> RejectedCardList;
 
@@ -459,6 +464,8 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
 
+            Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);
+
             // print data
             Hrtprozis.Instance.printHero();
             Hrtprozis.Instance.printOwnMinions();
@@ -507,6 +514,11 @@ namespace HREngine.Bots
             this.ownHeroWeapon = "";
             this.heroWeaponAttack = 0;
             this.heroWeaponDurability = 0;
+
+            this.ownHeroFatigue = ownhero.GetFatigue();
+            this.enemyHeroFatigue = enemyhero.GetFatigue();
+            //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
+            //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
 
 
 
@@ -809,7 +821,6 @@ namespace HREngine.Bots
     }
 
 
-
     // the ai :D
 //please ask/write me if you use this in your project
 
@@ -955,6 +966,11 @@ namespace HREngine.Bots
         public int lostHeal = 0;
         public int lostWeaponDamage = 0;
 
+        public int ownDeckSize = 0;
+        public int enemyDeckSize = 0;
+        public int ownHeroFatigue = 0;
+        public int enemyHeroFatigue = 0;
+
         public CardDB.Card ownHeroAblility;
 
         Helpfunctions help = Helpfunctions.Instance;
@@ -1030,6 +1046,11 @@ namespace HREngine.Bots
             this.startedWithMobsPlayedThisTurn = Hrtprozis.Instance.numMinionsPlayedThisTurn;// only change mobsplayedthisturm
             this.cardsPlayedThisTurn = Hrtprozis.Instance.cardsPlayedThisTurn;
             this.ueberladung = Hrtprozis.Instance.ueberladung;
+
+            this.ownHeroFatigue = Hrtprozis.Instance.ownHeroFatigue;
+            this.enemyHeroFatigue = Hrtprozis.Instance.enemyHeroFatigue;
+            this.ownDeckSize = Hrtprozis.Instance.ownDeckSize;
+            this.enemyDeckSize = Hrtprozis.Instance.enemyDeckSize;
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = this.ownHeroHp;
@@ -1162,6 +1183,11 @@ namespace HREngine.Bots
             this.cardsPlayedThisTurn = p.cardsPlayedThisTurn;
             this.ueberladung = p.ueberladung;
 
+            this.ownDeckSize = p.ownDeckSize;
+            this.enemyDeckSize = p.enemyDeckSize;
+            this.ownHeroFatigue = p.ownHeroFatigue;
+            this.enemyHeroFatigue = p.enemyHeroFatigue;
+
             //need the following for manacost-calculation
             this.ownHeroHpStarted = p.ownHeroHpStarted;
             this.enemyHeroHp = p.enemyHeroHp;
@@ -1218,6 +1244,12 @@ namespace HREngine.Bots
                 help.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
                 return false;
             }
+
+            if (this.ownDeckSize != p.ownDeckSize || this.enemyDeckSize != p.enemyDeckSize || this.ownHeroFatigue != p.ownHeroFatigue || this.enemyHeroFatigue != p.enemyHeroFatigue)
+            {
+                help.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
+            }
+
             if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung)
             {
                 help.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
@@ -6521,7 +6553,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void attackWithWeapon(int target, int targetEntity)
+        public void attackWithWeapon(int target, int targetEntity, int penality)
         {
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;
@@ -6866,7 +6898,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Ai
     {
 
@@ -6874,6 +6905,7 @@ namespace HREngine.Bots
         private int maxwide = 7000;
         private bool usePenalityManager = true;
         private bool useCutingTargets = true;
+        private bool dontRecalc = true;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -6904,8 +6936,8 @@ namespace HREngine.Bots
 
         private Ai()
         {
-            Playfield nextMoveGuess = new Playfield();
-            nextMoveGuess.mana = -1;
+            this.nextMoveGuess = new Playfield();
+            this.nextMoveGuess.mana = -1;
         }
 
         private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc)
@@ -7176,7 +7208,12 @@ namespace HREngine.Bots
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
-                            pf.attackWithWeapon(trgt.target, trgt.targetEntity);
+                            int heroAttackPen = 0;
+                            if (usePenalityManager)
+                            {
+                                heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
+                            }
+                            pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             this.posmoves.Add(pf);
                         }
                     }
@@ -7335,7 +7372,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
                 }
 
                 if (bestmove.useability)
@@ -7439,7 +7476,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
                 }
 
                 if (bestmove.useability)
@@ -7477,7 +7514,7 @@ namespace HREngine.Bots
 
             help.loggonoff(false);
             //do we need to recalc?
-            if (posmoves[0].isEqual(this.nextMoveGuess))
+            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess))
             {
                 doNextCalcedMove();
             }
@@ -7934,9 +7971,13 @@ namespace HREngine.Bots
     }
 
 
-
     public class Hrtprozis
     {
+
+        public int ownHeroFatigue = 0;
+        public int ownDeckSize = 0;
+        public int enemyDeckSize = 0;
+        public int enemyHeroFatigue = 0;
 
         public int ownHeroEntity = -1;
         public int enemyHeroEntitiy = -1;
@@ -8190,6 +8231,14 @@ namespace HREngine.Bots
             this.enemyfrozen = frozen;
         }
 
+        public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
+        {
+            this.ownDeckSize = ods;
+            this.ownHeroFatigue = ohf;
+            this.enemyDeckSize = eds;
+            this.enemyHeroFatigue = ehf;
+        }
+
         public void setEnchantments(List<BattleField.HrtUnit> enchantments)
         {
             foreach (BattleField.HrtUnit bhu in enchantments)
@@ -8310,6 +8359,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
+            help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }
 
@@ -8621,7 +8671,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -8692,6 +8741,23 @@ namespace HREngine.Bots
             int pen = 0;
             pen = getAttackSecretPenality(m, p, target);
             return pen;
+        }
+
+        public int getAttackWithHeroPenality(int target, Playfield p)
+        {
+            int retval = 0;
+
+            //no penality, but a bonus, if he has weapon on hand!
+            if (p.ownWeaponDurability == 1)
+            {
+                bool hasweapon = false;
+                foreach (Handmanager.Handcard c in p.owncards)
+                {
+                    if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
+                }
+                if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
+            }
+            return retval;
         }
 
         public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice)

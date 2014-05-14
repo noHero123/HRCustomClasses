@@ -166,6 +166,11 @@ namespace HREngine.Bots
         public int lostHeal = 0; 
         public int lostWeaponDamage = 0;
 
+        public int ownDeckSize = 0;
+        public int enemyDeckSize = 0;
+        public int ownHeroFatigue = 0;
+        public int enemyHeroFatigue = 0;
+
         public CardDB.Card ownHeroAblility;
 
         Helpfunctions help = Helpfunctions.Instance;
@@ -241,6 +246,11 @@ namespace HREngine.Bots
             this.startedWithMobsPlayedThisTurn = Hrtprozis.Instance.numMinionsPlayedThisTurn;// only change mobsplayedthisturm
             this.cardsPlayedThisTurn = Hrtprozis.Instance.cardsPlayedThisTurn;
             this.ueberladung = Hrtprozis.Instance.ueberladung;
+
+            this.ownHeroFatigue = Hrtprozis.Instance.ownHeroFatigue;
+            this.enemyHeroFatigue = Hrtprozis.Instance.enemyHeroFatigue;
+            this.ownDeckSize = Hrtprozis.Instance.ownDeckSize;
+            this.enemyDeckSize = Hrtprozis.Instance.enemyDeckSize;
 
             //need the following for manacost-calculation
             this.ownHeroHpStarted = this.ownHeroHp;
@@ -373,6 +383,11 @@ namespace HREngine.Bots
             this.cardsPlayedThisTurn = p.cardsPlayedThisTurn;
             this.ueberladung = p.ueberladung;
 
+            this.ownDeckSize = p.ownDeckSize;
+            this.enemyDeckSize = p.enemyDeckSize;
+            this.ownHeroFatigue = p.ownHeroFatigue;
+            this.enemyHeroFatigue = p.enemyHeroFatigue;
+
             //need the following for manacost-calculation
             this.ownHeroHpStarted = p.ownHeroHpStarted;
             this.enemyHeroHp = p.enemyHeroHp;
@@ -429,6 +444,12 @@ namespace HREngine.Bots
                 help.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
                 return false;
             }
+
+            if (this.ownDeckSize != p.ownDeckSize || this.enemyDeckSize != p.enemyDeckSize || this.ownHeroFatigue != p.ownHeroFatigue || this.enemyHeroFatigue != p.enemyHeroFatigue)
+            {
+                help.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
+            }
+
             if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung)
             {
                 help.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
@@ -5732,7 +5753,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void attackWithWeapon(int target, int targetEntity)
+        public void attackWithWeapon(int target, int targetEntity, int penality)
         {
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;

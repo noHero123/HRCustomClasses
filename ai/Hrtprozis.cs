@@ -13,6 +13,11 @@ namespace HREngine.Bots
     public class Hrtprozis
     {
 
+        public int ownHeroFatigue = 0;
+        public int ownDeckSize = 0;
+        public int enemyDeckSize = 0;
+        public int enemyHeroFatigue = 0;
+
         public int ownHeroEntity = -1;
         public int enemyHeroEntitiy = -1;
         public DateTime roundstart = DateTime.Now;
@@ -265,6 +270,14 @@ namespace HREngine.Bots
             this.enemyfrozen = frozen;
         }
 
+        public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
+        {
+            this.ownDeckSize = ods;
+            this.ownHeroFatigue = ohf;
+            this.enemyDeckSize = eds;
+            this.enemyHeroFatigue = ehf;
+        }
+
         public void setEnchantments(List<BattleField.HrtUnit> enchantments)
         {
             foreach (BattleField.HrtUnit bhu in enchantments)
@@ -385,6 +398,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
+            help.logg("fatigue: " + this.ownDeckSize + " " +this.ownHeroFatigue + " "+ this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }
 

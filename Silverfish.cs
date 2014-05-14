@@ -60,6 +60,11 @@ namespace HREngine.Bots
         int anzcards = 0;
         int enemyAnzCards = 0;
 
+        int ownHeroFatigue = 0;
+        int enemyHeroFatigue = 0;
+        int ownDecksize = 0;
+        int enemyDecksize = 0;
+
         private Dictionary<int, HRCard> RejectedCardList;
 
         private PlayCardAction NextFixedAction { get; set; }
@@ -115,6 +120,8 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
 
+            Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);
+
             // print data
             Hrtprozis.Instance.printHero();
             Hrtprozis.Instance.printOwnMinions();
@@ -163,6 +170,11 @@ namespace HREngine.Bots
             this.ownHeroWeapon = "";
             this.heroWeaponAttack = 0;
             this.heroWeaponDurability = 0;
+
+            this.ownHeroFatigue = ownhero.GetFatigue();
+            this.enemyHeroFatigue = enemyhero.GetFatigue();
+            //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
+            //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
             
             
 
