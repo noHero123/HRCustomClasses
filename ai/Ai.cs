@@ -24,6 +24,7 @@ namespace HREngine.Bots
         public Action bestmove = new Action();
         public int bestmoveValue = 0;
         Playfield bestboard = new Playfield();
+        Playfield nextMoveGuess = new Playfield();
 
         private static Ai instance;
 
@@ -41,6 +42,8 @@ namespace HREngine.Bots
 
         private Ai()
         {
+            Playfield nextMoveGuess = new Playfield();
+            nextMoveGuess.mana = -1;
         }
 
         private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc)
@@ -206,7 +209,7 @@ namespace HREngine.Bots
                                         this.posmoves.Add(pf);
                                     }
 
-                                    
+
                                 }
                                 else
                                 {
@@ -253,7 +256,7 @@ namespace HREngine.Bots
                             bool dontattacked = true;
                             foreach (Minion mnn in tempoo)
                             {
-                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt==m.taunt) continue;
+                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt == m.taunt) continue;
                                 if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
                                 dontattacked = false;
                             }
@@ -269,7 +272,7 @@ namespace HREngine.Bots
 
                             List<targett> trgts = p.getAttackTargets();
                             if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
-                            
+
                             foreach (targett trgt in trgts)
                             {
                                 Playfield pf = new Playfield(p);
@@ -293,7 +296,7 @@ namespace HREngine.Bots
                                     this.posmoves.Add(pf);
                                 }
 
-                                
+
                             }
                             if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
                             {
@@ -330,7 +333,7 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
                                 //if (this.hp.heroname == "priest" && trgt == 200) continue;
-                                
+
                                 Playfield pf = new Playfield(p);
 
                                 if (usePenalityManager)
@@ -354,7 +357,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            
+
                             Playfield pf = new Playfield(p);
 
                             if (usePenalityManager)
@@ -449,6 +452,43 @@ namespace HREngine.Bots
                 pf.getBestPlacePrint(bestmove.card);
             }*/
 
+            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
+            {
+                this.nextMoveGuess = new Playfield();
+                if (bestmove.cardplay)
+                {
+                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                    Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
+                    this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+
+                }
+
+                if (bestmove.minionplay)
+                {
+                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                    Minion m = this.nextMoveGuess.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
+                    this.nextMoveGuess.attackWithMinion(m, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+
+                }
+
+                if (bestmove.heroattack)
+                {
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                }
+
+                if (bestmove.useability)
+                {
+                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                    this.nextMoveGuess.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                this.bestboard.playactions.RemoveAt(0);
+            }
+            else
+            {
+                nextMoveGuess.mana = -1;
+            }
+
         }
 
 
@@ -510,6 +550,52 @@ namespace HREngine.Bots
             return retvalues;
         }
 
+        private void doNextCalcedMove()
+        {
+            help.logg("noRecalcNeeded!!!-----------------------------------");
+            this.bestboard.printActions();
+            this.bestmove = this.bestboard.getNextAction();
+
+            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
+            {
+                this.nextMoveGuess = new Playfield();
+                if (bestmove.cardplay)
+                {
+                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                    Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
+                    this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+
+                }
+
+                if (bestmove.minionplay)
+                {
+                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                    Minion m = this.nextMoveGuess.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
+                    this.nextMoveGuess.attackWithMinion(m, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+
+                }
+
+                if (bestmove.heroattack)
+                {
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy);
+                }
+
+                if (bestmove.useability)
+                {
+                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                    this.nextMoveGuess.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                this.bestboard.playactions.RemoveAt(0);
+            }
+            else
+            {
+                nextMoveGuess.mana = -1;
+            }
+
+        }
+
+
         public void dosomethingclever(Bot botbase)
         {
             //return;
@@ -528,7 +614,17 @@ namespace HREngine.Bots
             //help.logg("is hero ready?" + posmoves[0].ownHeroReady);
 
             help.loggonoff(false);
-            doallmoves(false, botbase);
+            //do we need to recalc?
+            if (posmoves[0].isEqual(this.nextMoveGuess))
+            {
+                doNextCalcedMove();
+            }
+            else
+            {
+                doallmoves(false, botbase);
+            }
+
+            
             //help.logging(true);
 
         }

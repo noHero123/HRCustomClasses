@@ -226,8 +226,8 @@ namespace HREngine.Bots
             this.ownWeaponAttack = Hrtprozis.Instance.heroWeaponAttack;
             this.ownWeaponName = Hrtprozis.Instance.ownHeroWeapon;
             this.owncarddraw = 0;
-            this.ownHeroDefence = 0;
-            this.enemyHeroDefence = 0;
+            this.ownHeroDefence = Hrtprozis.Instance.heroDefence;
+            this.enemyHeroDefence = Hrtprozis.Instance.enemyDefence;
             this.enemyWeaponAttack = 0;//dont know jet
             this.enemyWeaponDurability = Hrtprozis.Instance.enemyWeaponDurability;
             this.enemycarddraw = 0;
@@ -414,6 +414,119 @@ namespace HREngine.Bots
                 if (m.name == "manawraith") this.managespenst++;
             }
 
+        }
+
+        public bool isEqual(Playfield p)
+        {
+            if (this.enemySecretCount != p.enemySecretCount)
+            {
+                help.logg("enemy secrets changed ");
+                return false;
+            }
+
+            if (this.mana != p.mana || this.enemyMaxMana != p.enemyMaxMana || this.ownMaxMana != p.ownMaxMana)
+            {
+                help.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
+                return false;
+            }
+            if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung)
+            {
+                help.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
+                return false;
+            }
+                
+            if (this.ownHeroName != p.ownHeroName || this.enemyHeroName != p.enemyHeroName)
+            {
+                help.logg("hero name changed ");
+                return false;
+            }
+
+            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking)
+            {
+                help.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking);
+                return false;
+            }
+            if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury)
+            {
+                help.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
+                return false;
+            }
+            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen)
+            {
+                help.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen);
+                return false;
+            }
+
+            if (this.auchenaiseelenpriesterin != p.auchenaiseelenpriesterin || this.winzigebeschwoererin != p.winzigebeschwoererin || this.zauberlehrling != p.zauberlehrling || this.managespenst != p.managespenst || this.soeldnerDerVenture != p.soeldnerDerVenture || this.beschwoerungsportal != p.beschwoerungsportal || this.doublepriest != p.doublepriest)
+            {
+                help.logg("special minions changed " + this.auchenaiseelenpriesterin + " " + p.auchenaiseelenpriesterin + " " + this.winzigebeschwoererin + " " + p.winzigebeschwoererin + " " + this.zauberlehrling + " " + p.zauberlehrling + " " + this.managespenst + " " + p.managespenst + " " + this.soeldnerDerVenture + " " + p.soeldnerDerVenture + " " + this.beschwoerungsportal + " " + p.beschwoerungsportal + " " + this.doublepriest + " " + p.doublepriest);
+                return false;
+            }
+
+            if (this.ownHeroAblility.name != p.ownHeroAblility.name)
+            {
+                help.logg("hero ability changed ");
+                return false;
+            }
+            
+            if (this.spellpower != p.spellpower)
+            {
+                help.logg("spellpower changed");
+                return false;
+            }
+            
+            if (this.ownMinions.Count != p.ownMinions.Count || this.enemyMinions.Count != p.enemyMinions.Count)
+            {
+                help.logg("minions count or hand changed");
+                return false;
+            }
+
+            bool minionbool = true;
+            for (int i = 0; i < this.ownMinions.Count; i++)
+            {
+                Minion dis = this.ownMinions[i]; Minion pis = p.ownMinions[i];
+                if (dis.entitiyID != pis.entitiyID) minionbool= false;
+                if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
+                if (dis.playedThisTurn != pis.playedThisTurn || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.silenced != pis.silenced || dis.stealth != pis.stealth || dis.taunt != pis.taunt || dis.windfury != pis.windfury || dis.wounded != pis.wounded || dis.zonepos != pis.zonepos) minionbool = false;
+                if (dis.divineshild != pis.divineshild || dis.cantLowerHPbelowONE != pis.cantLowerHPbelowONE || dis.immune != pis.immune) minionbool = false;
+               
+            }
+            if (minionbool == false)
+            {
+                help.logg("ownminions changed");
+                return false;
+            }
+            
+            for (int i = 0; i < this.enemyMinions.Count; i++)
+            {
+                Minion dis = this.enemyMinions[i]; Minion pis = p.enemyMinions[i];
+                if (dis.entitiyID != pis.entitiyID) minionbool = false;
+                if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
+                if (dis.playedThisTurn != pis.playedThisTurn || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.silenced != pis.silenced || dis.stealth != pis.stealth || dis.taunt != pis.taunt || dis.windfury != pis.windfury || dis.wounded != pis.wounded || dis.zonepos != pis.zonepos) minionbool = false;
+                if (dis.divineshild != pis.divineshild || dis.cantLowerHPbelowONE != pis.cantLowerHPbelowONE || dis.immune != pis.immune) minionbool = false;
+
+            }
+            if (minionbool == false)
+            {
+                help.logg("enemyminions changed");
+                return false;
+            }
+
+            for (int i = 0; i < this.owncards.Count; i++)
+            {
+                Handmanager.Handcard dishc = this.owncards[i]; Handmanager.Handcard pishc = p.owncards[i];
+                if ( dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.card.getManaCost(this) != pishc.card.getManaCost(p))
+                {
+                    help.logg("handcard changed: " + dishc.card.name);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public int getValuee()
@@ -1417,7 +1530,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    if (this.ownHeroDefence > 0)
+                    if (this.ownHeroDefence > 0 && dmg > 0)
                     {
 
                         int rest = ownHeroDefence - dmg;
@@ -1446,7 +1559,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    if (this.enemyHeroDefence > 0)
+                    if (this.enemyHeroDefence > 0 && dmg > 0)
                     {
 
                         int rest = enemyHeroDefence - dmg;
@@ -1738,7 +1851,7 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.name == "stormwindchampion")
+                if (ownm.name == "stormwindchampion" && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_222o");
                     e.creator = ownm.entitiyID;
@@ -3676,7 +3789,7 @@ namespace HREngine.Bots
 
             Action a = new Action();
             a.cardplay = true;
-            a.card = c;
+            a.card = new CardDB.Card(c);
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
             a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
 
@@ -5546,7 +5659,7 @@ namespace HREngine.Bots
             {
                 Action a = new Action();
                 a.cardplay = true;
-                a.card = c;
+                a.card = new CardDB.Card(c);
                 a.cardEntitiy = cardEntity;
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
                 a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
@@ -5647,18 +5760,20 @@ namespace HREngine.Bots
             if (target == 200)
             {
                 attackOrHealHero(this.ownheroAngr, false);
-                return;
             }
-
-            Minion enemy = this.enemyMinions[target - 10];
-            minionGetDamagedOrHealed(enemy, this.ownheroAngr, 0, false);
-
-            if (!this.heroImmuneWhileAttacking)
+            else
             {
-                attackOrHealHero(enemy.Angr, true);
-                if (enemy.name == "waterelemental")
+
+                Minion enemy = this.enemyMinions[target - 10];
+                minionGetDamagedOrHealed(enemy, this.ownheroAngr, 0, false);
+
+                if (!this.heroImmuneWhileAttacking)
                 {
-                    this.ownHeroFrozen = true;
+                    attackOrHealHero(enemy.Angr, true);
+                    if (enemy.name == "waterelemental")
+                    {
+                        this.ownHeroFrozen = true;
+                    }
                 }
             }
 

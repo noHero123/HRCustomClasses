@@ -569,6 +569,24 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+            if ((name == "polymorph" || name == "hex"))
+            {
+
+                if (target >= 0 && target <= 9)
+                {
+                    return 500;
+                }
+
+                if (target >= 10 && target <= 19)
+                {
+                    Minion frog = p.enemyMinions[target - 10];
+                    if (this.priorityTargets.ContainsKey(frog.name)) return 0;
+                    if (frog.Angr >= 4 && frog.Hp >=4) return 0;
+                    return 30;
+                }
+               
+            }
+
             if ((name == "biggamehunter") && target == -1)
             {
                 return 19;
