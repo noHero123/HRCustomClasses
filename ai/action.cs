@@ -4456,7 +4456,7 @@ namespace HREngine.Bots
                 {
                     if (mnn.id + 10 != target)
                     {
-                        minionGetDamagedOrHealed(m, damage1, 0, false);
+                        minionGetDamagedOrHealed(mnn, damage1, 0, false);
                     }
                 }
             }
@@ -5662,7 +5662,7 @@ namespace HREngine.Bots
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
 
-            if (logging) help.logg("play crd" + c.name + " " + cardEntity + " " + c.getManaCost(this) + " trgt " + target);
+            if (logging) help.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + c.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
             {
@@ -6019,6 +6019,27 @@ namespace HREngine.Bots
              */
         }
 
+
+        private void debugMinions()
+        {
+            help.logg("OWN MINIONS################");
+
+            foreach (Minion m in this.ownMinions)
+            {
+                help.logg("name,ang, hp, maxhp: " + m.name + ", " + m.Angr + ", " + m.Hp + ", "+ m.maxHp);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg("enchment: " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+
+            help.logg("ENEMY MINIONS############");
+            foreach (Minion m in this.enemyMinions)
+            {
+                help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
+            }
+        }
+
         public void printBoard()
         {
             help.logg("board: "+ value);
@@ -6036,7 +6057,7 @@ namespace HREngine.Bots
                 help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
                 foreach (Enchantment e in m.enchantments)
                 {
-                    help.logg("name,ang, hp: " + e.CARDID + " "+ e.creator + " "+ e.controllerOfCreator);
+                    help.logg("enchment " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
                 }
             }
 

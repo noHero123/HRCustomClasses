@@ -112,7 +112,7 @@ namespace HREngine.Bots
               
               if (m.poisonous) retval -= 4;
 
-              if (penman.priorityTargets.ContainsKey(m.name)) retval -= penman.priorityTargets[m.name];
+              if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
 
               if (m.Angr >= 4) retval -= 20;
               if (m.Angr >= 7) retval -= 50;

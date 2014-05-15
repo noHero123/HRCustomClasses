@@ -105,7 +105,7 @@ namespace HREngine.Bots
                             pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
                             this.posmoves.Add(pf);
                         }
-                       
+
                     }
                     else
                     {
@@ -253,13 +253,34 @@ namespace HREngine.Bots
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
+                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
+                            bool isSpecial = penman.specialMinions.ContainsKey(m.name);
                             foreach (Minion mnn in tempoo)
                             {
-                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt == m.taunt) continue;
-                                if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                                dontattacked = false;
+                                // special minions are allowed to attack in silended and unsilenced state!
+                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                                bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+
+                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                                {
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                                {
+                                    if (m.name != mnn.name) // different name -> take it
+                                    {
+                                        continue;
+                                    }
+                                    // same name -> test whether they are equal
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
                             }
 
                             if (dontattacked)
@@ -268,9 +289,10 @@ namespace HREngine.Bots
                             }
                             else
                             {
+                                //help.logg(m.name + " doesnt need to attack!");
                                 continue;
                             }
-
+                            //help.logg(m.name + " is going to attack!");
                             List<targett> trgts = p.getAttackTargets();
                             if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
 
@@ -311,6 +333,7 @@ namespace HREngine.Bots
                     if (p.ownHeroReady)
                     {
                         List<targett> trgts = p.getAttackTargets();
+                        if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                         havedonesomething = true;
                         foreach (targett trgt in trgts)
                         {
@@ -479,7 +502,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy,0);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
                 }
 
                 if (bestmove.useability)
@@ -532,25 +555,55 @@ namespace HREngine.Bots
                     {
                         retvaluesPrio.Add(t);
                         priomins = true;
+                        //help.logg(m.name + " is added to targetlist");
                         continue;
                     }
-                    bool allreadyadded = false;
+
+
+                    bool goingtoadd = true;
                     List<Minion> temp = new List<Minion>(addedmins);
+                    bool isSpecial = penman.specialMinions.ContainsKey(m.name);
                     foreach (Minion mnn in temp)
                     {
-                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced) continue;
-                        if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                        allreadyadded = true;
+                        // special minions are allowed to attack in silended and unsilenced state!
+                        //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                        bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+
+                        if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                        {
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
+                        if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                        {
+                            if (m.name != mnn.name) // different name -> take it
+                            {
+                                continue;
+                            }
+                            // same name -> test whether they are equal
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
                     }
 
-                    if (!allreadyadded)
+                    if (goingtoadd)
                     {
                         addedmins.Add(m);
                         retvalues.Add(t);
+                        //help.logg(m.name + " " + m.id +" is added to targetlist");
                     }
+                    else
+                    {
+                        //help.logg(m.name + " is not needed to attack");
+                        continue;
+                    }
+
                 }
             }
-
+            //help.logg("end targetcutting");
             if (priomins) return retvaluesPrio;
 
             return retvalues;
@@ -583,7 +636,7 @@ namespace HREngine.Bots
 
                 if (bestmove.heroattack)
                 {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy,0);
+                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
                 }
 
                 if (bestmove.useability)
@@ -612,11 +665,11 @@ namespace HREngine.Bots
             hp.updatePositions();
             posmoves.Add(new Playfield());
 
-           /* foreach (var item in this.posmoves[0].owncards)
-            {
-                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
-            }
-            */
+            /* foreach (var item in this.posmoves[0].owncards)
+             {
+                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
+             }
+             */
             //help.logg("is hero ready?" + posmoves[0].ownHeroReady);
 
             help.loggonoff(false);
@@ -630,7 +683,7 @@ namespace HREngine.Bots
                 doallmoves(false, botbase);
             }
 
-            
+
             //help.logging(true);
 
         }
@@ -687,7 +740,7 @@ namespace HREngine.Bots
 
             foreach (var item in this.posmoves[0].owncards)
             {
-                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) +" cost/mana: " + item.card.cost +"/"+ posmoves[0].mana);
+                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
 
             doallmoves(true, botbase);
@@ -732,6 +785,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
 
 }

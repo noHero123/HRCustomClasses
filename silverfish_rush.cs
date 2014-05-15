@@ -103,7 +103,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (penman.priorityTargets.ContainsKey(m.name)) retval -= penman.priorityTargets[m.name];
+                if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
                 if (m.Angr >= 4) retval -= 20;
                 if (m.Angr >= 7) retval -= 50;
             }
@@ -336,8 +336,12 @@ namespace HREngine.Bots
 
     }
 
+
     public class Silverfish
     {
+
+        private bool singleLog = false;
+
 
         Settings sttngs = Settings.Instance;
 
@@ -401,7 +405,17 @@ namespace HREngine.Bots
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
             sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
-            sttngs.setLoggPath(path);
+
+            if (!singleLog)
+            {
+                sttngs.setLoggPath(path);
+            }
+            else
+            {
+                sttngs.setLoggPath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+                sttngs.setLoggFile("UILogg.txt");
+                Helpfunctions.Instance.createNewLoggfile();
+            }
 
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
@@ -411,8 +425,15 @@ namespace HREngine.Bots
 
         public void setnewLoggFile()
         {
-            sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
-            Helpfunctions.Instance.createNewLoggfile();
+            if (!singleLog)
+            {
+                sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
+                Helpfunctions.Instance.createNewLoggfile();
+            }
+            else
+            {
+                sttngs.setLoggFile("UILogg.txt");
+            }
         }
 
         public void updateEverything(Bot botbase)
@@ -5238,7 +5259,7 @@ namespace HREngine.Bots
                 {
                     if (mnn.id + 10 != target)
                     {
-                        minionGetDamagedOrHealed(m, damage1, 0, false);
+                        minionGetDamagedOrHealed(mnn, damage1, 0, false);
                     }
                 }
             }
@@ -6444,7 +6465,7 @@ namespace HREngine.Bots
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
 
-            if (logging) help.logg("play crd" + c.name + " " + cardEntity + " " + c.getManaCost(this) + " trgt " + target);
+            if (logging) help.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + c.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
             {
@@ -6801,6 +6822,27 @@ namespace HREngine.Bots
              */
         }
 
+
+        private void debugMinions()
+        {
+            help.logg("OWN MINIONS################");
+
+            foreach (Minion m in this.ownMinions)
+            {
+                help.logg("name,ang, hp, maxhp: " + m.name + ", " + m.Angr + ", " + m.Hp + ", " + m.maxHp);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg("enchment: " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+
+            help.logg("ENEMY MINIONS############");
+            foreach (Minion m in this.enemyMinions)
+            {
+                help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
+            }
+        }
+
         public void printBoard()
         {
             help.logg("board: " + value);
@@ -6818,7 +6860,7 @@ namespace HREngine.Bots
                 help.logg("name,ang, hp: " + m.name + ", " + m.Angr + ", " + m.Hp);
                 foreach (Enchantment e in m.enchantments)
                 {
-                    help.logg("name,ang, hp: " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                    help.logg("enchment " + e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
                 }
             }
 
@@ -7128,13 +7170,34 @@ namespace HREngine.Bots
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
+                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
+                            bool isSpecial = penman.specialMinions.ContainsKey(m.name);
                             foreach (Minion mnn in tempoo)
                             {
-                                if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced && mnn.taunt == m.taunt) continue;
-                                if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                                dontattacked = false;
+                                // special minions are allowed to attack in silended and unsilenced state!
+                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                                bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+
+                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                                {
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                                {
+                                    if (m.name != mnn.name) // different name -> take it
+                                    {
+                                        continue;
+                                    }
+                                    // same name -> test whether they are equal
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
                             }
 
                             if (dontattacked)
@@ -7143,9 +7206,10 @@ namespace HREngine.Bots
                             }
                             else
                             {
+                                //help.logg(m.name + " doesnt need to attack!");
                                 continue;
                             }
-
+                            //help.logg(m.name + " is going to attack!");
                             List<targett> trgts = p.getAttackTargets();
                             if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
 
@@ -7186,6 +7250,7 @@ namespace HREngine.Bots
                     if (p.ownHeroReady)
                     {
                         List<targett> trgts = p.getAttackTargets();
+                        if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                         havedonesomething = true;
                         foreach (targett trgt in trgts)
                         {
@@ -7407,25 +7472,55 @@ namespace HREngine.Bots
                     {
                         retvaluesPrio.Add(t);
                         priomins = true;
+                        //help.logg(m.name + " is added to targetlist");
                         continue;
                     }
-                    bool allreadyadded = false;
+
+
+                    bool goingtoadd = true;
                     List<Minion> temp = new List<Minion>(addedmins);
+                    bool isSpecial = penman.specialMinions.ContainsKey(m.name);
                     foreach (Minion mnn in temp)
                     {
-                        if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.silenced == m.silenced) continue;
-                        if (!m.silenced && (mnn.name == m.name || !penman.specialMinions.ContainsKey(m.name))) continue; //silenced minions are all equal :D
-                        allreadyadded = true;
+                        // special minions are allowed to attack in silended and unsilenced state!
+                        //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                        bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+
+                        if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                        {
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
+                        if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                        {
+                            if (m.name != mnn.name) // different name -> take it
+                            {
+                                continue;
+                            }
+                            // same name -> test whether they are equal
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
                     }
 
-                    if (!allreadyadded)
+                    if (goingtoadd)
                     {
                         addedmins.Add(m);
                         retvalues.Add(t);
+                        //help.logg(m.name + " " + m.id +" is added to targetlist");
                     }
+                    else
+                    {
+                        //help.logg(m.name + " is not needed to attack");
+                        continue;
+                    }
+
                 }
             }
-
+            //help.logg("end targetcutting");
             if (priomins) return retvaluesPrio;
 
             return retvalues;
@@ -8652,7 +8747,6 @@ namespace HREngine.Bots
         }
 
     }
-
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -10216,7 +10310,7 @@ namespace HREngine.Bots
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO) && p.cardsPlayedThisTurn == 0) return retval;
 
-                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE))
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO))
                 {
                     retval.Add(new targett(100, p.ownHeroEntity));//ownhero
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
@@ -11795,6 +11889,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        tempminion.silenced = silenced;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -11857,6 +11952,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        tempminion.silenced = silenced;
                         if (maxhp > hp) tempminion.wounded = true;
 
 

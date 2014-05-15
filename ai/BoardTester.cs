@@ -210,6 +210,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        tempminion.silenced = silenced;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -272,6 +273,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        tempminion.silenced = silenced;
                         if (maxhp > hp) tempminion.wounded = true;
 
 

@@ -12,7 +12,10 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        
+
+        private bool singleLog = false;
+
+
         Settings sttngs = Settings.Instance;
 
         List<Minion> ownMinions = new List<Minion>();
@@ -75,7 +78,17 @@ namespace HREngine.Bots
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
             sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
-            sttngs.setLoggPath(path);
+            
+            if (!singleLog)
+            {
+                sttngs.setLoggPath(path);
+            }
+            else 
+            {
+                sttngs.setLoggPath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+                sttngs.setLoggFile("UILogg.txt");
+                Helpfunctions.Instance.createNewLoggfile();
+            }
             
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
@@ -85,8 +98,15 @@ namespace HREngine.Bots
 
         public void setnewLoggFile()
         {
-            sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
-            Helpfunctions.Instance.createNewLoggfile();
+            if (!singleLog)
+            {
+                sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
+                Helpfunctions.Instance.createNewLoggfile();
+            }
+            else 
+            {
+                sttngs.setLoggFile("UILogg.txt");
+            }
         }
 
         public void updateEverything(Bot botbase)
