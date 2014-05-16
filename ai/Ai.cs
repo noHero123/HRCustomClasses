@@ -140,7 +140,7 @@ namespace HREngine.Bots
 
 
 
-        private void doallmoves(bool test, Bot botBase)
+        private void doallmoves(bool test, Bot botBase, bool isLethalCheck)
         {
 
             bool havedonesomething = true;
@@ -187,6 +187,27 @@ namespace HREngine.Bots
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
+                                if (isLethalCheck && (penman.DamageTargetDatabase.ContainsKey(c.name) || penman.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                {
+                                    targett trg = trgts.Find(x => x.target == 200);
+                                    if (trg != null)
+                                    {
+                                        trgts.Clear();
+                                        trgts.Add(trg);
+                                    }
+                                    else
+                                    {
+                                        // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                        if (trgts.Count >= 1)
+                                        {
+                                            trg = trgts[0];
+                                            trgts.Clear();
+                                            trgts.Add(trg);
+                                        }
+                                    }
+                                }
+
+
                                 int cardplayPenality = 0;
 
                                 if (trgts.Count == 0)
@@ -214,6 +235,16 @@ namespace HREngine.Bots
                                 }
                                 else
                                 {
+                                    if (isLethalCheck)// only target enemy hero during Lethal check!
+                                    {
+                                        targett trg = trgts.Find(x => x.target == 200);
+                                        if (trg != null)
+                                        {
+                                            trgts.Clear();
+                                            trgts.Add(trg);
+                                        }
+                                    }
+
                                     foreach (targett trgt in trgts)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -253,6 +284,7 @@ namespace HREngine.Bots
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
+                            //BEGIN:cut (double/similar) attacking minions out#####################################
                             // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
@@ -292,9 +324,31 @@ namespace HREngine.Bots
                                 //help.logg(m.name + " doesnt need to attack!");
                                 continue;
                             }
+                            //END: cut (double/similar) attacking minions out#####################################
+
                             //help.logg(m.name + " is going to attack!");
                             List<targett> trgts = p.getAttackTargets();
                             if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+
+                            if (isLethalCheck)// only target enemy hero during Lethal check!
+                            {
+                                targett trg = trgts.Find(x => x.target == 200);
+                                if (trg != null)
+                                {
+                                    trgts.Clear();
+                                    trgts.Add(trg);
+                                }
+                                else
+                                {
+                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                    if (trgts.Count >= 1)
+                                    {
+                                        trg = trgts[0];
+                                        trgts.Clear();
+                                        trgts.Add(trg);
+                                    }
+                                }
+                            }
 
                             foreach (targett trgt in trgts)
                             {
@@ -335,6 +389,27 @@ namespace HREngine.Bots
                         List<targett> trgts = p.getAttackTargets();
                         if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                         havedonesomething = true;
+
+                        if (isLethalCheck)// only target enemy hero during Lethal check!
+                        {
+                            targett trg = trgts.Find(x => x.target == 200);
+                            if (trg != null)
+                            {
+                                trgts.Clear();
+                                trgts.Add(trg);
+                            }
+                            else
+                            {
+                                // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                if (trgts.Count >= 1)
+                                {
+                                    trg = trgts[0];
+                                    trgts.Clear();
+                                    trgts.Add(trg);
+                                }
+                            }
+                        }
+
                         foreach (targett trgt in trgts)
                         {
                             Playfield pf = new Playfield(p);
@@ -355,13 +430,34 @@ namespace HREngine.Bots
                         int abilityPenality = 0;
 
                         havedonesomething = true;
+                        // if we have mage or priest, we have to target something####################################################
                         if (this.hp.heroname == "mage" || this.hp.heroname == "priest")
                         {
 
                             List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
+
+                            if (isLethalCheck && (this.hp.heroname == "mage" || (this.hp.heroname == "priest" && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
+                            {
+                                targett trg = trgts.Find(x => x.target == 200);
+                                if (trg != null)
+                                {
+                                    trgts.Clear();
+                                    trgts.Add(trg);
+                                }
+                                else
+                                {
+                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                    if (trgts.Count >= 1)
+                                    {
+                                        trg = trgts[0];
+                                        trgts.Clear();
+                                        trgts.Add(trg);
+                                    }
+                                }
+                            }
+
                             foreach (targett trgt in trgts)
                             {
-                                //if (this.hp.heroname == "priest" && trgt == 200) continue;
 
                                 Playfield pf = new Playfield(p);
 
@@ -386,7 +482,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-
+                             // the other classes dont have to target####################################################
                             Playfield pf = new Playfield(p);
 
                             if (usePenalityManager)
@@ -661,8 +757,10 @@ namespace HREngine.Bots
             //turncheck
             //help.moveMouse(950,750);
             //help.Screenshot();
-            posmoves.Clear();
+            
             hp.updatePositions();
+
+            posmoves.Clear();
             posmoves.Add(new Playfield());
 
             /* foreach (var item in this.posmoves[0].owncards)
@@ -674,13 +772,22 @@ namespace HREngine.Bots
 
             help.loggonoff(false);
             //do we need to recalc?
+            help.logg("recalc-check###########");
             if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess))
             {
                 doNextCalcedMove();
             }
             else
             {
-                doallmoves(false, botbase);
+                help.logg("Leathal-check###########");
+                doallmoves(false, botbase, true);
+                if (bestmoveValue < 10000)
+                {
+                    posmoves.Clear();
+                    posmoves.Add(new Playfield());
+                    help.logg("no lethal, do something random######");
+                    doallmoves(false, botbase, false);
+                }
             }
 
 
@@ -714,7 +821,7 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
 
-            doallmoves(true, botbase);
+            doallmoves(true, botbase,false);
         }
 
         public void simulatorTester(Bot botbase)
@@ -743,7 +850,7 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
 
-            doallmoves(true, botbase);
+            doallmoves(true, botbase,false);
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();
@@ -775,7 +882,16 @@ namespace HREngine.Bots
                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
             }
             help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0]) + " cost/mana: " + posmoves[0].ownHeroAblility.cost + "/" + posmoves[0].mana);
-            doallmoves(false, botbase);
+
+            // lethalcheck + normal 
+            doallmoves(false, botbase, true);
+            if (bestmoveValue < 10000)
+            {
+                posmoves.Clear();
+                posmoves.Add(new Playfield());
+                doallmoves(false, botbase, false);
+            }
+
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();

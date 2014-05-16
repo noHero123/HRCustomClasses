@@ -4326,6 +4326,7 @@ namespace HREngine.Bots
                 damage = 4;
                 this.owncarddraw--;
                 this.owncards.RemoveRange(0, Math.Min(1, this.owncards.Count));
+                
 
             }
             if (c.name == "poweroverwhelming")
@@ -5172,7 +5173,7 @@ namespace HREngine.Bots
                 {
                     if (maxHp < enemy.Hp) maxHp = enemy.Hp;
 
-                    minionGetDamagedOrHealed(enemy, damage, 0, false, true);
+                    minionGetDamagedOrHealed(enemy, damage, 0, false,true);
                 }
                 this.lostDamage += Math.Max(0, damage - maxHp); 
 
@@ -5654,6 +5655,8 @@ namespace HREngine.Bots
             // lock at frostnova (click) / frostblitz (no click)
             this.mana = this.mana - c.getManaCost(this);
 
+            removeCard(c);// remove card
+
             if (c.Secret)
             {
                 this.ownSecretsIDList.Add(c.CardID);
@@ -5720,10 +5723,6 @@ namespace HREngine.Bots
             }
 
             triggerACardGetPlayed(c);
-
-            removeCard(c);// remove card
-
-
 
             this.ueberladung += c.recallValue;
 

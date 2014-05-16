@@ -34,6 +34,14 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
+          if (p.enemyHeroName == "mage")
+          {
+              if (p.ownMinions.Count - p.enemyMinions.Count >= 2)
+              {
+                  retval -= (p.ownMinions.Count - p.enemyMinions.Count) * 20;
+              }
+          }
+
           if (p.ownHeroHp + p.ownHeroDefence > 10)
           {
               retval += p.ownHeroHp + p.ownHeroDefence;

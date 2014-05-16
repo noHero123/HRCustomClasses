@@ -16,8 +16,8 @@ namespace HREngine.Bots
         Dictionary<string, int> HealHeroDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealAllDatabase = new Dictionary<string, int>();
 
-        Dictionary<string, int> DamageTargetDatabase = new Dictionary<string, int>();
-        Dictionary<string, int> DamageTargetSpecialDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> DamageTargetDatabase = new Dictionary<string, int>();
+        public Dictionary<string, int> DamageTargetSpecialDatabase = new Dictionary<string, int>();
         Dictionary<string, int> DamageAllDatabase = new Dictionary<string, int>();
         Dictionary<string, int> DamageHeroDatabase = new Dictionary<string, int>();
         Dictionary<string, int> DamageRandomDatabase = new Dictionary<string, int>();
@@ -34,6 +34,8 @@ namespace HREngine.Bots
         Dictionary<string, int> cardDrawBattleCryDatabase = new Dictionary<string, int>();
         Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
+
+        Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
         public Dictionary<string, int> priorityTargets = new Dictionary<string, int>();
@@ -69,6 +71,7 @@ namespace HREngine.Bots
             setupDestroyOwnCards();
             setupSpecialMins();
             setupEnemyTargetPriority();
+            setupHeroDamagingAOE();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
@@ -1209,6 +1212,11 @@ namespace HREngine.Bots
             returnHandDatabase.Add("shadowstep",0);
             returnHandDatabase.Add("vanish",0);
             returnHandDatabase.Add("youthfulbrewmaster",0);
+        }
+
+        private void setupHeroDamagingAOE()
+        {
+            this.heroDamagingAoeDatabase.Add("", 0);
         }
 
         private void setupSpecialMins()
