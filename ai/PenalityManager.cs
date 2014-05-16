@@ -750,6 +750,20 @@ namespace HREngine.Bots
                 if (mnn.numAttacksThisTurn >= 1) attackedbefore ++;
             }
 
+            if (c.name == "acidicswampooze" && (p.enemyHeroName == "warrior" || p.enemyHeroName == "thief" || p.enemyHeroName == "pala"))
+            {
+                if (p.enemyHeroName == "thief" && p.enemyWeaponAttack <= 2)
+                {
+                    pen += 100;
+                }
+                else
+                {
+                    if (p.enemyWeaponAttack <= 1)
+                    {
+                        pen += 100;
+                    }
+                }
+            }
 
             if (p.enemyHeroName == "hunter")
             {
