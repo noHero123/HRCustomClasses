@@ -7271,7 +7271,7 @@ namespace HREngine.Bots
 
                             //help.logg(m.name + " is going to attack!");
                             List<targett> trgts = p.getAttackTargets();
-                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+
 
                             if (isLethalCheck)// only target enemy hero during Lethal check!
                             {
@@ -7291,6 +7291,10 @@ namespace HREngine.Bots
                                         trgts.Add(trg);
                                     }
                                 }
+                            }
+                            else
+                            {
+                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                             }
 
                             foreach (targett trgt in trgts)
@@ -7330,7 +7334,7 @@ namespace HREngine.Bots
                     if (p.ownHeroReady)
                     {
                         List<targett> trgts = p.getAttackTargets();
-                        if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+
                         havedonesomething = true;
 
                         if (isLethalCheck)// only target enemy hero during Lethal check!
@@ -7351,6 +7355,10 @@ namespace HREngine.Bots
                                     trgts.Add(trg);
                                 }
                             }
+                        }
+                        else
+                        {
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
                         }
 
                         foreach (targett trgt in trgts)
@@ -7844,7 +7852,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class Handmanager
     {
