@@ -5824,7 +5824,6 @@ namespace HREngine.Bots
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
             a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
-            this.cardsPlayedThisTurn++;
             if (logging) help.logg("play ability on target " + target);
 
             if (heroname == "mage")
