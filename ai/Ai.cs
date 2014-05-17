@@ -8,6 +8,15 @@ namespace HREngine.Bots
 
     public class Ai
     {
+        private int maxdeep = 12;
+        private int maxwide = 7000;
+        private bool usePenalityManager = true;
+        private bool useCutingTargets = true;
+        private bool dontRecalc = true;
+        private bool useLethalCheck = true;
+        private bool useThreads = true;
+        private int numberOfThreads = 8;
+
 
         public class aitask
         {
@@ -34,14 +43,6 @@ namespace HREngine.Bots
                 this.threadnumber = threadnumber;
             }
         }
-
-        private int maxdeep = 12;
-        private int maxwide = 7000;
-        private bool usePenalityManager = true;
-        private bool useCutingTargets = true;
-        private bool dontRecalc = true;
-        private bool useThreads = true;
-        private int numberOfThreads = 8;
 
 
         private List<aitask> threadResults = new List<aitask>();
@@ -1383,13 +1384,15 @@ namespace HREngine.Bots
             else
             {
                 help.logg("Leathal-check###########");
+                bestmoveValue = -1000000;
                 if (useThreads)
                 {
-                    doallmovesParallel(false, botbase, true);
+                    if (useLethalCheck) doallmovesParallel(false, botbase, true);
+                    
                 }
                 else
                 {
-                    doallmoves(false, botbase, true);
+                    if (useLethalCheck) doallmoves(false, botbase, true);
                 }
                 if (bestmoveValue < 10000)
                 {

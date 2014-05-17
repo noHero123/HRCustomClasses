@@ -6053,7 +6053,7 @@ namespace HREngine.Bots
                 temp.AddRange(this.ownMinions);
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    minionGetDamagedOrHealed(enemy, damage, 0, true);
                 }
                 attackOrHealHero(damage, true);
                 attackOrHealHero(damage, false);
@@ -6628,7 +6628,7 @@ namespace HREngine.Bots
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
             a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
             this.playactions.Add(a);
-
+            this.cardsPlayedThisTurn++;
             if (logging) help.logg("play ability on target " + target);
 
             if (heroname == "mage")
@@ -6922,9 +6922,17 @@ namespace HREngine.Bots
 
     }
 
-
     public class Ai
     {
+
+        private int maxdeep = 12;
+        private int maxwide = 7000;
+        private bool usePenalityManager = true;
+        private bool useCutingTargets = true;
+        private bool dontRecalc = true;
+        private bool useLethalCheck = true;
+        private bool useThreads = true;
+        private int numberOfThreads = 8;
 
         public class aitask
         {
@@ -6952,13 +6960,7 @@ namespace HREngine.Bots
             }
         }
 
-        private int maxdeep = 12;
-        private int maxwide = 7000;
-        private bool usePenalityManager = true;
-        private bool useCutingTargets = true;
-        private bool dontRecalc = true;
-        private bool useThreads = true;
-        private int numberOfThreads = 8;
+
 
 
         private List<aitask> threadResults = new List<aitask>();
@@ -8300,13 +8302,15 @@ namespace HREngine.Bots
             else
             {
                 help.logg("Leathal-check###########");
+                bestmoveValue = -1000000;
                 if (useThreads)
                 {
-                    doallmovesParallel(false, botbase, true);
+                    if (useLethalCheck) doallmovesParallel(false, botbase, true);
+
                 }
                 else
                 {
-                    doallmoves(false, botbase, true);
+                    if (useLethalCheck) doallmoves(false, botbase, true);
                 }
                 if (bestmoveValue < 10000)
                 {
@@ -8483,6 +8487,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
 
     public class Handmanager
