@@ -90,11 +90,11 @@ namespace HREngine.Bots
               if (!a.cardplay) continue;
               if (a.card.type == CardDB.cardtype.MOB) playmobs++;
               //if (a.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
-              if (a.card.name == "execute") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
+
               if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
               if (p.ownHeroName != "thief" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
-              if (p.ownHeroName == "thief" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.comboBeforePlayed) retval -= 11;
+              if (p.ownHeroName == "thief" && a.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
 
           int mobsInHand = 0;
@@ -103,9 +103,9 @@ namespace HREngine.Bots
               if (hc.card.type == CardDB.cardtype.MOB) mobsInHand++;
           }
 
-          if (p.ownMinions.Count - p.enemyMinions.Count >= 4 && playmobs >= 1 && mobsInHand < 2)
+          if (p.ownMinions.Count - p.enemyMinions.Count >= 4 && mobsInHand >= 1)
           {
-              retval -= (p.ownMinions.Count - p.enemyMinions.Count) * 20;
+              retval += mobsInHand * 20;
           }
 
           foreach (Minion m in p.ownMinions)
@@ -1343,6 +1343,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.ownMinions.Count; i++)
             {
                 Minion dis = this.ownMinions[i]; Minion pis = p.ownMinions[i];
+                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool = false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -1360,6 +1362,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.enemyMinions.Count; i++)
             {
                 Minion dis = this.enemyMinions[i]; Minion pis = p.enemyMinions[i];
+                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool = false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -1983,12 +1987,46 @@ namespace HREngine.Bots
                     if (e.CARDID == "EX1_334e")// dunkler wahnsin (control minion till end of turn)
                     {
                         //"uncontrol minion"
-                        minionGetControlled(m, false, true);
+                        minionGetControlled(m, !own, true);
                     }
 
                 }
             }
 
+            temp.Clear();
+            if (own)
+            {
+                temp.AddRange(this.enemyMinions);
+
+            }
+            else
+            {
+                temp.AddRange(this.ownMinions);
+            }
+
+            foreach (Minion m in temp)
+            {
+                m.cantLowerHPbelowONE = false;
+                m.immune = false;
+                List<Enchantment> tempench = new List<Enchantment>(m.enchantments);
+                foreach (Enchantment e in tempench)
+                {
+
+                    if (e.CARDID == "EX1_046e")// dunkeleisenzwerg
+                    {
+                        debuff(m, e);
+                    }
+                    if (e.CARDID == "CS2_188o")// ruchloserunteroffizier
+                    {
+                        debuff(m, e);
+                    }
+                    if (e.CARDID == "EX1_549o")//zorn des wildtiers
+                    {
+                        debuff(m, e);
+                    }
+
+                }
+            }
 
         }
 
@@ -2361,7 +2399,7 @@ namespace HREngine.Bots
                     {
                         this.enemyHeroHp += rest;
                     }
-                    ownHeroDefence = Math.Max(0, enemyHeroDefence - dmg);
+                    this.enemyHeroDefence = Math.Max(0, this.enemyHeroDefence - dmg);
 
                 }
             }
@@ -2391,12 +2429,12 @@ namespace HREngine.Bots
                     if (this.ownHeroDefence > 0 && dmg > 0)
                     {
 
-                        int rest = ownHeroDefence - dmg;
+                        int rest = this.ownHeroDefence - dmg;
                         if (rest < 0)
                         {
                             this.ownHeroHp += rest;
                         }
-                        ownHeroDefence = Math.Max(0, ownHeroDefence - dmg);
+                        this.ownHeroDefence = Math.Max(0, this.ownHeroDefence - dmg);
 
                     }
                 }
@@ -2425,7 +2463,7 @@ namespace HREngine.Bots
                         {
                             this.enemyHeroHp += rest;
                         }
-                        ownHeroDefence = Math.Max(0, enemyHeroDefence - dmg);
+                        this.enemyHeroDefence = Math.Max(0, this.enemyHeroDefence - dmg);
 
                     }
                 }
@@ -2865,7 +2903,6 @@ namespace HREngine.Bots
                 {
                     CardDB.Card c = CardDB.Instance.getCardData("damagedgolem");
                     callKid(c, m.id - 1, own);
-
                 }
 
                 if (m.name == "cairnebloodhoof")
@@ -4882,9 +4919,39 @@ namespace HREngine.Bots
 
             if (c.name == "icelance")
             {
-                if (m.frozen)
-                { damage = 4; }
-                else { frozen = true; }
+                if (target >= 0 && target <= 19)
+                {
+                    if (m.frozen)
+                    {
+                        damage = 4;
+                    }
+                    else { frozen = true; }
+                }
+                else
+                {
+                    if (target == 100)
+                    {
+                        if (this.ownHeroFrozen)
+                        {
+                            damage = 4;
+                        }
+                        else
+                        {
+                            frozen = true;
+                        }
+                    }
+                    if (target == 200)
+                    {
+                        if (this.enemyHeroFrozen)
+                        {
+                            damage = 4;
+                        }
+                        else
+                        {
+                            frozen = true;
+                        }
+                    }
+                }
             }
 
             if (c.name == "coneofcold")
@@ -6956,7 +7023,6 @@ namespace HREngine.Bots
 
     public class Ai
     {
-
         private int maxdeep = 12;
         private int maxwide = 7000;
         private bool usePenalityManager = true;
@@ -6965,6 +7031,7 @@ namespace HREngine.Bots
         private bool useLethalCheck = true;
         private bool useThreads = true;
         private int numberOfThreads = 8;
+
 
         public class aitask
         {
@@ -6991,8 +7058,6 @@ namespace HREngine.Bots
                 this.threadnumber = threadnumber;
             }
         }
-
-        
 
 
         private List<aitask> threadResults = new List<aitask>();
@@ -8272,7 +8337,15 @@ namespace HREngine.Bots
                 {
                     //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                     Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
-                    this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    {
+                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                    else
+                    {
+                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+
 
                 }
 
@@ -8303,7 +8376,6 @@ namespace HREngine.Bots
             }
 
         }
-
 
         public void dosomethingclever(Bot botbase)
         {
@@ -8469,6 +8541,7 @@ namespace HREngine.Bots
             }
             help.logg("bestfield");
             bestboard.printBoard();
+            //simmulateWholeTurn();
         }
 
         public void autoTesterParallel(Bot botbase)
@@ -8518,8 +8591,157 @@ namespace HREngine.Bots
             bestboard.printBoard();
         }
 
-    }
+        public void simmulateWholeTurn()
+        {
+            help.logg("simulate best board");
+            //this.bestboard.printActions();
 
+            Playfield tempbestboard = new Playfield();
+
+            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
+            {
+                bestmove.print();
+                if (bestmove.cardplay)
+                {
+                    help.logg("card");
+                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                    Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmove.cardEntitiy);
+                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    {
+                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                    else
+                    {
+                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                }
+
+                if (bestmove.minionplay)
+                {
+                    help.logg("min");
+                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                    Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
+                    help.logg("min");
+                    tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                    help.logg("min");
+                }
+
+                if (bestmove.heroattack)
+                {
+                    help.logg("hero");
+                    tempbestboard.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                if (bestmove.useability)
+                {
+                    help.logg("abi");
+                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                    tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+            }
+            else
+            {
+                tempbestboard.mana = -1;
+            }
+            help.logg("-------------");
+            help.logg("OwnMinions:");
+
+
+            foreach (Minion m in tempbestboard.ownMinions)
+            {
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+            help.logg("EnemyMinions:");
+            foreach (Minion m in tempbestboard.enemyMinions)
+            {
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+
+
+            foreach (Action bestmovee in bestboard.playactions)
+            {
+
+                help.logg("stepp");
+
+
+                if (bestmovee != null) // save the guessed move, so we doesnt need to recalc!
+                {
+                    bestmovee.print();
+                    if (bestmovee.cardplay)
+                    {
+                        help.logg("card");
+                        //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                        Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmovee.cardEntitiy);
+                        if (bestmovee.owntarget >= 0 && bestmovee.enemytarget >= 0 && bestmovee.enemytarget <= 9 && bestmovee.owntarget < bestmovee.enemytarget)
+                        {
+                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                        else
+                        {
+                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                    }
+
+                    if (bestmovee.minionplay)
+                    {
+                        help.logg("min");
+                        //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                        Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
+                        help.logg("min");
+                        tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                        help.logg("min");
+                    }
+
+                    if (bestmovee.heroattack)
+                    {
+                        help.logg("hero");
+                        tempbestboard.attackWithWeapon(bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                    if (bestmovee.useability)
+                    {
+                        help.logg("abi");
+                        //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                        tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                }
+                else
+                {
+                    tempbestboard.mana = -1;
+                }
+                help.logg("-------------");
+                help.logg("OwnMinions:");
+                foreach (Minion m in tempbestboard.ownMinions)
+                {
+                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                    }
+                }
+                help.logg("EnemyMinions:");
+                foreach (Minion m in tempbestboard.enemyMinions)
+                {
+                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                    }
+                }
+            }
+        }
+
+    }
 
 
     public class Handmanager
@@ -9594,6 +9816,7 @@ namespace HREngine.Bots
         Dictionary<string, int> cardDrawBattleCryDatabase = new Dictionary<string, int>();
         Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> destroyDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
@@ -9681,6 +9904,8 @@ namespace HREngine.Bots
             retval += getCardDrawPenality(name, target, p, choice);
             retval += getCardDrawofEffectMinions(card, p);
             retval += getCardDiscardPenality(name, p);
+            retval += getDestroyOwnPenality(name, target, p);
+
             retval += getDestroyPenality(name, target, p);
             retval += getSpecialCardComboPenalitys(card, target, p);
             retval += playSecretPenality(card, p);
@@ -10115,7 +10340,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyPenality(string name, int target, Playfield p)
+        private int getDestroyOwnPenality(string name, int target, Playfield p)
         {
             if (!this.destroyOwnDatabase.ContainsKey(name)) return 0;
             int pen = 0;
@@ -10129,6 +10354,27 @@ namespace HREngine.Bots
                 if (m.card.deathrattle) return 10;
 
                 return 500;
+            }
+
+            return pen;
+        }
+
+        private int getDestroyPenality(string name, int target, Playfield p)
+        {
+            if (!this.destroyDatabase.ContainsKey(name)) return 0;
+            int pen = 0;
+
+            if (target >= 10 && target <= 19)
+            {
+                // dont destroy owns ;_; (except mins with deathrattle effects)
+
+                Minion m = p.enemyMinions[target - 10];
+
+                if (m.Angr <= 4)
+                {
+                    pen += 25; // so we dont destroy cheap ones :D
+                }
+
             }
 
             return pen;
@@ -10225,7 +10471,10 @@ namespace HREngine.Bots
                     pen = 20;
                 }
             }
-
+            if (name == "aldorpeacekeeper" && target == -1)
+            {
+                pen = 30;
+            }
             if ((name == "aldorpeacekeeper" || name == "humility") && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
@@ -10776,6 +11025,16 @@ namespace HREngine.Bots
             this.destroyOwnDatabase.Add("siphonsoul", 0);//not own mins
             this.destroyOwnDatabase.Add("biggamehunter", 0);//not own mins
             this.destroyOwnDatabase.Add("hungrycrab", 0);//not own mins
+            this.destroyOwnDatabase.Add("sacrificialpact", 0);//not own mins
+
+
+            this.destroyDatabase.Add("assassinate", 0);//not own mins
+            this.destroyDatabase.Add("corruption", 0);//not own mins
+            this.destroyDatabase.Add("execute", 0);//not own mins
+            this.destroyDatabase.Add("naturalize", 0);//not own mins
+            this.destroyDatabase.Add("siphonsoul", 0);//not own mins
+            this.destroyDatabase.Add("mindcontrol", 0);//not own mins
+
         }
 
         private void setupReturnBackToHandCards()

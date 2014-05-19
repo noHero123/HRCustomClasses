@@ -34,6 +34,7 @@ namespace HREngine.Bots
         Dictionary<string, int> cardDrawBattleCryDatabase = new Dictionary<string, int>();
         Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> destroyDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
@@ -121,6 +122,8 @@ namespace HREngine.Bots
             retval += getCardDrawPenality( name,  target,  p,  choice);
             retval += getCardDrawofEffectMinions( card,  p);
             retval += getCardDiscardPenality( name,  p);
+            retval += getDestroyOwnPenality(name, target, p);
+            
             retval += getDestroyPenality( name,  target,  p);
             retval += getSpecialCardComboPenalitys( card,  target,  p);
             retval += playSecretPenality( card,  p);
@@ -555,7 +558,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyPenality(string name, int target, Playfield p)
+        private int getDestroyOwnPenality(string name, int target, Playfield p)
         {
             if (!this.destroyOwnDatabase.ContainsKey(name)) return 0;
             int pen = 0;
@@ -569,6 +572,27 @@ namespace HREngine.Bots
                 if (m.card.deathrattle) return 10;
 
                 return 500;
+            }
+
+            return pen;
+        }
+
+        private int getDestroyPenality(string name, int target, Playfield p)
+        {
+            if (!this.destroyDatabase.ContainsKey(name)) return 0;
+            int pen = 0;
+
+            if (target >= 10 && target <= 19)
+            {
+                // dont destroy owns ;_; (except mins with deathrattle effects)
+
+                Minion m = p.enemyMinions[target-10];
+
+                if (m.Angr <= 4)
+                {
+                    pen += 25; // so we dont destroy cheap ones :D
+                }
+
             }
 
             return pen;
@@ -665,7 +689,10 @@ namespace HREngine.Bots
                     pen = 20;
                 }
             }
-
+            if (name == "aldorpeacekeeper" && target == -1)
+            {
+                pen = 30;
+            }
             if ((name == "aldorpeacekeeper" || name == "humility" ) && target >= 0 && target <= 19)
             {
                 if (target >= 0 && target <= 9) pen = 500; // dont use on own minions
@@ -1216,6 +1243,16 @@ namespace HREngine.Bots
             this.destroyOwnDatabase.Add("siphonsoul", 0);//not own mins
             this.destroyOwnDatabase.Add("biggamehunter", 0);//not own mins
             this.destroyOwnDatabase.Add("hungrycrab", 0);//not own mins
+            this.destroyOwnDatabase.Add("sacrificialpact", 0);//not own mins
+
+
+            this.destroyDatabase.Add("assassinate", 0);//not own mins
+            this.destroyDatabase.Add("corruption", 0);//not own mins
+            this.destroyDatabase.Add("execute", 0);//not own mins
+            this.destroyDatabase.Add("naturalize", 0);//not own mins
+            this.destroyDatabase.Add("siphonsoul", 0);//not own mins
+            this.destroyDatabase.Add("mindcontrol", 0);//not own mins
+
         }
 
         private void setupReturnBackToHandCards()

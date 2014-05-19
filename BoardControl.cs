@@ -81,11 +81,11 @@ namespace HREngine.Bots
               if (!a.cardplay) continue;
               if (a.card.type == CardDB.cardtype.MOB) playmobs++;
               //if (a.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
-              if (a.card.name == "execute") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
+              
               if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
               if (p.ownHeroName != "thief" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
-              if (p.ownHeroName == "thief" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.comboBeforePlayed) retval -= 11;
+              if (p.ownHeroName == "thief" && a.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200) ) retval -= 11;
           }
 
           int mobsInHand = 0;
@@ -94,9 +94,9 @@ namespace HREngine.Bots
               if (hc.card.type == CardDB.cardtype.MOB) mobsInHand++;
           }
 
-          if (p.ownMinions.Count - p.enemyMinions.Count >= 4 && playmobs>=1 && mobsInHand < 2 )
+          if (p.ownMinions.Count - p.enemyMinions.Count >= 4 && mobsInHand >= 1 )
           {
-              retval -= (p.ownMinions.Count - p.enemyMinions.Count) * 20;
+              retval += mobsInHand * 20;
           }
 
           foreach (Minion m in p.ownMinions)

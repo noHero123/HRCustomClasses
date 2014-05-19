@@ -61,7 +61,6 @@ namespace HREngine.Bots
           {
               if (a.useability && a.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.card.name == "execute") retval -= 18; // a enemy minion make -10 for only being there, so + 10 for being eliminated 
               if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
 

@@ -506,6 +506,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.ownMinions.Count; i++)
             {
                 Minion dis = this.ownMinions[i]; Minion pis = p.ownMinions[i];
+                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool= false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -523,6 +525,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.enemyMinions.Count; i++)
             {
                 Minion dis = this.enemyMinions[i]; Minion pis = p.enemyMinions[i];
+                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool = false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -1146,12 +1150,46 @@ namespace HREngine.Bots
                     if (e.CARDID == "EX1_334e")// dunkler wahnsin (control minion till end of turn)
                     {
                         //"uncontrol minion"
-                        minionGetControlled(m, false, true);
+                        minionGetControlled(m, !own, true);
                     }
 
                 }
             }
 
+            temp.Clear();
+            if (own)
+            {
+                temp.AddRange(this.enemyMinions);
+                
+            }
+            else
+            {
+                temp.AddRange(this.ownMinions);  
+            }
+
+            foreach (Minion m in temp)
+            {
+                m.cantLowerHPbelowONE = false;
+                m.immune = false;
+                List<Enchantment> tempench = new List<Enchantment>(m.enchantments);
+                foreach (Enchantment e in tempench)
+                {
+
+                    if (e.CARDID == "EX1_046e")// dunkeleisenzwerg
+                    {
+                        debuff(m, e);
+                    }
+                    if (e.CARDID == "CS2_188o")// ruchloserunteroffizier
+                    {
+                        debuff(m, e);
+                    }
+                    if (e.CARDID == "EX1_549o")//zorn des wildtiers
+                    {
+                        debuff(m, e);
+                    }
+
+                }
+            }
 
         }
 
@@ -1524,7 +1562,7 @@ namespace HREngine.Bots
                     {
                         this.enemyHeroHp += rest;
                     }
-                    ownHeroDefence = Math.Max(0, enemyHeroDefence - dmg);
+                    this.enemyHeroDefence = Math.Max(0, this.enemyHeroDefence - dmg);
 
                 }
             }
@@ -1554,12 +1592,12 @@ namespace HREngine.Bots
                     if (this.ownHeroDefence > 0 && dmg > 0)
                     {
 
-                        int rest = ownHeroDefence - dmg;
+                        int rest = this.ownHeroDefence - dmg;
                         if (rest < 0)
                         {
                             this.ownHeroHp += rest;
                         }
-                        ownHeroDefence = Math.Max(0, ownHeroDefence - dmg);
+                        this.ownHeroDefence = Math.Max(0, this.ownHeroDefence - dmg);
 
                     }
                 }
@@ -1588,7 +1626,7 @@ namespace HREngine.Bots
                         {
                             this.enemyHeroHp += rest;
                         }
-                        ownHeroDefence = Math.Max(0, enemyHeroDefence - dmg);
+                        this.enemyHeroDefence = Math.Max(0, this.enemyHeroDefence - dmg);
 
                     }
                 }
@@ -2028,7 +2066,6 @@ namespace HREngine.Bots
                 {
                     CardDB.Card c = CardDB.Instance.getCardData("damagedgolem");
                     callKid(c, m.id - 1, own);
-
                 }
 
                 if (m.name == "cairnebloodhoof")
@@ -4045,9 +4082,39 @@ namespace HREngine.Bots
 
             if (c.name == "icelance")
             {
-                if (m.frozen)
-                { damage = 4; }
-                else { frozen = true; }
+                if (target >= 0 && target <= 19)
+                {
+                    if (m.frozen)
+                    { 
+                        damage = 4; 
+                    }
+                    else { frozen = true; }
+                }
+                else
+                {
+                    if (target ==100)
+                    {
+                        if (this.ownHeroFrozen)
+                        {
+                            damage = 4; 
+                        }
+                        else
+                        {
+                            frozen = true;
+                        }
+                    }
+                    if (target == 200)
+                    {
+                        if (this.enemyHeroFrozen)
+                        {
+                            damage = 4;
+                        }
+                        else
+                        {
+                            frozen = true;
+                        }
+                    }
+                }
             }
 
             if (c.name == "coneofcold")

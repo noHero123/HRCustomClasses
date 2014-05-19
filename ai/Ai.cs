@@ -1322,7 +1322,15 @@ namespace HREngine.Bots
                 {
                     //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                     Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
-                    this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    {
+                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                    else
+                    {
+                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+
 
                 }
 
@@ -1353,7 +1361,6 @@ namespace HREngine.Bots
             }
 
         }
-
 
         public void dosomethingclever(Bot botbase)
         {
@@ -1519,6 +1526,7 @@ namespace HREngine.Bots
             }
             help.logg("bestfield");
             bestboard.printBoard();
+            //simmulateWholeTurn();
         }
 
         public void autoTesterParallel(Bot botbase)
@@ -1566,6 +1574,156 @@ namespace HREngine.Bots
             }
             help.logg("bestfield");
             bestboard.printBoard();
+        }
+        
+        public void simmulateWholeTurn()
+        {
+            help.logg("simulate best board");
+            //this.bestboard.printActions();
+
+            Playfield tempbestboard = new Playfield();
+
+            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
+            {
+                bestmove.print();
+                if (bestmove.cardplay)
+                {
+                    help.logg("card");
+                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                    Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmove.cardEntitiy);
+                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    {
+                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                    else
+                    {
+                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                }
+
+                if (bestmove.minionplay)
+                {
+                    help.logg("min");
+                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                    Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
+                    help.logg("min");
+                    tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                    help.logg("min");
+                }
+
+                if (bestmove.heroattack)
+                {
+                    help.logg("hero");
+                    tempbestboard.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                if (bestmove.useability)
+                {
+                    help.logg("abi");
+                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                    tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+            }
+            else
+            {
+                tempbestboard.mana = -1;
+            }
+            help.logg("-------------");
+            help.logg("OwnMinions:");
+
+
+            foreach (Minion m in tempbestboard.ownMinions)
+            {
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+            help.logg("EnemyMinions:");
+            foreach (Minion m in tempbestboard.enemyMinions)
+            {
+                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                foreach (Enchantment e in m.enchantments)
+                {
+                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                }
+            }
+
+
+            foreach (Action bestmovee in bestboard.playactions)
+            {
+
+                help.logg("stepp");
+
+
+                if (bestmovee != null) // save the guessed move, so we doesnt need to recalc!
+                {
+                    bestmovee.print();
+                    if (bestmovee.cardplay)
+                    {
+                        help.logg("card");
+                        //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                        Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmovee.cardEntitiy);
+                        if (bestmovee.owntarget >= 0 && bestmovee.enemytarget >= 0 && bestmovee.enemytarget <= 9 && bestmovee.owntarget < bestmovee.enemytarget)
+                        {
+                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                        else
+                        {
+                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                    }
+
+                    if (bestmovee.minionplay)
+                    {
+                        help.logg("min");
+                        //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                        Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
+                        help.logg("min");
+                        tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                        help.logg("min");
+                    }
+
+                    if (bestmovee.heroattack)
+                    {
+                        help.logg("hero");
+                        tempbestboard.attackWithWeapon(bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                    if (bestmovee.useability)
+                    {
+                        help.logg("abi");
+                        //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                        tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                }
+                else
+                {
+                    tempbestboard.mana = -1;
+                }
+                help.logg("-------------");
+                help.logg("OwnMinions:");
+                foreach (Minion m in tempbestboard.ownMinions)
+                {
+                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                    }
+                }
+                help.logg("EnemyMinions:");
+                foreach (Minion m in tempbestboard.enemyMinions)
+                {
+                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
+                    }
+                }
+            }
         }
 
     }
