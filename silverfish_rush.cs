@@ -884,9 +884,6 @@ namespace HREngine.Bots
         }
 
     }
-
-
-
     public class Playfield
     {
         public bool logging = false;
@@ -1418,7 +1415,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        tempval = 30;
+                        tempval -= m.Hp + 2;
                     }
 
                     if (m.name == "flametonguetotem") tempval += 50;
@@ -3187,7 +3184,7 @@ namespace HREngine.Bots
             {
                 removeMinionFromListNoDeath(m, this.enemyMinions, !newOwner);
                 m.Ready = false;
-
+                m.playedThisTurn = true;
                 this.getNewEffects(m, newOwner, newOwnerList.Count, false);
 
                 addMiniontoList(m, this.ownMinions, newOwnerList.Count, newOwner);
@@ -3687,7 +3684,7 @@ namespace HREngine.Bots
             {
                 int oldHP = enemy.Hp;
                 minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
-                if (oldHP > enemy.Hp && m.name == "waterelemental") enemy.frozen = true;
+                if (!m.silenced && oldHP > enemy.Hp && m.name == "waterelemental") enemy.frozen = true;
             }
 
 
@@ -3702,7 +3699,7 @@ namespace HREngine.Bots
                 {
                     int oldHP = m.Hp;
                     minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
-                    if (oldHP > m.Hp && enemy.name == "waterelemental") m.frozen = true;
+                    if (!enemy.silenced && oldHP > m.Hp && enemy.name == "waterelemental") m.frozen = true;
                 }
             }
         }
@@ -6661,7 +6658,7 @@ namespace HREngine.Bots
                 if (!this.heroImmuneWhileAttacking)
                 {
                     attackOrHealHero(enemy.Angr, true);
-                    if (enemy.name == "waterelemental")
+                    if (!enemy.silenced && enemy.name == "waterelemental")
                     {
                         this.ownHeroFrozen = true;
                     }
@@ -6988,6 +6985,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class Ai
     {
         private int maxdeep = 12;
@@ -7063,7 +7061,7 @@ namespace HREngine.Bots
             this.nextMoveGuess.mana = -1;
         }
 
-        private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc)
+        private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc, bool lethalcheck)
         {
             bool havedonesomething = false;
 
@@ -7109,7 +7107,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
                                 pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
@@ -7130,7 +7128,7 @@ namespace HREngine.Bots
                             Playfield pf = new Playfield(p);
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
@@ -7189,7 +7187,7 @@ namespace HREngine.Bots
                         playedcards.Add(c.name);
                         if (c.choice)
                         {
-                            if (doAllChoices(c, p, hc))
+                            if (doAllChoices(c, p, hc, isLethalCheck))
                             {
                                 havedonesomething = true;
                             }
@@ -7231,7 +7229,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             havedonesomething = true;
@@ -7266,7 +7264,7 @@ namespace HREngine.Bots
 
                                         if (usePenalityManager)
                                         {
-                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0, isLethalCheck);
                                             if (cardplayPenality <= 499)
                                             {
                                                 havedonesomething = true;
@@ -7486,7 +7484,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0, isLethalCheck);
                                     if (abilityPenality <= 499)
                                     {
                                         havedonesomething = true;
@@ -7510,7 +7508,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -7680,7 +7678,7 @@ namespace HREngine.Bots
                     playedcards.Add(c.name);
                     if (c.choice)
                     {
-                        if (doAllChoices(c, p, hc))
+                        if (doAllChoices(c, p, hc, isLethalCheck))
                         {
                             havedonesomething = true;
                         }
@@ -7722,7 +7720,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                    cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0, isLethalCheck);
                                     if (cardplayPenality <= 499)
                                     {
                                         havedonesomething = true;
@@ -7757,7 +7755,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                        cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             havedonesomething = true;
@@ -7977,7 +7975,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -8001,7 +7999,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                            abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                             if (abilityPenality <= 499)
                             {
                                 havedonesomething = true;
@@ -9054,7 +9052,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Hrtprozis
     {
 
@@ -9428,7 +9425,7 @@ namespace HREngine.Bots
         public void printHero()
         {
             help.logg("player:");
-            help.logg(this.currentMana + " " + this.ownMaxMana + " " + this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController);
+            help.logg(this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController);
 
             help.logg("ownhero:");
             help.logg(this.heroname + " " + heroHp + " " + heroDefence + " immn " + this.heroImmuneToDamageWhileAttacking);
@@ -9453,7 +9450,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -9467,7 +9464,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -9755,7 +9752,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -9849,7 +9845,7 @@ namespace HREngine.Bots
             return retval;
         }
 
-        public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice)
+        public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice, bool lethal)
         {
             int retval = 0;
             string name = card.name;
@@ -9866,16 +9862,16 @@ namespace HREngine.Bots
                 retval += abuff + tbuff;
             }
             retval += getHPBuffPenality(card, target, p, choice);
-            retval += getSilencePenality(name, target, p, choice);
+            retval += getSilencePenality(name, target, p, choice, lethal);
             retval += getDamagePenality(name, target, p, choice);
-            retval += getHealPenality(name, target, p, choice);
+            retval += getHealPenality(name, target, p, choice, lethal);
             retval += getCardDrawPenality(name, target, p, choice);
             retval += getCardDrawofEffectMinions(card, p);
             retval += getCardDiscardPenality(name, p);
             retval += getDestroyOwnPenality(name, target, p);
 
             retval += getDestroyPenality(name, target, p);
-            retval += getSpecialCardComboPenalitys(card, target, p);
+            retval += getSpecialCardComboPenalitys(card, target, p, lethal);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
 
@@ -9956,7 +9952,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSilencePenality(string name, int target, Playfield p, int choice)
+        private int getSilencePenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             int pen = 0;
             if (name == "earthshock") return 0;//earthshock is handled in damage stuff
@@ -9988,6 +9984,14 @@ namespace HREngine.Bots
 
                     if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
                     {
+                        return 500;
+                    }
+
+                    if (lethal)
+                    {
+                        //during lethal we only silence taunt, or if its a mob (owl/spellbreaker) + we can give him charge
+                        if (m.taunt || (name == "ironbeakowl" && (p.ownMinions.Find(x => x.name == "tundrarhino") != null || p.ownMinions.Find(x => x.name == "warsongcommander") != null || p.owncards.Find(x => x.card.name == "charge") != null)) || (name == "ironbeakowl" && p.owncards.Find(x => x.card.name == "charge") != null)) return 0;
+
                         return 500;
                     }
 
@@ -10129,7 +10133,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getHealPenality(string name, int target, Playfield p, int choice)
+        private int getHealPenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             ///Todo healpenality for aoe heal
             ///todo auchenai soulpriest
@@ -10192,8 +10196,6 @@ namespace HREngine.Bots
 
                     pen = 500;
                 }
-
-                if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
 
 
             }
@@ -10348,7 +10350,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal)
         {
             string name = card.name;
             //some effects, which are bad :D
@@ -10363,6 +10365,42 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target - 10];
             }
 
+            if (name == "divinespirit")
+            {
+                if (lethal)
+                {
+                    if (target >= 10 && target <= 19)
+                    {
+                        if (!m.taunt)
+                        {
+                            return 500;
+                        }
+                        else
+                        {
+                            // combo for killing with innerfire and biggamehunter
+                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit") != null && m.Hp >= 2)))
+                            {
+                                return 0;
+                            }
+                            return 500;
+                        }
+                    }
+                }
+                else
+                {
+                    if (target >= 10 && target <= 19)
+                    {
+
+                        // combo for killing with innerfire and biggamehunter
+                        if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
+                        {
+                            return 0;
+                        }
+                        return 500;
+                    }
+                }
+
+            }
 
             if (name == "facelessmanipulator")
             {
@@ -12858,10 +12896,10 @@ namespace HREngine.Bots
 
                 if (readstate == 42 && counter == 1) // player
                 {
-                    this.overdrive = Convert.ToInt32(s.Split(' ')[4]);
-                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[2]);
-                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[3]);
-                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[5]);
+                    this.overdrive = Convert.ToInt32(s.Split(' ')[2]);
+                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[0]);
+                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[1]);
+                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[3]);
                 }
 
                 if (readstate == 1 && counter == 1) // class + hp + defence + immune
@@ -12934,7 +12972,7 @@ namespace HREngine.Bots
 
                 if (readstate == 3) // minion or enchantment
                 {
-                    if (s.Contains(" id "))
+                    if (s.Contains(" id:"))
                     {
                         if (counter >= 2) this.ownminions.Add(tempminion);
 
@@ -12958,7 +12996,19 @@ namespace HREngine.Bots
                         int ent = 1000 + j;
                         if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
 
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        bool pois = false;//poision
+                        if (s.Contains(" poi:")) pois = s.Split(new string[] { " poi:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool stl = false;//stealth
+                        if (s.Contains(" stl:")) stl = s.Split(new string[] { " stl:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool immn = false;//immune
+                        if (s.Contains(" imm:")) immn = s.Split(new string[] { " imm:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool chrg = false;//charge
+                        if (s.Contains(" chrg:")) chrg = s.Split(new string[] { " chrg:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ex = false;//exhausted
+                        if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+
+
+                        int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
@@ -12971,6 +13021,11 @@ namespace HREngine.Bots
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
                         tempminion.silenced = silenced;
+                        tempminion.exhausted = ex;
+                        tempminion.poisonous = pois;
+                        tempminion.stealth = stl;
+                        tempminion.immune = immn;
+                        tempminion.charge = chrg;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -12996,7 +13051,7 @@ namespace HREngine.Bots
 
                 if (readstate == 4) // minion or enchantment
                 {
-                    if (s.Contains(" id "))
+                    if (s.Contains(" id:"))
                     {
                         if (counter >= 2) this.enemyminions.Add(tempminion);
 
@@ -13020,8 +13075,18 @@ namespace HREngine.Bots
                         int ent = 1000 + j;
                         if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
 
+                        bool pois = false;//poision
+                        if (s.Contains(" poi:")) pois = s.Split(new string[] { " poi:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool stl = false;//stealth
+                        if (s.Contains(" stl:")) stl = s.Split(new string[] { " stl:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool immn = false;//immune
+                        if (s.Contains(" imm:")) immn = s.Split(new string[] { " imm:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool chrg = false;//charge
+                        if (s.Contains(" chrg:")) chrg = s.Split(new string[] { " chrg:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ex = false;//exhausted
+                        if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
 
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
@@ -13034,6 +13099,11 @@ namespace HREngine.Bots
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
                         tempminion.silenced = silenced;
+                        tempminion.exhausted = ex;
+                        tempminion.poisonous = pois;
+                        tempminion.stealth = stl;
+                        tempminion.immune = immn;
+                        tempminion.charge = chrg;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -13180,7 +13250,6 @@ namespace HREngine.Bots
 
 
     }
-
 
     public class Enchantment
     {

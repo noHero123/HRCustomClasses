@@ -2383,7 +2383,7 @@ namespace HREngine.Bots
             {
                 removeMinionFromListNoDeath(m, this.enemyMinions, !newOwner);
                 m.Ready = false;
-
+                m.playedThisTurn = true;
                 this.getNewEffects(m, newOwner, newOwnerList.Count, false);
 
                 addMiniontoList(m, this.ownMinions, newOwnerList.Count, newOwner);
@@ -2883,7 +2883,7 @@ namespace HREngine.Bots
             {
                 int oldHP = enemy.Hp;
                 minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
-                if (oldHP > enemy.Hp && m.name == "waterelemental") enemy.frozen = true;
+                if (!m.silenced && oldHP > enemy.Hp && m.name == "waterelemental") enemy.frozen = true;
             }
 
 
@@ -2898,7 +2898,7 @@ namespace HREngine.Bots
                 {
                     int oldHP = m.Hp;
                     minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
-                    if (oldHP > m.Hp && enemy.name == "waterelemental") m.frozen = true;
+                    if (!enemy.silenced && oldHP > m.Hp && enemy.name == "waterelemental") m.frozen = true;
                 }
             }
         }
@@ -5857,7 +5857,7 @@ namespace HREngine.Bots
                 if (!this.heroImmuneWhileAttacking)
                 {
                     attackOrHealHero(enemy.Angr, true);
-                    if (enemy.name == "waterelemental")
+                    if (!enemy.silenced && enemy.name == "waterelemental")
                     {
                         this.ownHeroFrozen = true;
                     }

@@ -98,10 +98,10 @@ namespace HREngine.Bots
 
                 if (readstate == 42 && counter == 1) // player
                 {
-                    this.overdrive = Convert.ToInt32(s.Split(' ')[4]);
-                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[2]);
-                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[3]);
-                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[5]);
+                    this.overdrive = Convert.ToInt32(s.Split(' ')[2]);
+                    this.numMinionsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[0]);
+                    this.cardsPlayedThisTurn = Convert.ToInt32(s.Split(' ')[1]);
+                    this.ownPlayer = Convert.ToInt32(s.Split(' ')[3]);
                 }
 
                 if (readstate == 1 && counter == 1) // class + hp + defence + immune
@@ -174,7 +174,7 @@ namespace HREngine.Bots
 
                 if (readstate == 3) // minion or enchantment
                 {
-                    if (s.Contains(" id "))
+                    if (s.Contains(" id:"))
                     {
                         if (counter >= 2) this.ownminions.Add(tempminion);
 
@@ -195,10 +195,22 @@ namespace HREngine.Bots
                         int natt = 0;
                         if (s.Contains(" natt:")) natt = Convert.ToInt32(s.Split(new string[] { " natt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
 
-                        int ent = 1000+j;
+                        int ent = 1000 + j;
                         if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
 
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        bool pois = false;//poision
+                        if (s.Contains(" poi:")) pois = s.Split(new string[] { " poi:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool stl = false;//stealth
+                        if (s.Contains(" stl:")) stl = s.Split(new string[] { " stl:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool immn = false;//immune
+                        if (s.Contains(" imm:")) immn = s.Split(new string[] { " imm:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool chrg = false;//charge
+                        if (s.Contains(" chrg:")) chrg = s.Split(new string[] { " chrg:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ex = false;//exhausted
+                        if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+
+
+                        int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
@@ -211,6 +223,11 @@ namespace HREngine.Bots
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
                         tempminion.silenced = silenced;
+                        tempminion.exhausted = ex;
+                        tempminion.poisonous = pois;
+                        tempminion.stealth = stl;
+                        tempminion.immune = immn;
+                        tempminion.charge = chrg;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -236,7 +253,7 @@ namespace HREngine.Bots
 
                 if (readstate == 4) // minion or enchantment
                 {
-                    if (s.Contains(" id "))
+                    if (s.Contains(" id:"))
                     {
                         if (counter >= 2) this.enemyminions.Add(tempminion);
 
@@ -260,8 +277,18 @@ namespace HREngine.Bots
                         int ent = 1000 + j;
                         if (s.Contains(" e:")) ent = Convert.ToInt32(s.Split(new string[] { " e:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
 
+                        bool pois = false;//poision
+                        if (s.Contains(" poi:")) pois = s.Split(new string[] { " poi:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool stl = false;//stealth
+                        if (s.Contains(" stl:")) stl = s.Split(new string[] { " stl:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool immn = false;//immune
+                        if (s.Contains(" imm:")) immn = s.Split(new string[] { " imm:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool chrg = false;//charge
+                        if (s.Contains(" chrg:")) chrg = s.Split(new string[] { " chrg:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool ex = false;//exhausted
+                        if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         
-                        int id = Convert.ToInt32(s.Split(new string[] { " id " }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
+                        int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
@@ -274,6 +301,11 @@ namespace HREngine.Bots
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
                         tempminion.silenced = silenced;
+                        tempminion.exhausted = ex;
+                        tempminion.poisonous = pois;
+                        tempminion.stealth = stl;
+                        tempminion.immune = immn;
+                        tempminion.charge = chrg;
                         if (maxhp > hp) tempminion.wounded = true;
 
 

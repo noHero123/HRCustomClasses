@@ -383,7 +383,7 @@ namespace HREngine.Bots
         public void printHero()
         {
             help.logg("player:");
-            help.logg(this.currentMana + " " + this.ownMaxMana + " " + this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController );
+            help.logg(this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController );
 
             help.logg("ownhero:");
             help.logg(this.heroname + " " + heroHp + " " + heroDefence + " immn " + this.heroImmuneToDamageWhileAttacking);
@@ -408,7 +408,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID +" " + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos  + " e:" + m.entitiyID  + " A:" + m.Angr + " H:" + m.Hp +" mH:" + m.maxHp+ " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn +" wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+e.creator + " " +e.controllerOfCreator);
@@ -422,7 +422,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury  + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
+                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID  + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);

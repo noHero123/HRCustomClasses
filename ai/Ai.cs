@@ -81,7 +81,7 @@ namespace HREngine.Bots
             this.nextMoveGuess.mana = -1;
         }
 
-        private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc)
+        private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc, bool lethalcheck)
         {
             bool havedonesomething = false;
 
@@ -127,7 +127,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                            cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
                                 pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
@@ -148,7 +148,7 @@ namespace HREngine.Bots
                             Playfield pf = new Playfield(p);
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i);
+                                cardplayPenality = penman.getPlayCardPenality(c, -1, pf, i, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
@@ -207,7 +207,7 @@ namespace HREngine.Bots
                         playedcards.Add(c.name);
                         if (c.choice)
                         {
-                            if (doAllChoices(c, p, hc))
+                            if (doAllChoices(c, p, hc, isLethalCheck))
                             {
                                 havedonesomething = true;
                             }
@@ -249,7 +249,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                        cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             havedonesomething = true;
@@ -284,7 +284,7 @@ namespace HREngine.Bots
 
                                         if (usePenalityManager)
                                         {
-                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0, isLethalCheck);
                                             if (cardplayPenality <= 499)
                                             {
                                                 havedonesomething = true;
@@ -504,7 +504,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0, isLethalCheck);
                                     if (abilityPenality <= 499)
                                     {
                                         havedonesomething = true;
@@ -528,7 +528,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -698,7 +698,7 @@ namespace HREngine.Bots
                     playedcards.Add(c.name);
                     if (c.choice)
                     {
-                        if (doAllChoices(c, p, hc))
+                        if (doAllChoices(c, p, hc, isLethalCheck))
                         {
                             havedonesomething = true;
                         }
@@ -740,7 +740,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0);
+                                    cardplayPenality = penman.getPlayCardPenality(c, -1, pf, 0, isLethalCheck);
                                     if (cardplayPenality <= 499)
                                     {
                                         havedonesomething = true;
@@ -775,7 +775,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0);
+                                        cardplayPenality = penman.getPlayCardPenality(c, trgt.target, pf, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             havedonesomething = true;
@@ -995,7 +995,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0);
+                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -1019,7 +1019,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0);
+                            abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                             if (abilityPenality <= 499)
                             {
                                 havedonesomething = true;

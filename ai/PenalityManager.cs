@@ -99,7 +99,7 @@ namespace HREngine.Bots
             return retval;
         }
 
-        public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice)
+        public int getPlayCardPenality(CardDB.Card card, int target, Playfield p, int choice, bool lethal)
         {
             int retval = 0;
             string name = card.name;
@@ -116,16 +116,16 @@ namespace HREngine.Bots
                 retval += abuff + tbuff;
             }
             retval += getHPBuffPenality(card, target, p, choice);
-            retval += getSilencePenality( name,  target,  p,  choice);
+            retval += getSilencePenality( name,  target,  p,  choice, lethal);
             retval += getDamagePenality( name,  target,  p,  choice);
-            retval += getHealPenality( name,  target,  p,  choice);
+            retval += getHealPenality( name,  target,  p,  choice, lethal);
             retval += getCardDrawPenality( name,  target,  p,  choice);
             retval += getCardDrawofEffectMinions( card,  p);
             retval += getCardDiscardPenality( name,  p);
             retval += getDestroyOwnPenality(name, target, p);
             
             retval += getDestroyPenality( name,  target,  p);
-            retval += getSpecialCardComboPenalitys( card,  target,  p);
+            retval += getSpecialCardComboPenalitys( card,  target,  p, lethal);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
 
@@ -206,7 +206,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSilencePenality(string name, int target, Playfield p, int choice)
+        private int getSilencePenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             int pen = 0;
             if (name == "earthshock") return 0;//earthshock is handled in damage stuff
@@ -238,6 +238,14 @@ namespace HREngine.Bots
 
                     if ( !m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord") )
                     {
+                        return 500;
+                    }
+
+                    if (lethal)
+                    {
+                        //during lethal we only silence taunt, or if its a mob (owl/spellbreaker) + we can give him charge
+                        if (m.taunt || (name == "ironbeakowl" && (p.ownMinions.Find(x => x.name == "tundrarhino") != null || p.ownMinions.Find(x => x.name == "warsongcommander") != null || p.owncards.Find(x => x.card.name == "charge") != null)) || (name == "ironbeakowl" && p.owncards.Find(x => x.card.name == "charge") != null)) return 0;
+                       
                         return 500;
                     }
 
@@ -379,7 +387,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getHealPenality(string name, int target, Playfield p, int choice)
+        private int getHealPenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             ///Todo healpenality for aoe heal
             ///todo auchenai soulpriest
@@ -442,9 +450,7 @@ namespace HREngine.Bots
 
                     pen = 500;
                 }
-                
-                if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
-                
+ 
 
             }
 
@@ -598,7 +604,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal)
         {
             string name = card.name;
             //some effects, which are bad :D
@@ -613,6 +619,42 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+            if ( name == "divinespirit")
+            {
+                if (lethal)
+                {
+                    if (target >= 10 && target <= 19)
+                    {
+                        if (!m.taunt)
+                        {
+                            return 500;
+                        }
+                        else
+                        {
+                            // combo for killing with innerfire and biggamehunter
+                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit")!=null &&  m.Hp >=2)))
+                            {
+                                return 0;
+                            }
+                            return 500;
+                        }
+                    }
+                }
+                else
+                {
+                    if (target >= 10 && target <= 19)
+                    {
+
+                            // combo for killing with innerfire and biggamehunter
+                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
+                            {
+                                return 0;
+                            }
+                            return 500;
+                    }
+                }
+ 
+            }
 
             if (name == "facelessmanipulator" )
             {
@@ -1039,6 +1081,7 @@ namespace HREngine.Bots
             HealTargetDatabase.Add("lesserheal", 2);
             HealTargetDatabase.Add("voodoodoctor", 2);
             HealTargetDatabase.Add("willofmukla", 8);
+            //HealTargetDatabase.Add("divinespirit", 2);
         }
 
         private void setupDamageDatabase()
