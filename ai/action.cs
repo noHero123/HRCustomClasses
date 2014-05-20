@@ -506,8 +506,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.ownMinions.Count; i++)
             {
                 Minion dis = this.ownMinions[i]; Minion pis = p.ownMinions[i];
-                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
-                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
+                //if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                //if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool= false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -525,8 +525,8 @@ namespace HREngine.Bots
             for (int i = 0; i < this.enemyMinions.Count; i++)
             {
                 Minion dis = this.enemyMinions[i]; Minion pis = p.enemyMinions[i];
-                if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
-                if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
+                //if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                //if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
                 if (dis.entitiyID != pis.entitiyID) minionbool = false;
                 if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
@@ -614,7 +614,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        tempval = 30;
+                        tempval -= m.Hp+2;
                     }
 
                     if (m.name == "flametonguetotem") tempval += 50;

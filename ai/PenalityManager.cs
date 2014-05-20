@@ -613,6 +613,20 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+
+            if (name == "facelessmanipulator" )
+            {
+                if (target == -1 ) 
+                {
+                    return 21;
+                }
+                if (this.priorityTargets.ContainsKey(m.name) || m.Angr>=5)
+                {
+                    return 0;
+                }
+                return 10;
+            }
+
             if ((name == "polymorph" || name == "hex"))
             {
 
