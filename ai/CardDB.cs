@@ -33,7 +33,55 @@ namespace HREngine.Bots
 
         }
 
+        public enum specialMinions // and cards :D
+        {
+            None,
+            raidleader,
+            leokk,
+            stormwindchampion,
+            grimscaleoracle,
+            murlocwarleader,
+            southseacaptain,
+            timberwolf,
+            tundrarhino,
+            direwolfalpha,
+            flametonguetotem,
+            swordofjustice,
+            warsongcommander,
+            oldmurkeye,
+            acolyteofpain,
+            gurubashiberserker,
+            frothingberserker,
+            armorsmith,
+            lightwarden,
+            northshirecleric,
+            scavenginghyena,
+            flesheatingghoul,
+            cultmaster,
+            illidanstormrage,
+            questingadventurer,
+            unboundelemental,
+            waterelemental,
+            knifejuggler,
+            starvingbuzzard,
+            murloctidecaller,
+            manawyrm,
+            manaaddict,
+            secretkeeper,
+            archmageantonidas,
+            violetteacher,
+            gadgetzanauctioneer,
+            wildpyromancer,
+            frog,
+            prophetvelen,
+            auchenaisoulpriest,
+            pintsizedsummoner,
+            sorcerersapprentice,
+            manawraith,
+            venturecomercenary,
+            summoningportal
 
+        }
 
         public enum ErrorType2
         {
@@ -141,6 +189,7 @@ namespace HREngine.Bots
             public int needMinionsCapIfAvailable = 0;
             public List<ErrorType2> playrequires = new List<ErrorType2>();
             public int spellpowervalue = 0;
+            public specialMinions specialMin = specialMinions.None;
 
             public Card()
             { }
@@ -198,6 +247,7 @@ namespace HREngine.Bots
                 this.type = c.type;
                 this.windfury = c.windfury;
                 this.playrequires.AddRange(c.playrequires);
+                this.specialMin = c.specialMin;
             }
 
             public bool isRequirementInList(CardDB.ErrorType2 et)
@@ -431,7 +481,7 @@ namespace HREngine.Bots
                         retval = retval + offset - p.ownWeaponAttack + p.ownWeaponAttackStarted; // if weapon attack change we change manacost
                         break;
                     case "seagiant":
-                        retval = retval + offset - p.ownMinions.Count + p.ownMobsCountStarted;
+                        retval = retval + offset - p.ownMinions.Count - p.enemyMinions.Count + p.ownMobsCountStarted;
                         break;
                     case "mountaingiant":
                         retval = retval + offset - p.owncards.Count + p.ownCardsCountStarted;
@@ -692,6 +742,52 @@ namespace HREngine.Bots
 
                         //Helpfunctions.Instance.logg(temp);
                         c.name = temp;
+                        c.specialMin=specialMinions.None;
+                        if (temp == "direwolfalpha") c.specialMin = specialMinions.direwolfalpha;
+                        if (temp == "flametonguetotem") c.specialMin = specialMinions.flametonguetotem;
+                        if (temp == "grimscaleoracle") c.specialMin = specialMinions.grimscaleoracle;
+                        if (temp == "leokk") c.specialMin = specialMinions.leokk;
+                        if (temp == "murlocwarleader") c.specialMin = specialMinions.murlocwarleader;
+                        if (temp == "raidleader") c.specialMin = specialMinions.raidleader;
+                        if (temp == "southseacaptain") c.specialMin = specialMinions.southseacaptain;
+                        if (temp == "stormwindchampion") c.specialMin = specialMinions.stormwindchampion;
+                        if (temp == "timberwolf") c.specialMin = specialMinions.timberwolf;
+                        if (temp == "tundrarhino") c.specialMin = specialMinions.tundrarhino;
+                        if (temp == "swordofjustice") c.specialMin = specialMinions.swordofjustice;
+                        if (temp == "warsongcommander") c.specialMin = specialMinions.warsongcommander;
+                        if (temp == "oldmurk-eye") c.specialMin = specialMinions.oldmurkeye;
+                        if (temp == "acolyteofpain") c.specialMin = specialMinions.acolyteofpain;
+                        if (temp == "gurubashiberserker") c.specialMin = specialMinions.gurubashiberserker;
+                        if (temp == "frothingberserker") c.specialMin = specialMinions.frothingberserker;
+                        if (temp == "armorsmith") c.specialMin = specialMinions.armorsmith;
+                        if (temp == "northshirecleric") c.specialMin = specialMinions.northshirecleric;
+                        if (temp == "lightwarden") c.specialMin = specialMinions.lightwarden;
+                        if (temp == "scavenginghyena") c.specialMin = specialMinions.scavenginghyena;
+                        if (temp == "flesheatingghoul") c.specialMin = specialMinions.flesheatingghoul;
+                        if (temp == "cultmaster") c.specialMin = specialMinions.cultmaster;
+                        if (temp == "illidanstormrage") c.specialMin = specialMinions.illidanstormrage;
+                        if (temp == "questingadventurer") c.specialMin = specialMinions.questingadventurer;
+                        if (temp == "unboundelemental") c.specialMin = specialMinions.unboundelemental;
+                        if (temp == "waterelemental") c.specialMin = specialMinions.waterelemental;
+                        if (temp == "knifejuggler") c.specialMin = specialMinions.knifejuggler;
+                        if (temp == "starvingbuzzard") c.specialMin = specialMinions.starvingbuzzard;
+                        if (temp == "murloctidecaller") c.specialMin = specialMinions.murloctidecaller;
+                        if (temp == "manawyrm") c.specialMin = specialMinions.manawyrm;
+                        if (temp == "manaaddict") c.specialMin = specialMinions.manaaddict;
+                        if (temp == "secretkeeper") c.specialMin = specialMinions.secretkeeper;
+                        if (temp == "archmageantonidas") c.specialMin = specialMinions.archmageantonidas;
+                        if (temp == "violetteacher") c.specialMin = specialMinions.violetteacher;
+                        if (temp == "gadgetzanauctioneer") c.specialMin = specialMinions.gadgetzanauctioneer;
+                        if (temp == "wildpyromancer") c.specialMin = specialMinions.wildpyromancer;
+                        if (temp == "frog") c.specialMin = specialMinions.frog;
+                        if (temp == "prophetvelen") c.specialMin = specialMinions.prophetvelen;
+                        if (temp == "auchenaisoulpriest") c.specialMin = specialMinions.auchenaisoulpriest;
+                        if (temp == "pint-sizedsummoner") c.specialMin = specialMinions.pintsizedsummoner;
+                        if (temp == "sorcerersapprentice") c.specialMin = specialMinions.sorcerersapprentice;
+                        if (temp == "manawraith") c.specialMin = specialMinions.manawraith;
+                        if (temp == "venturecomercenary") c.specialMin = specialMinions.venturecomercenary;
+                        if (temp == "summoningportal") c.specialMin = specialMinions.summoningportal;
+                       
                     }
                     if (de == 1)
                     {

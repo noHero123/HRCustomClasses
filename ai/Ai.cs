@@ -32,7 +32,7 @@ namespace HREngine.Bots
             public bool test = false;
             public Bot botBase = null;
             public bool isLethalCheck = false;
-            public List<Playfield> playfieldsTasklist = new List<Playfield>();
+            public List<Playfield> playfieldsTasklist = new List<Playfield>(7000);
             public int threadnumber = 0;
             public threadobject(bool test, Bot botBase, bool isLethalCheck, List<Playfield> playfieldsTasklist, int threadnumber)
             {
@@ -50,7 +50,7 @@ namespace HREngine.Bots
 
         PenalityManager penman = PenalityManager.Instance;
 
-        List<Playfield> posmoves = new List<Playfield>();
+        List<Playfield> posmoves = new List<Playfield>(7000);
 
         Hrtprozis hp = Hrtprozis.Instance;
         Handmanager hm = Handmanager.Instance;
@@ -1083,6 +1083,7 @@ namespace HREngine.Bots
                 int bestoldval = -20000000;
 
                 //help.logg("create taskts");
+                
                 List<System.Threading.Thread> tasks = new List<System.Threading.Thread>(this.numberOfThreads);
                 List<List<Playfield>> playfieldsTasklist = new List<List<Playfield>>(this.numberOfThreads);
                 this.threadResults.Clear();
@@ -1110,6 +1111,7 @@ namespace HREngine.Bots
                 {
                     //System.Threading.Thread threadl = new System.Threading.Thread(() => this.Workthread(test, botBase, isLethalCheck, playfieldsTasklist[k], threadnumbers[k]));
                     System.Threading.Thread threadl = new System.Threading.Thread(new System.Threading.ParameterizedThreadStart(this.Workthread));
+                    //System.Threading.Tasks.Task tsk = new System.Threading.Tasks.Task(this.Workthread, (object)new threadobject(test, botBase, isLethalCheck, playfieldsTasklist[k], threadnumbers[k]));
                     threadl.Start((object)new threadobject(test, botBase, isLethalCheck, playfieldsTasklist[k], threadnumbers[k]));
                     tasks.Add(threadl);
 
@@ -1438,68 +1440,6 @@ namespace HREngine.Bots
 
             //help.logging(true);
 
-        }
-
-        public void doBenchmark(Bot botbase)
-        {
-            help.logg("do benchmark, dont cry");
-            //setup cards in hand
-            this.hm.loadPreparedBattlefield(10);
-
-
-            this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
-            //setup minions on field
-            this.hp.loadPreparedBattlefield(10);
-
-            //calculate the stuff
-            posmoves.Clear();
-            posmoves.Add(new Playfield());
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
-            help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
-            help.logg("owncardscount " + posmoves[0].owncards.Count);
-
-            foreach (var item in this.posmoves[0].owncards)
-            {
-                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
-            }
-
-            doallmoves(true, botbase, false);
-        }
-
-        public void simulatorTester(Bot botbase)
-        {
-            help.logg("simulating board ");
-            //setup cards in hand
-            this.hm.loadPreparedBattlefield(5);
-
-
-            this.hp.loadPreparedHeros(0);//setup hero hp, weapons and stuff
-            //setup minions on field
-            this.hp.loadPreparedBattlefield(5);
-
-            //calculate the stuff
-            posmoves.Clear();
-            posmoves.Add(new Playfield());
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
-            help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
-            help.logg("owncardscount " + posmoves[0].owncards.Count);
-
-            foreach (var item in this.posmoves[0].owncards)
-            {
-                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
-            }
-
-            doallmoves(true, botbase, false);
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
         }
 
         public void autoTester(Bot botbase)

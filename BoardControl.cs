@@ -63,13 +63,23 @@ namespace HREngine.Bots
           retval -= p.enemycarddraw * 5;
 
           retval += p.ownMaxMana;
+          int owntaunt = 0;
+          foreach (Minion m in p.ownMinions)
+          {
+              retval += m.Hp * 1;
+              retval += m.Angr * 2;
+              retval += m.card.rarity;
+              if (m.windfury) retval += m.Angr;
+              if (m.divineshild) retval += 1;
+              if (m.stealth) retval += 1;
+              //if (m.poisonous) retval += 1;
+              if (m.divineshild && m.taunt) retval += 4;
+              if (m.taunt && m.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
+          }
 
           if (p.enemyMinions.Count >= 0)
           {
               int anz = p.enemyMinions.Count;
-              int owntaunt = p.ownMinions.FindAll(x => x.taunt == true).Count;
-              int froggs = p.ownMinions.FindAll(x => x.name == "frog").Count;
-              owntaunt -= froggs;
               if (owntaunt == 0) retval -= 10 * anz;
               retval += owntaunt * 10 - 11 * anz;
           }
@@ -99,17 +109,7 @@ namespace HREngine.Bots
               retval += mobsInHand * 20;
           }
 
-          foreach (Minion m in p.ownMinions)
-          {
-              retval += m.Hp * 1;
-              retval += m.Angr * 2;
-              retval += m.card.rarity;
-              if (m.windfury) retval += m.Angr;
-              if (m.divineshild) retval += 1;
-              if (m.stealth) retval += 1;
-              //if (m.poisonous) retval += 1;
-              if (m.divineshild && m.taunt) retval += 4;
-          }
+          
 
           foreach (Minion m in p.enemyMinions)
           {
