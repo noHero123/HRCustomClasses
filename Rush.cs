@@ -31,6 +31,7 @@ namespace HREngine.Bots
 
       protected override int evaluatePlayfield(Playfield p)
       {
+          if (p.value >= -2000000) return p.value;
           int retval = 0;
           retval -= p.evaluatePenality;
           retval += p.owncards.Count * 1;
@@ -75,7 +76,7 @@ namespace HREngine.Bots
 
           foreach (Minion m in p.enemyMinions)
           {
-              if (p.enemyMinions.Count >= 4)
+              if (p.enemyMinions.Count >= 4 || m.taunt || (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) || m.Angr >= 5)
               {
                   retval -= m.Hp;
                   retval -= m.Angr * 2;
@@ -86,20 +87,7 @@ namespace HREngine.Bots
                   if (m.poisonous) retval -= 4;
                   retval -= m.card.rarity;
               }
-              else
-              {
-                  if (m.taunt)
-                  {
-                      retval -= m.Hp;
-                      retval -= m.Angr * 2;
-                      if (m.windfury) retval -= m.Angr;
-                      if (m.taunt) retval -= 5;
-                      if (m.divineshild) retval -= 1;
-                      if (m.frozen) retval += 1; // because its bad for enemy :D
-                      if (m.poisonous) retval -= 4;
-                      retval -= m.card.rarity;
-                  }
-              }
+
 
               if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
               if (m.Angr >= 4) retval -= 20;

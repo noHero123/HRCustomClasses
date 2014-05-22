@@ -27,7 +27,18 @@ namespace HREngine.Bots
         {
             public int position = 0;
             public int entity = -1;
-            public CardDB.Card card = new CardDB.Card();
+            public CardDB.Card card ;
+
+            public Handcard()
+            {
+                card = new CardDB.Card();
+            }
+            public Handcard(Handcard hc)
+            {
+                this.position = hc.position;
+                this.entity = hc.entity;
+                this.card = new CardDB.Card(hc.card);
+            }
         }
 
         private BattleField bf = BattleField.Instance;

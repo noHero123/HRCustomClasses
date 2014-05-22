@@ -60,10 +60,11 @@ namespace HREngine.Bots
         public bool silenced = false;
         public int entitiyID = -1;
         public bool cantLowerHPbelowONE = false;
-        public List<Enchantment> enchantments = new List<Enchantment>();
+        public List<Enchantment> enchantments ;
 
         public Minion()
         {
+            enchantments = new List<Enchantment>();
         }
 
         public Minion(Minion m)
@@ -92,7 +93,7 @@ namespace HREngine.Bots
             this.poisonous = m.poisonous;
             this.silenced = m.silenced;
             this.entitiyID = m.entitiyID;
-            this.enchantments.AddRange(m.enchantments);
+            this.enchantments= new List<Enchantment>(m.enchantments);
             this.cantLowerHPbelowONE = m.cantLowerHPbelowONE;
         }
 
@@ -122,6 +123,7 @@ namespace HREngine.Bots
             this.poisonous = m.poisonous;
             this.silenced = m.silenced;
             this.entitiyID = m.entitiyID;
+            this.enchantments.Clear();
             this.enchantments.AddRange(m.enchantments);
         }
     }

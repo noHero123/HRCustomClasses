@@ -79,7 +79,10 @@ namespace HREngine.Bots
             sorcerersapprentice,
             manawraith,
             venturecomercenary,
-            summoningportal
+            summoningportal, 
+            spitefulsmith,
+            defenderofargus,
+            sunfuryprotector
 
         }
 
@@ -187,12 +190,15 @@ namespace HREngine.Bots
             public int needMinNumberOfEnemy = 0;
             public int needMinTotalMinions = 0;
             public int needMinionsCapIfAvailable = 0;
-            public List<ErrorType2> playrequires = new List<ErrorType2>();
+            
             public int spellpowervalue = 0;
             public specialMinions specialMin = specialMinions.None;
+            public List<ErrorType2> playrequires;
 
             public Card()
-            { }
+            {
+                playrequires = new List<ErrorType2>();
+            }
 
             public Card(Card c)
             {
@@ -230,7 +236,7 @@ namespace HREngine.Bots
                 this.needWithMaxAttackValueOf = c.needWithMaxAttackValueOf;
                 this.needWithMinAttackValueOf = c.needWithMinAttackValueOf;
                 this.oneTurnEffect = c.oneTurnEffect;
-                this.playrequires.AddRange(c.playrequires);
+                this.playrequires =  new List<ErrorType2>(c.playrequires);
                 this.poisionous = c.poisionous;
                 this.race = c.race;
                 this.Recall = c.Recall;
@@ -246,19 +252,12 @@ namespace HREngine.Bots
                 this.targettext = c.targettext;
                 this.type = c.type;
                 this.windfury = c.windfury;
-                this.playrequires.AddRange(c.playrequires);
                 this.specialMin = c.specialMin;
             }
 
             public bool isRequirementInList(CardDB.ErrorType2 et)
             {
-                foreach (CardDB.ErrorType2 et2 in this.playrequires)
-                {
-                    if (et == et2)
-                    {
-                        return true;
-                    }
-                }
+                if (this.playrequires.Contains(et)) return true;
                 return false;
             }
 
@@ -787,6 +786,9 @@ namespace HREngine.Bots
                         if (temp == "manawraith") c.specialMin = specialMinions.manawraith;
                         if (temp == "venturecomercenary") c.specialMin = specialMinions.venturecomercenary;
                         if (temp == "summoningportal") c.specialMin = specialMinions.summoningportal;
+                        if (temp == "spitefulsmith") c.specialMin = specialMinions.spitefulsmith;
+                        if (temp == "defenderofargus") c.specialMin = specialMinions.defenderofargus;
+                        if (temp == "sunfuryprotector") c.specialMin = specialMinions.sunfuryprotector;
                        
                     }
                     if (de == 1)

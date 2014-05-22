@@ -229,6 +229,15 @@ namespace HREngine.Bots
                 }
             }
 
+            if (target == -1)
+            {
+                if (name == "ironbeakowl" || name == "spellbreaker")
+                {
+
+                    return 20;
+                }
+            }
+
             if (target >= 10 && target <= 19)
             {
                 if (this.silenceDatabase.ContainsKey(name))
@@ -244,21 +253,22 @@ namespace HREngine.Bots
                     if (lethal)
                     {
                         //during lethal we only silence taunt, or if its a mob (owl/spellbreaker) + we can give him charge
-                        if (m.taunt || (name == "ironbeakowl" && (p.ownMinions.Find(x => x.name == "tundrarhino") != null || p.ownMinions.Find(x => x.name == "warsongcommander") != null || p.owncards.Find(x => x.card.name == "charge") != null)) || (name == "ironbeakowl" && p.owncards.Find(x => x.card.name == "charge") != null)) return 0;
+                        if (m.taunt || (name == "ironbeakowl" && (p.ownMinions.Find(x => x.name == "tundrarhino") != null || p.ownMinions.Find(x => x.name == "warsongcommander") != null || p.owncards.Find(x => x.card.name == "charge") != null)) || (name == "spellbreaker" && p.owncards.Find(x => x.card.name == "charge") != null)) return 0;
                        
                         return 500;
-                    }
-
-                    //silence nothing
-                    if ( (m.Angr < m.card.Attack || m.maxHp < m.card.Health ) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
-                    {
-                        return 30;
                     }
 
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
                         return -10;
                     }
+                    //silence nothing
+                    if ( (m.Angr < m.card.Attack || m.maxHp < m.card.Health ) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
+                    {
+                        return 30;
+                    }
+
+                    
 
                     pen = 0;
                 }
