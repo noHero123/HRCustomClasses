@@ -211,7 +211,7 @@ namespace HREngine.Bots
 
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -222,6 +222,7 @@ namespace HREngine.Bots
                         tempminion.windfury = wndfry;
                         tempminion.numAttacksThisTurn = natt;
                         tempminion.entitiyID = ent;
+                        tempminion.handcard.entity = ent;
                         tempminion.silenced = silenced;
                         tempminion.exhausted = ex;
                         tempminion.poisonous = pois;
@@ -289,7 +290,7 @@ namespace HREngine.Bots
                         if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(CardDB.Instance.getCardData(minionname), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -336,7 +337,7 @@ namespace HREngine.Bots
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
                     card.card = CardDB.Instance.getCardData(minionname);
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
-                    card.card.cost = mana;
+                    card.manacost = mana;
                     card.position = pos;
                     handcards.Add(card);
 
@@ -410,35 +411,34 @@ namespace HREngine.Bots
 
 
 
-
-        private Minion createNewMinion(CardDB.Card c, int id)
+        private Minion createNewMinion(Handmanager.Handcard hc, int id)
         {
             Minion m = new Minion();
-            m.card = c;
+            m.handcard = hc;
             m.id = id;
             m.zonepos = id + 1;
-            m.entitiyID = c.entityID;
+            m.entitiyID = hc.entity;
             m.Posix = 0;
             m.Posiy = 0;
-            m.Angr = c.Attack;
-            m.Hp = c.Health;
-            m.maxHp = c.Health;
-            m.name = c.name;
+            m.Angr = hc.card.Attack;
+            m.Hp = hc.card.Health;
+            m.maxHp = hc.card.Health;
+            m.name = hc.card.name;
             m.playedThisTurn = true;
             m.numAttacksThisTurn = 0;
 
 
-            if (c.windfury) m.windfury = true;
-            if (c.tank) m.taunt = true;
-            if (c.Charge)
+            if (hc.card.windfury) m.windfury = true;
+            if (hc.card.tank) m.taunt = true;
+            if (hc.card.Charge)
             {
                 m.Ready = true;
                 m.charge = true;
             }
 
-            if (c.poisionous) m.poisonous = true;
+            if (hc.card.poisionous) m.poisonous = true;
 
-            if (c.Stealth) m.stealth = true;
+            if (hc.card.Stealth) m.stealth = true;
 
             if (m.name == "lightspawn" && !m.silenced)
             {

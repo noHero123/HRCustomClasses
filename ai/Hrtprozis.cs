@@ -341,34 +341,34 @@ namespace HREngine.Bots
 
         }
 
-        private Minion createNewMinion(CardDB.Card c, int id)
+        private Minion createNewMinion(Handmanager.Handcard hc, int id)
         {
             Minion m = new Minion();
-            m.card = c;
+            m.handcard = hc;
             m.id = id;
             m.zonepos = id + 1;
-            m.entitiyID = c.entityID;
+            m.entitiyID = hc.entity;
             m.Posix = 0;
             m.Posiy = 0;
-            m.Angr = c.Attack;
-            m.Hp = c.Health;
-            m.maxHp = c.Health;
-            m.name = c.name;
+            m.Angr = hc.card.Attack;
+            m.Hp = hc.card.Health;
+            m.maxHp = hc.card.Health;
+            m.name = hc.card.name;
             m.playedThisTurn = true;
             m.numAttacksThisTurn = 0;
 
 
-            if (c.windfury) m.windfury = true;
-            if (c.tank) m.taunt = true;
-            if (c.Charge)
+            if (hc.card.windfury) m.windfury = true;
+            if (hc.card.tank) m.taunt = true;
+            if (hc.card.Charge)
             {
                 m.Ready = true;
                 m.charge = true;
             }
 
-            if (c.poisionous) m.poisonous = true;
+            if (hc.card.poisionous) m.poisonous = true;
 
-            if (c.Stealth) m.stealth = true;
+            if (hc.card.Stealth) m.stealth = true;
 
             if (m.name == "lightspawn" && !m.silenced)
             {

@@ -49,14 +49,14 @@ namespace HREngine.Bots
             this.nextMoveGuess.mana = -1;
         }
 
-        private bool doAllChoices(CardDB.Card card, Playfield p, Handmanager.Handcard hc, bool lethalcheck)
+        private bool doAllChoices( Playfield p, Handmanager.Handcard hc, bool lethalcheck)
         {
             bool havedonesomething = false;
 
             for (int i = 1; i < 3; i++)
             {
-                CardDB.Card c = card;
-                if (card.name == "starfall")
+                CardDB.Card c = hc.card;
+                if (c.name == "starfall")
                 {
                     if (i == 1)
                     {
@@ -68,7 +68,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (card.name == "ancientoflore")
+                if (c.name == "ancientoflore")
                 {
                     if (i == 1)
                     {
@@ -80,7 +80,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (c.canplayCard(p))
+                if (hc.canplayCard(p))
                 {
                     havedonesomething = true;
 
@@ -99,14 +99,14 @@ namespace HREngine.Bots
                             if (cardplayPenality <= 499)
                             {
                                 Playfield pf = new Playfield(p);
-                                pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                                pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
                                 this.posmoves.Add(pf);
                             }
                         }
                         else
                         {
                             Playfield pf = new Playfield(p);
-                            pf.playCard(card, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
                             this.posmoves.Add(pf);
                         }
 
@@ -122,14 +122,14 @@ namespace HREngine.Bots
                                 if (cardplayPenality <= 499)
                                 {
                                     Playfield pf = new Playfield(p);
-                                    pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                    pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
                                     this.posmoves.Add(pf);
                                 }
                             }
                             else
                             {
                                 Playfield pf = new Playfield(p);
-                                pf.playCard(card, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
                                 this.posmoves.Add(pf);
                             }
 
@@ -179,7 +179,7 @@ namespace HREngine.Bots
                         playedcards.Add(c.name);
                         if (c.choice)
                         {
-                            if (doAllChoices(c, p, hc, isLethalCheck))
+                            if (doAllChoices(p, hc, isLethalCheck))
                             {
                                 havedonesomething = true;
                             }
@@ -187,7 +187,7 @@ namespace HREngine.Bots
                         else
                         {
                             int bestplace = p.getBestPlace(c);
-                            if (c.canplayCard(p))
+                            if (hc.canplayCard(p))
                             {
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
@@ -226,7 +226,7 @@ namespace HREngine.Bots
                                         {
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
-                                            pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
                                     }
@@ -234,7 +234,7 @@ namespace HREngine.Bots
                                     {
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
-                                        pf.playCard(c, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                        pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
                                         this.posmoves.Add(pf);
                                     }
 
@@ -263,7 +263,7 @@ namespace HREngine.Bots
                                             {
                                                 Playfield pf = new Playfield(p);
                                                 havedonesomething = true;
-                                                pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                                 this.posmoves.Add(pf);
                                             }
                                         }
@@ -271,7 +271,7 @@ namespace HREngine.Bots
                                         {
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
-                                            pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                            pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
                                             this.posmoves.Add(pf);
                                         }
 
@@ -371,7 +371,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    attackPenality = penman.getAttackWithMininonPenality(m, p, trgt.target);
+                                    attackPenality = penman.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
                                     if (attackPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -444,7 +444,7 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p))
+                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p,2))
                     {
                         int abilityPenality = 0;
 
@@ -591,7 +591,7 @@ namespace HREngine.Bots
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
             this.bestboard = new Playfield(bestplay);
-            /*if (bestmove != null && bestmove.cardplay && bestmove.card.type == CardDB.cardtype.MOB)
+            /*if (bestmove != null && bestmove.cardplay && bestmove.handcard.card.type == CardDB.cardtype.MOB)
             {
                 Playfield pf = new Playfield();
                 help.logg("bestplaces:");
@@ -608,11 +608,11 @@ namespace HREngine.Bots
 
                     if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
                     {
-                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
                     else
                     {
-                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
                     //this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
 
@@ -751,11 +751,11 @@ namespace HREngine.Bots
                     Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
                     if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
                     {
-                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
                     else
                     {
-                        this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
 
 
@@ -803,7 +803,7 @@ namespace HREngine.Bots
 
             /* foreach (var item in this.posmoves[0].owncards)
              {
-                 help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
+                 help.logg("card " + item.handcard.card.name + " is playable :" + item.handcard.card.canplayCard(posmoves[0]) + " cost/mana: " + item.handcard.card.cost + "/" + posmoves[0].mana);
              }
              */
             //help.logg("is hero ready?" + posmoves[0].ownHeroReady);
@@ -866,9 +866,9 @@ namespace HREngine.Bots
 
             foreach (var item in this.posmoves[0].owncards)
             {
-                help.logg("card " + item.card.name + " is playable :" + item.card.canplayCard(posmoves[0]) + " cost/mana: " + item.card.cost + "/" + posmoves[0].mana);
+                help.logg("card " + item.card.name + " is playable :" + item.canplayCard(posmoves[0]) + " cost/mana: " + item.manacost + "/" + posmoves[0].mana);
             }
-            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0]) + " cost/mana: " + posmoves[0].ownHeroAblility.cost + "/" + posmoves[0].mana);
+            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0],2) + " cost/mana: " + posmoves[0].ownHeroAblility.getManaCost(posmoves[0],2) + "/" + posmoves[0].mana);
 
             // lethalcheck + normal
             DateTime strt = DateTime.Now;
@@ -909,11 +909,11 @@ namespace HREngine.Bots
                     Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmove.cardEntitiy);
                     if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
                     {
-                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
                     else
                     {
-                        tempbestboard.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
                     }
                 }
 
@@ -984,11 +984,11 @@ namespace HREngine.Bots
                         Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmovee.cardEntitiy);
                         if (bestmovee.owntarget >= 0 && bestmovee.enemytarget >= 0 && bestmovee.enemytarget <= 9 && bestmovee.owntarget < bestmovee.enemytarget)
                         {
-                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
                         }
                         else
                         {
-                            tempbestboard.playCard(bestmovee.card, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
                         }
                     }
 

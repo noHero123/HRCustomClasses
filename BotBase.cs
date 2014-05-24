@@ -95,7 +95,7 @@ namespace HREngine.Bots
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
                     Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
-                    if (moveTodo.card.type == CardDB.cardtype.MOB)
+                    if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay, target, moveTodo.owntarget + 1);
                     }
@@ -106,7 +106,7 @@ namespace HREngine.Bots
                 else
                 {
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
-                    if (moveTodo.card.type == CardDB.cardtype.MOB)
+                    if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay, null, moveTodo.owntarget + 1);
                     }

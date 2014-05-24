@@ -60,16 +60,16 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.handcard.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
 
           foreach (Minion m in p.ownMinions)
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
-              retval += m.card.rarity;
+              retval += m.handcard.card.rarity;
               if (m.windfury) retval += m.Angr;
               if (m.taunt) retval += 1;
           }
@@ -85,7 +85,7 @@ namespace HREngine.Bots
                   if (m.divineshild) retval -= 1;
                   if (m.frozen) retval += 1; // because its bad for enemy :D
                   if (m.poisonous) retval -= 4;
-                  retval -= m.card.rarity;
+                  retval -= m.handcard.card.rarity;
               }
 
 
@@ -105,8 +105,8 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus") deletecardsAtLast = 1;
-              if (deletecardsAtLast == 1 && !(a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus")) retval -= 20;
+              if (a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus") deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus")) retval -= 20;
           }
           if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;

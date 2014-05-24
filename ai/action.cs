@@ -31,7 +31,7 @@ namespace HREngine.Bots
         public bool heroattack = false;
         public bool useability = false;
         public bool minionplay = false;
-        public CardDB.Card card;
+        public Handmanager.Handcard handcard;
         public int cardEntitiy = -1;
         public int owntarget = -1; //= target where card/minion is placed
         public int ownEntitiy = -1;
@@ -47,7 +47,7 @@ namespace HREngine.Bots
             help.logg("current Action: ");
                 if (this.cardplay)
                 {
-                    help.logg("play " + this.card.name);
+                    help.logg("play " + this.handcard.card.name);
                     if (this.druidchoice >= 1) help.logg("choose choise " + this.druidchoice);
                     help.logg("with position " + this.cardEntitiy);
                     if (this.owntarget >= 0)
@@ -274,7 +274,7 @@ namespace HREngine.Bots
                 if (m.silenced) continue;
 
                 if (m.name == "prophetvelen") this.doublepriest++;
-                spellpower = spellpower + m.card.spellpowervalue;
+                spellpower = spellpower + m.handcard.card.spellpowervalue;
                 if (m.name == "auchenaisoulpriest") this.auchenaiseelenpriesterin = true;
 
                 if (m.name == "pint-sizedsummoner")
@@ -404,14 +404,14 @@ namespace HREngine.Bots
             foreach (Minion m in this.ownMinions)
             {
                 if (m.silenced) continue;
-                if (m.card.specialMin == CardDB.specialMinions.prophetvelen) this.doublepriest++;
-                spellpower = spellpower + m.card.spellpowervalue;
-                if (m.card.specialMin == CardDB.specialMinions.auchenaisoulpriest) this.auchenaiseelenpriesterin = true;
-                if (m.card.specialMin == CardDB.specialMinions.pintsizedsummoner) this.winzigebeschwoererin++;
-                if (m.card.specialMin == CardDB.specialMinions.sorcerersapprentice) this.zauberlehrling++;
-                if (m.card.specialMin == CardDB.specialMinions.manawraith) this.managespenst++;
-                if (m.card.specialMin == CardDB.specialMinions.venturecomercenary) this.soeldnerDerVenture++;
-                if (m.card.specialMin == CardDB.specialMinions.summoningportal) this.beschwoerungsportal++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.prophetvelen) this.doublepriest++;
+                spellpower = spellpower + m.handcard.card.spellpowervalue;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.auchenaisoulpriest) this.auchenaiseelenpriesterin = true;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.pintsizedsummoner) this.winzigebeschwoererin++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.sorcerersapprentice) this.zauberlehrling++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.manawraith) this.managespenst++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.venturecomercenary) this.soeldnerDerVenture++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.summoningportal) this.beschwoerungsportal++;
 
 
             }
@@ -419,7 +419,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.silenced) continue;
-                if (m.card.specialMin == CardDB.specialMinions.manawraith) this.managespenst++;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.manawraith) this.managespenst++;
             }
 
         }
@@ -538,7 +538,7 @@ namespace HREngine.Bots
             for (int i = 0; i < this.owncards.Count; i++)
             {
                 Handmanager.Handcard dishc = this.owncards[i]; Handmanager.Handcard pishc = p.owncards[i];
-                if ( dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.card.getManaCost(this) != pishc.card.getManaCost(p))
+                if ( dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.getManaCost(this) != pishc.getManaCost(p))
                 {
                     Helpfunctions.Instance.logg("handcard changed: " + dishc.card.name);
                     return false;
@@ -559,7 +559,7 @@ namespace HREngine.Bots
             {
                 if (m.stealth) continue; // cant target stealth
 
-                if (m.taunt)
+                if (m.taunt && !m.silenced)
                 {
                     hastanks = true;
                     trgts.Add(new targett(m.id + 10, m.entitiyID));
@@ -603,20 +603,20 @@ namespace HREngine.Bots
                         tempval -= m.Hp+2;
                     }
 
-                    if (m.card.specialMin == CardDB.specialMinions.flametonguetotem) tempval += 50;
-                    if (m.card.specialMin == CardDB.specialMinions.raidleader) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.grimscaleoracle) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.direwolfalpha) tempval += 50;
-                    if (m.card.specialMin == CardDB.specialMinions.murlocwarleader) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.southseacaptain) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.stormwindchampion) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.timberwolf) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.leokk) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.northshirecleric) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.sorcerersapprentice) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.pintsizedsummoner) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.summoningportal) tempval += 10;
-                    if (m.card.specialMin == CardDB.specialMinions.scavenginghyena) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem) tempval += 50;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.raidleader) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.grimscaleoracle) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha) tempval += 50;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.murlocwarleader) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.southseacaptain) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.timberwolf) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.leokk) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.northshirecleric) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.sorcerersapprentice) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.pintsizedsummoner) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.summoningportal) tempval += 10;
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.scavenginghyena) tempval += 10;
 
                     places[i] = tempval;
 
@@ -677,20 +677,20 @@ namespace HREngine.Bots
                     tempval += m.maxHp;
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.flametonguetotem) tempval += 50;
-                if (m.card.specialMin == CardDB.specialMinions.raidleader) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.grimscaleoracle) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.direwolfalpha) tempval += 50;
-                if (m.card.specialMin == CardDB.specialMinions.murlocwarleader) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.southseacaptain) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.stormwindchampion) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.timberwolf) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.leokk) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.northshirecleric) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.sorcerersapprentice) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.pintsizedsummoner) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.summoningportal) tempval += 10;
-                if (m.card.specialMin == CardDB.specialMinions.scavenginghyena) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem) tempval += 50;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.raidleader) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.grimscaleoracle) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha) tempval += 50;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.murlocwarleader) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.southseacaptain) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.timberwolf) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.leokk) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.northshirecleric) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.sorcerersapprentice) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.pintsizedsummoner) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.summoningportal) tempval += 10;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.scavenginghyena) tempval += 10;
 
                 places[i] = tempval;
 
@@ -983,7 +983,7 @@ namespace HREngine.Bots
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    minionReturnToHand(m, false);
+                    minionReturnToHand(m, false,0);
                 }
                 if (secretID == "EX1_533") // missdirection
                 {
@@ -1353,7 +1353,7 @@ namespace HREngine.Bots
 
                     attackOrHealHero(-6, false);
                 }
-                if (m.card.CardID == "EX1_tk9") //treant which is destroyed
+                if (m.handcard.card.CardID == "EX1_tk9") //treant which is destroyed
                 {
                     minionGetDestroyed(m, own);
                 }
@@ -1535,6 +1535,7 @@ namespace HREngine.Bots
         private void attackEnemyHeroWithoutKill(int dmg)
         {
             int oldHp = this.enemyHeroHp;
+            if (dmg < 0 && this.enemyHeroHp <= 0) return;
             if (this.enemyHeroDefence <= 0)
             {
                 this.enemyHeroHp = Math.Min(30, this.enemyHeroHp - dmg);
@@ -1563,6 +1564,7 @@ namespace HREngine.Bots
             {
                 if (dmg < 0 || this.ownHeroDefence <= 0)
                 {
+                    if (dmg < 0 && this.ownHeroHp <= 0) return;
                     //heal
                     int copy = this.ownHeroHp;
 
@@ -1593,8 +1595,10 @@ namespace HREngine.Bots
             }
             else
             {
+                
                 if (dmg < 0 || this.enemyHeroDefence <= 0)
                 {
+                    if (dmg < 0 && this.enemyHeroHp <= 0) return;
                     int copy = this.enemyHeroHp;
                     if (dmg < 0 && this.enemyHeroHp - dmg > 30) this.lostHeal += this.enemyHeroHp - dmg - 30;
                     this.enemyHeroHp = Math.Min(30, this.enemyHeroHp - dmg);
@@ -1630,11 +1634,11 @@ namespace HREngine.Bots
                 for (int i = 0; i < anz; i++)
                 {
 
-                    if (e.charge && !m.card.Charge && m.enchantments.FindAll(x => x.charge == true).Count == 0)
+                    if (e.charge && !m.handcard.card.Charge && m.enchantments.FindAll(x => x.charge == true).Count == 0)
                     {
                         m.charge = false;
                     }
-                    if (e.taunt && !m.card.tank && m.enchantments.FindAll(x => x.taunt == true).Count == 0)
+                    if (e.taunt && !m.handcard.card.tank && m.enchantments.FindAll(x => x.taunt == true).Count == 0)
                     {
                         m.taunt = false;
                     }
@@ -1642,7 +1646,7 @@ namespace HREngine.Bots
                     {
                         m.divineshild = false;
                     }
-                    if (e.windfury && !m.card.windfury && m.enchantments.FindAll(x => x.windfury == true).Count == 0)
+                    if (e.windfury && !m.handcard.card.windfury && m.enchantments.FindAll(x => x.windfury == true).Count == 0)
                     {
                         m.divineshild = false;
                     }
@@ -1782,37 +1786,37 @@ namespace HREngine.Bots
 
         private void endEffectsDueToDeath(Minion m, bool own)
         { // minion which grants effect died
-            if (m.card.specialMin == CardDB.specialMinions.raidleader) // if he dies, lower attack of all minions of his side
+            if (m.handcard.card.specialMin == CardDB.specialMinions.raidleader) // if he dies, lower attack of all minions of his side
             {
                 deleteEffectOf("CS2_122e", m.entitiyID);
             }
 
-            if (m.card.specialMin == CardDB.specialMinions.grimscaleoracle)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.grimscaleoracle)
             {
                 deleteEffectOf("EX1_508o", m.entitiyID);
             }
 
-            if (m.card.specialMin == CardDB.specialMinions.direwolfalpha)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha)
             {
                 deleteEffectOf("EX1_162o", m.entitiyID);
             }
-            if (m.card.specialMin == CardDB.specialMinions.murlocwarleader)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.murlocwarleader)
             {
                 deleteEffectOf("EX1_507e", m.entitiyID);
             }
-            if (m.card.specialMin == CardDB.specialMinions.southseacaptain)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.southseacaptain)
             {
                 deleteEffectOf("NEW1_027e", m.entitiyID);
             }
-            if (m.card.specialMin == CardDB.specialMinions.stormwindchampion)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion)
             {
                 deleteEffectOf("CS2_222o", m.entitiyID);
             }
-            if (m.card.specialMin == CardDB.specialMinions.timberwolf)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.timberwolf)
             {
                 deleteEffectOf("DS1_175o", m.entitiyID);
             }
-            if (m.card.specialMin == CardDB.specialMinions.leokk)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.leokk)
             {
                 deleteEffectOf("NEW1_033o", m.entitiyID);
             }
@@ -1821,21 +1825,21 @@ namespace HREngine.Bots
 
             foreach (Minion mnn in this.ownMinions)
             {
-                if (mnn.card.specialMin == CardDB.specialMinions.oldmurkeye && m.card.race == 14)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.oldmurkeye && m.handcard.card.race == 14)
                 {
                     minionGetBuffed(mnn, -1, 0, true);
                 }
             }
             foreach (Minion mnn in this.enemyMinions)
             {
-                if (mnn.card.specialMin == CardDB.specialMinions.oldmurkeye && m.card.race == 14)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.oldmurkeye && m.handcard.card.race == 14)
                 {
                     minionGetBuffed(mnn, -1, 0, false);
                 }
             }
 
             //no deathrattle, but lowering the weapon
-            if (m.card.specialMin == CardDB.specialMinions.spitefulsmith && m.wounded)// remove weapon changes form hasserfuelleschmiedin
+            if (m.handcard.card.specialMin == CardDB.specialMinions.spitefulsmith && m.wounded)// remove weapon changes form hasserfuelleschmiedin
             {
                 if (own && this.ownWeaponDurability >= 1)
                 {
@@ -1849,14 +1853,9 @@ namespace HREngine.Bots
         private void getNewEffects(Minion m, bool own, int placeOfNewMob, bool isSummon)
         {
             bool havekriegshymnenanfuehrerin = false;
-            List<Minion> temp = new List<Minion>();
-            int controller = 0;
-            if (own)
-            {
-                temp.AddRange(this.ownMinions);
-                controller = this.ownController;
-            }
-            else
+            List<Minion> temp = new List<Minion>(this.ownMinions);
+            int controller = this.ownController;
+            if (!own)
             {
                 temp.AddRange(this.enemyMinions);
                 controller = 0;
@@ -1876,12 +1875,12 @@ namespace HREngine.Bots
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (isSummon && ownm.card.specialMin == CardDB.specialMinions.warsongcommander)
+                if (isSummon && ownm.handcard.card.specialMin == CardDB.specialMinions.warsongcommander)
                 {
                     havekriegshymnenanfuehrerin = true;
                 }
 
-                if (ownm.card.specialMin == CardDB.specialMinions.raidleader && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.raidleader && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_122e");
                     e.creator = ownm.entitiyID;
@@ -1889,7 +1888,7 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.leokk && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.leokk && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_033o");
                     e.creator = ownm.entitiyID;
@@ -1897,37 +1896,37 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
 
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.stormwindchampion && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_222o");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.grimscaleoracle && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.grimscaleoracle && m.handcard.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.murlocwarleader && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.murlocwarleader && m.handcard.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.southseacaptain && m.card.race == 23)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.southseacaptain && m.handcard.card.race == 23)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("NEW1_027e");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                
 
-                if (ownm.card.specialMin == CardDB.specialMinions.timberwolf && (TAG_RACE)m.card.race == TAG_RACE.PET)
+
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.timberwolf && (TAG_RACE)m.handcard.card.race == TAG_RACE.PET)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("DS1_175o");
                     e.creator = ownm.entitiyID;
@@ -1935,12 +1934,12 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, own);
                 }
 
-                if (isSummon && ownm.card.specialMin == CardDB.specialMinions.tundrarhino && (TAG_RACE)m.card.race == TAG_RACE.PET)
+                if (isSummon && ownm.handcard.card.specialMin == CardDB.specialMinions.tundrarhino && (TAG_RACE)m.handcard.card.race == TAG_RACE.PET)
                 {
                     minionGetCharge(m);
                 }
 
-                if (ownm.card.specialMin == CardDB.specialMinions.direwolfalpha)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha)
                 {
                     if (ownm.id == placeOfNewMob + 1 || ownm.id == placeOfNewMob - adjacentplace)
                     {
@@ -1958,7 +1957,7 @@ namespace HREngine.Bots
                         debuff(m, e, own);
                     }
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.flametonguetotem)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem)
                 {
                     if (ownm.id == placeOfNewMob + 1 || ownm.id == placeOfNewMob - adjacentplace)
                     {
@@ -1979,16 +1978,16 @@ namespace HREngine.Bots
                 }
             }
             //buff oldmurk
-            if (isSummon && m.card.specialMin == CardDB.specialMinions.oldmurkeye && own)
+            if (isSummon && m.handcard.card.specialMin == CardDB.specialMinions.oldmurkeye && own)
             {
                 int murlocs = 0;
                 foreach (Minion mnn in this.ownMinions)
                 {
-                    if (mnn.card.race == 14) murlocs++;
+                    if (mnn.handcard.card.race == 14) murlocs++;
                 }
                 foreach (Minion mnn in this.enemyMinions)
                 {
-                    if (mnn.card.race == 14) murlocs++;
+                    if (mnn.handcard.card.race == 14) murlocs++;
                 }
 
                 minionGetBuffed(m, murlocs, 0, true);
@@ -2011,14 +2010,14 @@ namespace HREngine.Bots
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
-                if (ownm.card.specialMin == CardDB.specialMinions.grimscaleoracle && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.grimscaleoracle && m.handcard.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_508o");
                     e.creator = ownm.entitiyID;
                     e.controllerOfCreator = controller;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
-                if (ownm.card.specialMin == CardDB.specialMinions.murlocwarleader && m.card.race == 14 && ownm.entitiyID != m.entitiyID)
+                if (ownm.handcard.card.specialMin == CardDB.specialMinions.murlocwarleader && m.handcard.card.race == 14 && ownm.entitiyID != m.entitiyID)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_507e");
                     e.creator = ownm.entitiyID;
@@ -2042,7 +2041,7 @@ namespace HREngine.Bots
             {
 
                 //real deathrattles
-                if (m.card.CardID == "EX1_534")//m.name == "savannenhochmaehne"
+                if (m.handcard.card.CardID == "EX1_534")//m.name == "savannenhochmaehne"
                 {
                     CardDB.Card c = CardDB.Instance.getCardData("hyena");
                     callKid(c, m.id - 1, own);
@@ -2191,7 +2190,7 @@ namespace HREngine.Bots
                 if (e.CARDID == "CS2_038e" && !geistderahnen)
                 {
                     //revive minion due to "geist der ahnen"
-                    CardDB.Card kid = m.card;
+                    CardDB.Card kid = m.handcard.card;
                     int pos = this.ownMinions.Count - 1;
                     if (!own) pos = this.enemyMinions.Count - 1;
                     callKid(kid, pos, own);
@@ -2230,15 +2229,15 @@ namespace HREngine.Bots
             {
                 if (mnn.silenced) continue;
 
-                if (mnn.card.specialMin == CardDB.specialMinions.scavenginghyena && m.card.race == 20)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.scavenginghyena && m.handcard.card.race == 20)
                 {
                     mnn.Angr += 2; mnn.Hp += 1;
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.flesheatingghoul)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.flesheatingghoul)
                 {
                     mnn.Angr += 1;
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.cultmaster)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.cultmaster)
                 {
                     if (own)
                     {
@@ -2255,7 +2254,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in temp2)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.flesheatingghoul)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.flesheatingghoul)
                 {
                     mnn.Angr += 1;
                 }
@@ -2278,13 +2277,19 @@ namespace HREngine.Bots
 
         }
 
-        private void minionReturnToHand(Minion m, bool own)
+        private void minionReturnToHand(Minion m, bool own, int manachange)
         {
 
             if (own)
             {
                 removeMinionFromListNoDeath(m, this.ownMinions, true);
-                drawACard(m.card.name);
+                CardDB.Card c = m.handcard.card;
+                Handmanager.Handcard hc = new Handmanager.Handcard();
+                hc.card = c;
+                hc.position = this.owncards.Count + 1;
+                hc.entity = m.entitiyID;
+                hc.manacost = c.calculateManaCost(this) + manachange ;
+                this.owncards.Add(hc);
             }
             else
             {
@@ -2295,8 +2300,9 @@ namespace HREngine.Bots
 
         private void minionTransform(Minion m, CardDB.Card c, bool own)
         {
-
-            Minion tranform = createNewMinion(c, m.id, own);
+            Handmanager.Handcard hc = new Handmanager.Handcard(c);
+            hc.entity = m.entitiyID;
+            Minion tranform = createNewMinion(hc, m.id, own);
             Minion temp = new Minion();
             temp.setMinionTominion(m);
             m.setMinionTominion(tranform);
@@ -2319,7 +2325,7 @@ namespace HREngine.Bots
             m.poisonous = false;
 
             //delete enrage (if minion is silenced the first time)
-            if (m.wounded && m.card.Enrage && !m.silenced)
+            if (m.wounded && m.handcard.card.Enrage && !m.silenced)
             {
                 deleteWutanfall(m, own);
             }
@@ -2343,13 +2349,13 @@ namespace HREngine.Bots
 
             m.enchantments.Clear();
 
-            m.Angr = m.card.Attack;
-            if (m.maxHp < m.card.Health)//minion has lower maxHp as his card -> heal his hp
+            m.Angr = m.handcard.card.Attack;
+            if (m.maxHp < m.handcard.card.Health)//minion has lower maxHp as his card -> heal his hp
             {
-                m.Hp += m.card.Health - m.maxHp; //heal minion
+                m.Hp += m.handcard.card.Health - m.maxHp; //heal minion
 
             }
-            m.maxHp = m.card.Health;
+            m.maxHp = m.handcard.card.Health;
             if (m.Hp > m.maxHp) m.Hp = m.maxHp;
 
             getNewEffects(m, own, m.id, false);// minion get effects of others 
@@ -2514,7 +2520,7 @@ namespace HREngine.Bots
 
         private void wutanfall(Minion m, bool woundedBefore, bool own) // = enrange effects
         {
-            if (!m.card.Enrage) return; // if minion has no enrange, do nothing
+            if (!m.handcard.card.Enrage) return; // if minion has no enrange, do nothing
             if (woundedBefore == m.wounded || m.silenced) return; // if he was wounded, and still is (or was unwounded) do nothing
 
             if (m.wounded && m.Hp >= 1) //is wounded, wasnt wounded before, grant wutanfall
@@ -2563,7 +2569,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.lightwarden)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
                     minionGetBuffed(mnn, 2, 0, true);
                 }
@@ -2571,7 +2577,7 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.lightwarden)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
                     minionGetBuffed(mnn, 2, 0, false);
                 }
@@ -2583,12 +2589,12 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.northshirecleric)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.northshirecleric)
                 {
                     this.owncarddraw++;
                     drawACard("");
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.lightwarden)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
                     minionGetBuffed(mnn, 2, 0, true);
                 }
@@ -2596,11 +2602,11 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.northshirecleric)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.northshirecleric)
                 {
                     this.enemycarddraw++;
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.lightwarden)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
                     minionGetBuffed(mnn, 2, 0, false);
                 }
@@ -2611,7 +2617,7 @@ namespace HREngine.Bots
         private void triggerAMinionGetDamage(Minion m, bool own)
         {
             //minion take dmg
-            if (m.card.specialMin == CardDB.specialMinions.acolyteofpain && !m.silenced)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.acolyteofpain && !m.silenced)
             {
                 if (own)
                 {
@@ -2623,20 +2629,20 @@ namespace HREngine.Bots
                     this.enemycarddraw++;
                 }
             }
-            if (m.card.specialMin == CardDB.specialMinions.gurubashiberserker && !m.silenced)
+            if (m.handcard.card.specialMin == CardDB.specialMinions.gurubashiberserker && !m.silenced)
             {
                 minionGetBuffed(m, 3, 0, own);
             }
             foreach (Minion mnn in this.ownMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.frothingberserker)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.frothingberserker)
                 {
                     mnn.Angr++;
                 }
                 if (own)
                 {
-                    if (mnn.card.specialMin == CardDB.specialMinions.armorsmith)
+                    if (mnn.handcard.card.specialMin == CardDB.specialMinions.armorsmith)
                     {
                         this.ownHeroDefence++;
                     }
@@ -2645,13 +2651,13 @@ namespace HREngine.Bots
             foreach (Minion mnn in this.enemyMinions)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.frothingberserker)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.frothingberserker)
                 {
                     mnn.Angr++;
                 }
                 if (!own)
                 {
-                    if (mnn.card.specialMin == CardDB.specialMinions.armorsmith)
+                    if (mnn.handcard.card.specialMin == CardDB.specialMinions.armorsmith)
                     {
                         this.enemyHeroDefence++;
                     }
@@ -2750,7 +2756,7 @@ namespace HREngine.Bots
         {
             target.name = source.name;
             target.Angr = source.Angr;
-            target.card = CardDB.Instance.getCardDataFromID(source.card.CardID);
+            target.handcard.card = CardDB.Instance.getCardDataFromID(source.handcard.card.CardID);
             target.charge = source.charge;
             target.divineshild = source.divineshild;
             target.exhausted = source.exhausted;
@@ -2862,7 +2868,7 @@ namespace HREngine.Bots
             int ownAttack = m.Angr;
             int enemyAttack = enemy.Angr;
             // defender take damage
-            if (m.card.poisionous)
+            if (m.handcard.card.poisionous)
             {
                 minionGetDestroyed(enemy, enemyOwn);
             }
@@ -2870,14 +2876,14 @@ namespace HREngine.Bots
             {
                 int oldHP = enemy.Hp;
                 minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
-                if (!m.silenced && oldHP > enemy.Hp && m.card.specialMin == CardDB.specialMinions.waterelemental) enemy.frozen = true;
+                if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.specialMin == CardDB.specialMinions.waterelemental) enemy.frozen = true;
             }
 
 
             //attacker take damage
             if (!m.immune)
             {
-                if (enemy.card.poisionous)
+                if (enemy.handcard.card.poisionous)
                 {
                     minionGetDestroyed(m, attackOwn);
                 }
@@ -2885,7 +2891,7 @@ namespace HREngine.Bots
                 {
                     int oldHP = m.Hp;
                     minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
-                    if (!enemy.silenced && oldHP > m.Hp && enemy.card.specialMin == CardDB.specialMinions.waterelemental) m.frozen = true;
+                    if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.specialMin == CardDB.specialMinions.waterelemental) m.frozen = true;
                 }
             }
         }
@@ -2955,38 +2961,38 @@ namespace HREngine.Bots
                 i++;
             }
             adjacentBuffUpdate(own);
-            triggerPlayedAMinion(m.card, own);
+            triggerPlayedAMinion(m.handcard, own);
 
         }
 
-        private Minion createNewMinion(CardDB.Card c, int placeOfNewMob, bool own)
+        private Minion createNewMinion(Handmanager.Handcard hc, int placeOfNewMob, bool own)
         {
             Minion m = new Minion();
-            m.card = c;
-            m.entitiyID = c.entityID;
+            m.handcard = hc;
+            m.entitiyID = hc.entity;
             m.Posix = 0;
             m.Posiy = 0;
-            m.Angr = c.Attack;
-            m.Hp = c.Health;
-            m.maxHp = c.Health;
-            m.name = c.name;
+            m.Angr = hc.card.Attack;
+            m.Hp = hc.card.Health;
+            m.maxHp = hc.card.Health;
+            m.name = hc.card.name;
             m.playedThisTurn = true;
             m.numAttacksThisTurn = 0;
             m.id = placeOfNewMob;
             m.zonepos = placeOfNewMob + 1;
 
 
-            if (c.windfury) m.windfury = true;
-            if (c.tank) m.taunt = true;
-            if (c.Charge)
+            if (hc.card.windfury) m.windfury = true;
+            if (hc.card.tank) m.taunt = true;
+            if (hc.card.Charge)
             {
                 m.Ready = true;
                 m.charge = true;
             }
 
-            if (c.poisionous) m.poisonous = true;
+            if (hc.card.poisionous) m.poisonous = true;
 
-            if (c.Stealth) m.stealth = true;
+            if (hc.card.Stealth) m.stealth = true;
 
             if (m.name == "lightspawn" && !m.silenced)
             {
@@ -3014,6 +3020,7 @@ namespace HREngine.Bots
             bool frozen = false;
             bool stealth = false;
             bool backtohand = false;
+            int backtoHandManaChange = 0;
 
             bool own = true;
 
@@ -3089,6 +3096,7 @@ namespace HREngine.Bots
             if (c.name == "kidnapper" && this.cardsPlayedThisTurn >= 1)
             {
                 backtohand = true;
+                backtoHandManaChange = 0;
             }
             if (c.name == "masterofdisguise")
             {
@@ -3115,10 +3123,12 @@ namespace HREngine.Bots
             if (c.name == "ancientbrewmaster")
             {
                 backtohand = true;
+                backtoHandManaChange = 0;
             }
             if (c.name == "youthfulbrewmaster")
             {
                 backtohand = true;
+                backtoHandManaChange = 0;
             }
 
             if (c.name == "darkirondwarf")
@@ -3254,7 +3264,7 @@ namespace HREngine.Bots
                 if (destroy) minionGetDestroyed(m, true);
                 if (frozen) m.frozen = true;
                 if (stealth) m.stealth = true;
-                if (backtohand) minionReturnToHand(m, true);
+                if (backtohand) minionReturnToHand(m, true, backtoHandManaChange);
                 if (silence) minionGetSilenced(m, true);
 
             }
@@ -3275,7 +3285,7 @@ namespace HREngine.Bots
                 if (destroy) minionGetDestroyed(m, false);
                 if (frozen) m.frozen = true;
                 if (stealth) m.stealth = true;
-                if (backtohand) minionReturnToHand(m, false);
+                if (backtohand) minionReturnToHand(m, false,backtoHandManaChange);
                 if (silence) minionGetSilenced(m, false);
             }
             if (target == 100)
@@ -3608,7 +3618,7 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
                 {
-                    if ((TAG_RACE)m.card.race == TAG_RACE.PET)
+                    if ((TAG_RACE)m.handcard.card.race == TAG_RACE.PET)
                     {
                         minionGetCharge(m);
                     }
@@ -3650,7 +3660,7 @@ namespace HREngine.Bots
                 {
                     if (m.id == position - 1 || m.id == position )
                     {
-                        m.card.spellpowervalue++;
+                        m.handcard.card.spellpowervalue++;
                     }
                 }
             }
@@ -3675,7 +3685,7 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
                 {
-                    if ((TAG_RACE)m.card.race == TAG_RACE.MURLOC)
+                    if ((TAG_RACE)m.handcard.card.race == TAG_RACE.MURLOC)
                     {
                         minionGetBuffed(m, 0, 2, true);
                     }
@@ -3684,7 +3694,7 @@ namespace HREngine.Bots
                 temp.AddRange(this.enemyMinions);
                 foreach (Minion m in temp)
                 {
-                    if ((TAG_RACE)m.card.race == TAG_RACE.MURLOC)
+                    if ((TAG_RACE)m.handcard.card.race == TAG_RACE.MURLOC)
                     {
                         minionGetBuffed(m, 0, 2, false);
                     }
@@ -3816,7 +3826,7 @@ namespace HREngine.Bots
                 retval.Y = enemyMinions[mobplace - 1].Posiy;
             }*/
 
-            Minion m = createNewMinion(c, mobplace, own);
+            Minion m = createNewMinion(new Handmanager.Handcard(c), mobplace, own);
 
             if (own)
             {
@@ -3829,12 +3839,12 @@ namespace HREngine.Bots
 
         }
 
-        private Action placeAmobSomewhere(CardDB.Card c, int cardpos, int target, int choice, int placepos)
+        private Action placeAmobSomewhere(Handmanager.Handcard hc, int cardpos, int target, int choice, int placepos)
         {
 
             Action a = new Action();
             a.cardplay = true;
-            a.card = new CardDB.Card(c);
+            //a.card = new CardDB.Card(c);
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
             a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
 
@@ -3846,11 +3856,11 @@ namespace HREngine.Bots
 
 
             // but before additional minions span next to it! (because we buff the minion in createNewMinion and swordofjustice gives summeond minons his buff first!
-            int spawnkids = spawnKids(c, mobplace-1, true, choice); //  if a mob targets something, it doesnt spawn minions!?
+            int spawnkids = spawnKids(hc.card, mobplace-1, true, choice); //  if a mob targets something, it doesnt spawn minions!?
             
 
             //create the new minion
-            Minion m = createNewMinion(c, mobplace, true);
+            Minion m = createNewMinion(hc, mobplace, true);
 
 
 
@@ -3865,7 +3875,7 @@ namespace HREngine.Bots
 
 
             addMiniontoList(m, this.ownMinions, mobplace, true);
-            if (logging) Helpfunctions.Instance.logg("added " + m.card.name);
+            if (logging) Helpfunctions.Instance.logg("added " + m.handcard.card.name);
 
             //only for fun :D
             if (target >= 0)
@@ -3941,8 +3951,9 @@ namespace HREngine.Bots
 
         }
 
-        private void playCardWithTarget(CardDB.Card c, int target, int choice)
+        private void playCardWithTarget(Handmanager.Handcard hc, int target, int choice)
         {
+            CardDB.Card c = hc.card;
             //play card with target
             int attackbuff = 0;
             int hpbuff = 0;
@@ -3956,6 +3967,7 @@ namespace HREngine.Bots
             bool frozen = false;
             bool stealth = false;
             bool backtohand = false;
+            int backtoHandManaChange = 0;
             bool charge = false;
             bool setHPtoONE = false;
             bool immune = false;
@@ -4044,7 +4056,7 @@ namespace HREngine.Bots
                 damage = 3;
                 foreach (Minion mnn in this.ownMinions)
                 {
-                    if ((TAG_RACE)mnn.card.race == TAG_RACE.PET)
+                    if ((TAG_RACE)mnn.handcard.card.race == TAG_RACE.PET)
                     {
                         damage = 5;
                     }
@@ -4054,7 +4066,7 @@ namespace HREngine.Bots
             {
 
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_549o");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, own);
             }
@@ -4165,7 +4177,7 @@ namespace HREngine.Bots
             if (c.name == "blessingofwisdom")
             {
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_363e2");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 m.enchantments.Add(e);
             }
@@ -4196,7 +4208,7 @@ namespace HREngine.Bots
             {
 
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_334e");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, own);
                 this.minionGetControlled(m, true, true);
@@ -4247,11 +4259,13 @@ namespace HREngine.Bots
             if (c.name == "shadowstep")
             {
                 backtohand = true;
-                m.card.cost = Math.Max(0, m.card.cost -= 2);
+                backtoHandManaChange = -2;
+                //m.handcard.card.cost = Math.Max(0, m.handcard.card.cost -= 2);
             }
             if (c.name == "sap")
             {
                 backtohand = true;
+                backtoHandManaChange = 0;
             }
             if (c.name == "shiv")
             {
@@ -4323,7 +4337,7 @@ namespace HREngine.Bots
                 if (target <= 20)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_045e");
-                    e.creator = c.entityID;
+                    e.creator = hc.entity;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, own);
                 }
@@ -4387,7 +4401,7 @@ namespace HREngine.Bots
             {
                 //only to own mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_316e");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, true);
             }
@@ -4395,7 +4409,7 @@ namespace HREngine.Bots
             {
                 //only to enemy mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("CS2_063e");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, false);
             }
@@ -4431,7 +4445,7 @@ namespace HREngine.Bots
 
             if (c.name == "demonfire")
             {
-                if (m.card.race == 15 && own)
+                if (m.handcard.card.race == 15 && own)
                 {
                     attackbuff = 2;
                     hpbuff = 2;
@@ -4560,7 +4574,7 @@ namespace HREngine.Bots
             {
                 //only to own mininos
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_316e");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 addEffectToMinionNoDoubles(m, e, true);
             }
@@ -4568,6 +4582,7 @@ namespace HREngine.Bots
             if (c.name == "dream")
             {
                 backtohand = true;
+                backtoHandManaChange = 0;
             }
 
             if (c.name == "bananas")
@@ -4611,7 +4626,7 @@ namespace HREngine.Bots
                 if (destroy) minionGetDestroyed(m, true);
                 if (frozen) m.frozen = true;
                 if (stealth) m.stealth = true;
-                if (backtohand) minionReturnToHand(m, true);
+                if (backtohand) minionReturnToHand(m, true,backtoHandManaChange );
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
@@ -4635,7 +4650,7 @@ namespace HREngine.Bots
                 if (geistderahnen)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_038e");
-                    e.creator = c.entityID;
+                    e.creator = hc.entity;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, true);
                 }
@@ -4655,7 +4670,7 @@ namespace HREngine.Bots
                 if (destroy) minionGetDestroyed(m, false);
                 if (frozen) m.frozen = true;
                 if (stealth) m.stealth = true;
-                if (backtohand) minionReturnToHand(m, false);
+                if (backtohand) minionReturnToHand(m, false,backtoHandManaChange);
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
@@ -4678,7 +4693,7 @@ namespace HREngine.Bots
                 if (geistderahnen)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("CS2_038e");
-                    e.creator = c.entityID;
+                    e.creator = hc.entity;
                     e.controllerOfCreator = this.ownController;
                     addEffectToMinionNoDoubles(m, e, false);
                 }
@@ -4699,9 +4714,9 @@ namespace HREngine.Bots
 
         }
 
-        private void playCardWithoutTarget(CardDB.Card c, int choice)
+        private void playCardWithoutTarget(Handmanager.Handcard hc, int choice)
         {
-
+            CardDB.Card c = hc.card;
             //todo faehrtenlesen!
 
             //play card without target
@@ -4775,10 +4790,10 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 Enchantment e1 = CardDB.getEnchantmentFromCardID("NEW1_036e");
-                e1.creator = c.entityID;
+                e1.creator = hc.entity;
                 e1.controllerOfCreator = this.ownController;
                 Enchantment e2 = CardDB.getEnchantmentFromCardID("NEW1_036e2");
-                e2.creator = c.entityID;
+                e2.creator = hc.entity;
                 e2.controllerOfCreator = this.ownController;
                 foreach (Minion mnn in temp)
                 {//cantLowerHPbelowONE
@@ -5156,6 +5171,7 @@ namespace HREngine.Bots
                 {
                     this.ownWeaponAttack += 2;
                     this.ownheroAngr += 2;
+
                 }
             }
             if (c.name == "fanofknives")
@@ -5184,13 +5200,13 @@ namespace HREngine.Bots
                 int heal = getSpellHeal(4);
                 foreach (Minion enemy in temp)
                 {
-                    minionReturnToHand(enemy, false);
+                    minionReturnToHand(enemy, false, 0);
                 }
                 temp.Clear();
                 temp.AddRange(this.ownMinions);
                 foreach (Minion enemy in temp)
                 {
-                    minionReturnToHand(enemy, true);
+                    minionReturnToHand(enemy, true, 0);
                 }
 
             }
@@ -5245,7 +5261,7 @@ namespace HREngine.Bots
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 foreach (Minion m in temp)
                 {
-                    if (m.card.race == 21) // if minion is a totem, buff it
+                    if (m.handcard.card.race == 21) // if minion is a totem, buff it
                     {
                         minionGetBuffed(m, 0, 2, true);
                     }
@@ -5316,7 +5332,7 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 Enchantment e = CardDB.getEnchantmentFromCardID("EX1_158e");
-                e.creator = c.entityID;
+                e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
                 foreach (Minion enemy in temp)
                 {
@@ -5515,24 +5531,25 @@ namespace HREngine.Bots
             {
                 CardDB.Card plchldr = new CardDB.Card();
                 plchldr.name = "unknown";
-                plchldr.cost = 1000;
                 Handmanager.Handcard hc = new Handmanager.Handcard();
                 hc.card = plchldr;
                 hc.position = this.owncards.Count + 1;
+                hc.manacost = 1000;
                 this.owncards.Add(hc);
             }
-            if (s == "fireball")
+            else
             {
-                CardDB.Card c = CardDB.Instance.getCardData("fireball");
+                CardDB.Card c = CardDB.Instance.getCardData(s);
                 Handmanager.Handcard hc = new Handmanager.Handcard();
                 hc.card = c;
                 hc.position = this.owncards.Count + 1;
+                hc.manacost = c.calculateManaCost(this);
                 this.owncards.Add(hc);
             }
 
         }
 
-        private void triggerPlayedAMinion(CardDB.Card c, bool own)
+        private void triggerPlayedAMinion(Handmanager.Handcard hc, bool own)
         {
             if (own) // effects only for OWN minons
             {
@@ -5541,7 +5558,7 @@ namespace HREngine.Bots
                 {
                     if (m.silenced) continue;
 
-                    if (m.card.specialMin==  CardDB.specialMinions.knifejuggler)
+                    if (m.handcard.card.specialMin==  CardDB.specialMinions.knifejuggler)
                     {
                         if (this.enemyMinions.Count >= 1)
                         {
@@ -5562,7 +5579,7 @@ namespace HREngine.Bots
                         }
                     }
 
-                    if (own && m.card.specialMin==  CardDB.specialMinions.starvingbuzzard && (TAG_RACE)c.race == TAG_RACE.PET)
+                    if (own && m.handcard.card.specialMin==  CardDB.specialMinions.starvingbuzzard && (TAG_RACE)hc.card.race == TAG_RACE.PET)
                     {
                         this.owncarddraw++;
                         this.drawACard("");
@@ -5579,11 +5596,11 @@ namespace HREngine.Bots
             foreach (Minion m in tempoo)
             {
                 if (m.silenced) continue;
-                if (m.card.specialMin==  CardDB.specialMinions.murloctidecaller && c.race == 14 && m.entitiyID != c.entityID)
+                if (m.handcard.card.specialMin==  CardDB.specialMinions.murloctidecaller && hc.card.race == 14 && m.entitiyID != hc.entity)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
-                if (m.card.specialMin==  CardDB.specialMinions.oldmurkeye && c.race == 14 && m.entitiyID != c.entityID)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.oldmurkeye && hc.card.race == 14 && m.entitiyID != hc.entity)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
@@ -5594,11 +5611,11 @@ namespace HREngine.Bots
             {
                 if (m.silenced) continue;
                 //truebaugederalte
-                if (m.card.specialMin==  CardDB.specialMinions.murloctidecaller && c.race == 14 && m.entitiyID != c.entityID)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.murloctidecaller && hc.card.race == 14 && m.entitiyID != hc.entity)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
-                if (m.card.specialMin==  CardDB.specialMinions.oldmurkeye && c.race == 14 && m.entitiyID != c.entityID)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.oldmurkeye && hc.card.race == 14 && m.entitiyID != hc.entity)
                 {
                     minionGetBuffed(m, 1, 0, false);
                 }
@@ -5615,12 +5632,12 @@ namespace HREngine.Bots
             {
                 if (m.silenced) continue;
 
-                if (m.card.specialMin == CardDB.specialMinions.manawyrm)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.manawyrm)
                 {
                     minionGetBuffed(m, 1, 0, true);
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.manaaddict)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.manaaddict)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID("EX1_055o");
                     e.creator = m.entitiyID;
@@ -5628,29 +5645,29 @@ namespace HREngine.Bots
                     addEffectToMinionNoDoubles(m, e, true);
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)
                 {
                     minionGetBuffed(m, 1, 1, true);
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.archmageantonidas)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.archmageantonidas)
                 {
                     drawACard("fireball");
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.violetteacher)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.violetteacher)
                 {
 
                     CardDB.Card d = CardDB.Instance.getCardData("violetapprentice");
                     callKid(d, m.id, true);
                 }
 
-                if (m.card.specialMin == CardDB.specialMinions.gadgetzanauctioneer)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.gadgetzanauctioneer)
                 {
                     this.owncarddraw++;
                     drawACard("");
                 }
-                if (m.card.specialMin == CardDB.specialMinions.wildpyromancer)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.wildpyromancer)
                 {
                     wilderpyro = true;
                 }
@@ -5659,7 +5676,7 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
 
-                if (m.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)
+                if (m.handcard.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)
                 {
                     minionGetBuffed(m, 1, 1, true);
                 }
@@ -5673,7 +5690,7 @@ namespace HREngine.Bots
                 {
                     if (m.silenced) continue;
 
-                    if (m.card.specialMin == CardDB.specialMinions.wildpyromancer)
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.wildpyromancer)
                     {
                         List<Minion> temp2 = new List<Minion>(this.ownMinions);
                         foreach (Minion mnn in temp2)
@@ -5692,10 +5709,10 @@ namespace HREngine.Bots
 
         }
 
-        public void removeCard(CardDB.Card c)
+        public void removeCard(Handmanager.Handcard hcc)
         {
 
-            this.owncards.RemoveAll(x => x.entity == c.entityID);
+            this.owncards.RemoveAll(x => x.entity == hcc.entity);
             int i = 1;
             foreach (Handmanager.Handcard hc in this.owncards)
             {
@@ -5705,13 +5722,14 @@ namespace HREngine.Bots
 
         }
 
-        public void playCard(CardDB.Card c, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos, int penality)
+        public void playCard(Handmanager.Handcard hc, int cardpos, int cardEntity, int target, int targetEntity, int choice, int placepos, int penality)
         {
+            CardDB.Card c = hc.card;
             this.evaluatePenality += penality;
             // lock at frostnova (click) / frostblitz (no click)
-            this.mana = this.mana - c.getManaCost(this);
+            this.mana = this.mana - hc.getManaCost(this);
 
-            removeCard(c);// remove card
+            removeCard(hc);// remove card
 
             if (c.Secret)
             {
@@ -5721,11 +5739,12 @@ namespace HREngine.Bots
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
 
-            if (logging) Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + c.getManaCost(this) + " trgt " + target);
+            if (logging) Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
             {
-                Action b = this.placeAmobSomewhere(c, cardpos, target, choice,placepos);
+                Action b = this.placeAmobSomewhere(hc, cardpos, target, choice,placepos);
+                b.handcard = new Handmanager.Handcard(hc);
                 b.druidchoice = choice;
                 b.owntarget = placepos;
                 b.enemyEntitiy = targetEntity;
@@ -5739,7 +5758,7 @@ namespace HREngine.Bots
             {
                 Action a = new Action();
                 a.cardplay = true;
-                a.card = new CardDB.Card(c);
+                a.handcard = new Handmanager.Handcard(hc);
                 a.cardEntitiy = cardEntity;
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
                 a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
@@ -5759,7 +5778,7 @@ namespace HREngine.Bots
                     {
                         equipWeapon(c);
                     }
-                    playCardWithoutTarget(c, choice);
+                    playCardWithoutTarget(hc, choice);
                 }
                 else //before : if(target >=0 && target < 20)
                 {
@@ -5767,7 +5786,7 @@ namespace HREngine.Bots
                     {
                         equipWeapon(c);
                     }
-                    playCardWithTarget(c, target, choice);
+                    playCardWithTarget(hc, target, choice);
                 }
 
                 this.playactions.Add(a);
@@ -5792,16 +5811,16 @@ namespace HREngine.Bots
             foreach (Minion mnn in temp)
             {
                 if (mnn.silenced) continue;
-                if (mnn.card.specialMin == CardDB.specialMinions.illidanstormrage)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.illidanstormrage)
                 {
                     CardDB.Card d = CardDB.Instance.getCardData("flameofazzinoth");
                     callKid(d, mnn.id, true);
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.questingadventurer)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.questingadventurer)
                 {
                     minionGetBuffed(mnn, 1, 1, true);
                 }
-                if (mnn.card.specialMin == CardDB.specialMinions.unboundelemental && c.recallValue >= 1)
+                if (mnn.handcard.card.specialMin == CardDB.specialMinions.unboundelemental && c.recallValue >= 1)
                 {
                     minionGetBuffed(mnn, 1, 1, true);
                 }
@@ -5846,7 +5865,7 @@ namespace HREngine.Bots
                 if (!this.heroImmuneWhileAttacking)
                 {
                     attackOrHealHero(enemy.Angr, true);
-                    if (!enemy.silenced && enemy.card.specialMin ==  CardDB.specialMinions.waterelemental)
+                    if (!enemy.silenced && enemy.handcard.card.specialMin ==  CardDB.specialMinions.waterelemental)
                     {
                         this.ownHeroFrozen = true;
                     }
@@ -5874,7 +5893,7 @@ namespace HREngine.Bots
             this.mana -= 2;
             Action a = new Action();
             a.useability = true;
-            a.card = c;
+            a.handcard = new Handmanager.Handcard(c);
             a.enemytarget = target;
             a.enemyEntitiy = targetEntity;
             a.numEnemysBeforePlayed = this.enemyMinions.Count;
@@ -6023,7 +6042,7 @@ namespace HREngine.Bots
 
                 if (a.cardplay)
                 {
-                    if (logging) help.logg("play " + a.card.name);
+                    if (logging) help.logg("play " + a.handcard.card.name);
                     if (logging) help.logg("with position " + a.cardplace.X + "," + a.cardplace.Y);
                     help.clicklauf(a.cardplace.X, a.cardplace.Y);
                     if (a.owntarget >= 0)
@@ -6137,7 +6156,7 @@ namespace HREngine.Bots
             {
                 if (a.cardplay)
                 {
-                    Helpfunctions.Instance.logg("play " + a.card.name);
+                    Helpfunctions.Instance.logg("play " + a.handcard.card.name);
                     if (a.druidchoice >= 1) Helpfunctions.Instance.logg("choose choise " + a.druidchoice);
                     Helpfunctions.Instance.logg("with position " + a.cardEntitiy);
                     if (a.owntarget >= 0)

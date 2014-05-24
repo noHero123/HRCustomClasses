@@ -75,7 +75,7 @@ namespace HREngine.Bots
             setupHeroDamagingAOE();
         }
 
-        public int getAttackWithMininonPenality(Minion m, Playfield p, int target)
+        public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
         {
             int pen = 0;
             pen = getAttackSecretPenality(m,p,target);
@@ -219,7 +219,7 @@ namespace HREngine.Bots
                     // no pen if own is enrage
                     Minion m = p.ownMinions[target];
 
-                    if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.card.Attack || m.maxHp < m.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn==0))
+                    if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
                     {
                         return 0;
                     }
@@ -263,7 +263,7 @@ namespace HREngine.Bots
                         return -10;
                     }
                     //silence nothing
-                    if ( (m.Angr < m.card.Attack || m.maxHp < m.card.Health ) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
+                    if ((m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
                     {
                         return 30;
                     }
@@ -333,7 +333,7 @@ namespace HREngine.Bots
 
                     // no pen if we have battlerage for example
                     int dmg = DamageTargetDatabase[name];
-                    if (m.card.deathrattle) return 10;
+                    if (m.handcard.card.deathrattle) return 10;
                     if (m.Hp > dmg)
                     {
                         if (m.name == "acolyteofpain" && p.owncards.Count <= 3) return 0; 
@@ -356,7 +356,7 @@ namespace HREngine.Bots
                     
                     Minion m = p.ownMinions[target];
 
-                    if (name == "demonfire" && (TAG_RACE)m.card.race == TAG_RACE.DEMON) return 0;
+                    if (name == "demonfire" && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == "earthshock" && m.Hp >= 2 )
                     {
                         if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
@@ -364,7 +364,7 @@ namespace HREngine.Bots
                             return 500;
                         }
 
-                        if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.card.Attack || m.maxHp < m.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
+                        if ((!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord")) || m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
                         return 0;
                     }
                     if (name == "earthshock")//dont silence other own minions
@@ -405,17 +405,18 @@ namespace HREngine.Bots
             if (name == "ancientoflore" && choice != 2) return 0;
             int pen = 0;
             int heal=0;
-            if (HealHeroDatabase.ContainsKey(name))
+            /*if (HealHeroDatabase.ContainsKey(name))
             {
                 heal = HealHeroDatabase[name];
                 if (target == 200) pen = 500; // dont heal enemy
                 if ((target == 100 || target == -1) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
-            }
+            }*/
 
             if (HealTargetDatabase.ContainsKey(name))
             {
                 heal = HealTargetDatabase[name];
-                if (target == 200) pen = 500; // dont heal enemy
+                if (target == 200) return 500; // dont heal enemy
+                if ((target == 100) && p.ownHeroHp == 30) return 500;
                 if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
                 Minion m = new Minion();
 
@@ -423,6 +424,7 @@ namespace HREngine.Bots
                 {
                     m = p.ownMinions[target];
                     int wasted=0;
+                    if (m.Hp == m.maxHp) return 500;
                     if (m.Hp + heal > m.maxHp) wasted = m.Hp + heal - m.maxHp;
                     pen=wasted;
                     if (m.taunt && wasted <= 2 && m.Hp < m.maxHp) pen -= 5; // if we heal a taunt, its good :D
@@ -431,6 +433,7 @@ namespace HREngine.Bots
                 if (target >= 10 && target < 20)
                 {
                     m = p.enemyMinions[target-10];
+                    if (m.Hp == m.maxHp) return 500;
                     // no penality if we heal enrage enemy
                     if (enrageDatabase.ContainsKey(m.name))
                     {
@@ -562,7 +565,7 @@ namespace HREngine.Bots
                 bool canplayanothercard = false;
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
-                    if (hc.card.cost <= newmana)
+                    if (hc.card.getManaCost(p,hc.manacost) <= newmana)
                     {
                         canplayanothercard = true;
                     }
@@ -585,7 +588,7 @@ namespace HREngine.Bots
                 // dont destroy owns ;_; (except mins with deathrattle effects)
 
                 Minion m = p.ownMinions[target];
-                if (m.card.deathrattle) return 10;
+                if (m.handcard.card.deathrattle) return 10;
 
                 return 500;
             }
@@ -617,6 +620,14 @@ namespace HREngine.Bots
         private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal)
         {
             string name = card.name;
+
+            if (lethal && card.type == CardDB.cardtype.MOB)
+            {
+                if (!(name == "nightblade" || card.Charge || this.silenceDatabase.ContainsKey(name)|| ((TAG_RACE)card.race == TAG_RACE.PET && p.ownMinions.Find(x => x.name == "tundrarhino") != null) || (p.ownMinions.Find(x => x.name == "warsongcommander") != null && card.Attack <= 3) || p.owncards.Find(x => x.card.name == "charge") != null))
+                {
+                    return 500;
+                }
+            }
             //some effects, which are bad :D
             int pen = 0;
             Minion m = new Minion();
@@ -802,7 +813,7 @@ namespace HREngine.Bots
             {
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
-                    if (hc.card.name == "kirintormage" && p.mana >= hc.card.cost)
+                    if (hc.card.name == "kirintormage" && p.mana >= hc.getManaCost(p))
                     {
                         pen = 500;
                     }

@@ -27,6 +27,7 @@ namespace HREngine.Bots
         {
             public int position = 0;
             public int entity = -1;
+            public int manacost = 1000;
             public CardDB.Card card ;
 
             public Handcard()
@@ -37,7 +38,22 @@ namespace HREngine.Bots
             {
                 this.position = hc.position;
                 this.entity = hc.entity;
-                this.card = new CardDB.Card(hc.card);
+                this.manacost = hc.manacost;
+                this.card = hc.card;
+            }
+            public Handcard(CardDB.Card c )
+            {
+                this.position = 0;
+                this.entity = -1;
+                this.card = c;
+            }
+            public int getManaCost(Playfield p)
+            {
+                return this.card.getManaCost(p, this.manacost);
+            }
+            public bool canplayCard(Playfield p)
+            {
+                return this.card.canplayCard(p, this.manacost);
             }
         }
 
@@ -223,12 +239,7 @@ namespace HREngine.Bots
             this.handCards.Clear();
             foreach (Handcard h in hc)
             {
-                Handcard h1 = new Handcard();
-                h1.card = new CardDB.Card(h.card);
-                h1.entity = h.entity;
-                h1.position = h.position;
-                h1.card.entityID = h.entity;
-                this.handCards.Add(h1);
+                this.handCards.Add(new Handcard(h));
             }
             //this.handCards.AddRange(hc);
             this.handCards.Sort((a, b) => a.position.CompareTo(b.position));
@@ -243,7 +254,7 @@ namespace HREngine.Bots
             help.logg("Own Handcards: ");
             foreach (Handmanager.Handcard c in this.handCards)
             {
-                help.logg("pos " + c.position + " " + c.card.name + " " + c.card.cost + " entity " + c.entity);
+                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity);
             }
         }
 

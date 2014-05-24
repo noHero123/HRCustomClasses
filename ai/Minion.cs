@@ -45,7 +45,7 @@ namespace HREngine.Bots
         public bool taunt = false;
         public bool wounded = false;//hp red?
         public string name = "";
-        public CardDB.Card card;
+        public Handmanager.Handcard handcard;
         public bool divineshild = false;
         public bool windfury = false;
         public bool frozen = false;
@@ -65,6 +65,7 @@ namespace HREngine.Bots
         public Minion()
         {
             enchantments = new List<Enchantment>();
+            this.handcard = new Handmanager.Handcard();
         }
 
         public Minion(Minion m)
@@ -79,7 +80,7 @@ namespace HREngine.Bots
             this.taunt = m.taunt;
             this.wounded = m.wounded;
             this.name = m.name;
-            this.card = m.card;
+            this.handcard = m.handcard;
             this.divineshild = m.divineshild;
             this.windfury = m.windfury;
             this.frozen = m.frozen;
@@ -109,7 +110,7 @@ namespace HREngine.Bots
             this.taunt = m.taunt;
             this.wounded = m.wounded;
             this.name = m.name;
-            this.card = m.card;
+            this.handcard.card = m.handcard.card;
             this.divineshild = m.divineshild;
             this.windfury = m.windfury;
             this.frozen = m.frozen;

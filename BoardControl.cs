@@ -69,13 +69,13 @@ namespace HREngine.Bots
           {
               retval += m.Hp * 1;
               retval += m.Angr * 2;
-              retval += m.card.rarity;
+              retval += m.handcard.card.rarity;
               if (m.windfury) retval += m.Angr;
               if (m.divineshild) retval += 1;
               if (m.stealth) retval += 1;
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;
-              if (m.taunt && m.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
+              if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
           }
 
           if (p.enemyMinions.Count >= 0)
@@ -88,15 +88,15 @@ namespace HREngine.Bots
           int playmobs = 0;
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.handcard.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.card.type == CardDB.cardtype.MOB) playmobs++;
-              //if (a.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
-              
-              if (a.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.handcard.card.type == CardDB.cardtype.MOB) playmobs++;
+              //if (a.handcard.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
+
+              if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
-              if (p.ownHeroName != "thief" && a.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
-              if (p.ownHeroName == "thief" && a.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200) ) retval -= 11;
+              if (p.ownHeroName != "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
+              if (p.ownHeroName == "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
 
           int mobsInHand = 0;
@@ -120,7 +120,7 @@ namespace HREngine.Bots
                   retval -= m.Angr * 2;
                   if (m.windfury) retval -= m.Angr;
               }
-              retval -= m.card.rarity;
+              retval -= m.handcard.card.rarity;
               if (m.taunt) retval -= 5;
               if (m.divineshild) retval -= 1;
               if (m.stealth) retval -= 1;
@@ -144,8 +144,8 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus") deletecardsAtLast = 1;
-              if (deletecardsAtLast == 1 && !(a.card.name == "soulfire" || a.card.name == "doomguard" || a.card.name == "succubus")) retval -= 20;
+              if (a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus") deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus")) retval -= 20;
           }
           if (p.enemyHeroHp >=1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;

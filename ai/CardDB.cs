@@ -141,7 +141,6 @@ namespace HREngine.Bots
         public class Card
         {
             public string CardID = "";
-            public int entityID = 0;
             public string name = "";
             public int race = 0;
             public int rarity = 0;
@@ -202,7 +201,7 @@ namespace HREngine.Bots
 
             public Card(Card c)
             {
-                this.entityID = c.entityID;
+                //this.entityID = c.entityID;
                 this.rarity = c.rarity;
                 this.AdjacentBuff = c.AdjacentBuff;
                 this.Attack = c.Attack;
@@ -380,14 +379,14 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
-                        if (!(m.card.race == this.needRaceForPlaying))
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
                         }
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (!(m.card.race == this.needRaceForPlaying))
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
                         }
@@ -415,9 +414,70 @@ namespace HREngine.Bots
 
             }
 
-            public int getManaCost(Playfield p)
+            public int calculateManaCost(Playfield p)//calculates the mana from orginal mana, needed for back-to hand effects
             {
                 int retval = this.cost;
+                int offset = 0;
+
+                if (this.type == cardtype.MOB)
+                {
+                    offset += (p.soeldnerDerVenture) * 3;
+
+                    offset += (p.managespenst);
+
+                    int temp = -(p.startedWithbeschwoerungsportal) * 2;
+                    if (retval + temp <= 0) temp = -retval + 1;
+                    offset = offset + temp;
+
+                    if (p.mobsplayedThisTurn == 0 )
+                    { 
+                        offset -= p.winzigebeschwoererin;
+                    }
+
+                }
+
+                if (this.type == cardtype.SPELL)
+                { //if the number of zauberlehrlings change
+                    offset -= (p.zauberlehrling);
+                    if (p.playedPreparation)
+                    { //if the number of zauberlehrlings change
+                        offset -= 3;
+                    }
+
+                }
+
+                switch (this.name)
+                {
+                    case "dreadcorsair":
+                        retval = retval + offset - p.ownWeaponAttack;
+                        break;
+                    case "seagiant":
+                        retval = retval + offset - p.ownMinions.Count - p.enemyMinions.Count;
+                        break;
+                    case "mountaingiant":
+                        retval = retval + offset - p.owncards.Count;
+                        break;
+                    case "moltengiant":
+                        retval = retval + offset - p.ownHeroHp;
+                        break;
+                    default:
+                        retval = retval + offset;
+                        break;
+                }
+
+                if (this.Secret && p.playedmagierinderkirintor)
+                {
+                    retval = 0;
+                }
+
+                retval = Math.Max(0, retval);
+
+                return retval;
+            }
+
+            public int getManaCost(Playfield p, int currentcost)//calculates mana from current mana
+            {
+                int retval = currentcost;
 
 
                 int offset = 0; // if offset < 0 costs become lower, if >0 costs are higher at the end
@@ -503,14 +563,14 @@ namespace HREngine.Bots
                 return retval;
             }
 
-            public bool canplayCard(Playfield p)
+            public bool canplayCard(Playfield p, int manacost)
             {
                 //is playrequirement?
                 bool haveToDoRequires = isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY);
                 bool retval = true;
                 // cant play if i have to few mana
 
-                if (p.mana < this.getManaCost(p)) return false;
+                if (p.mana < this.getManaCost(p, manacost)) return false;
 
                 // cant play mob, if i have allready 7 mininos
                 if (this.type == CardDB.cardtype.MOB && p.ownMinions.Count >= 7) return false;

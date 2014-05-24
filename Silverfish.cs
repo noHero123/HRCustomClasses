@@ -306,7 +306,7 @@ namespace HREngine.Bots
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
                     Minion m = new Minion();
                     m.name = c.name;
-                    m.card = c;
+                    m.handcard.card = c;
                     m.Angr = entitiy.GetATK();
                     m.maxHp = entitiy.GetHealth();
                     m.Hp = m.maxHp - entitiy.GetDamage();
@@ -473,13 +473,14 @@ namespace HREngine.Bots
                 if (entitiy.GetControllerId() == this.ownPlayerController && entitiy.GetZonePosition() >= 1) // own handcard
                 {
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
-                    c.cost = entitiy.GetCost();
-                    c.entityID = entitiy.GetEntityId();
+                    //c.cost = entitiy.GetCost();
+                    //c.entityID = entitiy.GetEntityId();
                     
                     Handmanager.Handcard hc = new Handmanager.Handcard();
                     hc.card = c;
                     hc.position = entitiy.GetZonePosition();
                     hc.entity = entitiy.GetEntityId();
+                    hc.manacost = entitiy.GetCost();
                     handCards.Add(hc);
                     this.anzcards++;
                 }
