@@ -194,6 +194,7 @@ namespace HREngine.Bots
             this.ownHeroFatigue = ownhero.GetFatigue();
             this.enemyHeroFatigue = enemyhero.GetFatigue();
             //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
+            
             //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
             
             

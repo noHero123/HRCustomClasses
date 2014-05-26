@@ -95,7 +95,7 @@ namespace HREngine.Bots
 
               if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
-              if (p.ownHeroName != "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200)) retval -= 11;
+              if (p.ownHeroName != "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.name != "shieldblock") retval -= 11;
               if (p.ownHeroName == "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
 

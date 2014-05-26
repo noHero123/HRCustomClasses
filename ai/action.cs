@@ -911,6 +911,9 @@ namespace HREngine.Bots
             startTurnEffect(false);//enemy turn begins
             guessHeroDamage();
             simulateTraps();
+            endTurnBuffs(false);//end enemy turn
+            endTurnEffect(false);//own turn ends
+            startTurnEffect(true);//start your turn
             
         }
 
@@ -2968,7 +2971,7 @@ namespace HREngine.Bots
         private Minion createNewMinion(Handmanager.Handcard hc, int placeOfNewMob, bool own)
         {
             Minion m = new Minion();
-            m.handcard = hc;
+            m.handcard = new Handmanager.Handcard(hc);
             m.entitiyID = hc.entity;
             m.Posix = 0;
             m.Posiy = 0;
@@ -3174,7 +3177,9 @@ namespace HREngine.Bots
             }
             if (c.name == "voodoodoctor")
             {
-                heal = 2;
+                if (this.auchenaiseelenpriesterin)
+                { damage = 2; }
+                else { heal = 2; }
             }
             if (c.name == "templeenforcer")
             {
@@ -3220,7 +3225,9 @@ namespace HREngine.Bots
             }
             if (c.name == "earthenringfarseer")
             {
-                heal = 3;
+                if (this.auchenaiseelenpriesterin)
+                { damage = 3; }
+                else { heal = 3; }
             }
             if (c.name == "biggamehunter")
             {
@@ -3539,10 +3546,15 @@ namespace HREngine.Bots
                 foreach (Minion m in temp)
                 {
 
-                    minionGetDamagedOrHealed(m, 0, 2, true);
+                    if (this.auchenaiseelenpriesterin)
+                    { minionGetDamagedOrHealed(m, 2, 0, true); }
+                    else { minionGetDamagedOrHealed(m, 0, 2, true); }
 
                 }
-                attackOrHealHero(-2, true);
+                if (this.auchenaiseelenpriesterin)
+                { attackOrHealHero(2, true); }
+                else { attackOrHealHero(-2, true); }
+                
             }
             if (c.name == "nightblade")
             {

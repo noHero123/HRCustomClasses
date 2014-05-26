@@ -79,6 +79,7 @@ namespace HREngine.Bots
         {
             int pen = 0;
             pen = getAttackSecretPenality(m,p,target);
+            if (!lethal && m.name == "bloodimp") pen = 50;
             return pen;
         }
 
@@ -286,7 +287,7 @@ namespace HREngine.Bots
             if (name == "savagery" && p.ownheroAngr == 0) return 500;
             if (name == "keeperofthegrove" && choice != 1) return 0; // look at silence penality
 
-            if (this.DamageAllDatabase.ContainsKey(name)) // aoe penality
+            if (this.DamageAllDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealAllDatabase.ContainsKey(name))) // aoe penality
             {
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
@@ -295,7 +296,7 @@ namespace HREngine.Bots
 
                 if( p.enemyMinions.Count <=1 || p.enemyMinions.Count +1 <= p.ownMinions.Count || p.ownMinions.Count >=3)
                 {
-                    return 20;
+                    return 30;
                 }
             }
 
@@ -313,14 +314,14 @@ namespace HREngine.Bots
 
             if (target == 100)
             {
-                if (DamageTargetDatabase.ContainsKey(name) || DamageTargetSpecialDatabase.ContainsKey(name))
+                if (DamageTargetDatabase.ContainsKey(name) || DamageTargetSpecialDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealTargetDatabase.ContainsKey(name)))
                 {
                     pen = 500;
                 }
             }
             if (target >= 0 && target <= 9)
             {
-                if (DamageTargetDatabase.ContainsKey(name))
+                if (DamageTargetDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealTargetDatabase.ContainsKey(name)))
                 {
                     // no pen if own is enrage
                     Minion m = p.ownMinions[target];
@@ -332,7 +333,15 @@ namespace HREngine.Bots
                     }
 
                     // no pen if we have battlerage for example
-                    int dmg = DamageTargetDatabase[name];
+                    int dmg = 0;
+                    if (DamageTargetDatabase.ContainsKey(name))
+                    {
+                        dmg = DamageTargetSpecialDatabase[name];
+                    }
+                    else
+                    {
+                        dmg = HealTargetDatabase[name];
+                    }
                     if (m.handcard.card.deathrattle) return 10;
                     if (m.Hp > dmg)
                     {
@@ -349,11 +358,9 @@ namespace HREngine.Bots
                 }
 
                 //special cards
-                if (DamageTargetSpecialDatabase.ContainsKey(name))
+                if (DamageTargetSpecialDatabase.ContainsKey(name) )
                 {
-                    int dmg = DamageTargetSpecialDatabase[name];
-
-                    
+                    int dmg  = DamageTargetSpecialDatabase[name];
                     Minion m = p.ownMinions[target];
 
                     if (name == "demonfire" && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
@@ -401,10 +408,10 @@ namespace HREngine.Bots
         {
             ///Todo healpenality for aoe heal
             ///todo auchenai soulpriest
-
+            if (p.auchenaiseelenpriesterin) return 0;
             if (name == "ancientoflore" && choice != 2) return 0;
             int pen = 0;
-            int heal=0;
+            int heal = 0;
             /*if (HealHeroDatabase.ContainsKey(name))
             {
                 heal = HealHeroDatabase[name];
@@ -673,6 +680,17 @@ namespace HREngine.Bots
                             }
                             return 500;
                     }
+
+                }
+
+                if (target >= 0 && target <= 9)
+                {
+
+                    if (m.Hp >= 4)
+                    {
+                        return 0;
+                    }
+                    return 15;
                 }
  
             }
@@ -683,11 +701,19 @@ namespace HREngine.Bots
                 {
                     return 21;
                 }
-                if (this.priorityTargets.ContainsKey(m.name) || m.Angr>=5)
+                if (m.Angr>=5 || m.handcard.card.cost>=5)
                 {
                     return 0;
                 }
-                return 10;
+                return 20;
+            }
+
+            if (name == "knifejuggler")
+            {
+                if (p.mobsplayedThisTurn>=1)
+                {
+                    return 10;
+                }
             }
 
             if ((name == "polymorph" || name == "hex"))
@@ -1473,7 +1499,7 @@ namespace HREngine.Bots
 
             //shaman cards
             priorityTargets.Add("dustdevil", 10);
-            priorityTargets.Add("wrathofairtotem", 10);
+            priorityTargets.Add("wrathofairtotem", 1);
             priorityTargets.Add("flametonguetotem", 10);
             priorityTargets.Add("manatidetotem", 10);
             priorityTargets.Add("unboundelemental", 10);

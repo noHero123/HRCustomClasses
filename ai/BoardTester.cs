@@ -414,7 +414,7 @@ namespace HREngine.Bots
         private Minion createNewMinion(Handmanager.Handcard hc, int id)
         {
             Minion m = new Minion();
-            m.handcard = hc;
+            m.handcard = new Handmanager.Handcard(hc);
             m.id = id;
             m.zonepos = id + 1;
             m.entitiyID = hc.entity;
