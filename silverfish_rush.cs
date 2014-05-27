@@ -881,7 +881,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Playfield
     {
         public bool logging = false;
@@ -3683,7 +3682,7 @@ namespace HREngine.Bots
 
 
             //attacker take damage
-            if (!m.immune)
+            if (!m.immune && !dontcount)
             {
                 if (enemy.handcard.card.poisionous)
                 {
@@ -9131,7 +9130,7 @@ namespace HREngine.Bots
                     int dmg = 0;
                     if (DamageTargetDatabase.ContainsKey(name))
                     {
-                        dmg = DamageTargetSpecialDatabase[name];
+                        dmg = DamageTargetDatabase[name];
                     }
                     else
                     {

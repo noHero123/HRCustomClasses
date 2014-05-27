@@ -336,7 +336,7 @@ namespace HREngine.Bots
                     int dmg = 0;
                     if (DamageTargetDatabase.ContainsKey(name))
                     {
-                        dmg = DamageTargetSpecialDatabase[name];
+                        dmg = DamageTargetDatabase[name];
                     }
                     else
                     {

@@ -2884,7 +2884,7 @@ namespace HREngine.Bots
 
 
             //attacker take damage
-            if (!m.immune)
+            if (!m.immune && !dontcount)
             {
                 if (enemy.handcard.card.poisionous)
                 {
