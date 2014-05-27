@@ -564,7 +564,7 @@ namespace HREngine.Bots
 
         private int getCardDiscardPenality(string name, Playfield p)
         {
-            if (p.owncards.Count == 0) return 0;
+            if (p.owncards.Count <= 1) return 0;
             int pen = 0;
             if (this.cardDiscardDatabase.ContainsKey(name))
             {
@@ -572,6 +572,7 @@ namespace HREngine.Bots
                 bool canplayanothercard = false;
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
+                    if (this.cardDiscardDatabase.ContainsKey(hc.card.name)) continue;
                     if (hc.card.getManaCost(p,hc.manacost) <= newmana)
                     {
                         canplayanothercard = true;
