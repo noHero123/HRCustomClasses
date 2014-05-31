@@ -55,7 +55,7 @@ namespace HREngine.Bots
           }
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
-          retval += p.ownWeaponAttack;// +ownWeaponDurability;
+          retval += p.ownWeaponAttack * p.ownWeaponDurability;
           if (!p.enemyHeroFrozen)
           {
               retval -= p.enemyWeaponDurability * p.enemyWeaponAttack;
@@ -73,6 +73,7 @@ namespace HREngine.Bots
 
           retval += p.ownMaxMana;
           int owntaunt = 0;
+          int ownMinionsCount = 0;
           foreach (Minion m in p.ownMinions)
           {
               retval += m.Hp * 1;
@@ -84,6 +85,7 @@ namespace HREngine.Bots
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;
               if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
+              if (m.Angr > 1 || m.Hp > 1) ownMinionsCount++;
           }
 
           if (p.enemyMinions.Count >= 0)
@@ -113,7 +115,7 @@ namespace HREngine.Bots
               if (hc.card.type == CardDB.cardtype.MOB) mobsInHand++;
           }
 
-          if (p.ownMinions.Count - p.enemyMinions.Count >= 4 && mobsInHand >= 1)
+          if (ownMinionsCount - p.enemyMinions.Count >= 4 && mobsInHand >= 1)
           {
               retval += mobsInHand * 20;
           }
@@ -166,28 +168,29 @@ namespace HREngine.Bots
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
           HRLog.Write("handle mulligan");
-         if (HRMulligan.IsMulliganActive())
-         {
-            var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
+          if (HRMulligan.IsMulliganActive())
+          {
+              var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
 
-            foreach (var item in list)
-            {
-               if (item.GetEntity().GetCost() >= 4)
-               {
-                  HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
-                  HRMulligan.ToggleCard(item);
-               }
-               if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622")
-               {
-                   HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
-                   HRMulligan.ToggleCard(item);
-               }
-            }
-            sf.setnewLoggFile();
-            return null;
-            //HRMulligan.EndMulligan();
-         }
-         return null;
+              foreach (var item in list)
+              {
+                  if (item.GetEntity().GetCost() >= 4)
+                  {
+                      HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                      HRMulligan.ToggleCard(item);
+                  }
+                  if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                  {
+                      HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                      HRMulligan.ToggleCard(item);
+                  }
+              }
+
+              sf.setnewLoggFile();
+              return null;
+              //HRMulligan.EndMulligan();
+          }
+          return null;
       }
 
       /// <summary>
@@ -8846,6 +8849,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -9645,6 +9649,58 @@ namespace HREngine.Bots
                     pen = 30;
                 }
                 if (m.name == "lightspawn") pen = 500;
+            }
+
+            if (name == "shatteredsuncleric" && target == -1) { pen = 10; }
+            if (name == "argentprotector" && target == -1) { pen = 10; }
+
+            if (name == "defiasringleader" && p.cardsPlayedThisTurn == 0)
+            { pen = 10; }
+            if (name == "bloodknight")
+            {
+                int shilds = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                foreach (Minion min in p.enemyMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                if (shilds == 0)
+                {
+                    pen = 10;
+                }
+            }
+            if (name == "direwolfalpha")
+            {
+                int ready = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.Ready)
+                    { ready++; }
+                }
+                if (ready == 0)
+                { pen = 5; }
+            }
+            if (name == "abusivesergeant")
+            {
+                int ready = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.Ready)
+                    { ready++; }
+                }
+                if (ready == 0)
+                {
+                    pen = 5;
+                }
             }
 
 

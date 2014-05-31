@@ -807,6 +807,58 @@ namespace HREngine.Bots
                 if (m.name == "lightspawn") pen = 500;
             }
 
+            if (name == "shatteredsuncleric" && target == -1) {pen = 10;}
+            if (name == "argentprotector" && target == -1){pen = 10;}
+
+            if (name == "defiasringleader" && p.cardsPlayedThisTurn == 0)
+            {pen = 10;}
+            if (name == "bloodknight")
+            {
+                int shilds = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                foreach (Minion min in p.enemyMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                if (shilds == 0)
+                {
+                    pen = 10;
+                }
+            }
+            if (name == "direwolfalpha")
+            {
+                int ready = 0;
+            foreach (Minion min in p.ownMinions)
+            {
+                if (min.Ready)
+                {ready++;}
+            }
+                if (ready == 0)
+                {pen = 5;}
+            }
+            if (name == "abusivesergeant")
+            {
+                int ready = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.Ready)
+                    {ready++;}
+                }
+                if (ready == 0)
+                {
+                    pen = 5;
+                }
+            }
+
 
             if (returnHandDatabase.ContainsKey(name))
             {

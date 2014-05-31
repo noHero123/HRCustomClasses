@@ -131,12 +131,13 @@ namespace HREngine.Bots
                         HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
                         HRMulligan.ToggleCard(item);
                     }
-                    if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622")
+                    if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
                     {
                         HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
                         HRMulligan.ToggleCard(item);
                     }
                 }
+
                 sf.setnewLoggFile();
                 return null;
                 //HRMulligan.EndMulligan();
@@ -8800,6 +8801,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -9599,6 +9601,58 @@ namespace HREngine.Bots
                     pen = 30;
                 }
                 if (m.name == "lightspawn") pen = 500;
+            }
+
+            if (name == "shatteredsuncleric" && target == -1) { pen = 10; }
+            if (name == "argentprotector" && target == -1) { pen = 10; }
+
+            if (name == "defiasringleader" && p.cardsPlayedThisTurn == 0)
+            { pen = 10; }
+            if (name == "bloodknight")
+            {
+                int shilds = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                foreach (Minion min in p.enemyMinions)
+                {
+                    if (min.divineshild)
+                    {
+                        shilds++;
+                    }
+                }
+                if (shilds == 0)
+                {
+                    pen = 10;
+                }
+            }
+            if (name == "direwolfalpha")
+            {
+                int ready = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.Ready)
+                    { ready++; }
+                }
+                if (ready == 0)
+                { pen = 5; }
+            }
+            if (name == "abusivesergeant")
+            {
+                int ready = 0;
+                foreach (Minion min in p.ownMinions)
+                {
+                    if (min.Ready)
+                    { ready++; }
+                }
+                if (ready == 0)
+                {
+                    pen = 5;
+                }
             }
 
 
