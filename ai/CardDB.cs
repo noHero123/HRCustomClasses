@@ -82,7 +82,15 @@ namespace HREngine.Bots
             summoningportal, 
             spitefulsmith,
             defenderofargus,
-            sunfuryprotector
+            sunfuryprotector,
+            biggamehunter,
+            shadowworddeath,
+            lesserheal,
+            flamestrike,
+            shieldblock,
+            soulfire,
+            doomguard,
+            succubus
 
         }
 
@@ -849,7 +857,15 @@ namespace HREngine.Bots
                         if (temp == "spitefulsmith") c.specialMin = specialMinions.spitefulsmith;
                         if (temp == "defenderofargus") c.specialMin = specialMinions.defenderofargus;
                         if (temp == "sunfuryprotector") c.specialMin = specialMinions.sunfuryprotector;
-                       
+                        if (temp == "biggamehunter") c.specialMin = specialMinions.biggamehunter;
+                        if (temp == "shadowworddeath") c.specialMin = specialMinions.shadowworddeath;
+                        if (temp == "lesserheal") c.specialMin = specialMinions.lesserheal;
+                        if (temp == "flamestrike") c.specialMin = specialMinions.flamestrike;
+                        if (temp == "shieldblock") c.specialMin = specialMinions.shieldblock;
+                        if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
+                        if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
+                        if (temp == "succubus") c.specialMin = specialMinions.succubus;
+
                     }
                     if (de == 1)
                     {

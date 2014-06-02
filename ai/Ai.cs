@@ -462,12 +462,12 @@ namespace HREngine.Bots
 
                         havedonesomething = true;
                         // if we have mage or priest, we have to target something####################################################
-                        if (this.hp.heroname == "mage" || this.hp.heroname == "priest")
+                        if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
                         {
 
                             List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
 
-                            if (isLethalCheck && (this.hp.heroname == "mage" || (this.hp.heroname == "priest" && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
+                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
                             {
                                 targett trg = trgts.Find(x => x.target == 200);
                                 if (trg != null)

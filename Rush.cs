@@ -46,7 +46,7 @@ namespace HREngine.Bots
           }
           else
           {
-              if (p.enemyHeroName != "mage" && p.enemyHeroName != "priest")
+              if (p.enemyHeroName != HeroEnum.mage && p.enemyHeroName != HeroEnum.priest)
               {
                   retval += 11;
               }
@@ -60,9 +60,9 @@ namespace HREngine.Bots
 
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.handcard.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.handcard.card.specialMin == CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
 
           foreach (Minion m in p.ownMinions)
@@ -105,8 +105,8 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus") deletecardsAtLast = 1;
-              if (deletecardsAtLast == 1 && !(a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus")) retval -= 20;
+              if (a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus) deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
           }
           if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;

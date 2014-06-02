@@ -10,6 +10,21 @@ using System.Threading;
 namespace HREngine.Bots
 {
 
+    public enum HeroEnum
+    {
+        druid,
+        hogger,
+        hunter,
+        priest,
+        warlock,
+        thief,
+        pala,
+        warrior,
+        shaman,
+        mage,
+        lordjaraxxus
+    }
+
     public class Hrtprozis
     {
 
@@ -35,7 +50,9 @@ namespace HREngine.Bots
         public List<string> ownSecretList = new List<string>();
         public int enemySecretCount = 0;
 
-        public string heroname = "druid", enemyHeroname = "druid";
+
+
+        public HeroEnum heroname = HeroEnum.druid, enemyHeroname = HeroEnum.druid;
         public CardDB.Card heroAbility;
         public int anzEnemys = 0;
         public int anzOwn = 0;
@@ -111,8 +128,8 @@ namespace HREngine.Bots
             ownHeroWindfury = false;
             ownSecretList.Clear();
             enemySecretCount = 0;
-            heroname = "druid";
-            enemyHeroname = "druid";
+            heroname = HeroEnum.druid;
+            enemyHeroname = HeroEnum.druid;
             heroAbility = new CardDB.Card();
             anzEnemys = 0;
             anzOwn = 0;
@@ -197,6 +214,59 @@ namespace HREngine.Bots
             return retval;
         }
 
+        public HeroEnum heroNametoEnum(string s)
+        {
+            HeroEnum retval = HeroEnum.druid;
+
+            if (s == "hogger")
+            {
+                retval = HeroEnum.hogger;
+            }
+            if (s == "hunter")
+            {
+                retval = HeroEnum.hunter;
+            }
+            if (s == "priest")
+            {
+                retval = HeroEnum.priest;
+            }
+            if (s == "druid")
+            {
+                retval = HeroEnum.druid;
+            }
+            if (s == "warlock")
+            {
+                retval = HeroEnum.warlock;
+            }
+            if (s == "thief")
+            {
+                retval = HeroEnum.thief;
+            }
+            if (s == "pala")
+            {
+                retval = HeroEnum.pala;
+            }
+            if (s == "warrior")
+            {
+                retval = HeroEnum.warrior;
+            }
+            if (s == "shaman")
+            {
+                retval = HeroEnum.shaman;
+            }
+            if (s == "mage")
+            {
+                retval = HeroEnum.mage;
+            }
+            if (s == "lordjaraxxus")
+            {
+                retval = HeroEnum.lordjaraxxus;
+            }
+
+            return retval;
+        }
+
+
         public void updateMinions(List<Minion> om, List<Minion> em)
         {
             this.ownMinions.Clear();
@@ -248,7 +318,7 @@ namespace HREngine.Bots
             this.heroAtk = heroatt;
             this.heroHp = herohp;
             this.heroDefence = herodef;
-            this.heroname = heron;
+            this.heroname = this.heroNametoEnum(heron);
             this.ownheroisread = heroready;
             this.herofrozen = frozen;
             this.heroAbility = hab;
@@ -265,7 +335,7 @@ namespace HREngine.Bots
             this.enemyWeaponDurability = wdur;
             this.enemyAtk = heroatt;
             this.enemyHp = herohp;
-            this.enemyHeroname = heron;
+            this.enemyHeroname = this.heroNametoEnum(heron);
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
         }

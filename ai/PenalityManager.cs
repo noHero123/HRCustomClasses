@@ -145,8 +145,8 @@ namespace HREngine.Bots
                 //allow it if you have biggamehunter
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
-                    if (hc.card.name == "biggamehunter") return pen;
-                    if (hc.card.name == "shadowworddeath") return pen;
+                    if (hc.card.specialMin == CardDB.specialMinions.biggamehunter) return pen;
+                    if (hc.card.specialMin == CardDB.specialMinions.shadowworddeath) return pen;
                 }
 
                 pen = 500;
@@ -661,7 +661,7 @@ namespace HREngine.Bots
                         else
                         {
                             // combo for killing with innerfire and biggamehunter
-                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit")!=null &&  m.Hp >=2)))
+                            if (p.owncards.Find(x => x.card.specialMin == CardDB.specialMinions.biggamehunter) != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit")!=null &&  m.Hp >=2)))
                             {
                                 return 0;
                             }
@@ -675,7 +675,7 @@ namespace HREngine.Bots
                     {
 
                             // combo for killing with innerfire and biggamehunter
-                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
+                            if (p.owncards.Find(x => x.card.specialMin == CardDB.specialMinions.biggamehunter) != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
                             {
                                 return 0;
                             }
@@ -735,7 +735,7 @@ namespace HREngine.Bots
                
             }
 
-            if ((name == "biggamehunter") && target == -1)
+            if ((card.specialMin == CardDB.specialMinions.biggamehunter) && target == -1)
             {
                 return 19;
             }
@@ -933,9 +933,9 @@ namespace HREngine.Bots
                 if (mnn.numAttacksThisTurn >= 1) attackedbefore ++;
             }
 
-            if (c.name == "acidicswampooze" && (p.enemyHeroName == "warrior" || p.enemyHeroName == "thief" || p.enemyHeroName == "pala"))
+            if (c.name == "acidicswampooze" && (p.enemyHeroName == HeroEnum.warrior || p.enemyHeroName == HeroEnum.thief || p.enemyHeroName == HeroEnum.pala))
             {
-                if (p.enemyHeroName == "thief" && p.enemyWeaponAttack <= 2)
+                if (p.enemyHeroName == HeroEnum.thief && p.enemyWeaponAttack <= 2)
                 {
                     pen += 100;
                 }
@@ -948,7 +948,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "hunter")
+            if (p.enemyHeroName == HeroEnum.hunter)
             {
                 if (c.type == CardDB.cardtype.MOB && (attackedbefore == 0 || c.Health <= 4 || (p.enemyHeroHp >= p.enemyHeroHpStarted && attackedbefore >= 1)))
                 {
@@ -956,7 +956,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "mage" )
+            if (p.enemyHeroName == HeroEnum.mage )
             {
                 if (c.type == CardDB.cardtype.MOB)
                 {
@@ -977,7 +977,7 @@ namespace HREngine.Bots
                 
             }
 
-            if (p.enemyHeroName == "pala")
+            if (p.enemyHeroName == HeroEnum.pala)
             {
                 if (c.type == CardDB.cardtype.MOB)
                 {
@@ -1014,7 +1014,7 @@ namespace HREngine.Bots
                 if (mnn.numAttacksThisTurn >= 1) attackedbefore ++;
             }
 
-            if (p.enemyHeroName == "hunter")
+            if (p.enemyHeroName == HeroEnum.hunter)
             {
                 bool islow = isOwnLowest(m, p);
                 if (attackedbefore == 0 && islow) pen -= 20;
@@ -1027,7 +1027,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "mage")
+            if (p.enemyHeroName == HeroEnum.mage)
             {
                 if (p.mobsplayedThisTurn == 0) pen += 10;
 
@@ -1044,7 +1044,7 @@ namespace HREngine.Bots
                 
             }
 
-            if (p.enemyHeroName == "pala")
+            if (p.enemyHeroName == HeroEnum.pala)
             {
 
                 bool islow = isOwnLowest(m, p);

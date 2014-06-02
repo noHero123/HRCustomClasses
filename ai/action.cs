@@ -98,8 +98,8 @@ namespace HREngine.Bots
 
         public int mana = 0;
         public int enemyHeroHp = 30;
-        public string ownHeroName = "";
-        public string enemyHeroName = "";
+        public HeroEnum ownHeroName = HeroEnum.druid;
+        public HeroEnum enemyHeroName = HeroEnum.druid;
         public bool ownHeroReady = false;
         public int ownHeroNumAttackThisTurn = 0;
         public bool ownHeroWindfury = false;
@@ -928,10 +928,10 @@ namespace HREngine.Bots
                 if (m.windfury) ghd += m.Angr;
             }
 
-            if (this.enemyHeroName == "druid") ghd++;
-            if (this.enemyHeroName == "mage") ghd++;
-            if (this.enemyHeroName == "thief") ghd++;
-            if (this.enemyHeroName == "hunter") ghd += 2;
+            if (this.enemyHeroName == HeroEnum.druid) ghd++;
+            if (this.enemyHeroName == HeroEnum.mage) ghd++;
+            if (this.enemyHeroName == HeroEnum.thief) ghd++;
+            if (this.enemyHeroName == HeroEnum.hunter) ghd += 2;
             ghd += enemyWeaponAttack;
 
             foreach (Minion m in this.ownMinions)
@@ -3415,7 +3415,7 @@ namespace HREngine.Bots
             if (c.name == "lordjaraxxus")
             {
                 this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_tk33");
-                this.ownHeroName = "lordjaraxxus";
+                this.ownHeroName = HeroEnum.lordjaraxxus;
                 this.ownHeroHp = c.Hp;
             }
 
@@ -5900,7 +5900,7 @@ namespace HREngine.Bots
         public void activateAbility(CardDB.Card c, int target, int targetEntity, int penality)
         {
             this.evaluatePenality += penality;
-            string heroname = this.ownHeroName;
+            HeroEnum heroname = this.ownHeroName;
             this.ownAbilityReady = false;
             this.mana -= 2;
             Action a = new Action();
@@ -5913,7 +5913,7 @@ namespace HREngine.Bots
             this.playactions.Add(a);
             if (logging) Helpfunctions.Instance.logg("play ability on target " + target);
 
-            if (heroname == "mage")
+            if (heroname == HeroEnum.mage)
             {
                 int damage = 1;
                 if (target == 100)
@@ -5944,7 +5944,7 @@ namespace HREngine.Bots
 
             }
 
-            if (heroname == "priest")
+            if (heroname == HeroEnum.priest)
             {
                 int heal = 2;
                 if (this.auchenaiseelenpriesterin) heal = -2;
@@ -5986,12 +5986,12 @@ namespace HREngine.Bots
 
             }
 
-            if (heroname == "warrior")
+            if (heroname == HeroEnum.warrior)
             {
                 this.ownHeroDefence += 2;
             }
 
-            if (heroname == "warlock")
+            if (heroname == HeroEnum.warlock)
             {
                 this.owncarddraw++;
                 drawACard("");
@@ -5999,14 +5999,14 @@ namespace HREngine.Bots
             }
 
 
-            if (heroname == "thief")
+            if (heroname == HeroEnum.thief)
             {
 
                 CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
                 this.equipWeapon(wcard);
             }
 
-            if (heroname == "druid")
+            if (heroname == HeroEnum.druid)
             {
                 this.ownheroAngr += 1;
                 if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen) 
@@ -6017,26 +6017,26 @@ namespace HREngine.Bots
             }
 
 
-            if (heroname == "hunter")
+            if (heroname == HeroEnum.hunter)
             {
                 this.attackOrHealHero(2, false);
             }
 
-            if (heroname == "pala")
+            if (heroname == HeroEnum.pala)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
                 callKid(kid, posi, true);
             }
 
-            if (heroname == "shaman")
+            if (heroname == HeroEnum.shaman)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
                 callKid(kid, posi, true);
             }
 
-            if (heroname == "lordjaraxxus")
+            if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("infernal");

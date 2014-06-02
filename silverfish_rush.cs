@@ -48,7 +48,7 @@ namespace HREngine.Bots
             }
             else
             {
-                if (p.enemyHeroName != "mage" && p.enemyHeroName != "priest")
+                if (p.enemyHeroName != HeroEnum.mage && p.enemyHeroName != HeroEnum.priest)
                 {
                     retval += 11;
                 }
@@ -62,9 +62,9 @@ namespace HREngine.Bots
 
             foreach (Action a in p.playactions)
             {
-                if (a.useability && a.handcard.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+                if (a.useability && a.handcard.card.specialMin == CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
                 if (!a.cardplay) continue;
-                if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+                if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
             }
 
             foreach (Minion m in p.ownMinions)
@@ -107,8 +107,8 @@ namespace HREngine.Bots
             foreach (Action a in p.playactions)
             {
                 if (!a.cardplay) continue;
-                if (a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus") deletecardsAtLast = 1;
-                if (deletecardsAtLast == 1 && !(a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus")) retval -= 20;
+                if (a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus) deletecardsAtLast = 1;
+                if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
             }
             if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
             if (p.ownHeroHp <= 0) retval = -10000;
@@ -923,8 +923,8 @@ namespace HREngine.Bots
 
         public int mana = 0;
         public int enemyHeroHp = 30;
-        public string ownHeroName = "";
-        public string enemyHeroName = "";
+        public HeroEnum ownHeroName = HeroEnum.druid;
+        public HeroEnum enemyHeroName = HeroEnum.druid;
         public bool ownHeroReady = false;
         public int ownHeroNumAttackThisTurn = 0;
         public bool ownHeroWindfury = false;
@@ -1753,10 +1753,10 @@ namespace HREngine.Bots
                 if (m.windfury) ghd += m.Angr;
             }
 
-            if (this.enemyHeroName == "druid") ghd++;
-            if (this.enemyHeroName == "mage") ghd++;
-            if (this.enemyHeroName == "thief") ghd++;
-            if (this.enemyHeroName == "hunter") ghd += 2;
+            if (this.enemyHeroName == HeroEnum.druid) ghd++;
+            if (this.enemyHeroName == HeroEnum.mage) ghd++;
+            if (this.enemyHeroName == HeroEnum.thief) ghd++;
+            if (this.enemyHeroName == HeroEnum.hunter) ghd += 2;
             ghd += enemyWeaponAttack;
 
             foreach (Minion m in this.ownMinions)
@@ -4240,7 +4240,7 @@ namespace HREngine.Bots
             if (c.name == "lordjaraxxus")
             {
                 this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_tk33");
-                this.ownHeroName = "lordjaraxxus";
+                this.ownHeroName = HeroEnum.lordjaraxxus;
                 this.ownHeroHp = c.Hp;
             }
 
@@ -6725,7 +6725,7 @@ namespace HREngine.Bots
         public void activateAbility(CardDB.Card c, int target, int targetEntity, int penality)
         {
             this.evaluatePenality += penality;
-            string heroname = this.ownHeroName;
+            HeroEnum heroname = this.ownHeroName;
             this.ownAbilityReady = false;
             this.mana -= 2;
             Action a = new Action();
@@ -6738,7 +6738,7 @@ namespace HREngine.Bots
             this.playactions.Add(a);
             if (logging) Helpfunctions.Instance.logg("play ability on target " + target);
 
-            if (heroname == "mage")
+            if (heroname == HeroEnum.mage)
             {
                 int damage = 1;
                 if (target == 100)
@@ -6769,7 +6769,7 @@ namespace HREngine.Bots
 
             }
 
-            if (heroname == "priest")
+            if (heroname == HeroEnum.priest)
             {
                 int heal = 2;
                 if (this.auchenaiseelenpriesterin) heal = -2;
@@ -6811,12 +6811,12 @@ namespace HREngine.Bots
 
             }
 
-            if (heroname == "warrior")
+            if (heroname == HeroEnum.warrior)
             {
                 this.ownHeroDefence += 2;
             }
 
-            if (heroname == "warlock")
+            if (heroname == HeroEnum.warlock)
             {
                 this.owncarddraw++;
                 drawACard("");
@@ -6824,14 +6824,14 @@ namespace HREngine.Bots
             }
 
 
-            if (heroname == "thief")
+            if (heroname == HeroEnum.thief)
             {
 
                 CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
                 this.equipWeapon(wcard);
             }
 
-            if (heroname == "druid")
+            if (heroname == HeroEnum.druid)
             {
                 this.ownheroAngr += 1;
                 if ((this.ownHeroNumAttackThisTurn == 0 || (this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1)) && !this.ownHeroFrozen)
@@ -6842,26 +6842,26 @@ namespace HREngine.Bots
             }
 
 
-            if (heroname == "hunter")
+            if (heroname == HeroEnum.hunter)
             {
                 this.attackOrHealHero(2, false);
             }
 
-            if (heroname == "pala")
+            if (heroname == HeroEnum.pala)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
                 callKid(kid, posi, true);
             }
 
-            if (heroname == "shaman")
+            if (heroname == HeroEnum.shaman)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
                 callKid(kid, posi, true);
             }
 
-            if (heroname == "lordjaraxxus")
+            if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("infernal");
@@ -7028,6 +7028,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
     public class Ai
     {
@@ -7485,12 +7486,12 @@ namespace HREngine.Bots
 
                         havedonesomething = true;
                         // if we have mage or priest, we have to target something####################################################
-                        if (this.hp.heroname == "mage" || this.hp.heroname == "priest")
+                        if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
                         {
 
                             List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
 
-                            if (isLethalCheck && (this.hp.heroname == "mage" || (this.hp.heroname == "priest" && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
+                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
                             {
                                 targett trg = trgts.Find(x => x.target == 200);
                                 if (trg != null)
@@ -8334,6 +8335,21 @@ namespace HREngine.Bots
 
     }
 
+    public enum HeroEnum
+    {
+        druid,
+        hogger,
+        hunter,
+        priest,
+        warlock,
+        thief,
+        pala,
+        warrior,
+        shaman,
+        mage,
+        lordjaraxxus
+    }
+
     public class Hrtprozis
     {
 
@@ -8359,7 +8375,9 @@ namespace HREngine.Bots
         public List<string> ownSecretList = new List<string>();
         public int enemySecretCount = 0;
 
-        public string heroname = "druid", enemyHeroname = "druid";
+
+
+        public HeroEnum heroname = HeroEnum.druid, enemyHeroname = HeroEnum.druid;
         public CardDB.Card heroAbility;
         public int anzEnemys = 0;
         public int anzOwn = 0;
@@ -8435,8 +8453,8 @@ namespace HREngine.Bots
             ownHeroWindfury = false;
             ownSecretList.Clear();
             enemySecretCount = 0;
-            heroname = "druid";
-            enemyHeroname = "druid";
+            heroname = HeroEnum.druid;
+            enemyHeroname = HeroEnum.druid;
             heroAbility = new CardDB.Card();
             anzEnemys = 0;
             anzOwn = 0;
@@ -8521,6 +8539,59 @@ namespace HREngine.Bots
             return retval;
         }
 
+        public HeroEnum heroNametoEnum(string s)
+        {
+            HeroEnum retval = HeroEnum.druid;
+
+            if (s == "hogger")
+            {
+                retval = HeroEnum.hogger;
+            }
+            if (s == "hunter")
+            {
+                retval = HeroEnum.hunter;
+            }
+            if (s == "priest")
+            {
+                retval = HeroEnum.priest;
+            }
+            if (s == "druid")
+            {
+                retval = HeroEnum.druid;
+            }
+            if (s == "warlock")
+            {
+                retval = HeroEnum.warlock;
+            }
+            if (s == "thief")
+            {
+                retval = HeroEnum.thief;
+            }
+            if (s == "pala")
+            {
+                retval = HeroEnum.pala;
+            }
+            if (s == "warrior")
+            {
+                retval = HeroEnum.warrior;
+            }
+            if (s == "shaman")
+            {
+                retval = HeroEnum.shaman;
+            }
+            if (s == "mage")
+            {
+                retval = HeroEnum.mage;
+            }
+            if (s == "lordjaraxxus")
+            {
+                retval = HeroEnum.lordjaraxxus;
+            }
+
+            return retval;
+        }
+
+
         public void updateMinions(List<Minion> om, List<Minion> em)
         {
             this.ownMinions.Clear();
@@ -8572,7 +8643,7 @@ namespace HREngine.Bots
             this.heroAtk = heroatt;
             this.heroHp = herohp;
             this.heroDefence = herodef;
-            this.heroname = heron;
+            this.heroname = this.heroNametoEnum(heron);
             this.ownheroisread = heroready;
             this.herofrozen = frozen;
             this.heroAbility = hab;
@@ -8589,7 +8660,7 @@ namespace HREngine.Bots
             this.enemyWeaponDurability = wdur;
             this.enemyAtk = heroatt;
             this.enemyHp = herohp;
-            this.enemyHeroname = heron;
+            this.enemyHeroname = this.heroNametoEnum(heron);
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
         }
@@ -8759,6 +8830,7 @@ namespace HREngine.Bots
     }
 
 
+
     public class Helpfunctions
     {
 
@@ -8838,7 +8910,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class PenalityManager
     {
@@ -8979,8 +9050,8 @@ namespace HREngine.Bots
                 //allow it if you have biggamehunter
                 foreach (Handmanager.Handcard hc in p.owncards)
                 {
-                    if (hc.card.name == "biggamehunter") return pen;
-                    if (hc.card.name == "shadowworddeath") return pen;
+                    if (hc.card.specialMin == CardDB.specialMinions.biggamehunter) return pen;
+                    if (hc.card.specialMin == CardDB.specialMinions.shadowworddeath) return pen;
                 }
 
                 pen = 500;
@@ -9495,7 +9566,7 @@ namespace HREngine.Bots
                         else
                         {
                             // combo for killing with innerfire and biggamehunter
-                            if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit") != null && m.Hp >= 2)))
+                            if (p.owncards.Find(x => x.card.specialMin == CardDB.specialMinions.biggamehunter) != null && p.owncards.Find(x => x.card.name == "innerfire") != null && (m.Hp >= 4 || (p.owncards.Find(x => x.card.name == "divinespirit") != null && m.Hp >= 2)))
                             {
                                 return 0;
                             }
@@ -9509,7 +9580,7 @@ namespace HREngine.Bots
                     {
 
                         // combo for killing with innerfire and biggamehunter
-                        if (p.owncards.Find(x => x.card.name == "biggamehunter") != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
+                        if (p.owncards.Find(x => x.card.specialMin == CardDB.specialMinions.biggamehunter) != null && p.owncards.Find(x => x.card.name == "innerfire") != null && m.Hp >= 4)
                         {
                             return 0;
                         }
@@ -9569,7 +9640,7 @@ namespace HREngine.Bots
 
             }
 
-            if ((name == "biggamehunter") && target == -1)
+            if ((card.specialMin == CardDB.specialMinions.biggamehunter) && target == -1)
             {
                 return 19;
             }
@@ -9767,9 +9838,9 @@ namespace HREngine.Bots
                 if (mnn.numAttacksThisTurn >= 1) attackedbefore++;
             }
 
-            if (c.name == "acidicswampooze" && (p.enemyHeroName == "warrior" || p.enemyHeroName == "thief" || p.enemyHeroName == "pala"))
+            if (c.name == "acidicswampooze" && (p.enemyHeroName == HeroEnum.warrior || p.enemyHeroName == HeroEnum.thief || p.enemyHeroName == HeroEnum.pala))
             {
-                if (p.enemyHeroName == "thief" && p.enemyWeaponAttack <= 2)
+                if (p.enemyHeroName == HeroEnum.thief && p.enemyWeaponAttack <= 2)
                 {
                     pen += 100;
                 }
@@ -9782,7 +9853,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "hunter")
+            if (p.enemyHeroName == HeroEnum.hunter)
             {
                 if (c.type == CardDB.cardtype.MOB && (attackedbefore == 0 || c.Health <= 4 || (p.enemyHeroHp >= p.enemyHeroHpStarted && attackedbefore >= 1)))
                 {
@@ -9790,7 +9861,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "mage")
+            if (p.enemyHeroName == HeroEnum.mage)
             {
                 if (c.type == CardDB.cardtype.MOB)
                 {
@@ -9811,7 +9882,7 @@ namespace HREngine.Bots
 
             }
 
-            if (p.enemyHeroName == "pala")
+            if (p.enemyHeroName == HeroEnum.pala)
             {
                 if (c.type == CardDB.cardtype.MOB)
                 {
@@ -9848,7 +9919,7 @@ namespace HREngine.Bots
                 if (mnn.numAttacksThisTurn >= 1) attackedbefore++;
             }
 
-            if (p.enemyHeroName == "hunter")
+            if (p.enemyHeroName == HeroEnum.hunter)
             {
                 bool islow = isOwnLowest(m, p);
                 if (attackedbefore == 0 && islow) pen -= 20;
@@ -9861,7 +9932,7 @@ namespace HREngine.Bots
                 }
             }
 
-            if (p.enemyHeroName == "mage")
+            if (p.enemyHeroName == HeroEnum.mage)
             {
                 if (p.mobsplayedThisTurn == 0) pen += 10;
 
@@ -9878,7 +9949,7 @@ namespace HREngine.Bots
 
             }
 
-            if (p.enemyHeroName == "pala")
+            if (p.enemyHeroName == HeroEnum.pala)
             {
 
                 bool islow = isOwnLowest(m, p);
@@ -10482,7 +10553,15 @@ namespace HREngine.Bots
             summoningportal,
             spitefulsmith,
             defenderofargus,
-            sunfuryprotector
+            sunfuryprotector,
+            biggamehunter,
+            shadowworddeath,
+            lesserheal,
+            flamestrike,
+            shieldblock,
+            soulfire,
+            doomguard,
+            succubus
 
         }
 
@@ -11249,6 +11328,14 @@ namespace HREngine.Bots
                         if (temp == "spitefulsmith") c.specialMin = specialMinions.spitefulsmith;
                         if (temp == "defenderofargus") c.specialMin = specialMinions.defenderofargus;
                         if (temp == "sunfuryprotector") c.specialMin = specialMinions.sunfuryprotector;
+                        if (temp == "biggamehunter") c.specialMin = specialMinions.biggamehunter;
+                        if (temp == "shadowworddeath") c.specialMin = specialMinions.shadowworddeath;
+                        if (temp == "lesserheal") c.specialMin = specialMinions.lesserheal;
+                        if (temp == "flamestrike") c.specialMin = specialMinions.flamestrike;
+                        if (temp == "shieldblock") c.specialMin = specialMinions.shieldblock;
+                        if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
+                        if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
+                        if (temp == "succubus") c.specialMin = specialMinions.succubus;
 
                     }
                     if (de == 1)

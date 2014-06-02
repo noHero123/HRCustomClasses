@@ -90,15 +90,15 @@ namespace HREngine.Bots
           int playmobs = 0;
           foreach (Action a in p.playactions)
           {
-              if (a.useability && a.handcard.card.name == "lesserheal" && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.handcard.card.specialMin ==  CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
               if (a.handcard.card.type == CardDB.cardtype.MOB) playmobs++;
               //if (a.handcard.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
 
-              if (a.handcard.card.name == "flamestrike" && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.handcard.card.specialMin ==  CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
-              if (p.ownHeroName != "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.name != "shieldblock") retval -= 11;
-              if (p.ownHeroName == "thief" && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
+              if (p.ownHeroName != HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.specialMin!= CardDB.specialMinions.shieldblock) retval -= 11;
+              if (p.ownHeroName == HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
 
           int mobsInHand = 0;
@@ -146,8 +146,8 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus") deletecardsAtLast = 1;
-              if (deletecardsAtLast == 1 && !(a.handcard.card.name == "soulfire" || a.handcard.card.name == "doomguard" || a.handcard.card.name == "succubus")) retval -= 20;
+              if (a.handcard.card.specialMin ==  CardDB.specialMinions.soulfire || a.handcard.card.specialMin ==  CardDB.specialMinions.doomguard || a.handcard.card.specialMin ==  CardDB.specialMinions.succubus) deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
           }
           if (p.enemyHeroHp >=1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
