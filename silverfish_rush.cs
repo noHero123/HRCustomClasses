@@ -17,6 +17,7 @@ namespace HREngine.Bots
     {
 
         private int dirtytarget = -1;
+        private int dirtychoice = -1;
         PenalityManager penman = PenalityManager.Instance;
         Silverfish sf;
 
@@ -164,6 +165,24 @@ namespace HREngine.Bots
                     dirtytarget = -1;
                     return new HREngine.API.Actions.TargetAction(target);
                 }
+                if (HRChoice.IsChoiceActive())
+                {
+                    if (this.dirtychoice >= 1)
+                    {
+                        List<HREntity> choices = HRChoice.GetChoiceCards();
+                        int choice = this.dirtychoice - 1;
+                        this.dirtychoice = -1;
+                        return new HREngine.API.Actions.ChoiceAction(choices[choice]);
+                    }
+                    else
+                    {
+                        //Todo: ultimate tracking-simulation!
+                        List<HREntity> choices = HRChoice.GetChoiceCards();
+                        Random r = new Random();
+                        int choice = r.Next(0, choices.Count);
+                        return new HREngine.API.Actions.ChoiceAction(choices[choice]);
+                    }
+                }
 
 
                 //SafeHandleBattleLocalPlayerTurnHandler();
@@ -184,8 +203,13 @@ namespace HREngine.Bots
                     if (moveTodo.enemytarget >= 0)
                     {
                         HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " " + (moveTodo.owntarget + 1));
-                        Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                        Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " choice: " + moveTodo.druidchoice);
+                        if (moveTodo.druidchoice >= 1)
+                        {
+                            if (moveTodo.enemyEntitiy >= 0) this.dirtytarget = moveTodo.enemyEntitiy;
+                            this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                        }
                         if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                         {
                             return new HREngine.API.Actions.PlayCardAction(cardtoplay, target, moveTodo.owntarget + 1);
@@ -196,7 +220,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing" + " " + (moveTodo.owntarget + 1));
+                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
                         if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                         {
                             return new HREngine.API.Actions.PlayCardAction(cardtoplay, null, moveTodo.owntarget + 1);
@@ -230,6 +254,7 @@ namespace HREngine.Bots
                         return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                     }
                     HRLog.Write("hero attack without weapon");
+                    //HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
                 }
@@ -440,13 +465,13 @@ namespace HREngine.Bots
 
 
             // create hero + minion data
-            Helpfunctions.Instance.logg("gethero");
+            //Helpfunctions.Instance.logg("gethero");
             getHerostuff();
-            Helpfunctions.Instance.logg("getmins");
+            //Helpfunctions.Instance.logg("getmins");
             getMinions();
-            Helpfunctions.Instance.logg("gethand");
+            //Helpfunctions.Instance.logg("gethand");
             getHandcards();
-            Helpfunctions.Instance.logg("setstuff");
+            //Helpfunctions.Instance.logg("setstuff");
             // send ai the data:
             Hrtprozis.Instance.clearAll();
             Handmanager.Instance.clearAll();
@@ -849,10 +874,10 @@ namespace HREngine.Bots
             {
                 help.logg("play " + this.handcard.card.name);
                 if (this.druidchoice >= 1) help.logg("choose choise " + this.druidchoice);
-                help.logg("with position " + this.cardEntitiy);
+                help.logg("with entityid " + this.cardEntitiy);
                 if (this.owntarget >= 0)
                 {
-                    help.logg("on position " + this.ownEntitiy);
+                    help.logg("on position " + this.owntarget);
                 }
                 if (this.enemytarget >= 0)
                 {
@@ -881,6 +906,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
     public class Playfield
     {
@@ -6549,7 +6575,7 @@ namespace HREngine.Bots
             }
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
-
+            Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
             if (logging) Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
@@ -6969,10 +6995,10 @@ namespace HREngine.Bots
                 {
                     Helpfunctions.Instance.logg("play " + a.handcard.card.name);
                     if (a.druidchoice >= 1) Helpfunctions.Instance.logg("choose choise " + a.druidchoice);
-                    Helpfunctions.Instance.logg("with position " + a.cardEntitiy);
+                    Helpfunctions.Instance.logg("with entity " + a.cardEntitiy);
                     if (a.owntarget >= 0)
                     {
-                        Helpfunctions.Instance.logg("on position " + a.ownEntitiy);
+                        Helpfunctions.Instance.logg("on position " + a.owntarget);
                     }
                     if (a.enemytarget >= 0)
                     {
@@ -7053,6 +7079,18 @@ namespace HREngine.Bots
             for (int i = 1; i < 3; i++)
             {
                 CardDB.Card c = hc.card;
+                if (c.name == "keeperofthegrove")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                    }
+                }
+
                 if (c.name == "starfall")
                 {
                     if (i == 1)
@@ -7115,7 +7153,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, -1, p, i, lethalcheck);
+                                cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     Playfield pf = new Playfield(p);
@@ -8904,7 +8942,7 @@ namespace HREngine.Bots
 
             int abuff = getAttackBuffPenality(card, target, p, choice);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
-            if (name == "markofthewild" && ((abuff == 500 || tbuff == 0) || (abuff == 0 || tbuff == 500)))
+            if (name == "markofthewild" && ((abuff >= 500 && tbuff == 0) || (abuff == 0 && tbuff >= 500)))
             {
                 retval = 0;
             }

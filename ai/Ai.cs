@@ -56,6 +56,18 @@ namespace HREngine.Bots
             for (int i = 1; i < 3; i++)
             {
                 CardDB.Card c = hc.card;
+                if (c.name == "keeperofthegrove")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                    }
+                }
+
                 if (c.name == "starfall")
                 {
                     if (i == 1)
@@ -118,7 +130,7 @@ namespace HREngine.Bots
                             
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, -1, p, i, lethalcheck);
+                                cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     Playfield pf = new Playfield(p);

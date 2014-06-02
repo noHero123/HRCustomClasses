@@ -49,10 +49,10 @@ namespace HREngine.Bots
                 {
                     help.logg("play " + this.handcard.card.name);
                     if (this.druidchoice >= 1) help.logg("choose choise " + this.druidchoice);
-                    help.logg("with position " + this.cardEntitiy);
+                    help.logg("with entityid " + this.cardEntitiy);
                     if (this.owntarget >= 0)
                     {
-                        help.logg("on position " + this.ownEntitiy);
+                        help.logg("on position " + this.owntarget);
                     }
                     if (this.enemytarget >= 0)
                     {
@@ -5750,7 +5750,7 @@ namespace HREngine.Bots
             }
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
-
+            Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
             if (logging) Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
@@ -6170,10 +6170,10 @@ namespace HREngine.Bots
                 {
                     Helpfunctions.Instance.logg("play " + a.handcard.card.name);
                     if (a.druidchoice >= 1) Helpfunctions.Instance.logg("choose choise " + a.druidchoice);
-                    Helpfunctions.Instance.logg("with position " + a.cardEntitiy);
+                    Helpfunctions.Instance.logg("with entity " + a.cardEntitiy);
                     if (a.owntarget >= 0)
                     {
-                        Helpfunctions.Instance.logg("on position " + a.ownEntitiy);
+                        Helpfunctions.Instance.logg("on position " + a.owntarget);
                     }
                     if (a.enemytarget >= 0)
                     {

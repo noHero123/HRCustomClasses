@@ -19,7 +19,8 @@ namespace HREngine.Bots
    public abstract class Bot : API.IBot
    {
        
-       private int dirtytarget=-1;
+       private int dirtytarget = -1;
+       private int dirtychoice = -1;
        Silverfish sf;
 
       public Bot()
@@ -78,6 +79,24 @@ namespace HREngine.Bots
                  dirtytarget = -1;
                  return new HREngine.API.Actions.TargetAction(target);
              }
+             if (HRChoice.IsChoiceActive())
+             {
+                 if (this.dirtychoice >= 1)
+                 {
+                     List<HREntity> choices = HRChoice.GetChoiceCards();
+                     int choice=this.dirtychoice-1;
+                     this.dirtychoice=-1;
+                     return new HREngine.API.Actions.ChoiceAction(choices[choice]);
+                 }
+                 else
+                 {
+                     //Todo: ultimate tracking-simulation!
+                     List<HREntity> choices = HRChoice.GetChoiceCards(); 
+                     Random r = new Random();
+                     int choice = r.Next(0,choices.Count);
+                     return new HREngine.API.Actions.ChoiceAction(choices[choice]);
+                 }
+             }
               
            
             //SafeHandleBattleLocalPlayerTurnHandler();
@@ -99,7 +118,12 @@ namespace HREngine.Bots
                 {
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
-                    Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                    Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " choice: " + moveTodo.druidchoice);
+                    if (moveTodo.druidchoice >= 1)
+                    {
+                        if(moveTodo.enemyEntitiy>=0) this.dirtytarget = moveTodo.enemyEntitiy;
+                        this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                    }
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay, target, moveTodo.owntarget + 1);

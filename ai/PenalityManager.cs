@@ -108,7 +108,7 @@ namespace HREngine.Bots
 
             int abuff = getAttackBuffPenality(card, target, p, choice);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
-            if (name == "markofthewild" && ( (abuff == 500 || tbuff == 0) || (abuff == 0 || tbuff == 500)) )
+            if (name == "markofthewild" && ( (abuff >= 500 && tbuff == 0) || (abuff == 0 && tbuff >= 500)) )
             {
                 retval = 0;
             }
