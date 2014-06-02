@@ -991,8 +991,8 @@ namespace HREngine.Bots
         public int lostHeal = 0;
         public int lostWeaponDamage = 0;
 
-        public int ownDeckSize = 0;
-        public int enemyDeckSize = 0;
+        public int ownDeckSize = 30;
+        public int enemyDeckSize = 30;
         public int ownHeroFatigue = 0;
         public int enemyHeroFatigue = 0;
 
@@ -1352,7 +1352,6 @@ namespace HREngine.Bots
                 if (dis.playedThisTurn != pis.playedThisTurn || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
                 if (dis.silenced != pis.silenced || dis.stealth != pis.stealth || dis.taunt != pis.taunt || dis.windfury != pis.windfury || dis.wounded != pis.wounded || dis.zonepos != pis.zonepos) minionbool = false;
                 if (dis.divineshild != pis.divineshild || dis.cantLowerHPbelowONE != pis.cantLowerHPbelowONE || dis.immune != pis.immune) minionbool = false;
-
             }
             if (minionbool == false)
             {
@@ -1731,13 +1730,13 @@ namespace HREngine.Bots
         {
             this.value = int.MinValue;
             this.complete = true;
-            endTurnBuffs(true);//end own buffs 
             endTurnEffect(true);//own turn ends
+            endTurnBuffs(true);//end own buffs 
             startTurnEffect(false);//enemy turn begins
             guessHeroDamage();
             simulateTraps();
-            endTurnBuffs(false);//end enemy turn
             endTurnEffect(false);//own turn ends
+            endTurnBuffs(false);//end enemy turn
             startTurnEffect(true);//start your turn
 
         }
@@ -2110,12 +2109,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        //this.enemycarddraw++;
+                        this.drawACard("", own);
                     }
                 }
 
@@ -2149,12 +2149,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        //this.enemycarddraw++;
+                        this.drawACard("", own);
                     }
                 }
 
@@ -2190,12 +2191,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("yseraawakens");
+                        //this.owncarddraw++;
+                        this.drawACard("yseraawakens", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        //this.enemycarddraw++;
+                        this.drawACard("yseraawakens", own);
                     }
                 }
             }
@@ -2243,14 +2245,17 @@ namespace HREngine.Bots
                     minionGetDestroyed(m, own);
                     if (own)
                     {
-                        this.owncarddraw += 3;
-                        this.drawACard("");
-                        this.drawACard("");
-                        this.drawACard("");
+                        //this.owncarddraw += 3;
+                        this.drawACard("", own);
+                        this.drawACard("", own);
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw += 3;
+                        //this.enemycarddraw += 3 ;
+                        this.drawACard("", own);
+                        this.drawACard("", own);
+                        this.drawACard("", own);
                     }
                 }
 
@@ -2341,6 +2346,7 @@ namespace HREngine.Bots
                 }
             }
 
+            this.drawACard("", own);
         }
 
         private int getSpellDamageDamage(int dmg)
@@ -2908,12 +2914,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        this.drawACard("", own);
+                        //this.enemycarddraw++;
                     }
                 }
 
@@ -2924,12 +2931,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        //this.enemycarddraw++;
+                        this.drawACard("", own);
                     }
                 }
 
@@ -3069,12 +3077,13 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        this.owncarddraw++;
-                        drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", own);
                     }
                     else
                     {
-                        this.enemycarddraw++;
+                        //this.enemycarddraw++;
+                        this.drawACard("", own);
                     }
                 }
             }
@@ -3419,8 +3428,8 @@ namespace HREngine.Bots
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.northshirecleric)
                 {
-                    this.owncarddraw++;
-                    drawACard("");
+                    //this.owncarddraw++;
+                    this.drawACard("", true);
                 }
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
@@ -3432,7 +3441,8 @@ namespace HREngine.Bots
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.northshirecleric)
                 {
-                    this.enemycarddraw++;
+                    //this.enemycarddraw++;
+                    this.drawACard("", false);
                 }
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
                 {
@@ -3449,12 +3459,13 @@ namespace HREngine.Bots
             {
                 if (own)
                 {
-                    this.owncarddraw++;
-                    drawACard("");
+                    //this.owncarddraw++;
+                    this.drawACard("", own);
                 }
                 else
                 {
-                    this.enemycarddraw++;
+                    //this.enemycarddraw++;
+                    this.drawACard("", own);
                 }
             }
             if (m.handcard.card.specialMin == CardDB.specialMinions.gurubashiberserker && !m.silenced)
@@ -3753,7 +3764,7 @@ namespace HREngine.Bots
             this.owncarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
             {
-                drawACard("");
+                this.drawACard("", true);
             }
 
 
@@ -4159,9 +4170,9 @@ namespace HREngine.Bots
             {
                 if (choice == 1)
                 {
-                    this.owncarddraw += 2;
-                    this.drawACard("");
-                    this.drawACard("");
+                    //this.owncarddraw += 2;
+                    this.drawACard("", own);
+                    this.drawACard("", own);
                 }
 
             }
@@ -4332,10 +4343,12 @@ namespace HREngine.Bots
 
             if (c.name == "coldlightoracle")
             {
-                this.enemycarddraw += 2;
-                this.owncarddraw += 2;
-                drawACard("");
-                drawACard("");
+                //this.enemycarddraw += 2;
+                //this.owncarddraw += 2;
+                this.drawACard("", true);
+                this.drawACard("", true);
+                this.drawACard("", false);
+                this.drawACard("", false);
             }
 
             if (c.name == "arathiweaponsmith")
@@ -4356,13 +4369,13 @@ namespace HREngine.Bots
             }
             if (c.name == "noviceengineer")
             {
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
             if (c.name == "gnomishinventor")
             {
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
 
             if (c.name == "darkscalehealer")
@@ -4393,17 +4406,17 @@ namespace HREngine.Bots
 
             if (c.name == "azuredrake")
             {
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
 
             if (c.name == "harrisonjones")
             {
                 this.enemyWeaponAttack = 0;
-                this.owncarddraw += enemyWeaponDurability;
+                //this.owncarddraw += enemyWeaponDurability;
                 for (int i = 0; i < enemyWeaponDurability; i++)
                 {
-                    drawACard("");
+                    drawACard("", true);
                 }
                 this.enemyWeaponDurability = 0;
             }
@@ -4552,13 +4565,16 @@ namespace HREngine.Bots
                     minionGetDestroyed(enemy, false);
                 }
                 this.owncards.Clear();
+                this.owncarddraw = 0;
+                this.enemyAnzCards = 0;
+                this.enemycarddraw = 0;
 
             }
 
             if (c.name == "captainsparrot")
             {
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
 
             }
 
@@ -4850,8 +4866,8 @@ namespace HREngine.Bots
                 damage = 2;
                 if (m.Hp >= 3)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
             }
 
@@ -5001,8 +5017,8 @@ namespace HREngine.Bots
             if (c.name == "hammerofwrath")
             {
                 damage = 3;
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
 
             if (c.name == "blessingofkings")
@@ -5026,15 +5042,15 @@ namespace HREngine.Bots
             if (c.name == "holywrath")
             {
                 damage = 2;
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
             if (c.name == "layonhands")
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
                 heal = 8;
             }
@@ -5063,8 +5079,8 @@ namespace HREngine.Bots
             if (c.name == "powerwordshield")
             {
                 hpbuff = 2;
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
             if (c.name == "silence")
             {
@@ -5107,8 +5123,8 @@ namespace HREngine.Bots
             if (c.name == "shiv")
             {
                 damage = 1;
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
             if (c.name == "coldblood")
             {
@@ -5255,8 +5271,8 @@ namespace HREngine.Bots
                 damage = 1;
                 if (getSpellDamageDamage(1) >= m.Hp && !m.divineshild && !m.immune)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
             }
             if (c.name == "drainlife")
@@ -5333,8 +5349,8 @@ namespace HREngine.Bots
             if (c.name == "starfire")
             {
                 damage = 5;
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
 
             if (c.name == "naturalize")
@@ -5377,8 +5393,8 @@ namespace HREngine.Bots
                 if (choice == 2)
                 {
                     damage = 1;
-                    this.owncarddraw++;
-                    this.drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
             }
 
@@ -5436,8 +5452,8 @@ namespace HREngine.Bots
             if (c.CardID == "PRO_001b")// i am murloc
             {
                 damage = 4;
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
 
             } if (c.name == "willofmukla")
             {
@@ -5593,8 +5609,8 @@ namespace HREngine.Bots
                 {
                     m.stealth = false;
                 }
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
                 this.enemySecretCount = 0;
             }
 
@@ -5647,8 +5663,8 @@ namespace HREngine.Bots
                 {
                     if (mnn.wounded)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("");
+                        //this.owncarddraw++;
+                        drawACard("", true);
                     }
                 }
 
@@ -5731,8 +5747,8 @@ namespace HREngine.Bots
             if (c.name == "shieldblock")
             {
                 this.ownHeroDefence = this.ownHeroDefence + 5;
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
             }
 
 
@@ -5780,9 +5796,9 @@ namespace HREngine.Bots
             }
             if (c.name == "arcaneintellect")
             {
-                this.owncarddraw++;
-                this.drawACard("");
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
+                drawACard("", true);
             }
 
             if (c.name == "mirrorimage")
@@ -5861,8 +5877,8 @@ namespace HREngine.Bots
                 {
                     for (int i = 0; i < diff; i++)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("");
+                        //this.owncarddraw++;
+                        drawACard("", true);
                     }
                 }
             }
@@ -5909,17 +5925,17 @@ namespace HREngine.Bots
             }
             if (c.name == "thoughtsteal")
             {
-                this.owncarddraw++;
-                this.drawACard("enemycard");
-                this.owncarddraw++;
-                this.drawACard("enemycard");
+                //this.owncarddraw++;
+                this.drawACard("enemycard", true);
+                //this.owncarddraw++;
+                this.drawACard("enemycard", true);
             }
             if (c.name == "mindvision")
             {
-                if (this.enemyAnzCards >= 1)
+                if (this.enemyAnzCards + this.enemycarddraw >= 1)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("enemycard");
+                    //this.owncarddraw++;
+                    this.drawACard("enemycard", true);
                 }
             }
 
@@ -6025,8 +6041,8 @@ namespace HREngine.Bots
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
 
             }
@@ -6065,8 +6081,8 @@ namespace HREngine.Bots
 
             if (c.name == "farsight")
             {
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                drawACard("", true);
 
             }
 
@@ -6122,9 +6138,9 @@ namespace HREngine.Bots
             //hexenmeister #################################################
             if (c.name == "sensedemons")
             {
-                this.owncarddraw += 2;
-                this.drawACard("");
-                this.drawACard("");
+                //this.owncarddraw += 2;
+                this.drawACard("", true);
+                this.drawACard("", true);
 
 
             }
@@ -6251,8 +6267,8 @@ namespace HREngine.Bots
                 {
                     if (this.ownMaxMana == 10)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("excessmana");
+                        //this.owncarddraw++;
+                        this.drawACard("excessmana", true);
                     }
                     else
                     {
@@ -6261,8 +6277,8 @@ namespace HREngine.Bots
                     }
                     if (this.ownMaxMana == 10)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("excessmana");
+                        //this.owncarddraw++;
+                        this.drawACard("excessmana", true);
                     }
                     else
                     {
@@ -6272,10 +6288,10 @@ namespace HREngine.Bots
                 }
                 if (choice == 2)
                 {
-                    this.owncarddraw += 3;
-                    this.drawACard("");
-                    this.drawACard("");
-                    this.drawACard("");
+                    //this.owncarddraw+=3;
+                    this.drawACard("", true);
+                    this.drawACard("", true);
+                    this.drawACard("", true);
                 }
             }
 
@@ -6303,8 +6319,8 @@ namespace HREngine.Bots
             {
                 if (this.ownMaxMana == 10)
                 {
-                    this.owncarddraw++;
-                    this.drawACard("excessmana");
+                    //this.owncarddraw++;
+                    this.drawACard("excessmana", true);
                 }
                 else
                 {
@@ -6315,8 +6331,8 @@ namespace HREngine.Bots
 
             if (c.name == "excessmana")
             {
-                this.owncarddraw++;
-                this.drawACard("");
+                //this.owncarddraw++;
+                this.drawACard("", true);
             }
 
             if (c.name == "yseraawakens")
@@ -6357,13 +6373,82 @@ namespace HREngine.Bots
 
         }
 
-        private void drawACard(string ss)
+        private void drawACard(string ss, bool own)
         {
             string s = ss;
             if (s == "") s = "unknown";
             if (s == "enemycard") s = "unknown"; // NO PENALITY FOR DRAWING TO MUCH CARDS
 
-            if (this.owncards.Count >= 10) return; // cant hold more than 10 cards
+            // cant hold more than 10 cards
+
+            if (own)
+            {
+                if (s == "unknown") // draw a card from deck :D
+                {
+                    if (ownDeckSize == 0)
+                    {
+                        this.ownHeroFatigue++;
+                        this.attackOrHealHero(this.ownHeroFatigue, true);
+                    }
+                    else
+                    {
+                        this.ownDeckSize--;
+                        if (this.owncards.Count >= 10)
+                        {
+                            this.evaluatePenality += 5;
+                            return;
+                        }
+                        this.owncarddraw++;
+                    }
+
+                }
+                else
+                {
+                    if (this.owncards.Count >= 10)
+                    {
+                        this.evaluatePenality += 5;
+                        return;
+                    }
+                    this.owncarddraw++;
+
+                }
+
+
+            }
+            else
+            {
+                if (s == "unknown") // draw a card from deck :D
+                {
+                    if (enemyDeckSize == 0)
+                    {
+                        this.enemyHeroFatigue++;
+                        this.attackOrHealHero(this.enemyHeroFatigue, false);
+                    }
+                    else
+                    {
+                        this.enemyDeckSize--;
+                        if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                        {
+                            this.evaluatePenality += 5;
+                            return;
+                        }
+                        this.enemycarddraw++;
+                    }
+
+                }
+                else
+                {
+                    if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                    {
+                        this.evaluatePenality += 5;
+                        return;
+                    }
+                    this.enemycarddraw++;
+
+                }
+                return;
+            }
+
             if (s == "unknown")
             {
                 CardDB.Card plchldr = new CardDB.Card();
@@ -6418,8 +6503,8 @@ namespace HREngine.Bots
 
                     if (own && m.handcard.card.specialMin == CardDB.specialMinions.starvingbuzzard && (TAG_RACE)hc.card.race == TAG_RACE.PET)
                     {
-                        this.owncarddraw++;
-                        this.drawACard("");
+                        //this.owncarddraw++;
+                        this.drawACard("", true);
                     }
 
                 }
@@ -6489,7 +6574,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.archmageantonidas)
                 {
-                    drawACard("fireball");
+                    drawACard("fireball", true);
                 }
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.violetteacher)
@@ -6501,8 +6586,8 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.gadgetzanauctioneer)
                 {
-                    this.owncarddraw++;
-                    drawACard("");
+                    //this.owncarddraw++;
+                    drawACard("", true);
                 }
                 if (m.handcard.card.specialMin == CardDB.specialMinions.wildpyromancer)
                 {
@@ -6575,7 +6660,7 @@ namespace HREngine.Bots
             }
             if (c.type == CardDB.cardtype.SPELL) this.playedPreparation = false;
 
-            Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
+            //Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
             if (logging) Helpfunctions.Instance.logg("play crd " + c.name + " entitiy# " + cardEntity + " mana " + hc.getManaCost(this) + " trgt " + target);
 
             if (c.type == CardDB.cardtype.MOB)
@@ -6818,8 +6903,8 @@ namespace HREngine.Bots
 
             if (heroname == HeroEnum.warlock)
             {
-                this.owncarddraw++;
-                drawACard("");
+                //this.owncarddraw++;
+                this.drawACard("", true);
                 this.attackOrHealHero(2, true);
             }
 
@@ -8354,8 +8439,8 @@ namespace HREngine.Bots
     {
 
         public int ownHeroFatigue = 0;
-        public int ownDeckSize = 0;
-        public int enemyDeckSize = 0;
+        public int ownDeckSize = 30;
+        public int enemyDeckSize = 30;
         public int enemyHeroFatigue = 0;
 
         public int ownHeroEntity = -1;
@@ -8667,9 +8752,9 @@ namespace HREngine.Bots
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
         {
-            this.ownDeckSize = ods;
+            this.ownDeckSize = 30;// ods;
             this.ownHeroFatigue = ohf;
-            this.enemyDeckSize = eds;
+            this.enemyDeckSize = 30;// eds;
             this.enemyHeroFatigue = ehf;
         }
 
@@ -8828,7 +8913,6 @@ namespace HREngine.Bots
 
 
     }
-
 
 
     public class Helpfunctions
@@ -9551,6 +9635,11 @@ namespace HREngine.Bots
             if (target >= 10 && target <= 19)
             {
                 m = p.enemyMinions[target - 10];
+            }
+
+            if (name == "frothingberserker")
+            {
+                if (p.cardsPlayedThisTurn >= 1) pen = 5;
             }
 
             if (name == "divinespirit")
@@ -10488,6 +10577,7 @@ namespace HREngine.Bots
 
 
     }
+
 
     public class CardDB
     {
@@ -12237,7 +12327,6 @@ namespace HREngine.Bots
 
 
     }
-
     public class BoardTester
     {
         int ownPlayer = 1;
@@ -12257,6 +12346,11 @@ namespace HREngine.Bots
         int numMinionsPlayedThisTurn = 0;
         int cardsPlayedThisTurn = 0;
         int overdrive = 0;
+
+        int ownDecksize = 30;
+        int enemyDecksize = 30;
+        int ownFatigue = 0;
+        int enemyFatigue = 0;
 
         int enemySecrets = 0;
 
@@ -12402,6 +12496,13 @@ namespace HREngine.Bots
                         this.enemyWeapon = s.Split(' ')[2];
                     }
 
+                }
+                if (readstate == 2 && counter == 3) // fatigue
+                {
+                    this.ownDecksize = Convert.ToInt32(s.Split(' ')[1]);
+                    this.enemyDecksize = Convert.ToInt32(s.Split(' ')[3]);
+                    this.ownFatigue = Convert.ToInt32(s.Split(' ')[2]);
+                    this.enemyFatigue = Convert.ToInt32(s.Split(' ')[4]);
                 }
 
                 if (readstate == 3) // minion or enchantment
@@ -12636,6 +12737,9 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
+
+            Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownFatigue, this.enemyDecksize, this.enemyFatigue);
+
             Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
 
 

@@ -26,6 +26,11 @@ namespace HREngine.Bots
         int cardsPlayedThisTurn = 0;
         int overdrive = 0;
 
+        int ownDecksize = 30;
+        int enemyDecksize = 30;
+        int ownFatigue = 0;
+        int enemyFatigue = 0;
+
         int enemySecrets = 0;
 
         bool ownHeroFrozen = false;
@@ -170,6 +175,13 @@ namespace HREngine.Bots
                         this.enemyWeapon = s.Split(' ')[2] ;
                     }
                     
+                }
+                if (readstate == 2 && counter == 3) // fatigue
+                {
+                    this.ownDecksize = Convert.ToInt32(s.Split(' ')[1]);
+                    this.enemyDecksize = Convert.ToInt32(s.Split(' ')[3]);
+                    this.ownFatigue = Convert.ToInt32(s.Split(' ')[2]);
+                    this.enemyFatigue = Convert.ToInt32(s.Split(' ')[4]);
                 }
 
                 if (readstate == 3) // minion or enchantment
@@ -404,6 +416,9 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon,this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname,this.enemyFrozen);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
+            
+            Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownFatigue, this.enemyDecksize, this.enemyFatigue);
+            
             Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
 
 

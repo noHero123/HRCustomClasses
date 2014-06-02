@@ -648,6 +648,11 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+            if (name == "frothingberserker")
+            {
+                if (p.cardsPlayedThisTurn >= 1) pen = 5;
+            }
+
             if ( name == "divinespirit")
             {
                 if (lethal)

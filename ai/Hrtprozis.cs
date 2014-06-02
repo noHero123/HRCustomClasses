@@ -29,8 +29,8 @@ namespace HREngine.Bots
     {
 
         public int ownHeroFatigue = 0;
-        public int ownDeckSize = 0;
-        public int enemyDeckSize = 0;
+        public int ownDeckSize = 30;
+        public int enemyDeckSize = 30;
         public int enemyHeroFatigue = 0;
 
         public int ownHeroEntity = -1;
@@ -342,9 +342,9 @@ namespace HREngine.Bots
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
         {
-            this.ownDeckSize = ods;
+            this.ownDeckSize = 30;// ods;
             this.ownHeroFatigue = ohf;
-            this.enemyDeckSize = eds;
+            this.enemyDeckSize = 30;// eds;
             this.enemyHeroFatigue = ehf;
         }
 
