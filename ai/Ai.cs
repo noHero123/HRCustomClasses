@@ -28,6 +28,7 @@ namespace HREngine.Bots
         public int bestmoveValue = 0;
         Playfield bestboard = new Playfield();
         Playfield nextMoveGuess = new Playfield();
+        public Bot botBase = null;
 
         private static Ai instance;
 
@@ -157,12 +158,13 @@ namespace HREngine.Bots
         }
 
 
-        private void doallmoves(bool test, Bot botBase, bool isLethalCheck)
+        private void doallmoves(bool test, bool isLethalCheck)
         {
 
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
+            
             while (havedonesomething)
             {
                 help.logg("ailoop");
@@ -348,7 +350,7 @@ namespace HREngine.Bots
                             //END: cut (double/similar) attacking minions out#####################################
 
                             //help.logg(m.name + " is going to attack!");
-                            List<targett> trgts = p.getAttackTargets();
+                            List<targett> trgts = p.getAttackTargets(true);
 
 
                             if (isLethalCheck)// only target enemy hero during Lethal check!
@@ -372,7 +374,7 @@ namespace HREngine.Bots
                             }
                             else
                             {
-                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
                             }
 
                             foreach (targett trgt in trgts)
@@ -413,7 +415,7 @@ namespace HREngine.Bots
                     // attack with hero
                     if (p.ownHeroReady)
                     {
-                        List<targett> trgts = p.getAttackTargets();
+                        List<targett> trgts = p.getAttackTargets(true);
 
                         havedonesomething = true;
 
@@ -438,7 +440,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
                         }
 
                         foreach (targett trgt in trgts)
@@ -571,7 +573,7 @@ namespace HREngine.Bots
 
                 if (!test)
                 {
-                    cuttingposibilities(botBase);
+                    cuttingposibilities();
                 }
                 help.logg("cut to len " + this.posmoves.Count);
                 help.loggonoff(false);
@@ -580,10 +582,18 @@ namespace HREngine.Bots
                 if (deep >= this.maxdeep) break;//remove this?
             }
 
+            foreach (Playfield p in posmoves)//temp
+            {
+                if (!p.complete)
+                {
+                    p.endTurn();
+                }
+            }
+
             int bestval = int.MinValue;
             int bestanzactions = 1000;
-            Playfield bestplay = temp[0];
-            foreach (Playfield p in temp)
+            Playfield bestplay = posmoves[0];//temp[0]
+            foreach (Playfield p in posmoves)//temp
             {
                 int val = botBase.getPlayfieldValue(p);
                 if (bestval <= val)
@@ -659,7 +669,7 @@ namespace HREngine.Bots
         }
 
 
-        private void cuttingposibilities(Bot botBase)
+        public void cuttingposibilities()
         {
             // take the x best values
             int takenumber = this.maxwide;
@@ -672,7 +682,7 @@ namespace HREngine.Bots
         }
 
 
-        private List<targett> cutAttackTargets(List<targett> oldlist, Playfield p)
+        public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
         {
             List<targett> retvalues = new List<targett>();
             List<Minion> addedmins = new List<Minion>(8);
@@ -681,14 +691,16 @@ namespace HREngine.Bots
             List<targett> retvaluesPrio = new List<targett>();
             foreach (targett t in oldlist)
             {
-                if (t.target == 200)
+                if ((own && t.target == 200) || (!own && t.target==100))
                 {
                     retvalues.Add(t);
                     continue;
                 }
-                if (t.target >= 10 && t.target <= 20)
+                if ((own && t.target >= 10 && t.target <= 19) || (!own && t.target >= 0 && t.target <= 9))
                 {
-                    Minion m = p.enemyMinions[t.target - 10];
+                    Minion m = null;
+                    if (own) m = p.enemyMinions[t.target - 10];
+                    if (!own) m = p.ownMinions[t.target];
                     /*if (penman.priorityDatabase.ContainsKey(m.name))
                     {
                         //retvalues.Add(t);
@@ -801,13 +813,13 @@ namespace HREngine.Bots
 
         }
 
-        public void dosomethingclever(Bot botbase)
+        public void dosomethingclever(Bot bbase)
         {
             //return;
             //turncheck
             //help.moveMouse(950,750);
             //help.Screenshot();
-
+            this.botBase = bbase;
             hp.updatePositions();
 
             posmoves.Clear();
@@ -835,7 +847,7 @@ namespace HREngine.Bots
                 if (useLethalCheck)
                 {
                     strt = DateTime.Now;
-                    doallmoves(false, botbase, true);
+                    doallmoves(false, true);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
                 }
                 
@@ -845,7 +857,7 @@ namespace HREngine.Bots
                     posmoves.Add(new Playfield());
                     help.logg("no lethal, do something random######");
                     strt = DateTime.Now;
-                    doallmoves(false, botbase, false);
+                    doallmoves(false, false);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
                     
                 }
@@ -856,12 +868,12 @@ namespace HREngine.Bots
 
         }
 
-        public void autoTester(Bot botbase)
+        public void autoTester(Bot bbase)
         {
             help.logg("simulating board ");
 
             BoardTester bt = new BoardTester();
-
+            this.botBase = bbase;
             hp.printHero();
             hp.printOwnMinions();
             hp.printEnemyMinions();
@@ -884,14 +896,14 @@ namespace HREngine.Bots
 
             // lethalcheck + normal
             DateTime strt = DateTime.Now;
-            doallmoves(false, botbase, true);
+            doallmoves(false, true);
             help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
             if (bestmoveValue < 10000)
             {
                 posmoves.Clear();
                 posmoves.Add(new Playfield());
                 strt = DateTime.Now;
-                doallmoves(false, botbase, false);
+                doallmoves(false, false);
                 help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
             }
 

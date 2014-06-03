@@ -54,6 +54,7 @@ namespace HREngine.Bots
 
         public HeroEnum heroname = HeroEnum.druid, enemyHeroname = HeroEnum.druid;
         public CardDB.Card heroAbility;
+        public CardDB.Card enemyAbility;
         public int anzEnemys = 0;
         public int anzOwn = 0;
         public bool herofrozen = false;
@@ -131,6 +132,7 @@ namespace HREngine.Bots
             heroname = HeroEnum.druid;
             enemyHeroname = HeroEnum.druid;
             heroAbility = new CardDB.Card();
+            enemyAbility = new CardDB.Card();
             anzEnemys = 0;
             anzOwn = 0;
             herofrozen = false;
@@ -328,7 +330,7 @@ namespace HREngine.Bots
 
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -338,6 +340,7 @@ namespace HREngine.Bots
             this.enemyHeroname = this.heroNametoEnum(heron);
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
+            this.enemyAbility = eab;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
@@ -468,6 +471,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
+            help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
             help.logg("fatigue: " + this.ownDeckSize + " " +this.ownHeroFatigue + " "+ this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }

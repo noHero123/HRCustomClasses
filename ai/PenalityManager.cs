@@ -1132,7 +1132,7 @@ namespace HREngine.Bots
         private bool isEnemyLowest(Minion mnn, Playfield p)
         {
             bool ret = true;
-            List<targett> litt= p.getAttackTargets();
+            List<targett> litt= p.getAttackTargets(true);
             int val = getValueOfEnemyMinion(mnn);
             foreach (Minion m in p.enemyMinions)
             {

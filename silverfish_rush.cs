@@ -442,7 +442,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Silverfish
     {
 
@@ -492,6 +491,7 @@ namespace HREngine.Bots
 
         CardDB.Card heroAbility = new CardDB.Card();
         bool ownAbilityisReady = false;
+        CardDB.Card enemyAbility = new CardDB.Card();
 
         int anzcards = 0;
         int enemyAnzCards = 0;
@@ -553,13 +553,10 @@ namespace HREngine.Bots
 
 
             // create hero + minion data
-            //Helpfunctions.Instance.logg("gethero");
             getHerostuff();
-            //Helpfunctions.Instance.logg("getmins");
             getMinions();
-            //Helpfunctions.Instance.logg("gethand");
             getHandcards();
-            //Helpfunctions.Instance.logg("setstuff");
+
             // send ai the data:
             Hrtprozis.Instance.clearAll();
             Handmanager.Instance.clearAll();
@@ -571,7 +568,7 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
 
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility);
 
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
@@ -630,7 +627,6 @@ namespace HREngine.Bots
             this.ownHeroFatigue = ownhero.GetFatigue();
             this.enemyHeroFatigue = enemyhero.GetFatigue();
             //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
-            //HRLog.Write("owndecksize " + HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count);
             //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
 
 
@@ -713,6 +709,7 @@ namespace HREngine.Bots
             this.heroAbility = CardDB.Instance.getCardDataFromID(ownHeroAbility.GetCardId());
             this.ownAbilityisReady = (ownHeroAbility.IsExhausted()) ? false : true; // if exhausted, ability is NOT ready
 
+            this.enemyAbility = CardDB.Instance.getCardDataFromID(enemyhero.GetHeroPower().GetCardId());
 
 
 
@@ -995,10 +992,10 @@ namespace HREngine.Bots
 
     }
 
-
     public class Playfield
     {
         public bool logging = false;
+        public bool simulateEnemyTurn = true;
 
         public int evaluatePenality = 0;
         public int ownController = 0;
@@ -1014,20 +1011,26 @@ namespace HREngine.Bots
         public HeroEnum ownHeroName = HeroEnum.druid;
         public HeroEnum enemyHeroName = HeroEnum.druid;
         public bool ownHeroReady = false;
+        public bool enemyHeroReady = false;
         public int ownHeroNumAttackThisTurn = 0;
+        public int enemyHeroNumAttackThisTurn = 0;
         public bool ownHeroWindfury = false;
+        public bool enemyHeroWindfury = false;
 
         public List<string> ownSecretsIDList = new List<string>();
         public int enemySecretCount = 0;
 
         public int ownHeroHp = 30;
         public int ownheroAngr = 0;
+        public int enemyheroAngr = 0;
         public bool ownHeroFrozen = false;
         public bool enemyHeroFrozen = false;
         public bool heroImmuneWhileAttacking = false;
+        public bool enemyheroImmuneWhileAttacking = false;
         public int ownWeaponDurability = 0;
         public int ownWeaponAttack = 0;
         public string ownWeaponName = "";
+        public string enemyWeaponName = "";
 
         public int enemyWeaponAttack = 0;
         public int enemyWeaponDurability = 0;
@@ -1041,7 +1044,7 @@ namespace HREngine.Bots
         public int enemycarddraw = 0;
         public int enemyAnzCards = 0;
         public int enemyHeroDefence = 0;
-        public bool ownAbilityReady = false;
+
         public int doublepriest = 0;
         public int spellpower = 0;
         public bool auchenaiseelenpriesterin = false;
@@ -1084,7 +1087,10 @@ namespace HREngine.Bots
         public int ownHeroFatigue = 0;
         public int enemyHeroFatigue = 0;
 
+        public bool ownAbilityReady = false;
         public CardDB.Card ownHeroAblility;
+        public bool enemyAbilityReady = false;
+        public CardDB.Card enemyHeroAblility;
 
         //Helpfunctions help = Helpfunctions.Instance;
 
@@ -1141,12 +1147,14 @@ namespace HREngine.Bots
             this.owncarddraw = 0;
             this.ownHeroDefence = Hrtprozis.Instance.heroDefence;
             this.enemyHeroDefence = Hrtprozis.Instance.enemyDefence;
-            this.enemyWeaponAttack = 0;//dont know jet
+            this.enemyWeaponAttack = Hrtprozis.Instance.enemyWeaponAttack;//dont know jet
+            this.enemyWeaponName = Hrtprozis.Instance.enemyHeroWeapon;
             this.enemyWeaponDurability = Hrtprozis.Instance.enemyWeaponDurability;
             this.enemycarddraw = 0;
             this.enemyAnzCards = Handmanager.Instance.enemyAnzCards;
             this.ownAbilityReady = Hrtprozis.Instance.ownAbilityisReady;
             this.ownHeroAblility = Hrtprozis.Instance.heroAbility;
+            this.enemyHeroAblility = Hrtprozis.Instance.enemyAbility;
             this.doublepriest = 0;
             this.spellpower = 0;
             this.mobsplayedThisTurn = Hrtprozis.Instance.numMinionsPlayedThisTurn;
@@ -1259,16 +1267,22 @@ namespace HREngine.Bots
             this.playactions.AddRange(p.playactions);
             this.complete = false;
             this.ownHeroReady = p.ownHeroReady;
+            this.enemyHeroReady = p.enemyHeroReady;
             this.ownHeroNumAttackThisTurn = p.ownHeroNumAttackThisTurn;
+            this.enemyHeroNumAttackThisTurn = p.enemyHeroNumAttackThisTurn;
             this.ownHeroWindfury = p.ownHeroWindfury;
 
             this.ownheroAngr = p.ownheroAngr;
+            this.enemyheroAngr = p.enemyheroAngr;
             this.ownHeroFrozen = p.ownHeroFrozen;
             this.enemyHeroFrozen = p.enemyHeroFrozen;
             this.heroImmuneWhileAttacking = p.heroImmuneWhileAttacking;
+            this.enemyheroImmuneWhileAttacking = p.enemyheroImmuneWhileAttacking;
             this.owncarddraw = p.owncarddraw;
             this.ownHeroDefence = p.ownHeroDefence;
             this.enemyWeaponAttack = p.enemyWeaponAttack;
+            this.enemyWeaponDurability = p.enemyWeaponDurability;
+            this.enemyWeaponName = p.enemyWeaponName;
             this.enemycarddraw = p.enemycarddraw;
             this.enemyAnzCards = p.enemyAnzCards;
             this.enemyHeroDefence = p.enemyHeroDefence;
@@ -1281,7 +1295,9 @@ namespace HREngine.Bots
             this.lostHeal = p.lostHeal;
 
             this.ownAbilityReady = p.ownAbilityReady;
+            this.enemyAbilityReady = p.enemyAbilityReady;
             this.ownHeroAblility = p.ownHeroAblility;
+            this.enemyHeroAblility = p.enemyHeroAblility;
             this.doublepriest = 0;
             this.spellpower = 0;
             this.mobsplayedThisTurn = p.mobsplayedThisTurn;
@@ -1460,25 +1476,252 @@ namespace HREngine.Bots
             return true;
         }
 
+        public void simulateEnemysTurn()
+        {
+            int maxwide = 250;
 
-        public List<targett> getAttackTargets()
+            this.enemyAbilityReady = true;
+            this.enemyHeroNumAttackThisTurn = 0;
+            this.enemyHeroWindfury = false;
+            if (this.enemyWeaponName == "doomhammer") this.enemyHeroWindfury = true;
+            this.enemyheroImmuneWhileAttacking = false;
+            if (this.enemyWeaponName == "gladiatorslongbow") this.enemyheroImmuneWhileAttacking = true;
+            if (!this.enemyHeroFrozen && this.enemyWeaponDurability > 0) this.enemyHeroReady = true;
+            this.enemyheroAngr = this.enemyWeaponAttack;
+            bool havedonesomething = true;
+            List<Playfield> posmoves = new List<Playfield>();
+            posmoves.Add(new Playfield(this));
+            List<Playfield> temp = new List<Playfield>();
+            int deep = 0;
+
+
+            while (havedonesomething)
+            {
+
+                temp.Clear();
+                temp.AddRange(posmoves);
+                havedonesomething = false;
+                Playfield bestold = null;
+                int bestoldval = 20000000;
+                foreach (Playfield p in temp)
+                {
+
+                    if (p.complete)
+                    {
+                        continue;
+                    }
+                    List<Minion> playedMinions = new List<Minion>(8);
+
+                    foreach (Minion m in p.enemyMinions)
+                    {
+
+                        if (m.Ready && m.Angr >= 1 && !m.frozen)
+                        {
+                            //BEGIN:cut (double/similar) attacking minions out#####################################
+                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
+                            List<Minion> tempoo = new List<Minion>(playedMinions);
+                            bool dontattacked = true;
+                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                            foreach (Minion mnn in tempoo)
+                            {
+                                // special minions are allowed to attack in silended and unsilenced state!
+                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+
+                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                                {
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                                {
+                                    if (m.name != mnn.name) // different name -> take it
+                                    {
+                                        continue;
+                                    }
+                                    // same name -> test whether they are equal
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                            }
+
+                            if (dontattacked)
+                            {
+                                playedMinions.Add(m);
+                            }
+                            else
+                            {
+                                //help.logg(m.name + " doesnt need to attack!");
+                                continue;
+                            }
+                            //END: cut (double/similar) attacking minions out#####################################
+
+                            //help.logg(m.name + " is going to attack!");
+                            List<targett> trgts = p.getAttackTargets(false);
+
+
+
+                            if (true)//(this.useCutingTargets)
+                            {
+                                trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                            }
+
+                            foreach (targett trgt in trgts)
+                            {
+
+                                Playfield pf = new Playfield(p);
+                                havedonesomething = true;
+                                pf.ENEMYattackWithMinion(m, trgt.target, trgt.targetEntity);
+                                posmoves.Add(pf);
+
+
+                            }
+                            if (trgts.Count == 1 && trgts[0].target == 100)//only enemy hero is available als attack
+                            {
+                                break;
+                            }
+                        }
+
+                    }
+                    // attacked with minions done
+                    // attack with hero
+                    if (p.enemyHeroReady)
+                    {
+                        List<targett> trgts = p.getAttackTargets(false);
+
+                        havedonesomething = true;
+
+
+                        if (true)//(this.useCutingTargets)
+                        {
+                            trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                        }
+
+                        foreach (targett trgt in trgts)
+                        {
+                            Playfield pf = new Playfield(p);
+                            pf.ENEMYattackWithWeapon(trgt.target, trgt.targetEntity, 0);
+                            posmoves.Add(pf);
+                        }
+                    }
+
+                    // use ability
+                    /// TODO check if ready after manaup
+
+                    if (p.enemyAbilityReady && p.enemyHeroAblility.canplayCard(p, 0))
+                    {
+                        int abilityPenality = 0;
+
+                        havedonesomething = true;
+                        // if we have mage or priest, we have to target something####################################################
+                        if (p.enemyHeroName == HeroEnum.mage || p.enemyHeroName == HeroEnum.priest)
+                        {
+
+                            List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
+                            foreach (targett trgt in trgts)
+                            {
+                                Playfield pf = new Playfield(p);
+                                havedonesomething = true;
+                                pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                posmoves.Add(pf);
+                            }
+                        }
+                        else
+                        {
+                            // the other classes dont have to target####################################################
+                            Playfield pf = new Playfield(p);
+
+                            havedonesomething = true;
+                            pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                            posmoves.Add(pf);
+                        }
+
+                    }
+
+                    p.endEnemyTurn();
+
+                    if (Ai.Instance.botBase.getPlayfieldValue(p) < bestoldval) // want the best enemy-play-> worst for us
+                    {
+                        bestoldval = Ai.Instance.botBase.getPlayfieldValue(p);
+                        bestold = p;
+                    }
+                    posmoves.Remove(p);
+
+                    if (posmoves.Count >= maxwide) break;
+                }
+
+                if (bestoldval <= 10000 && bestold != null)
+                {
+                    posmoves.Add(bestold);
+                }
+
+                deep++;
+
+            }
+
+            foreach (Playfield p in posmoves)
+            {
+                if (!p.complete) p.endEnemyTurn();
+            }
+
+            int bestval = int.MaxValue;
+            Playfield bestplay = posmoves[0];
+            foreach (Playfield p in posmoves)
+            {
+                int val = Ai.Instance.botBase.getPlayfieldValue(p);
+                if (bestval > val)// we search the worst value
+                {
+                    bestplay = p;
+                    bestval = val;
+                }
+            }
+
+            this.value = bestplay.value;
+
+        }
+
+        public List<targett> getAttackTargets(bool own)
         {
             List<targett> trgts = new List<targett>();
             List<targett> trgts2 = new List<targett>();
-            trgts2.Add(new targett(200, this.enemyHeroEntity));
             bool hastanks = false;
-            foreach (Minion m in this.enemyMinions)
+            if (own)
             {
-                if (m.stealth) continue; // cant target stealth
+                trgts2.Add(new targett(200, this.enemyHeroEntity));
+                foreach (Minion m in this.enemyMinions)
+                {
+                    if (m.stealth) continue; // cant target stealth
 
-                if (m.taunt && !m.silenced)
-                {
-                    hastanks = true;
-                    trgts.Add(new targett(m.id + 10, m.entitiyID));
+                    if (m.taunt && !m.silenced)
+                    {
+                        hastanks = true;
+                        trgts.Add(new targett(m.id + 10, m.entitiyID));
+                    }
+                    else
+                    {
+                        trgts2.Add(new targett(m.id + 10, m.entitiyID));
+                    }
                 }
-                else
+            }
+            else
+            {
+                trgts2.Add(new targett(100, this.ownHeroEntity));
+                foreach (Minion m in this.ownMinions)
                 {
-                    trgts2.Add(new targett(m.id + 10, m.entitiyID));
+                    if (m.stealth) continue; // cant target stealth
+
+                    if (m.taunt && !m.silenced)
+                    {
+                        hastanks = true;
+                        trgts.Add(new targett(m.id + 10, m.entitiyID));
+                    }
+                    else
+                    {
+                        trgts2.Add(new targett(m.id + 10, m.entitiyID));
+                    }
                 }
             }
 
@@ -1813,19 +2056,36 @@ namespace HREngine.Bots
             return bestplace;
         }
 
+        private void endEnemyTurn()
+        {
+            endTurnEffect(false);//own turn ends
+            endTurnBuffs(false);//end enemy turn
+            startTurnEffect(true);//start your turn
+            this.complete = true;
+            //Ai.Instance.botBase.getPlayfieldValue(this);
+
+        }
 
         public void endTurn()
         {
             this.value = int.MinValue;
-            this.complete = true;
+            if (this.complete) return;
             endTurnEffect(true);//own turn ends
             endTurnBuffs(true);//end own buffs 
             startTurnEffect(false);//enemy turn begins
-            guessHeroDamage();
             simulateTraps();
-            endTurnEffect(false);//own turn ends
-            endTurnBuffs(false);//end enemy turn
-            startTurnEffect(true);//start your turn
+            if (!simulateEnemyTurn)
+            {
+                guessHeroDamage();
+                endTurnEffect(false);//own turn ends
+                endTurnBuffs(false);//end enemy turn
+                startTurnEffect(true);//start your turn
+                this.complete = true;
+            }
+            else
+            {
+
+            }
 
         }
 
@@ -2768,7 +3028,11 @@ namespace HREngine.Bots
                     this.ownWeaponAttack -= 2;
                     this.ownheroAngr -= 2;
                 }
-                if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack -= 2;
+                if (!own && this.enemyWeaponDurability >= 1)
+                {
+                    this.enemyWeaponAttack -= 2;
+                    this.enemyheroAngr -= 2;
+                }
             }
         }
 
@@ -3439,7 +3703,11 @@ namespace HREngine.Bots
                     this.ownWeaponAttack -= 2;
                     this.ownheroAngr -= 2;
                 }
-                if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack -= 2;
+                if (!own && this.enemyWeaponDurability >= 1)
+                {
+                    this.enemyWeaponAttack -= 2;
+                    this.enemyheroAngr -= 2;
+                }
             }
         }
 
@@ -3478,7 +3746,11 @@ namespace HREngine.Bots
                         this.ownWeaponAttack += 2;
                         this.ownheroAngr += 2;
                     }
-                    if (!own && this.enemyWeaponDurability >= 1) this.enemyWeaponAttack += 2;
+                    if (!own && this.enemyWeaponDurability >= 1)
+                    {
+                        this.enemyWeaponAttack += 2;
+                        this.enemyheroAngr += 2;
+                    }
                 }
 
             }
@@ -3854,8 +4126,27 @@ namespace HREngine.Bots
             {
                 this.drawACard("", true);
             }
+        }
 
+        public void ENEMYattackWithMinion(Minion ownMinion, int target, int targetEntity)
+        {
 
+            if (logging) Helpfunctions.Instance.logg("ennemy attck with" + ownMinion.name + " " + ownMinion.id + " trgt " + target + " A " + ownMinion.Angr + " H " + ownMinion.Hp);
+            attack(ownMinion.id, target, false);
+            //draw a card if the minion has enchantment from: Segen der weisheit 
+            int segenderweisheitAnz = 0;
+            foreach (Enchantment e in ownMinion.enchantments)
+            {
+                if (e.CARDID == "EX1_363e2" && e.controllerOfCreator != this.ownController)
+                {
+                    segenderweisheitAnz++;
+                }
+            }
+            this.enemycarddraw += segenderweisheitAnz;
+            for (int i = 0; i < segenderweisheitAnz; i++)
+            {
+                this.drawACard("", false);
+            }
         }
 
         private void addMiniontoList(Minion m, List<Minion> l, int pos, bool own)
@@ -4848,8 +5139,10 @@ namespace HREngine.Bots
                 this.enemyWeaponDurability -= value;
                 if (this.enemyWeaponDurability <= 0)
                 {
+                    this.enemyheroAngr -= this.enemyWeaponAttack;
                     this.enemyWeaponDurability = 0;
                     this.enemyWeaponAttack = 0;
+                    this.enemyWeaponName = "";
                 }
             }
         }
@@ -6895,6 +7188,55 @@ namespace HREngine.Bots
 
         }
 
+        public void ENEMYattackWithWeapon(int target, int targetEntity, int penality)
+        {
+            //this.ownHeroAttackedInRound = true;
+            this.enemyHeroNumAttackThisTurn++;
+            if ((this.enemyHeroWindfury && this.enemyHeroNumAttackThisTurn == 2) || (!this.enemyHeroWindfury && this.enemyHeroNumAttackThisTurn == 1))
+            {
+                this.enemyHeroReady = false;
+            }
+
+            if (this.enemyWeaponName == "truesilverchampion")
+            {
+                this.attackOrHealHero(-2, false);
+            }
+
+            if (logging) Helpfunctions.Instance.logg("enemy attck with weapon trgt: " + target + " " + targetEntity);
+
+            if (target == 100)
+            {
+                attackOrHealHero(this.enemyheroAngr, true);
+            }
+            else
+            {
+
+                Minion enemy = this.ownMinions[target];
+                minionGetDamagedOrHealed(enemy, this.enemyheroAngr, 0, true);
+
+                if (!this.enemyheroImmuneWhileAttacking)
+                {
+                    attackOrHealHero(enemy.Angr, false);
+                    if (!enemy.silenced && enemy.handcard.card.specialMin == CardDB.specialMinions.waterelemental)
+                    {
+                        this.enemyHeroFrozen = true;
+                    }
+                }
+            }
+
+            //todo
+            if (enemyWeaponName == "gorehowl" && target != 100)
+            {
+                this.enemyWeaponAttack--;
+                this.enemyheroAngr--;
+            }
+            else
+            {
+                this.lowerWeaponDurability(1, false);
+            }
+
+        }
+
         public void activateAbility(CardDB.Card c, int target, int targetEntity, int penality)
         {
             this.evaluatePenality += penality;
@@ -7039,6 +7381,152 @@ namespace HREngine.Bots
                 int posi = this.ownMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardData("infernal");
                 callKid(kid, posi, true);
+            }
+
+
+        }
+
+        public void ENEMYactivateAbility(CardDB.Card c, int target, int targetEntity)
+        {
+            HeroEnum heroname = this.enemyHeroName;
+            this.enemyAbilityReady = false;
+            if (logging) Helpfunctions.Instance.logg("enemy play ability on target " + target);
+
+            if (heroname == HeroEnum.mage)
+            {
+                int damage = 1;
+                if (target == 100)
+                {
+                    attackOrHealHero(damage, true);
+                }
+                else
+                {
+                    if (target == 200)
+                    {
+                        attackOrHealHero(damage, false);
+                    }
+                    else
+                    {
+                        if (target < 10)
+                        {
+                            Minion m = this.ownMinions[target];
+                            this.minionGetDamagedOrHealed(m, damage, 0, true);
+                        }
+
+                        if (target >= 10 && target < 20)
+                        {
+                            Minion m = this.enemyMinions[target - 10];
+                            this.minionGetDamagedOrHealed(m, damage, 0, false);
+                        }
+                    }
+                }
+
+            }
+
+            if (heroname == HeroEnum.priest)
+            {
+                int heal = 2;
+                if (this.auchenaiseelenpriesterin) heal = -2;
+
+                if (c.name == "mindspike")
+                {
+                    heal = -1 * 2;
+                }
+                if (c.name == "mindshatter")
+                {
+                    heal = -1 * 3;
+                }
+
+                if (target == 100)
+                {
+                    attackOrHealHero(-1 * heal, true);
+                }
+                else
+                {
+                    if (target == 200)
+                    {
+                        attackOrHealHero(-1 * heal, false);
+                    }
+                    else
+                    {
+                        if (target < 10)
+                        {
+                            Minion m = this.ownMinions[target];
+                            this.minionGetDamagedOrHealed(m, 0, heal, true);
+                        }
+
+                        if (target >= 10 && target < 20)
+                        {
+                            Minion m = this.enemyMinions[target - 10];
+                            this.minionGetDamagedOrHealed(m, 0, heal, false);
+                        }
+                    }
+                }
+
+            }
+
+            if (heroname == HeroEnum.warrior)
+            {
+                this.enemyHeroDefence += 2;
+            }
+
+            if (heroname == HeroEnum.warlock)
+            {
+                //this.owncarddraw++;
+                this.drawACard("", false);
+                this.attackOrHealHero(2, false);
+            }
+
+
+            if (heroname == HeroEnum.thief)
+            {
+
+                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                this.enemyheroAngr = wcard.Attack;
+                this.enemyWeaponAttack = wcard.Attack;
+                this.enemyWeaponDurability = wcard.Durability;
+                this.enemyHeroWindfury = false;
+                if ((this.enemyHeroNumAttackThisTurn == 0 || (this.enemyHeroWindfury && this.enemyHeroNumAttackThisTurn == 1)) && !this.enemyHeroFrozen)
+                {
+                    this.enemyHeroReady = true;
+                }
+            }
+
+            if (heroname == HeroEnum.druid)
+            {
+                this.enemyheroAngr += 1;
+                if ((this.enemyHeroNumAttackThisTurn == 0 || (this.enemyHeroWindfury && this.enemyHeroNumAttackThisTurn == 1)) && !this.enemyHeroFrozen)
+                {
+                    this.enemyHeroReady = true;
+                }
+                this.enemyHeroDefence += 1;
+            }
+
+
+            if (heroname == HeroEnum.hunter)
+            {
+                this.attackOrHealHero(2, true);
+            }
+
+            if (heroname == HeroEnum.pala)
+            {
+                int posi = this.enemyMinions.Count - 1;
+                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                callKid(kid, posi, false);
+            }
+
+            if (heroname == HeroEnum.shaman)
+            {
+                int posi = this.enemyMinions.Count - 1;
+                CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
+                callKid(kid, posi, false);
+            }
+
+            if (heroname == HeroEnum.lordjaraxxus)
+            {
+                int posi = this.enemyMinions.Count - 1;
+                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                callKid(kid, posi, false);
             }
 
 
@@ -7225,6 +7713,7 @@ namespace HREngine.Bots
         public int bestmoveValue = 0;
         Playfield bestboard = new Playfield();
         Playfield nextMoveGuess = new Playfield();
+        public Bot botBase = null;
 
         private static Ai instance;
 
@@ -7354,12 +7843,13 @@ namespace HREngine.Bots
         }
 
 
-        private void doallmoves(bool test, Bot botBase, bool isLethalCheck)
+        private void doallmoves(bool test, bool isLethalCheck)
         {
 
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
+
             while (havedonesomething)
             {
                 help.logg("ailoop");
@@ -7545,7 +8035,7 @@ namespace HREngine.Bots
                             //END: cut (double/similar) attacking minions out#####################################
 
                             //help.logg(m.name + " is going to attack!");
-                            List<targett> trgts = p.getAttackTargets();
+                            List<targett> trgts = p.getAttackTargets(true);
 
 
                             if (isLethalCheck)// only target enemy hero during Lethal check!
@@ -7569,7 +8059,7 @@ namespace HREngine.Bots
                             }
                             else
                             {
-                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
                             }
 
                             foreach (targett trgt in trgts)
@@ -7610,7 +8100,7 @@ namespace HREngine.Bots
                     // attack with hero
                     if (p.ownHeroReady)
                     {
-                        List<targett> trgts = p.getAttackTargets();
+                        List<targett> trgts = p.getAttackTargets(true);
 
                         havedonesomething = true;
 
@@ -7635,7 +8125,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p);
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
                         }
 
                         foreach (targett trgt in trgts)
@@ -7768,7 +8258,7 @@ namespace HREngine.Bots
 
                 if (!test)
                 {
-                    cuttingposibilities(botBase);
+                    cuttingposibilities();
                 }
                 help.logg("cut to len " + this.posmoves.Count);
                 help.loggonoff(false);
@@ -7777,10 +8267,18 @@ namespace HREngine.Bots
                 if (deep >= this.maxdeep) break;//remove this?
             }
 
+            foreach (Playfield p in posmoves)//temp
+            {
+                if (!p.complete)
+                {
+                    p.endTurn();
+                }
+            }
+
             int bestval = int.MinValue;
             int bestanzactions = 1000;
-            Playfield bestplay = temp[0];
-            foreach (Playfield p in temp)
+            Playfield bestplay = posmoves[0];//temp[0]
+            foreach (Playfield p in posmoves)//temp
             {
                 int val = botBase.getPlayfieldValue(p);
                 if (bestval <= val)
@@ -7856,7 +8354,7 @@ namespace HREngine.Bots
         }
 
 
-        private void cuttingposibilities(Bot botBase)
+        public void cuttingposibilities()
         {
             // take the x best values
             int takenumber = this.maxwide;
@@ -7869,7 +8367,7 @@ namespace HREngine.Bots
         }
 
 
-        private List<targett> cutAttackTargets(List<targett> oldlist, Playfield p)
+        public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
         {
             List<targett> retvalues = new List<targett>();
             List<Minion> addedmins = new List<Minion>(8);
@@ -7878,14 +8376,16 @@ namespace HREngine.Bots
             List<targett> retvaluesPrio = new List<targett>();
             foreach (targett t in oldlist)
             {
-                if (t.target == 200)
+                if ((own && t.target == 200) || (!own && t.target == 100))
                 {
                     retvalues.Add(t);
                     continue;
                 }
-                if (t.target >= 10 && t.target <= 20)
+                if ((own && t.target >= 10 && t.target <= 19) || (!own && t.target >= 0 && t.target <= 9))
                 {
-                    Minion m = p.enemyMinions[t.target - 10];
+                    Minion m = null;
+                    if (own) m = p.enemyMinions[t.target - 10];
+                    if (!own) m = p.ownMinions[t.target];
                     /*if (penman.priorityDatabase.ContainsKey(m.name))
                     {
                         //retvalues.Add(t);
@@ -7998,13 +8498,13 @@ namespace HREngine.Bots
 
         }
 
-        public void dosomethingclever(Bot botbase)
+        public void dosomethingclever(Bot bbase)
         {
             //return;
             //turncheck
             //help.moveMouse(950,750);
             //help.Screenshot();
-
+            this.botBase = bbase;
             hp.updatePositions();
 
             posmoves.Clear();
@@ -8032,7 +8532,7 @@ namespace HREngine.Bots
                 if (useLethalCheck)
                 {
                     strt = DateTime.Now;
-                    doallmoves(false, botbase, true);
+                    doallmoves(false, true);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
                 }
 
@@ -8042,7 +8542,7 @@ namespace HREngine.Bots
                     posmoves.Add(new Playfield());
                     help.logg("no lethal, do something random######");
                     strt = DateTime.Now;
-                    doallmoves(false, botbase, false);
+                    doallmoves(false, false);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
 
                 }
@@ -8053,12 +8553,12 @@ namespace HREngine.Bots
 
         }
 
-        public void autoTester(Bot botbase)
+        public void autoTester(Bot bbase)
         {
             help.logg("simulating board ");
 
             BoardTester bt = new BoardTester();
-
+            this.botBase = bbase;
             hp.printHero();
             hp.printOwnMinions();
             hp.printEnemyMinions();
@@ -8081,14 +8581,14 @@ namespace HREngine.Bots
 
             // lethalcheck + normal
             DateTime strt = DateTime.Now;
-            doallmoves(false, botbase, true);
+            doallmoves(false, true);
             help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
             if (bestmoveValue < 10000)
             {
                 posmoves.Clear();
                 posmoves.Add(new Playfield());
                 strt = DateTime.Now;
-                doallmoves(false, botbase, false);
+                doallmoves(false, false);
                 help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
             }
 
@@ -8252,6 +8752,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
 
     public class Handmanager
@@ -8552,6 +9053,7 @@ namespace HREngine.Bots
 
         public HeroEnum heroname = HeroEnum.druid, enemyHeroname = HeroEnum.druid;
         public CardDB.Card heroAbility;
+        public CardDB.Card enemyAbility;
         public int anzEnemys = 0;
         public int anzOwn = 0;
         public bool herofrozen = false;
@@ -8629,6 +9131,7 @@ namespace HREngine.Bots
             heroname = HeroEnum.druid;
             enemyHeroname = HeroEnum.druid;
             heroAbility = new CardDB.Card();
+            enemyAbility = new CardDB.Card();
             anzEnemys = 0;
             anzOwn = 0;
             herofrozen = false;
@@ -8826,7 +9329,7 @@ namespace HREngine.Bots
 
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -8836,6 +9339,7 @@ namespace HREngine.Bots
             this.enemyHeroname = this.heroNametoEnum(heron);
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
+            this.enemyAbility = eab;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
@@ -8966,6 +9470,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
+            help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
             help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }
@@ -10209,7 +10714,7 @@ namespace HREngine.Bots
         private bool isEnemyLowest(Minion mnn, Playfield p)
         {
             bool ret = true;
-            List<targett> litt = p.getAttackTargets();
+            List<targett> litt = p.getAttackTargets(true);
             int val = getValueOfEnemyMinion(mnn);
             foreach (Minion m in p.enemyMinions)
             {
@@ -12415,6 +12920,7 @@ namespace HREngine.Bots
 
 
     }
+
     public class BoardTester
     {
         int ownPlayer = 1;
@@ -12472,6 +12978,7 @@ namespace HREngine.Bots
             }
 
             CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
+            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID("CS2_034");
             bool abilityReady = false;
 
             int readstate = 0;
@@ -12585,7 +13092,11 @@ namespace HREngine.Bots
                     }
 
                 }
-                if (readstate == 2 && counter == 3) // fatigue
+                if (readstate == 2 && counter == 3) // ability
+                {
+                    enemyability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                }
+                if (readstate == 2 && counter == 4) // fatigue
                 {
                     this.ownDecksize = Convert.ToInt32(s.Split(' ')[1]);
                     this.enemyDecksize = Convert.ToInt32(s.Split(' ')[3]);
@@ -12822,7 +13333,7 @@ namespace HREngine.Bots
             int numattttHero = 0;
             bool herowindfury = false;
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
 

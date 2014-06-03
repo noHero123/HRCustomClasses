@@ -63,6 +63,7 @@ namespace HREngine.Bots
             }
 
             CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
+            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID("CS2_034");
             bool abilityReady = false;
 
             int readstate = 0;
@@ -176,7 +177,11 @@ namespace HREngine.Bots
                     }
                     
                 }
-                if (readstate == 2 && counter == 3) // fatigue
+                if (readstate == 2 && counter == 3) // ability
+                {
+                    enemyability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                }
+                if (readstate == 2 && counter == 4) // fatigue
                 {
                     this.ownDecksize = Convert.ToInt32(s.Split(' ')[1]);
                     this.enemyDecksize = Convert.ToInt32(s.Split(' ')[3]);
@@ -413,7 +418,7 @@ namespace HREngine.Bots
             int numattttHero = 0;
             bool herowindfury = false;
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon,this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname,this.enemyFrozen);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
             

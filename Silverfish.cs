@@ -59,6 +59,7 @@ namespace HREngine.Bots
 
         CardDB.Card heroAbility = new CardDB.Card();
         bool ownAbilityisReady = false;
+        CardDB.Card enemyAbility = new CardDB.Card();
 
         int anzcards = 0;
         int enemyAnzCards = 0;
@@ -135,7 +136,7 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
 
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility);
             
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
@@ -276,6 +277,7 @@ namespace HREngine.Bots
             this.heroAbility = CardDB.Instance.getCardDataFromID(ownHeroAbility.GetCardId());
             this.ownAbilityisReady = (ownHeroAbility.IsExhausted()) ? false : true; // if exhausted, ability is NOT ready
 
+            this.enemyAbility = CardDB.Instance.getCardDataFromID(enemyhero.GetHeroPower().GetCardId());
 
 
 
