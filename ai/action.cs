@@ -5970,7 +5970,7 @@ namespace HREngine.Bots
             }
 
             //todo
-            if (ownWeaponName == "gorehowl")
+            if (ownWeaponName == "gorehowl" && target != 200)
             {
                 this.ownWeaponAttack--;
                 this.ownheroAngr--;

@@ -21,6 +21,7 @@ namespace HREngine.Bots
        
        private int dirtytarget = -1;
        private int dirtychoice = -1;
+       private string choiceCardId = "";
        Silverfish sf;
 
       public Bot()
@@ -76,7 +77,9 @@ namespace HREngine.Bots
              {
                  HRLog.Write("dirty targeting...");
                  HREntity target = getEntityWithNumber(dirtytarget);
+                 
                  dirtytarget = -1;
+                 
                  return new HREngine.API.Actions.TargetAction(target);
              }
              if (HRChoice.IsChoiceActive())
@@ -84,9 +87,92 @@ namespace HREngine.Bots
                  if (this.dirtychoice >= 1)
                  {
                      List<HREntity> choices = HRChoice.GetChoiceCards();
-                     int choice=this.dirtychoice-1;
+                     int choice=this.dirtychoice;
                      this.dirtychoice=-1;
-                     return new HREngine.API.Actions.ChoiceAction(choices[choice]);
+                     string ccId = this.choiceCardId;
+                     this.choiceCardId = "";
+                     HREntity target= choices[choice-1];
+                     if (ccId == "EX1_160")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_160b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_160a") target = hre;
+                         }
+                     }
+                     if (ccId == "NEW1_008")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "NEW1_008a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "NEW1_008b") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_178")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_178a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_178b") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_573")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_573a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_573b") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_165")//druid of the claw
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_165t1") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_165t2") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_166")//keeper of the grove
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_166a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_166b") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_155")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_155a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_155b") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_164")
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_164a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_164b") target = hre;
+                         }
+                     }
+                     if (ccId == "New1_007")//starfall
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "New1_007b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "New1_007a") target = hre;
+                         }
+                     }
+                     if (ccId == "EX1_154")//warth
+                     {
+                         foreach (HREntity hre in choices)
+                         {
+                             if (choice == 0 && hre.GetCardId() == "EX1_154a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_154b") target = hre;
+                         }
+                     }
+                     return new HREngine.API.Actions.ChoiceAction(target);
                  }
                  else
                  {
@@ -123,6 +209,8 @@ namespace HREngine.Bots
                     {
                         if(moveTodo.enemyEntitiy>=0) this.dirtytarget = moveTodo.enemyEntitiy;
                         this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                        this.choiceCardId = moveTodo.handcard.card.CardID;
+
                     }
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
