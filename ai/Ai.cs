@@ -10,6 +10,7 @@ namespace HREngine.Bots
     {
         private int maxdeep = 12;
         private int maxwide = 7000;
+        public bool simulateEnemyTurn = false;
         private bool usePenalityManager = true;
         private bool useCutingTargets = true;
         private bool dontRecalc = true;
@@ -542,7 +543,14 @@ namespace HREngine.Bots
                     }
 
 
-                    p.endTurn();
+                    if (isLethalCheck)
+                    {
+                        p.complete = true;
+                    }
+                    else
+                    {
+                        p.endTurn();
+                    }
 
                     //sort stupid stuff ouf
 
@@ -586,7 +594,14 @@ namespace HREngine.Bots
             {
                 if (!p.complete)
                 {
-                    p.endTurn();
+                    if (isLethalCheck)
+                    {
+                        p.complete = true;
+                    }
+                    else
+                    {
+                        p.endTurn();
+                    }
                 }
             }
 
@@ -824,7 +839,7 @@ namespace HREngine.Bots
 
             posmoves.Clear();
             posmoves.Add(new Playfield());
-
+            posmoves[0].sEnemTurn = this.simulateEnemyTurn;
             /* foreach (var item in this.posmoves[0].owncards)
              {
                  help.logg("card " + item.handcard.card.name + " is playable :" + item.handcard.card.canplayCard(posmoves[0]) + " cost/mana: " + item.handcard.card.cost + "/" + posmoves[0].mana);
@@ -855,6 +870,7 @@ namespace HREngine.Bots
                 {
                     posmoves.Clear();
                     posmoves.Add(new Playfield());
+                    posmoves[0].sEnemTurn = this.simulateEnemyTurn;
                     help.logg("no lethal, do something random######");
                     strt = DateTime.Now;
                     doallmoves(false, false);
@@ -881,6 +897,7 @@ namespace HREngine.Bots
             //calculate the stuff
             posmoves.Clear();
             posmoves.Add(new Playfield());
+            posmoves[0].sEnemTurn = this.simulateEnemyTurn;
             foreach (Playfield p in this.posmoves)
             {
                 p.printBoard();
@@ -902,6 +919,7 @@ namespace HREngine.Bots
             {
                 posmoves.Clear();
                 posmoves.Add(new Playfield());
+                posmoves[0].sEnemTurn = this.simulateEnemyTurn;
                 strt = DateTime.Now;
                 doallmoves(false, false);
                 help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);

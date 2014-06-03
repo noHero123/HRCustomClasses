@@ -85,7 +85,7 @@ namespace HREngine.Bots
     public class Playfield
     {
         public bool logging = false;
-        public bool simulateEnemyTurn = false;
+        public bool sEnemTurn = false;
 
         public int evaluatePenality = 0;
         public int ownController = 0;
@@ -205,6 +205,7 @@ namespace HREngine.Bots
 
         public Playfield()
         {
+            //this.simulateEnemyTurn = Ai.Instance.simulateEnemyTurn;
             this.ownController = Hrtprozis.Instance.getOwnController();
             this.ownHeroEntity = Hrtprozis.Instance.ownHeroEntity;
             this.enemyHeroEntity = Hrtprozis.Instance.enemyHeroEntitiy;
@@ -335,6 +336,7 @@ namespace HREngine.Bots
 
         public Playfield(Playfield p)
         {
+            this.sEnemTurn = p.sEnemTurn;
             this.ownController = p.ownController;
             this.ownHeroEntity = p.ownHeroEntity;
             this.enemyHeroEntity = p.enemyHeroEntity;
@@ -568,7 +570,7 @@ namespace HREngine.Bots
 
         public void simulateEnemysTurn()
         {
-            int maxwide = 250;
+            int maxwide = 30;
 
             this.enemyAbilityReady = true;
             this.enemyHeroNumAttackThisTurn = 0;
@@ -710,12 +712,12 @@ namespace HREngine.Bots
                         if (p.enemyHeroName == HeroEnum.mage || p.enemyHeroName == HeroEnum.priest)
                         {
 
-                            List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
+                            List<targett> trgts = p.enemyHeroAblility.getTargetsForCard(p);
                             foreach (targett trgt in trgts)
                             {
                                     Playfield pf = new Playfield(p);
                                     havedonesomething = true;
-                                    pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                    pf.ENEMYactivateAbility(p.enemyHeroAblility, trgt.target, trgt.targetEntity);
                                     posmoves.Add(pf);
                             }
                         }
@@ -725,7 +727,7 @@ namespace HREngine.Bots
                             Playfield pf = new Playfield(p);
 
                                 havedonesomething = true;
-                                pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                pf.ENEMYactivateAbility(p.enemyHeroAblility, -1, -1);
                                 posmoves.Add(pf);
                         }
 
@@ -749,7 +751,7 @@ namespace HREngine.Bots
                 }
 
                 deep++;
-
+                if (posmoves.Count >= maxwide) break;
             }
 
             foreach (Playfield p in posmoves)
@@ -806,11 +808,11 @@ namespace HREngine.Bots
                     if (m.taunt && !m.silenced)
                     {
                         hastanks = true;
-                        trgts.Add(new targett(m.id + 10, m.entitiyID));
+                        trgts.Add(new targett(m.id, m.entitiyID));
                     }
                     else
                     {
-                        trgts2.Add(new targett(m.id + 10, m.entitiyID));
+                        trgts2.Add(new targett(m.id, m.entitiyID));
                     }
                 }
             }
@@ -1164,7 +1166,7 @@ namespace HREngine.Bots
             endTurnBuffs(true);//end own buffs 
             startTurnEffect(false);//enemy turn begins
             simulateTraps();
-            if (!simulateEnemyTurn)
+            if (!sEnemTurn)
             {
                 guessHeroDamage();
                 endTurnEffect(false);//own turn ends
@@ -1174,7 +1176,7 @@ namespace HREngine.Bots
             }
             else
             {
-
+                simulateEnemysTurn();
             }
             
         }
@@ -3220,9 +3222,9 @@ namespace HREngine.Bots
 
         public void ENEMYattackWithMinion(Minion ownMinion, int target, int targetEntity)
         {
-           
+            
             if (logging) Helpfunctions.Instance.logg("ennemy attck with" + ownMinion.name + " " + ownMinion.id + " trgt " + target + " A " + ownMinion.Angr + " H " + ownMinion.Hp);
-            attack(ownMinion.id, target, false);
+            attack(ownMinion.id+10, target, false);
             //draw a card if the minion has enchantment from: Segen der weisheit 
             int segenderweisheitAnz = 0;
             foreach (Enchantment e in ownMinion.enchantments)
@@ -3307,7 +3309,7 @@ namespace HREngine.Bots
                 m.Angr = m.Hp;
             }
 
-            this.getNewEffects(m, own, placeOfNewMob, true);
+            this.getNewEffects(m, own, placeOfNewMob,true);
 
             return m;
         }
