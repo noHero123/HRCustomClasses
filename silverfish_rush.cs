@@ -85,7 +85,7 @@ namespace HREngine.Bots
                     retval -= m.Angr * 2;
                     if (m.windfury) retval -= m.Angr;
                     if (m.taunt) retval -= 5;
-                    if (m.divineshild) retval -= 1;
+                    if (m.divineshild) retval -= m.Angr;
                     if (m.frozen) retval += 1; // because its bad for enemy :D
                     if (m.poisonous) retval -= 4;
                     retval -= m.handcard.card.rarity;

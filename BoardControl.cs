@@ -124,7 +124,8 @@ namespace HREngine.Bots
               }
               retval -= m.handcard.card.rarity;
               if (m.taunt) retval -= 5;
-              if (m.divineshild) retval -= 1;
+              if (m.divineshild) retval -= m.Angr;
+              if (m.divineshild && m.taunt) retval -= 5;
               if (m.stealth) retval -= 1;
               
               if (m.poisonous) retval -= 4;
