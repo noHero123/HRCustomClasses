@@ -2135,6 +2135,7 @@ namespace HREngine.Bots
             else
             {
                 simulateEnemysTurn();
+                this.complete = true;
             }
 
         }
@@ -7739,7 +7740,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class Ai
     {

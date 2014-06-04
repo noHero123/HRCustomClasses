@@ -2087,6 +2087,7 @@ namespace HREngine.Bots
             else
             {
                 simulateEnemysTurn();
+                this.complete = true;
             }
 
         }
