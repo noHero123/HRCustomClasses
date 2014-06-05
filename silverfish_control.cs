@@ -1040,7 +1040,6 @@ namespace HREngine.Bots
         }
 
     }
-
     public class Playfield
     {
         public bool logging = false;
@@ -5206,6 +5205,7 @@ namespace HREngine.Bots
             this.ownheroAngr = c.Attack;
             this.ownWeaponAttack = c.Attack;
             this.ownWeaponDurability = c.Durability;
+            this.ownWeaponName = c.name;
             if (c.name == "doomhammer")
             {
                 this.ownHeroWindfury = true;
@@ -5360,7 +5360,7 @@ namespace HREngine.Bots
             if (c.name == "explosiveshot")
             {
                 damage = 5;
-                adjacentDamage = 1;
+                adjacentDamage = 2;
             }
 
             //mage###############################################################################
