@@ -5266,7 +5266,7 @@ namespace HREngine.Bots
 
             if (c.name == "arcanemissiles")
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                /*List<Minion> temp = new List<Minion>(this.enemyMinions);
                 temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
                 int damage = 1;
                 int ammount = getSpellDamageDamage(3);
@@ -5283,7 +5283,34 @@ namespace HREngine.Bots
                     }
                     
                 }
-                if (i < ammount) attackOrHealHero(ammount - i, false);
+                if (i < ammount) attackOrHealHero(ammount - i, false);*/
+
+                int damage = 1;
+                int i = 0;
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int times = this.getSpellDamageDamage(3);
+                while (i < times)
+                {
+                    if (temp.Count >= 1)
+                    {
+                        temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
+                        if (temp[0].Hp == 1 && this.enemyHeroHp >= 2)
+                        {
+                            attackOrHealHero(damage, false);
+                        }
+                        else
+                        {
+                            minionGetDamagedOrHealed(temp[0], damage, 0, false);
+                        }
+                    }
+                    else
+                    {
+                        attackOrHealHero(damage, false);
+                    }
+                    i++;
+                }
+
+
 
             }
             if (c.name == "arcaneintellect")
@@ -5377,22 +5404,30 @@ namespace HREngine.Bots
 
             if (c.name == "avengingwrath")
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                
                 int damage = 1;
                 int i = 0;
-                if (temp.Count >= 1)
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int times = this.getSpellDamageDamage(8);
+                while (i < times)
                 {
-                    foreach (Minion enemy in temp)
+                    if (temp.Count >= 1)
                     {
-                        minionGetDamagedOrHealed(enemy, damage, 0, false);
-                        i++;
-                        if (i == 8) break;
+                        temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
+                        if (temp[0].Hp == 1 && this.enemyHeroHp >= 2)
+                        {
+                            attackOrHealHero(damage, false);
+                        }
+                        else
+                        {
+                            minionGetDamagedOrHealed(temp[0], damage, 0, false);
+                        }
                     }
-                }
-                else
-                {
-                    damage = getSpellDamageDamage(8);
-                    attackOrHealHero(damage, false);
+                    else
+                    {
+                        attackOrHealHero(damage, false);
+                    }
+                    i++;
                 }
 
             }

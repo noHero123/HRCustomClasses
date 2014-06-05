@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 42;
+        private int versionnumber = 43;
         private bool singleLog = false;
 
 
