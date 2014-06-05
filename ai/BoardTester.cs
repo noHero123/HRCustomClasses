@@ -205,6 +205,8 @@ namespace HREngine.Bots
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool frzn = false;
+                        if (s.Contains(" frz:")) frzn = s.Split(new string[] { " frz:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool silenced = false;
                         if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool divshield = false;
@@ -250,6 +252,7 @@ namespace HREngine.Bots
                         tempminion.stealth = stl;
                         tempminion.immune = immn;
                         tempminion.charge = chrg;
+                        tempminion.frozen = frzn;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -285,6 +288,9 @@ namespace HREngine.Bots
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool frzn = false;
+                        if (s.Contains(" frz:")) frzn = s.Split(new string[] { " frz:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        
                         bool silenced = false;
                         if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool divshield = false;
@@ -328,6 +334,7 @@ namespace HREngine.Bots
                         tempminion.stealth = stl;
                         tempminion.immune = immn;
                         tempminion.charge = chrg;
+                        tempminion.frozen = frzn;
                         if (maxhp > hp) tempminion.wounded = true;
 
 

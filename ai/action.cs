@@ -832,7 +832,7 @@ namespace HREngine.Bots
 
         }
 
-        public int getBestPlace(CardDB.Card card)
+        public int getBestPlace(CardDB.Card card, bool lethal)
         {
             if (card.type != CardDB.cardtype.MOB) return 0;
             if (this.ownMinions.Count == 0) return 0;
@@ -841,6 +841,43 @@ namespace HREngine.Bots
             int[] places = new int[this.ownMinions.Count];
             int i = 0;
             int tempval = 0;
+            if (lethal && card.specialMin == CardDB.specialMinions.defenderofargus)
+            {
+                i = 0;
+                foreach (Minion m in this.ownMinions)
+                {
+
+                    places[i] = 0;
+                    tempval = 0;
+                    if (m.Ready)
+                    {
+                        tempval -= m.Angr -1;
+                        if(m.windfury) tempval-=m.Angr -1;
+                    }
+                    places[i] = tempval;
+
+                    i++;
+                }
+
+
+                i = 0;
+                int bestpl = 7;
+                int bestval = 10000;
+                foreach (Minion m in this.ownMinions)
+                {
+                    int prev = 0;
+                    int next = 0;
+                    if (i >= 1) prev = places[i - 1];
+                    next = places[i];
+                    if (bestval > prev + next)
+                    {
+                        bestval = prev + next;
+                        bestpl = i;
+                    }
+                    i++;
+                }
+                return bestpl;
+            }
             if (card.specialMin == CardDB.specialMinions.sunfuryprotector || card.specialMin == CardDB.specialMinions.defenderofargus) // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
             {
                 i = 0;
@@ -1248,7 +1285,7 @@ namespace HREngine.Bots
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     foreach (Minion m in temp)
                     {
-                        minionGetDamagedOrHealed(m, 2, 0, false);
+                        minionGetDamagedOrHealed(m, 2, 0,false);
                     }
                     attackEnemyHeroWithoutKill(2);
                 }
@@ -2701,6 +2738,7 @@ namespace HREngine.Bots
         {
             if (m.windfury) return;
             m.windfury = true;
+            if (m.frozen) return;
             if (!m.playedThisTurn && m.numAttacksThisTurn <= 1)
             {
                 m.Ready = true;
@@ -5471,10 +5509,12 @@ namespace HREngine.Bots
                 if (this.ownHeroAblility.CardID == "CS1h_001") // lesser heal becomes mind spike
                 {
                     this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t");
+                    this.ownAbilityReady = true;
                 }
                 else
                 {
                     this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t2");  // mindspike becomes mind shatter
+                    this.ownAbilityReady = true;
                 }
             }
 
@@ -6088,10 +6128,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.manaaddict)
                 {
-                    Enchantment e = CardDB.getEnchantmentFromCardID("EX1_055o");
-                    e.creator = m.entitiyID;
-                    e.controllerOfCreator = this.ownController;
-                    addEffectToMinionNoDoubles(m, e, true);
+                    minionGetBuffed(m, 2, 0, true);
                 }
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)

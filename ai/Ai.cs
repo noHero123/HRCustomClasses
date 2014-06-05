@@ -100,7 +100,7 @@ namespace HREngine.Bots
 
 
 
-                    int bestplace = p.getBestPlace(c);
+                    int bestplace = p.getBestPlace(c, lethalcheck);
                     List<targett> trgts = c.getTargetsForCard(p);
                     int cardplayPenality = 0;
                     if (trgts.Count == 0)
@@ -178,7 +178,7 @@ namespace HREngine.Bots
                 foreach (Playfield p in temp)
                 {
 
-                    if (p.complete)
+                    if (p.complete || p.ownHeroHp <=0)
                     {
                         continue;
                     }
@@ -201,7 +201,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            int bestplace = p.getBestPlace(c);
+                            int bestplace = p.getBestPlace(c, isLethalCheck);
                             if (hc.canplayCard(p))
                             {
                                 havedonesomething = true;
@@ -570,7 +570,7 @@ namespace HREngine.Bots
                 {
                     this.posmoves.Add(bestold);
                 }
-
+                this.posmoves.RemoveAll(x => x.ownHeroHp <= 0);
                 help.loggonoff(true);
                 int donec = 0;
                 foreach (Playfield p in posmoves)

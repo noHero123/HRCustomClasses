@@ -35,7 +35,7 @@ namespace HREngine.Bots
         Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyDatabase = new Dictionary<string, int>();
-
+        Dictionary<string, int> buffingMinionsDatabase = new Dictionary<string, int>();
         Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
@@ -73,6 +73,7 @@ namespace HREngine.Bots
             setupSpecialMins();
             setupEnemyTargetPriority();
             setupHeroDamagingAOE();
+            setupBuffingMinions();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
@@ -123,7 +124,7 @@ namespace HREngine.Bots
             retval += getCardDrawPenality( name,  target,  p,  choice);
             retval += getCardDrawofEffectMinions( card,  p);
             retval += getCardDiscardPenality( name,  p);
-            retval += getDestroyOwnPenality(name, target, p);
+            retval += getDestroyOwnPenality(name, target, p, lethal);
             
             retval += getDestroyPenality( name,  target,  p);
             retval += getSpecialCardComboPenalitys( card,  target,  p, lethal);
@@ -585,7 +586,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyOwnPenality(string name, int target, Playfield p)
+        private int getDestroyOwnPenality(string name, int target, Playfield p, bool lethal)
         {
             if (!this.destroyOwnDatabase.ContainsKey(name)) return 0;
             int pen = 0;
@@ -597,8 +598,20 @@ namespace HREngine.Bots
 
                 Minion m = p.ownMinions[target];
                 if (m.handcard.card.deathrattle) return 10;
+                if (lethal && name == "sacrificialpact")
+                {
+                    int beasts = 0;
+                    foreach (Minion mm in p.ownMinions)
+                    {
+                        if (mm.Ready && mm.handcard.card.specialMin == CardDB.specialMinions.lightwarden) beasts++;
+                    }
+                    if (beasts == 0) return 500;
+                }
+                else
+                {
 
-                return 500;
+                    return 500;
+                }
             }
 
             return pen;
@@ -631,9 +644,66 @@ namespace HREngine.Bots
 
             if (lethal && card.type == CardDB.cardtype.MOB)
             {
-                if (!(name == "nightblade" || card.Charge || this.silenceDatabase.ContainsKey(name)|| ((TAG_RACE)card.race == TAG_RACE.PET && p.ownMinions.Find(x => x.name == "tundrarhino") != null) || (p.ownMinions.Find(x => x.name == "warsongcommander") != null && card.Attack <= 3) || p.owncards.Find(x => x.card.name == "charge") != null))
+                if (this.buffingMinionsDatabase.ContainsKey(name))
                 {
-                    return 500;
+                    if (name == "timberwolf" || name == "houndmaster")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.PET) beasts ++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    if (name == "southseacaptain")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.PIRATE) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    if (name == "murlocwarleader" || name =="grimscaleoracle" || name == "coldlightseer")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.MURLOC) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                }
+                else
+                {
+                    if (name == "theblackknight")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.enemyMinions)
+                        {
+                            if (mm.taunt) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    else
+                    {
+                        if ((this.HealTargetDatabase.ContainsKey(name) || this.HealHeroDatabase.ContainsKey(name) || this.HealAllDatabase.ContainsKey(name)))
+                        {
+                            int beasts = 0;
+                            foreach (Minion mm in p.ownMinions)
+                            {
+                                if (mm.Ready && mm.handcard.card.specialMin == CardDB.specialMinions.lightwarden ) beasts++;
+                            }
+                            if (beasts == 0) return 500;
+                        }
+                        else
+                        {
+                            if (!(name == "nightblade" || card.Charge || this.silenceDatabase.ContainsKey(name) || ((TAG_RACE)card.race == TAG_RACE.PET && p.ownMinions.Find(x => x.name == "tundrarhino") != null) || (p.ownMinions.Find(x => x.name == "warsongcommander") != null && card.Attack <= 3) || p.owncards.Find(x => x.card.name == "charge") != null))
+                            {
+                                return 500;
+                            }
+                        }
+                    }
                 }
             }
             //some effects, which are bad :D
@@ -651,6 +721,19 @@ namespace HREngine.Bots
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
+            }
+
+            if (lethal)
+            {
+                if (name == "corruption")
+                {
+                    int beasts = 0;
+                    foreach (Minion mm in p.ownMinions)
+                    {
+                        if (mm.Ready && (mm.handcard.card.specialMin == CardDB.specialMinions.questingadventurer || mm.handcard.card.specialMin == CardDB.specialMinions.archmageantonidas || mm.handcard.card.specialMin== CardDB.specialMinions.manaaddict || mm.handcard.card.specialMin == CardDB.specialMinions.manawyrm || mm.handcard.card.specialMin == CardDB.specialMinions.wildpyromancer)) beasts++;
+                    }
+                    if (beasts == 0) return 500;
+                }
             }
 
             if ( name == "divinespirit")
@@ -1514,6 +1597,30 @@ namespace HREngine.Bots
             this.specialMinions.Add("waterelemental", 0);
         }
 
+        private void setupBuffingMinions()
+        {
+            buffingMinionsDatabase.Add("abusivesergeant", 0);
+            buffingMinionsDatabase.Add("captaingreenskin", 0);
+            buffingMinionsDatabase.Add("cenarius", 0);
+            buffingMinionsDatabase.Add("coldlightseer", 0);
+            buffingMinionsDatabase.Add("crueltaskmaster", 0);
+            buffingMinionsDatabase.Add("darkirondwarf", 0);
+            buffingMinionsDatabase.Add("defenderofargus", 0);
+            buffingMinionsDatabase.Add("direwolfalpha", 0);
+            buffingMinionsDatabase.Add("flametonguetotem", 0);
+            buffingMinionsDatabase.Add("grimscaleoracle", 0);
+            buffingMinionsDatabase.Add("houndmaster", 0);
+            buffingMinionsDatabase.Add("leokk", 0);
+            buffingMinionsDatabase.Add("murlocwarleader", 0);
+            buffingMinionsDatabase.Add("raidleader", 0);
+            buffingMinionsDatabase.Add("shatteredsuncleric", 0);
+            buffingMinionsDatabase.Add("southseacaptain", 0);
+            buffingMinionsDatabase.Add("spitefulsmith", 0);
+            buffingMinionsDatabase.Add("stormwindchampion", 0);
+            buffingMinionsDatabase.Add("templeenforcer", 0);
+            buffingMinionsDatabase.Add("timberwolf", 0);
+
+        }
         private void setupEnemyTargetPriority()
         {
             priorityTargets.Add("angrychicken", 10);

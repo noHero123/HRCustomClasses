@@ -493,7 +493,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 43;
+        private int versionnumber = 44;
         private bool singleLog = false;
 
 
@@ -1793,7 +1793,7 @@ namespace HREngine.Bots
 
         }
 
-        public int getBestPlace(CardDB.Card card)
+        public int getBestPlace(CardDB.Card card, bool lethal)
         {
             if (card.type != CardDB.cardtype.MOB) return 0;
             if (this.ownMinions.Count == 0) return 0;
@@ -1802,6 +1802,43 @@ namespace HREngine.Bots
             int[] places = new int[this.ownMinions.Count];
             int i = 0;
             int tempval = 0;
+            if (lethal && card.specialMin == CardDB.specialMinions.defenderofargus)
+            {
+                i = 0;
+                foreach (Minion m in this.ownMinions)
+                {
+
+                    places[i] = 0;
+                    tempval = 0;
+                    if (m.Ready)
+                    {
+                        tempval -= m.Angr - 1;
+                        if (m.windfury) tempval -= m.Angr - 1;
+                    }
+                    places[i] = tempval;
+
+                    i++;
+                }
+
+
+                i = 0;
+                int bestpl = 7;
+                int bestval = 10000;
+                foreach (Minion m in this.ownMinions)
+                {
+                    int prev = 0;
+                    int next = 0;
+                    if (i >= 1) prev = places[i - 1];
+                    next = places[i];
+                    if (bestval > prev + next)
+                    {
+                        bestval = prev + next;
+                        bestpl = i;
+                    }
+                    i++;
+                }
+                return bestpl;
+            }
             if (card.specialMin == CardDB.specialMinions.sunfuryprotector || card.specialMin == CardDB.specialMinions.defenderofargus) // bestplace, if right and left minions have no taunt + lots of hp, dont make priority-minions to taunt
             {
                 i = 0;
@@ -3662,6 +3699,7 @@ namespace HREngine.Bots
         {
             if (m.windfury) return;
             m.windfury = true;
+            if (m.frozen) return;
             if (!m.playedThisTurn && m.numAttacksThisTurn <= 1)
             {
                 m.Ready = true;
@@ -6432,10 +6470,12 @@ namespace HREngine.Bots
                 if (this.ownHeroAblility.CardID == "CS1h_001") // lesser heal becomes mind spike
                 {
                     this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t");
+                    this.ownAbilityReady = true;
                 }
                 else
                 {
                     this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t2");  // mindspike becomes mind shatter
+                    this.ownAbilityReady = true;
                 }
             }
 
@@ -7049,10 +7089,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.manaaddict)
                 {
-                    Enchantment e = CardDB.getEnchantmentFromCardID("EX1_055o");
-                    e.creator = m.entitiyID;
-                    e.controllerOfCreator = this.ownController;
-                    addEffectToMinionNoDoubles(m, e, true);
+                    minionGetBuffed(m, 2, 0, true);
                 }
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.secretkeeper && c.Secret)
@@ -7891,7 +7928,7 @@ namespace HREngine.Bots
 
 
 
-                    int bestplace = p.getBestPlace(c);
+                    int bestplace = p.getBestPlace(c, lethalcheck);
                     List<targett> trgts = c.getTargetsForCard(p);
                     int cardplayPenality = 0;
                     if (trgts.Count == 0)
@@ -7969,7 +8006,7 @@ namespace HREngine.Bots
                 foreach (Playfield p in temp)
                 {
 
-                    if (p.complete)
+                    if (p.complete || p.ownHeroHp <= 0)
                     {
                         continue;
                     }
@@ -7992,7 +8029,7 @@ namespace HREngine.Bots
                         }
                         else
                         {
-                            int bestplace = p.getBestPlace(c);
+                            int bestplace = p.getBestPlace(c, isLethalCheck);
                             if (hc.canplayCard(p))
                             {
                                 havedonesomething = true;
@@ -8361,7 +8398,7 @@ namespace HREngine.Bots
                 {
                     this.posmoves.Add(bestold);
                 }
-
+                this.posmoves.RemoveAll(x => x.ownHeroHp <= 0);
                 help.loggonoff(true);
                 int donec = 0;
                 foreach (Playfield p in posmoves)
@@ -8876,8 +8913,6 @@ namespace HREngine.Bots
         }
 
     }
-
-
 
     public class Handmanager
     {
@@ -9746,7 +9781,7 @@ namespace HREngine.Bots
         Dictionary<string, int> cardDiscardDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyDatabase = new Dictionary<string, int>();
-
+        Dictionary<string, int> buffingMinionsDatabase = new Dictionary<string, int>();
         Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
@@ -9784,6 +9819,7 @@ namespace HREngine.Bots
             setupSpecialMins();
             setupEnemyTargetPriority();
             setupHeroDamagingAOE();
+            setupBuffingMinions();
         }
 
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
@@ -9834,7 +9870,7 @@ namespace HREngine.Bots
             retval += getCardDrawPenality(name, target, p, choice);
             retval += getCardDrawofEffectMinions(card, p);
             retval += getCardDiscardPenality(name, p);
-            retval += getDestroyOwnPenality(name, target, p);
+            retval += getDestroyOwnPenality(name, target, p, lethal);
 
             retval += getDestroyPenality(name, target, p);
             retval += getSpecialCardComboPenalitys(card, target, p, lethal);
@@ -10296,7 +10332,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyOwnPenality(string name, int target, Playfield p)
+        private int getDestroyOwnPenality(string name, int target, Playfield p, bool lethal)
         {
             if (!this.destroyOwnDatabase.ContainsKey(name)) return 0;
             int pen = 0;
@@ -10308,8 +10344,20 @@ namespace HREngine.Bots
 
                 Minion m = p.ownMinions[target];
                 if (m.handcard.card.deathrattle) return 10;
+                if (lethal && name == "sacrificialpact")
+                {
+                    int beasts = 0;
+                    foreach (Minion mm in p.ownMinions)
+                    {
+                        if (mm.Ready && mm.handcard.card.specialMin == CardDB.specialMinions.lightwarden) beasts++;
+                    }
+                    if (beasts == 0) return 500;
+                }
+                else
+                {
 
-                return 500;
+                    return 500;
+                }
             }
 
             return pen;
@@ -10342,9 +10390,66 @@ namespace HREngine.Bots
 
             if (lethal && card.type == CardDB.cardtype.MOB)
             {
-                if (!(name == "nightblade" || card.Charge || this.silenceDatabase.ContainsKey(name) || ((TAG_RACE)card.race == TAG_RACE.PET && p.ownMinions.Find(x => x.name == "tundrarhino") != null) || (p.ownMinions.Find(x => x.name == "warsongcommander") != null && card.Attack <= 3) || p.owncards.Find(x => x.card.name == "charge") != null))
+                if (this.buffingMinionsDatabase.ContainsKey(name))
                 {
-                    return 500;
+                    if (name == "timberwolf" || name == "houndmaster")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.PET) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    if (name == "southseacaptain")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.PIRATE) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    if (name == "murlocwarleader" || name == "grimscaleoracle" || name == "coldlightseer")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.ownMinions)
+                        {
+                            if ((TAG_RACE)mm.handcard.card.race == TAG_RACE.MURLOC) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                }
+                else
+                {
+                    if (name == "theblackknight")
+                    {
+                        int beasts = 0;
+                        foreach (Minion mm in p.enemyMinions)
+                        {
+                            if (mm.taunt) beasts++;
+                        }
+                        if (beasts == 0) return 500;
+                    }
+                    else
+                    {
+                        if ((this.HealTargetDatabase.ContainsKey(name) || this.HealHeroDatabase.ContainsKey(name) || this.HealAllDatabase.ContainsKey(name)))
+                        {
+                            int beasts = 0;
+                            foreach (Minion mm in p.ownMinions)
+                            {
+                                if (mm.Ready && mm.handcard.card.specialMin == CardDB.specialMinions.lightwarden) beasts++;
+                            }
+                            if (beasts == 0) return 500;
+                        }
+                        else
+                        {
+                            if (!(name == "nightblade" || card.Charge || this.silenceDatabase.ContainsKey(name) || ((TAG_RACE)card.race == TAG_RACE.PET && p.ownMinions.Find(x => x.name == "tundrarhino") != null) || (p.ownMinions.Find(x => x.name == "warsongcommander") != null && card.Attack <= 3) || p.owncards.Find(x => x.card.name == "charge") != null))
+                            {
+                                return 500;
+                            }
+                        }
+                    }
                 }
             }
             //some effects, which are bad :D
@@ -10362,6 +10467,19 @@ namespace HREngine.Bots
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
+            }
+
+            if (lethal)
+            {
+                if (name == "corruption")
+                {
+                    int beasts = 0;
+                    foreach (Minion mm in p.ownMinions)
+                    {
+                        if (mm.Ready && (mm.handcard.card.specialMin == CardDB.specialMinions.questingadventurer || mm.handcard.card.specialMin == CardDB.specialMinions.archmageantonidas || mm.handcard.card.specialMin == CardDB.specialMinions.manaaddict || mm.handcard.card.specialMin == CardDB.specialMinions.manawyrm || mm.handcard.card.specialMin == CardDB.specialMinions.wildpyromancer)) beasts++;
+                    }
+                    if (beasts == 0) return 500;
+                }
             }
 
             if (name == "divinespirit")
@@ -11225,6 +11343,30 @@ namespace HREngine.Bots
             this.specialMinions.Add("waterelemental", 0);
         }
 
+        private void setupBuffingMinions()
+        {
+            buffingMinionsDatabase.Add("abusivesergeant", 0);
+            buffingMinionsDatabase.Add("captaingreenskin", 0);
+            buffingMinionsDatabase.Add("cenarius", 0);
+            buffingMinionsDatabase.Add("coldlightseer", 0);
+            buffingMinionsDatabase.Add("crueltaskmaster", 0);
+            buffingMinionsDatabase.Add("darkirondwarf", 0);
+            buffingMinionsDatabase.Add("defenderofargus", 0);
+            buffingMinionsDatabase.Add("direwolfalpha", 0);
+            buffingMinionsDatabase.Add("flametonguetotem", 0);
+            buffingMinionsDatabase.Add("grimscaleoracle", 0);
+            buffingMinionsDatabase.Add("houndmaster", 0);
+            buffingMinionsDatabase.Add("leokk", 0);
+            buffingMinionsDatabase.Add("murlocwarleader", 0);
+            buffingMinionsDatabase.Add("raidleader", 0);
+            buffingMinionsDatabase.Add("shatteredsuncleric", 0);
+            buffingMinionsDatabase.Add("southseacaptain", 0);
+            buffingMinionsDatabase.Add("spitefulsmith", 0);
+            buffingMinionsDatabase.Add("stormwindchampion", 0);
+            buffingMinionsDatabase.Add("templeenforcer", 0);
+            buffingMinionsDatabase.Add("timberwolf", 0);
+
+        }
         private void setupEnemyTargetPriority()
         {
             priorityTargets.Add("angrychicken", 10);
@@ -13249,6 +13391,8 @@ namespace HREngine.Bots
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool frzn = false;
+                        if (s.Contains(" frz:")) frzn = s.Split(new string[] { " frz:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool silenced = false;
                         if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool divshield = false;
@@ -13294,6 +13438,7 @@ namespace HREngine.Bots
                         tempminion.stealth = stl;
                         tempminion.immune = immn;
                         tempminion.charge = chrg;
+                        tempminion.frozen = frzn;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
@@ -13329,6 +13474,9 @@ namespace HREngine.Bots
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         bool ready = s.Split(new string[] { " rdy:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool taunt = s.Split(new string[] { " tnt:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+                        bool frzn = false;
+                        if (s.Contains(" frz:")) frzn = s.Split(new string[] { " frz:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
+
                         bool silenced = false;
                         if (s.Contains(" silenced:")) silenced = s.Split(new string[] { " silenced:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         bool divshield = false;
@@ -13372,6 +13520,7 @@ namespace HREngine.Bots
                         tempminion.stealth = stl;
                         tempminion.immune = immn;
                         tempminion.charge = chrg;
+                        tempminion.frozen = frzn;
                         if (maxhp > hp) tempminion.wounded = true;
 
 
