@@ -117,6 +117,8 @@ namespace HREngine.Bots
         public bool enemyHeroFrozen = false;
         public bool heroImmuneWhileAttacking = false;
         public bool enemyheroImmuneWhileAttacking = false;
+        public bool heroImmune = false;
+        public bool enemyHeroImmune = false;
         public int ownWeaponDurability = 0;
         public int ownWeaponAttack = 0;
         public string ownWeaponName = "";
@@ -215,6 +217,9 @@ namespace HREngine.Bots
             this.evaluatePenality = 0;
             this.ownSecretsIDList = Hrtprozis.Instance.ownSecretList;
             this.enemySecretCount = Hrtprozis.Instance.enemySecretCount;
+
+            this.heroImmune = Hrtprozis.Instance.heroImmune;
+            this.enemyHeroImmune = Hrtprozis.Instance.enemyHeroImmune;
 
             addMinionsReal(Hrtprozis.Instance.ownMinions, ownMinions);
             addMinionsReal(Hrtprozis.Instance.enemyMinions, enemyMinions);
@@ -364,6 +369,9 @@ namespace HREngine.Bots
             this.enemyHeroNumAttackThisTurn = p.enemyHeroNumAttackThisTurn;
             this.ownHeroWindfury = p.ownHeroWindfury;
 
+            this.heroImmune = p.heroImmune;
+            this.enemyHeroImmune = p.enemyHeroImmune;
+
             this.ownheroAngr = p.ownheroAngr;
             this.enemyheroAngr = p.enemyheroAngr;
             this.ownHeroFrozen = p.ownHeroFrozen;
@@ -477,9 +485,9 @@ namespace HREngine.Bots
                 return false;
             }
 
-            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking)
+            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking || this.heroImmune!=p.heroImmune)
             {
-                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking);
+                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking+ " " + this.heroImmune + " " + p.heroImmune);
                 return false;
             }
             if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury)
@@ -487,9 +495,9 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
                 return false;
             }
-            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen)
+            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen || this.enemyHeroImmune != p.enemyHeroImmune)
             {
-                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen);
+                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
                 return false;
             }
 
@@ -1260,15 +1268,15 @@ namespace HREngine.Bots
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr,1));
-                    this.ownHeroDefence += this.enemyMinions.Count;// the more the enemy minions has on board, the more the posibility to destroy something other :D
+                    m.Angr = 0;
+                    this.evaluatePenality -= this.enemyMinions.Count;// the more the enemy minions has on board, the more the posibility to destroy something other :D
                 }
 
                 //mage secrets############
                 if (secretID == "EX1_287") //counterspell
                 {
                     // what should we do?
-                    this.ownHeroDefence += 5;
+                    this.evaluatePenality -= 8;
                 }
 
                 if (secretID == "EX1_289") //ice barrier
@@ -1279,7 +1287,10 @@ namespace HREngine.Bots
                 if (secretID == "EX1_295") //ice barrier
                 {
                     //set the guessed Damage to zero
-                    this.guessingHeroDamage = 0;
+                    foreach (Minion m in this.enemyMinions)
+                    {
+                        m.Angr = 0;
+                    }
                 }
 
                 if (secretID == "EX1_294") //mirror entity
@@ -1293,7 +1304,7 @@ namespace HREngine.Bots
                 {
                     //whut???
                     // add 2 to your defence (most attack-buffs give +2, lots of damage spells too)
-                    this.ownHeroDefence += 2;
+                    this.evaluatePenality -= 4;
                 }
                 if (secretID == "EX1_594") // vaporize
                 {
@@ -1302,23 +1313,27 @@ namespace HREngine.Bots
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
                     minionGetDestroyed(m, false);
                 }
                 //pala secrets############
                 if (secretID == "EX1_132") // eye for an eye
                 {
                     // enemy takes one damage
-                    attackEnemyHeroWithoutKill(1);
-                }
-                if (secretID == "EX1_130") // noble sacrifice
-                {
-                    //lower guessed hero damage
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
+                    attackEnemyHeroWithoutKill(m.Angr);
+                }
+                if (secretID == "EX1_130") // noble sacrifice
+                {
+                    //spawn a 2/1 taunt!
+                    int posi = this.ownMinions.Count - 1;
+                    CardDB.Card kid = CardDB.Instance.getCardData("frostwolfgrunt");
+                    callKid(kid, posi, true);
+                    this.ownMinions[this.ownMinions.Count - 1].maxHp = 1;
+                    this.ownMinions[this.ownMinions.Count - 1].Hp = 1;
+
                 }
 
                 if (secretID == "EX1_136") // redemption
@@ -1809,6 +1824,7 @@ namespace HREngine.Bots
 
         private void attackEnemyHeroWithoutKill(int dmg)
         {
+            if (this.enemyHeroImmune && dmg > 0) return;
             int oldHp = this.enemyHeroHp;
             if (dmg < 0 && this.enemyHeroHp <= 0) return;
             if (this.enemyHeroDefence <= 0)
@@ -1837,6 +1853,7 @@ namespace HREngine.Bots
         {
             if (own)
             {
+                if (this.heroImmune && dmg > 0) return;
                 if (dmg < 0 || this.ownHeroDefence <= 0)
                 {
                     if (dmg < 0 && this.ownHeroHp <= 0) return;
@@ -1870,7 +1887,7 @@ namespace HREngine.Bots
             }
             else
             {
-                
+                if (this.enemyHeroImmune && dmg > 0) return;
                 if (dmg < 0 || this.enemyHeroDefence <= 0)
                 {
                     if (dmg < 0 && this.enemyHeroHp <= 0) return;

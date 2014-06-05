@@ -74,6 +74,8 @@ namespace HREngine.Bots
         public int heroWeaponAttack = 0;
         public string ownHeroWeapon = "";
         public bool heroImmuneToDamageWhileAttacking = false;
+        public bool heroImmune = false;
+        public bool enemyHeroImmune = false;
 
         public bool minionsFailure = false;
 
@@ -144,13 +146,15 @@ namespace HREngine.Bots
             enemyMaxMana = 0;
             enemyWeaponDurability = 0;
             enemyWeaponAttack = 0;
-            enemyHeroWeapon = "";
             heroWeaponDurability = 0;
             heroWeaponAttack = 0;
-            ownHeroWeapon = "";
             heroImmuneToDamageWhileAttacking = false;
             ownMinions.Clear();
             enemyMinions.Clear();
+            heroImmune = false;
+            enemyHeroImmune = false;
+            this.ownHeroWeapon = "";
+            this.enemyHeroWeapon = "";
         }
 
 
@@ -311,12 +315,12 @@ namespace HREngine.Bots
 
         }
 
-        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimune, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury)
+        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimunewhileattack, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury, bool hisim)
         {
             this.ownHeroWeapon = weapon;
             this.heroWeaponAttack = watt;
             this.heroWeaponDurability = wdur;
-            this.heroImmuneToDamageWhileAttacking = heroimune;
+            this.heroImmuneToDamageWhileAttacking = heroimunewhileattack;
             this.heroAtk = heroatt;
             this.heroHp = herohp;
             this.heroDefence = herodef;
@@ -327,10 +331,10 @@ namespace HREngine.Bots
             this.ownAbilityisReady = habrdy;
             this.ownHeroWindfury = windfury;
             this.ownHeroNumAttacksThisTurn = numAttacksTTurn;
-
+            this.heroImmune = hisim;
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -341,6 +345,7 @@ namespace HREngine.Bots
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
             this.enemyAbility = eab;
+            this.enemyHeroImmune = ehisim;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
@@ -459,7 +464,7 @@ namespace HREngine.Bots
             help.logg(this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController );
 
             help.logg("ownhero:");
-            help.logg(this.heroname + " " + heroHp + " " + heroDefence + " immn " + this.heroImmuneToDamageWhileAttacking);
+            help.logg(this.heroname + " " + heroHp + " " + heroDefence + " " + this.heroImmuneToDamageWhileAttacking + " " + this.heroImmune);
             help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon );
             help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
             string secs = "";
@@ -469,7 +474,7 @@ namespace HREngine.Bots
             }
             help.logg("osecrets: " + secs);
             help.logg("enemyhero:");
-            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
+            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen + " " + this.enemyHeroImmune);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
             help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
             help.logg("fatigue: " + this.ownDeckSize + " " +this.ownHeroFatigue + " "+ this.enemyDeckSize + " " + this.enemyHeroFatigue);

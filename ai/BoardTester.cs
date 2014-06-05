@@ -31,6 +31,9 @@ namespace HREngine.Bots
         int ownFatigue = 0;
         int enemyFatigue = 0;
 
+        bool heroImmune = false;
+        bool enemyHeroImmune = false;
+
         int enemySecrets = 0;
 
         bool ownHeroFrozen = false;
@@ -110,13 +113,13 @@ namespace HREngine.Bots
                     this.ownPlayer = Convert.ToInt32(s.Split(' ')[3]);
                 }
 
-                if (readstate == 1 && counter == 1) // class + hp + defence + immune
+                if (readstate == 1 && counter == 1) // class + hp + defence + immunewhile attacking + immune
                 {
                     ownheroname = s.Split(' ')[0];
                     ownherohp = Convert.ToInt32(s.Split(' ')[1]);
                     ownherodefence = Convert.ToInt32(s.Split(' ')[2]);
-                    string boolim = s.Split(' ')[4];
-                    this.ownHeroimmunewhileattacking = (boolim == "True") ? true : false;
+                    this.ownHeroimmunewhileattacking = (s.Split(' ')[3] == "True") ? true : false;
+                    this.heroImmune = (s.Split(' ')[4] == "True") ? true : false;
 
                 }
 
@@ -155,12 +158,13 @@ namespace HREngine.Bots
                     }
                 }
                 
-                if (readstate == 2 && counter == 1) // class + hp + defence + frozen
+                if (readstate == 2 && counter == 1) // class + hp + defence + frozen + immune
                 {
                     enemyheroname = s.Split(' ')[0];
                     enemyherohp = Convert.ToInt32(s.Split(' ')[1]);
                     enemyherodefence = Convert.ToInt32(s.Split(' ')[2]);
                     enemyFrozen = (s.Split(' ')[3] == "True") ? true : false;
+                    enemyHeroImmune = (s.Split(' ')[4] == "True") ? true : false;
                 }
 
                 if (readstate == 2 && counter == 2) // wepon + stuff
@@ -417,8 +421,8 @@ namespace HREngine.Bots
 
             int numattttHero = 0;
             bool herowindfury = false;
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability);
+            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury, this.heroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
             

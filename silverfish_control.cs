@@ -493,7 +493,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-
+        private int versionnumber = 42;
         private bool singleLog = false;
 
 
@@ -518,6 +518,8 @@ namespace HREngine.Bots
         int heroWeaponAttack = 0;
         int heroWeaponDurability = 0;
         bool heroImmuneToDamageWhileAttacking = false;
+        bool heroImmune = false;
+        bool enemyHeroImmune = false;
 
         string enemyHeroWeapon = "";
         int enemyWeaponAttack = 0;
@@ -616,8 +618,8 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updatePlayer(this.ownMaxMana, this.currentMana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.ueberladung, ownPlayer.GetHero().GetEntityId(), enemyPlayer.GetHero().GetEntityId());
             Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
 
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility);
+            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury, this.heroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility, this.enemyHeroImmune);
 
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
@@ -654,7 +656,7 @@ namespace HREngine.Bots
             this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);//ownPlayer.GetRealTimeTempMana();
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss"));
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
@@ -667,7 +669,6 @@ namespace HREngine.Bots
             //if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;
             this.ueberladung = ownPlayer.GetTag(HRGameTag.RECALL_OWED);
 
-
             //get weapon stuff
             this.ownHeroWeapon = "";
             this.heroWeaponAttack = 0;
@@ -678,7 +679,8 @@ namespace HREngine.Bots
             //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
             //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
 
-
+            this.heroImmune = ownhero.IsImmune();
+            this.enemyHeroImmune = enemyhero.IsImmune();
 
             this.enemyHeroWeapon = "";
             this.enemyWeaponAttack = 0;
@@ -1040,6 +1042,7 @@ namespace HREngine.Bots
         }
 
     }
+
     public class Playfield
     {
         public bool logging = false;
@@ -1075,6 +1078,8 @@ namespace HREngine.Bots
         public bool enemyHeroFrozen = false;
         public bool heroImmuneWhileAttacking = false;
         public bool enemyheroImmuneWhileAttacking = false;
+        public bool heroImmune = false;
+        public bool enemyHeroImmune = false;
         public int ownWeaponDurability = 0;
         public int ownWeaponAttack = 0;
         public string ownWeaponName = "";
@@ -1173,6 +1178,9 @@ namespace HREngine.Bots
             this.evaluatePenality = 0;
             this.ownSecretsIDList = Hrtprozis.Instance.ownSecretList;
             this.enemySecretCount = Hrtprozis.Instance.enemySecretCount;
+
+            this.heroImmune = Hrtprozis.Instance.heroImmune;
+            this.enemyHeroImmune = Hrtprozis.Instance.enemyHeroImmune;
 
             addMinionsReal(Hrtprozis.Instance.ownMinions, ownMinions);
             addMinionsReal(Hrtprozis.Instance.enemyMinions, enemyMinions);
@@ -1322,6 +1330,9 @@ namespace HREngine.Bots
             this.enemyHeroNumAttackThisTurn = p.enemyHeroNumAttackThisTurn;
             this.ownHeroWindfury = p.ownHeroWindfury;
 
+            this.heroImmune = p.heroImmune;
+            this.enemyHeroImmune = p.enemyHeroImmune;
+
             this.ownheroAngr = p.ownheroAngr;
             this.enemyheroAngr = p.enemyheroAngr;
             this.ownHeroFrozen = p.ownHeroFrozen;
@@ -1435,9 +1446,9 @@ namespace HREngine.Bots
                 return false;
             }
 
-            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking)
+            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking || this.heroImmune != p.heroImmune)
             {
-                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking);
+                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking + " " + this.heroImmune + " " + p.heroImmune);
                 return false;
             }
             if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury)
@@ -1445,9 +1456,9 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
                 return false;
             }
-            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen)
+            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen || this.enemyHeroImmune != p.enemyHeroImmune)
             {
-                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen);
+                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
                 return false;
             }
 
@@ -2218,15 +2229,15 @@ namespace HREngine.Bots
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
-                    this.ownHeroDefence += this.enemyMinions.Count;// the more the enemy minions has on board, the more the posibility to destroy something other :D
+                    m.Angr = 0;
+                    this.evaluatePenality -= this.enemyMinions.Count;// the more the enemy minions has on board, the more the posibility to destroy something other :D
                 }
 
                 //mage secrets############
                 if (secretID == "EX1_287") //counterspell
                 {
                     // what should we do?
-                    this.ownHeroDefence += 5;
+                    this.evaluatePenality -= 8;
                 }
 
                 if (secretID == "EX1_289") //ice barrier
@@ -2237,7 +2248,10 @@ namespace HREngine.Bots
                 if (secretID == "EX1_295") //ice barrier
                 {
                     //set the guessed Damage to zero
-                    this.guessingHeroDamage = 0;
+                    foreach (Minion m in this.enemyMinions)
+                    {
+                        m.Angr = 0;
+                    }
                 }
 
                 if (secretID == "EX1_294") //mirror entity
@@ -2251,7 +2265,7 @@ namespace HREngine.Bots
                 {
                     //whut???
                     // add 2 to your defence (most attack-buffs give +2, lots of damage spells too)
-                    this.ownHeroDefence += 2;
+                    this.evaluatePenality -= 4;
                 }
                 if (secretID == "EX1_594") // vaporize
                 {
@@ -2260,23 +2274,27 @@ namespace HREngine.Bots
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
                     minionGetDestroyed(m, false);
                 }
                 //pala secrets############
                 if (secretID == "EX1_132") // eye for an eye
                 {
                     // enemy takes one damage
-                    attackEnemyHeroWithoutKill(1);
-                }
-                if (secretID == "EX1_130") // noble sacrifice
-                {
-                    //lower guessed hero damage
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
-                    this.guessingHeroDamage = Math.Max(0, this.guessingHeroDamage -= Math.Max(m.Angr, 1));
+                    attackEnemyHeroWithoutKill(m.Angr);
+                }
+                if (secretID == "EX1_130") // noble sacrifice
+                {
+                    //spawn a 2/1 taunt!
+                    int posi = this.ownMinions.Count - 1;
+                    CardDB.Card kid = CardDB.Instance.getCardData("frostwolfgrunt");
+                    callKid(kid, posi, true);
+                    this.ownMinions[this.ownMinions.Count - 1].maxHp = 1;
+                    this.ownMinions[this.ownMinions.Count - 1].Hp = 1;
+
                 }
 
                 if (secretID == "EX1_136") // redemption
@@ -2767,6 +2785,7 @@ namespace HREngine.Bots
 
         private void attackEnemyHeroWithoutKill(int dmg)
         {
+            if (this.enemyHeroImmune && dmg > 0) return;
             int oldHp = this.enemyHeroHp;
             if (dmg < 0 && this.enemyHeroHp <= 0) return;
             if (this.enemyHeroDefence <= 0)
@@ -2795,6 +2814,7 @@ namespace HREngine.Bots
         {
             if (own)
             {
+                if (this.heroImmune && dmg > 0) return;
                 if (dmg < 0 || this.ownHeroDefence <= 0)
                 {
                     if (dmg < 0 && this.ownHeroHp <= 0) return;
@@ -2828,7 +2848,7 @@ namespace HREngine.Bots
             }
             else
             {
-
+                if (this.enemyHeroImmune && dmg > 0) return;
                 if (dmg < 0 || this.enemyHeroDefence <= 0)
                 {
                     if (dmg < 0 && this.enemyHeroHp <= 0) return;
@@ -9142,6 +9162,8 @@ namespace HREngine.Bots
         public int heroWeaponAttack = 0;
         public string ownHeroWeapon = "";
         public bool heroImmuneToDamageWhileAttacking = false;
+        public bool heroImmune = false;
+        public bool enemyHeroImmune = false;
 
         public bool minionsFailure = false;
 
@@ -9212,13 +9234,15 @@ namespace HREngine.Bots
             enemyMaxMana = 0;
             enemyWeaponDurability = 0;
             enemyWeaponAttack = 0;
-            enemyHeroWeapon = "";
             heroWeaponDurability = 0;
             heroWeaponAttack = 0;
-            ownHeroWeapon = "";
             heroImmuneToDamageWhileAttacking = false;
             ownMinions.Clear();
             enemyMinions.Clear();
+            heroImmune = false;
+            enemyHeroImmune = false;
+            this.ownHeroWeapon = "";
+            this.enemyHeroWeapon = "";
         }
 
 
@@ -9379,12 +9403,12 @@ namespace HREngine.Bots
 
         }
 
-        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimune, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury)
+        public void updateOwnHero(string weapon, int watt, int wdur, bool heroimunewhileattack, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury, bool hisim)
         {
             this.ownHeroWeapon = weapon;
             this.heroWeaponAttack = watt;
             this.heroWeaponDurability = wdur;
-            this.heroImmuneToDamageWhileAttacking = heroimune;
+            this.heroImmuneToDamageWhileAttacking = heroimunewhileattack;
             this.heroAtk = heroatt;
             this.heroHp = herohp;
             this.heroDefence = herodef;
@@ -9395,10 +9419,10 @@ namespace HREngine.Bots
             this.ownAbilityisReady = habrdy;
             this.ownHeroWindfury = windfury;
             this.ownHeroNumAttacksThisTurn = numAttacksTTurn;
-
+            this.heroImmune = hisim;
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -9409,6 +9433,7 @@ namespace HREngine.Bots
             this.enemyDefence = herodef;
             this.enemyfrozen = frozen;
             this.enemyAbility = eab;
+            this.enemyHeroImmune = ehisim;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
@@ -9527,7 +9552,7 @@ namespace HREngine.Bots
             help.logg(this.numMinionsPlayedThisTurn + " " + this.cardsPlayedThisTurn + " " + this.ueberladung + " " + this.ownPlayerController);
 
             help.logg("ownhero:");
-            help.logg(this.heroname + " " + heroHp + " " + heroDefence + " immn " + this.heroImmuneToDamageWhileAttacking);
+            help.logg(this.heroname + " " + heroHp + " " + heroDefence + " " + this.heroImmuneToDamageWhileAttacking + " " + this.heroImmune);
             help.logg("ready: " + this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon);
             help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
             string secs = "";
@@ -9537,7 +9562,7 @@ namespace HREngine.Bots
             }
             help.logg("osecrets: " + secs);
             help.logg("enemyhero:");
-            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen);
+            help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen + " " + this.enemyHeroImmune);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
             help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
             help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
@@ -13015,6 +13040,9 @@ namespace HREngine.Bots
         int ownFatigue = 0;
         int enemyFatigue = 0;
 
+        bool heroImmune = false;
+        bool enemyHeroImmune = false;
+
         int enemySecrets = 0;
 
         bool ownHeroFrozen = false;
@@ -13094,13 +13122,13 @@ namespace HREngine.Bots
                     this.ownPlayer = Convert.ToInt32(s.Split(' ')[3]);
                 }
 
-                if (readstate == 1 && counter == 1) // class + hp + defence + immune
+                if (readstate == 1 && counter == 1) // class + hp + defence + immunewhile attacking + immune
                 {
                     ownheroname = s.Split(' ')[0];
                     ownherohp = Convert.ToInt32(s.Split(' ')[1]);
                     ownherodefence = Convert.ToInt32(s.Split(' ')[2]);
-                    string boolim = s.Split(' ')[4];
-                    this.ownHeroimmunewhileattacking = (boolim == "True") ? true : false;
+                    this.ownHeroimmunewhileattacking = (s.Split(' ')[3] == "True") ? true : false;
+                    this.heroImmune = (s.Split(' ')[4] == "True") ? true : false;
 
                 }
 
@@ -13139,12 +13167,13 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (readstate == 2 && counter == 1) // class + hp + defence + frozen
+                if (readstate == 2 && counter == 1) // class + hp + defence + frozen + immune
                 {
                     enemyheroname = s.Split(' ')[0];
                     enemyherohp = Convert.ToInt32(s.Split(' ')[1]);
                     enemyherodefence = Convert.ToInt32(s.Split(' ')[2]);
                     enemyFrozen = (s.Split(' ')[3] == "True") ? true : false;
+                    enemyHeroImmune = (s.Split(' ')[4] == "True") ? true : false;
                 }
 
                 if (readstate == 2 && counter == 2) // wepon + stuff
@@ -13401,8 +13430,8 @@ namespace HREngine.Bots
 
             int numattttHero = 0;
             bool herowindfury = false;
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability);
+            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury, this.heroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
 
