@@ -231,80 +231,80 @@ namespace HREngine.Bots
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_160b") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_160a") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_160b") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_160a") target = hre;
                           }
                       }
                       if (ccId == "NEW1_008")
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "NEW1_008a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "NEW1_008b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "NEW1_008a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "NEW1_008b") target = hre;
                           }
                       }
                       if (ccId == "EX1_178")
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_178a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_178b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_178a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_178b") target = hre;
                           }
                       }
                       if (ccId == "EX1_573")
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_573a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_573b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_573a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_573b") target = hre;
                           }
                       }
                       if (ccId == "EX1_165")//druid of the claw
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_165t1") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_165t2") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_165t1") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_165t2") target = hre;
                           }
                       }
                       if (ccId == "EX1_166")//keeper of the grove
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_166a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_166b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_166a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_166b") target = hre;
                           }
                       }
                       if (ccId == "EX1_155")
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_155a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_155b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_155a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_155b") target = hre;
                           }
                       }
                       if (ccId == "EX1_164")
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_164a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_164b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_164a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_164b") target = hre;
                           }
                       }
                       if (ccId == "New1_007")//starfall
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "New1_007b") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "New1_007a") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "New1_007b") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "New1_007a") target = hre;
                           }
                       }
                       if (ccId == "EX1_154")//warth
                       {
                           foreach (HREntity hre in choices)
                           {
-                              if (choice == 0 && hre.GetCardId() == "EX1_154a") target = hre;
-                              if (choice == 1 && hre.GetCardId() == "EX1_154b") target = hre;
+                              if (choice == 1 && hre.GetCardId() == "EX1_154a") target = hre;
+                              if (choice == 2 && hre.GetCardId() == "EX1_154b") target = hre;
                           }
                       }
                       return new HREngine.API.Actions.ChoiceAction(target);
@@ -7922,7 +7922,86 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (hc.canplayCard(p))
+                if (c.name == "powerofthewild")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_160b");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_160a");
+                    }
+                }
+                if (c.name == "ancientofwar")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_178a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_178b");
+                    }
+                }
+                if (c.name == "druidoftheclaw")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_165t1");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_165t2");
+                    }
+                }
+                //cenarius dont need
+                if (c.name == "keeperofthegrove")//keeper of the grove
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                    }
+                }
+                if (c.name == "markofnature")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_155a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_155b");
+                    }
+                }
+                if (c.name == "nourish")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_164a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_164b");
+                    }
+                }
+                if (c.name == "wrath")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_154a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_154b");
+                    }
+                }
+
+                if (c.canplayCard(p, hc.manacost))
                 {
                     havedonesomething = true;
 
@@ -7937,9 +8016,10 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = penman.getPlayCardPenality(c, -1, p, i, lethalcheck);
+                            cardplayPenality = penman.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
+                                //help.logg(hc.card.name + " is played");
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
                                 this.posmoves.Add(pf);
@@ -7960,9 +8040,10 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, lethalcheck);
+                                cardplayPenality = penman.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
+                                    //help.logg(hc.card.name + " is played");
                                     Playfield pf = new Playfield(p);
                                     pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
                                     this.posmoves.Add(pf);
@@ -8913,6 +8994,7 @@ namespace HREngine.Bots
         }
 
     }
+
 
     public class Handmanager
     {
@@ -9895,10 +9977,27 @@ namespace HREngine.Bots
                     if (hc.card.specialMin == CardDB.specialMinions.biggamehunter) return pen;
                     if (hc.card.specialMin == CardDB.specialMinions.shadowworddeath) return pen;
                 }
-
+                if (card.name == "crueltaskmaster" && !p.enemyMinions[target - 10].wounded)
+                {
+                    foreach (Handmanager.Handcard hc in p.owncards)
+                    {
+                        if (hc.card.name == "execute") return 0;
+                    }
+                }
                 pen = 500;
             }
-
+            if (target >= 0 && target <= 9)
+            {
+                Minion m = p.ownMinions[target];
+                if (!m.Ready)
+                {
+                    return 20;
+                }
+                if (m.Hp == 1)
+                {
+                    return 30;
+                }
+            }
             return pen;
         }
 
@@ -10109,7 +10208,7 @@ namespace HREngine.Bots
                 {
                     int dmg = DamageTargetSpecialDatabase[name];
                     Minion m = p.ownMinions[target];
-
+                    if (name == "crueltaskmaster" && m.Hp >= 2) return 0;
                     if (name == "demonfire" && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == "earthshock" && m.Hp >= 2)
                     {
@@ -10390,6 +10489,7 @@ namespace HREngine.Bots
 
             if (lethal && card.type == CardDB.cardtype.MOB)
             {
+
                 if (this.buffingMinionsDatabase.ContainsKey(name))
                 {
                     if (name == "timberwolf" || name == "houndmaster")
@@ -10467,6 +10567,11 @@ namespace HREngine.Bots
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
+            }
+
+            if (name == "handofprotection")
+            {
+                if (m.Hp == 1) pen = 15;
             }
 
             if (lethal)
@@ -11015,6 +11120,7 @@ namespace HREngine.Bots
             HealTargetDatabase.Add("lesserheal", 2);
             HealTargetDatabase.Add("voodoodoctor", 2);
             HealTargetDatabase.Add("willofmukla", 8);
+            HealTargetDatabase.Add("ancientoflore", 5);
             //HealTargetDatabase.Add("divinespirit", 2);
         }
 
@@ -13550,6 +13656,7 @@ namespace HREngine.Bots
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
                     card.card = CardDB.Instance.getCardData(minionname);
+                    if (minionname == "wrath") card.card = CardDB.Instance.getCardDataFromID("EX1_154");
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;

@@ -364,6 +364,7 @@ namespace HREngine.Bots
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
                     card.card = CardDB.Instance.getCardData(minionname);
+                    if (minionname == "wrath") card.card = CardDB.Instance.getCardDataFromID("EX1_154");
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;

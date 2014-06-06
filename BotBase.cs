@@ -96,80 +96,80 @@ namespace HREngine.Bots
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_160b") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_160a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_160b") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_160a") target = hre;
                          }
                      }
                      if (ccId == "NEW1_008")
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "NEW1_008a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "NEW1_008b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "NEW1_008a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "NEW1_008b") target = hre;
                          }
                      }
                      if (ccId == "EX1_178")
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_178a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_178b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_178a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_178b") target = hre;
                          }
                      }
                      if (ccId == "EX1_573")
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_573a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_573b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_573a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_573b") target = hre;
                          }
                      }
                      if (ccId == "EX1_165")//druid of the claw
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_165t1") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_165t2") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_165t1") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_165t2") target = hre;
                          }
                      }
                      if (ccId == "EX1_166")//keeper of the grove
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_166a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_166b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_166a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_166b") target = hre;
                          }
                      }
                      if (ccId == "EX1_155")
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_155a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_155b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_155a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_155b") target = hre;
                          }
                      }
                      if (ccId == "EX1_164")
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_164a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_164b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_164a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_164b") target = hre;
                          }
                      }
                      if (ccId == "New1_007")//starfall
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "New1_007b") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "New1_007a") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "New1_007b") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "New1_007a") target = hre;
                          }
                      }
                      if (ccId == "EX1_154")//warth
                      {
                          foreach (HREntity hre in choices)
                          {
-                             if (choice == 0 && hre.GetCardId() == "EX1_154a") target = hre;
-                             if (choice == 1 && hre.GetCardId() == "EX1_154b") target = hre;
+                             if (choice == 1 && hre.GetCardId() == "EX1_154a") target = hre;
+                             if (choice == 2 && hre.GetCardId() == "EX1_154b") target = hre;
                          }
                      }
                      return new HREngine.API.Actions.ChoiceAction(target);

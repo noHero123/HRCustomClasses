@@ -94,7 +94,86 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (hc.canplayCard(p))
+                if (c.name == "powerofthewild")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_160b");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_160a");
+                    }
+                }
+                if (c.name == "ancientofwar")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_178a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_178b");
+                    }
+                }
+                if (c.name == "druidoftheclaw")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_165t1");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_165t2");
+                    }
+                }
+                //cenarius dont need
+                if (c.name == "keeperofthegrove")//keeper of the grove
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                    }
+                }
+                if (c.name == "markofnature")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_155a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_155b");
+                    }
+                }
+                if (c.name == "nourish")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_164a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_164b");
+                    }
+                }
+                if (c.name == "wrath")
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_154a");
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID("EX1_154b");
+                    }
+                }
+
+                if (c.canplayCard(p,hc.manacost))
                 {
                     havedonesomething = true;
 
@@ -109,9 +188,10 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = penman.getPlayCardPenality(c, -1, p, i, lethalcheck);
+                            cardplayPenality = penman.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
+                                //help.logg(hc.card.name + " is played");
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
                                 this.posmoves.Add(pf);
@@ -132,9 +212,10 @@ namespace HREngine.Bots
                             
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, lethalcheck);
+                                cardplayPenality = penman.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
+                                    //help.logg(hc.card.name + " is played");
                                     Playfield pf = new Playfield(p);
                                     pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
                                     this.posmoves.Add(pf);

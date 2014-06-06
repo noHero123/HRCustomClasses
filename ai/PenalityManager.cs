@@ -149,10 +149,27 @@ namespace HREngine.Bots
                     if (hc.card.specialMin == CardDB.specialMinions.biggamehunter) return pen;
                     if (hc.card.specialMin == CardDB.specialMinions.shadowworddeath) return pen;
                 }
-
+                if (card.name == "crueltaskmaster" && !p.enemyMinions[target-10].wounded)
+                {
+                    foreach (Handmanager.Handcard hc in p.owncards)
+                    {
+                        if (hc.card.name == "execute") return 0;
+                    }
+                }
                 pen = 500;
             }
-
+            if (target >= 0 && target <= 9)
+            {
+                Minion m = p.ownMinions[target];
+                if (!m.Ready)
+                {
+                    return 20;
+                }
+                if (m.Hp == 1)
+                {
+                    return 30;
+                }
+            }
             return pen;
         }
 
@@ -363,7 +380,7 @@ namespace HREngine.Bots
                 {
                     int dmg  = DamageTargetSpecialDatabase[name];
                     Minion m = p.ownMinions[target];
-
+                    if (name == "crueltaskmaster" && m.Hp>=2) return 0;
                     if (name == "demonfire" && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == "earthshock" && m.Hp >= 2 )
                     {
@@ -644,6 +661,7 @@ namespace HREngine.Bots
 
             if (lethal && card.type == CardDB.cardtype.MOB)
             {
+
                 if (this.buffingMinionsDatabase.ContainsKey(name))
                 {
                     if (name == "timberwolf" || name == "houndmaster")
@@ -721,6 +739,11 @@ namespace HREngine.Bots
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
+            }
+
+            if (name == "handofprotection")
+            {
+                if (m.Hp ==1) pen = 15;
             }
 
             if (lethal)
@@ -1269,6 +1292,7 @@ namespace HREngine.Bots
             HealTargetDatabase.Add("lesserheal", 2);
             HealTargetDatabase.Add("voodoodoctor", 2);
             HealTargetDatabase.Add("willofmukla", 8);
+            HealTargetDatabase.Add("ancientoflore", 5);
             //HealTargetDatabase.Add("divinespirit", 2);
         }
 
