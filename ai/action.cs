@@ -453,75 +453,79 @@ namespace HREngine.Bots
 
         }
 
-        public bool isEqual(Playfield p)
+        public bool isEqual(Playfield p, bool logg)
         {
+            if (logg)
+            {
+                if (this.value != p.value) return false;
+            }
             if (this.enemySecretCount != p.enemySecretCount)
             {
                 
-                Helpfunctions.Instance.logg("enemy secrets changed ");
+                if(logg) Helpfunctions.Instance.logg("enemy secrets changed ");
                 return false;
             }
 
             if (this.mana != p.mana || this.enemyMaxMana != p.enemyMaxMana || this.ownMaxMana != p.ownMaxMana)
             {
-                Helpfunctions.Instance.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
+                if (logg) Helpfunctions.Instance.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
                 return false;
             }
 
             if (this.ownDeckSize != p.ownDeckSize || this.enemyDeckSize != p.enemyDeckSize || this.ownHeroFatigue != p.ownHeroFatigue || this.enemyHeroFatigue != p.enemyHeroFatigue)
             {
-                Helpfunctions.Instance.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
+                if (logg) Helpfunctions.Instance.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
             }
 
             if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung)
             {
-                Helpfunctions.Instance.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
+                if (logg) Helpfunctions.Instance.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
                 return false;
             }
                 
             if (this.ownHeroName != p.ownHeroName || this.enemyHeroName != p.enemyHeroName)
             {
-                Helpfunctions.Instance.logg("hero name changed ");
+                if (logg) Helpfunctions.Instance.logg("hero name changed ");
                 return false;
             }
 
             if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking || this.heroImmune!=p.heroImmune)
             {
-                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking+ " " + this.heroImmune + " " + p.heroImmune);
+                if (logg) Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking + " " + this.heroImmune + " " + p.heroImmune);
                 return false;
             }
             if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury)
             {
-                Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
+                if (logg) Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
                 return false;
             }
             if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen || this.enemyHeroImmune != p.enemyHeroImmune)
             {
-                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
+                if (logg) Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
                 return false;
             }
 
-            if (this.auchenaiseelenpriesterin != p.auchenaiseelenpriesterin || this.winzigebeschwoererin != p.winzigebeschwoererin || this.zauberlehrling != p.zauberlehrling || this.managespenst != p.managespenst || this.soeldnerDerVenture != p.soeldnerDerVenture || this.beschwoerungsportal != p.beschwoerungsportal || this.doublepriest != p.doublepriest)
+            /*if (this.auchenaiseelenpriesterin != p.auchenaiseelenpriesterin || this.winzigebeschwoererin != p.winzigebeschwoererin || this.zauberlehrling != p.zauberlehrling || this.managespenst != p.managespenst || this.soeldnerDerVenture != p.soeldnerDerVenture || this.beschwoerungsportal != p.beschwoerungsportal || this.doublepriest != p.doublepriest)
             {
                 Helpfunctions.Instance.logg("special minions changed " + this.auchenaiseelenpriesterin + " " + p.auchenaiseelenpriesterin + " " + this.winzigebeschwoererin + " " + p.winzigebeschwoererin + " " + this.zauberlehrling + " " + p.zauberlehrling + " " + this.managespenst + " " + p.managespenst + " " + this.soeldnerDerVenture + " " + p.soeldnerDerVenture + " " + this.beschwoerungsportal + " " + p.beschwoerungsportal + " " + this.doublepriest + " " + p.doublepriest);
                 return false;
-            }
+            }*/
 
             if (this.ownHeroAblility.name != p.ownHeroAblility.name)
             {
-                Helpfunctions.Instance.logg("hero ability changed ");
+                if (logg) Helpfunctions.Instance.logg("hero ability changed ");
                 return false;
             }
             
             if (this.spellpower != p.spellpower)
             {
-                Helpfunctions.Instance.logg("spellpower changed");
+                if (logg) Helpfunctions.Instance.logg("spellpower changed");
                 return false;
             }
             
             if (this.ownMinions.Count != p.ownMinions.Count || this.enemyMinions.Count != p.enemyMinions.Count || this.owncards.Count != p.owncards.Count)
             {
-                Helpfunctions.Instance.logg("minions count or hand changed");
+                if (logg) Helpfunctions.Instance.logg("minions count or hand changed");
                 return false;
             }
 
@@ -541,7 +545,7 @@ namespace HREngine.Bots
             }
             if (minionbool == false)
             {
-                Helpfunctions.Instance.logg("ownminions changed");
+                if (logg) Helpfunctions.Instance.logg("ownminions changed");
                 return false;
             }
             
@@ -559,7 +563,7 @@ namespace HREngine.Bots
             }
             if (minionbool == false)
             {
-                Helpfunctions.Instance.logg("enemyminions changed");
+                if (logg) Helpfunctions.Instance.logg("enemyminions changed");
                 return false;
             }
 
@@ -568,7 +572,7 @@ namespace HREngine.Bots
                 Handmanager.Handcard dishc = this.owncards[i]; Handmanager.Handcard pishc = p.owncards[i];
                 if ( dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.getManaCost(this) != pishc.getManaCost(p))
                 {
-                    Helpfunctions.Instance.logg("handcard changed: " + dishc.card.name);
+                    if (logg) Helpfunctions.Instance.logg("handcard changed: " + dishc.card.name);
                     return false;
                 }
             }
@@ -795,7 +799,7 @@ namespace HREngine.Bots
                 {
                     if (m.stealth) continue; // cant target stealth
 
-                    if (m.taunt && !m.silenced)
+                    if (m.taunt)
                     {
                         hastanks = true;
                         trgts.Add(new targett(m.id + 10, m.entitiyID));
@@ -813,7 +817,7 @@ namespace HREngine.Bots
                 {
                     if (m.stealth) continue; // cant target stealth
 
-                    if (m.taunt && !m.silenced)
+                    if (m.taunt)
                     {
                         hastanks = true;
                         trgts.Add(new targett(m.id, m.entitiyID));
@@ -4280,6 +4284,15 @@ namespace HREngine.Bots
                     this.ownWeaponDurability = 0;
                     this.ownWeaponAttack = 0;
                     this.ownWeaponName = "";
+
+                    foreach (Minion m in this.ownMinions)
+                    {
+                        if (m.playedThisTurn && m.name == "southseadeckhand")
+                        {
+                            m.Ready = false;
+                            m.charge = false;
+                        }
+                    }
                 }
             }
             else
@@ -4326,7 +4339,7 @@ namespace HREngine.Bots
 
             foreach (Minion m in this.ownMinions)
             {
-                if (m.name == "southseadeckhand")
+                if (m.playedThisTurn && m.name == "southseadeckhand")
                 {
                     minionGetCharge(m);
                 }
@@ -5860,6 +5873,19 @@ namespace HREngine.Bots
                     this.drawACard("", true);
                     this.drawACard("", true);
                 }
+            }
+
+            if (c.name == "savageroar")
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                Enchantment e = CardDB.getEnchantmentFromCardID("CS2_011o");
+                e.creator = hc.entity;
+                e.controllerOfCreator = this.ownController;
+                foreach (Minion m in temp)
+                {
+                    addEffectToMinionNoDoubles(m, e, true);
+                }
+                this.ownheroAngr += 2;
             }
 
             //special cards#######################

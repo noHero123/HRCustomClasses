@@ -35,7 +35,7 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
-              
+          retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10; 
 
           if (p.ownHeroHp + p.ownHeroDefence > 10)
           {
@@ -47,7 +47,7 @@ namespace HREngine.Bots
           }
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
-          retval += p.ownWeaponAttack * p.ownWeaponDurability;
+          retval += p.ownWeaponAttack + p.ownWeaponDurability;
           if (!p.enemyHeroFrozen)
           {
               retval -= p.enemyWeaponDurability*p.enemyWeaponAttack;
@@ -78,6 +78,7 @@ namespace HREngine.Bots
               if (m.divineshild && m.taunt) retval += 4;
               if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
               if (m.Angr > 1 || m.Hp > 1) ownMinionsCount++;
+              if (m.handcard.card.hasEffect) retval += 1;
           }
 
           if (p.enemyMinions.Count >= 0)

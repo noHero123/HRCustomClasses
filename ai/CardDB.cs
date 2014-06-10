@@ -158,6 +158,8 @@ namespace HREngine.Bots
             public string description = "";
             public int carddraw = 0;
 
+            public bool hasEffect = false;// has the minion an effect, but not battlecry
+
             public int Attack = 0;
             public int Health = 0;
             public int Durability = 0;//for weapons
@@ -210,6 +212,7 @@ namespace HREngine.Bots
             public Card(Card c)
             {
                 //this.entityID = c.entityID;
+                this.hasEffect = c.hasEffect;
                 this.rarity = c.rarity;
                 this.AdjacentBuff = c.AdjacentBuff;
                 this.Attack = c.Attack;
@@ -865,6 +868,7 @@ namespace HREngine.Bots
                         if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
                         if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
                         if (temp == "succubus") c.specialMin = specialMinions.succubus;
+                        if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 
                     }
                     if (de == 1)

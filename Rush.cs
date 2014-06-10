@@ -39,6 +39,8 @@ namespace HREngine.Bots
           retval += p.ownHeroHp + p.ownHeroDefence;
           retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
+          retval += p.ownMaxMana*10 - p.enemyMaxMana*10; 
+
           retval += p.ownWeaponAttack;// +ownWeaponDurability;
           if (!p.enemyHeroFrozen)
           {

@@ -15,6 +15,7 @@ namespace HREngine.Bots
         private bool useCutingTargets = true;
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
+        private bool useComparison = true;
 
 
         PenalityManager penman = PenalityManager.Instance;
@@ -51,7 +52,19 @@ namespace HREngine.Bots
             this.nextMoveGuess.mana = -1;
         }
 
-        private bool doAllChoices( Playfield p, Handmanager.Handcard hc, bool lethalcheck)
+        private void addToPosmoves(Playfield pf)
+        {
+            if (pf.ownHeroHp <= 0) return;
+            /*foreach (Playfield p in this.posmoves)
+            {
+                if (pf.isEqual(p, false)) return;
+            }*/
+            this.posmoves.Add(pf);
+            //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
+            //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
+        }
+
+        private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
         {
             bool havedonesomething = false;
 
@@ -173,7 +186,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (c.canplayCard(p,hc.manacost))
+                if (c.canplayCard(p, hc.manacost))
                 {
                     havedonesomething = true;
 
@@ -184,7 +197,7 @@ namespace HREngine.Bots
                     int cardplayPenality = 0;
                     if (trgts.Count == 0)
                     {
-                        
+
 
                         if (usePenalityManager)
                         {
@@ -194,14 +207,14 @@ namespace HREngine.Bots
                                 //help.logg(hc.card.name + " is played");
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
                         }
                         else
                         {
                             Playfield pf = new Playfield(p);
                             pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                            this.posmoves.Add(pf);
+                            addToPosmoves(pf);
                         }
 
                     }
@@ -209,7 +222,7 @@ namespace HREngine.Bots
                     {
                         foreach (targett trgt in trgts)
                         {
-                            
+
                             if (usePenalityManager)
                             {
                                 cardplayPenality = penman.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
@@ -218,14 +231,14 @@ namespace HREngine.Bots
                                     //help.logg(hc.card.name + " is played");
                                     Playfield pf = new Playfield(p);
                                     pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
                             }
                             else
                             {
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
 
                         }
@@ -246,7 +259,7 @@ namespace HREngine.Bots
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
-            
+
             while (havedonesomething)
             {
                 help.logg("ailoop");
@@ -259,7 +272,7 @@ namespace HREngine.Bots
                 foreach (Playfield p in temp)
                 {
 
-                    if (p.complete || p.ownHeroHp <=0)
+                    if (p.complete || p.ownHeroHp <= 0)
                     {
                         continue;
                     }
@@ -313,7 +326,7 @@ namespace HREngine.Bots
 
                                 if (trgts.Count == 0)
                                 {
-                                    
+
 
                                     if (usePenalityManager)
                                     {
@@ -323,7 +336,7 @@ namespace HREngine.Bots
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
                                             pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                            this.posmoves.Add(pf);
+                                            addToPosmoves(pf);
                                         }
                                     }
                                     else
@@ -331,7 +344,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
 
 
@@ -350,7 +363,7 @@ namespace HREngine.Bots
 
                                     foreach (targett trgt in trgts)
                                     {
-                                        
+
 
                                         if (usePenalityManager)
                                         {
@@ -360,7 +373,7 @@ namespace HREngine.Bots
                                                 Playfield pf = new Playfield(p);
                                                 havedonesomething = true;
                                                 pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                                this.posmoves.Add(pf);
+                                                addToPosmoves(pf);
                                             }
                                         }
                                         else
@@ -368,7 +381,7 @@ namespace HREngine.Bots
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
                                             pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                            this.posmoves.Add(pf);
+                                            addToPosmoves(pf);
                                         }
 
                                     }
@@ -461,7 +474,7 @@ namespace HREngine.Bots
 
                             foreach (targett trgt in trgts)
                             {
-                                
+
 
                                 int attackPenality = 0;
 
@@ -473,7 +486,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
                                 }
                                 else
@@ -481,7 +494,7 @@ namespace HREngine.Bots
                                     Playfield pf = new Playfield(p);
                                     havedonesomething = true;
                                     pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
 
 
@@ -534,13 +547,13 @@ namespace HREngine.Bots
                                 heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
-                            this.posmoves.Add(pf);
+                            addToPosmoves(pf);
                         }
                     }
 
                     // use ability
                     /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p,2))
+                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
                     {
                         int abilityPenality = 0;
 
@@ -574,7 +587,7 @@ namespace HREngine.Bots
                             foreach (targett trgt in trgts)
                             {
 
-                                
+
 
                                 if (usePenalityManager)
                                 {
@@ -584,7 +597,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
                                 }
                                 else
@@ -592,7 +605,7 @@ namespace HREngine.Bots
                                     Playfield pf = new Playfield(p);
                                     havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
 
                             }
@@ -609,14 +622,14 @@ namespace HREngine.Bots
                                 {
                                     havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
                             }
                             else
                             {
                                 havedonesomething = true;
                                 pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
 
                         }
@@ -651,7 +664,7 @@ namespace HREngine.Bots
                 {
                     this.posmoves.Add(bestold);
                 }
-                this.posmoves.RemoveAll(x => x.ownHeroHp <= 0);
+
                 help.loggonoff(true);
                 int donec = 0;
                 foreach (Playfield p in posmoves)
@@ -771,7 +784,32 @@ namespace HREngine.Bots
             int takenumber = this.maxwide;
             List<Playfield> temp = new List<Playfield>();
             posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
-            temp.AddRange(posmoves);
+
+            if (this.useComparison)
+            {
+                int i = 0;
+                foreach (Playfield p in posmoves)
+                {
+                    bool found = false;
+                    foreach (Playfield pp in temp)
+                    {
+                        if (pp.isEqual(p, false))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) temp.Add(p);
+                    i++;
+                    if (i >= this.maxwide) break;
+
+                }
+            }
+            else
+            {
+                temp.AddRange(posmoves);
+            }
+
             posmoves.Clear();
             posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
 
@@ -787,7 +825,7 @@ namespace HREngine.Bots
             List<targett> retvaluesPrio = new List<targett>();
             foreach (targett t in oldlist)
             {
-                if ((own && t.target == 200) || (!own && t.target==100))
+                if ((own && t.target == 200) || (!own && t.target == 100))
                 {
                     retvalues.Add(t);
                     continue;
@@ -931,7 +969,7 @@ namespace HREngine.Bots
             help.loggonoff(false);
             //do we need to recalc?
             help.logg("recalc-check###########");
-            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess))
+            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess, true))
             {
                 doNextCalcedMove();
             }
@@ -946,7 +984,7 @@ namespace HREngine.Bots
                     doallmoves(false, true);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
                 }
-                
+
                 if (bestmoveValue < 10000)
                 {
                     posmoves.Clear();
@@ -956,7 +994,7 @@ namespace HREngine.Bots
                     strt = DateTime.Now;
                     doallmoves(false, false);
                     help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
-                    
+
                 }
             }
 
@@ -990,7 +1028,7 @@ namespace HREngine.Bots
             {
                 help.logg("card " + item.card.name + " is playable :" + item.canplayCard(posmoves[0]) + " cost/mana: " + item.manacost + "/" + posmoves[0].mana);
             }
-            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0],2) + " cost/mana: " + posmoves[0].ownHeroAblility.getManaCost(posmoves[0],2) + "/" + posmoves[0].mana);
+            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0], 2) + " cost/mana: " + posmoves[0].ownHeroAblility.getManaCost(posmoves[0], 2) + "/" + posmoves[0].mana);
 
             // lethalcheck + normal
             DateTime strt = DateTime.Now;
@@ -1166,7 +1204,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
 
 }

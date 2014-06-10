@@ -42,6 +42,8 @@ namespace HREngine.Bots
             retval += p.ownHeroHp + p.ownHeroDefence;
             retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
+            retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10; 
+
             retval += p.ownWeaponAttack;// +ownWeaponDurability;
             if (!p.enemyHeroFrozen)
             {
@@ -1365,75 +1367,79 @@ namespace HREngine.Bots
 
         }
 
-        public bool isEqual(Playfield p)
+        public bool isEqual(Playfield p, bool logg)
         {
+            if (logg)
+            {
+                if (this.value != p.value) return false;
+            }
             if (this.enemySecretCount != p.enemySecretCount)
             {
 
-                Helpfunctions.Instance.logg("enemy secrets changed ");
+                if (logg) Helpfunctions.Instance.logg("enemy secrets changed ");
                 return false;
             }
 
             if (this.mana != p.mana || this.enemyMaxMana != p.enemyMaxMana || this.ownMaxMana != p.ownMaxMana)
             {
-                Helpfunctions.Instance.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
+                if (logg) Helpfunctions.Instance.logg("mana changed " + this.mana + " " + p.mana + " " + this.enemyMaxMana + " " + p.enemyMaxMana + " " + this.ownMaxMana + " " + p.ownMaxMana);
                 return false;
             }
 
             if (this.ownDeckSize != p.ownDeckSize || this.enemyDeckSize != p.enemyDeckSize || this.ownHeroFatigue != p.ownHeroFatigue || this.enemyHeroFatigue != p.enemyHeroFatigue)
             {
-                Helpfunctions.Instance.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
+                if (logg) Helpfunctions.Instance.logg("deck/fatigue changed " + this.ownDeckSize + " " + p.ownDeckSize + " " + this.enemyDeckSize + " " + p.enemyDeckSize + " " + this.ownHeroFatigue + " " + p.ownHeroFatigue + " " + this.enemyHeroFatigue + " " + p.enemyHeroFatigue);
             }
 
             if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung)
             {
-                Helpfunctions.Instance.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
+                if (logg) Helpfunctions.Instance.logg("stuff changed " + this.cardsPlayedThisTurn + " " + p.cardsPlayedThisTurn + " " + this.mobsplayedThisTurn + " " + p.mobsplayedThisTurn + " " + this.ueberladung + " " + p.ueberladung);
                 return false;
             }
 
             if (this.ownHeroName != p.ownHeroName || this.enemyHeroName != p.enemyHeroName)
             {
-                Helpfunctions.Instance.logg("hero name changed ");
+                if (logg) Helpfunctions.Instance.logg("hero name changed ");
                 return false;
             }
 
             if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking || this.heroImmune != p.heroImmune)
             {
-                Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking + " " + this.heroImmune + " " + p.heroImmune);
+                if (logg) Helpfunctions.Instance.logg("ownhero changed " + this.ownHeroHp + " " + p.ownHeroHp + " " + this.ownheroAngr + " " + p.ownheroAngr + " " + this.ownHeroDefence + " " + p.ownHeroDefence + " " + this.ownHeroFrozen + " " + p.ownHeroFrozen + " " + this.heroImmuneWhileAttacking + " " + p.heroImmuneWhileAttacking + " " + this.heroImmune + " " + p.heroImmune);
                 return false;
             }
             if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury)
             {
-                Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
+                if (logg) Helpfunctions.Instance.logg("weapon changed " + this.ownHeroReady + " " + p.ownHeroReady + " " + this.ownWeaponAttack + " " + p.ownWeaponAttack + " " + this.ownWeaponDurability + " " + p.ownWeaponDurability + " " + this.ownHeroNumAttackThisTurn + " " + p.ownHeroNumAttackThisTurn + " " + this.ownHeroWindfury + " " + p.ownHeroWindfury);
                 return false;
             }
             if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen || this.enemyHeroImmune != p.enemyHeroImmune)
             {
-                Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
+                if (logg) Helpfunctions.Instance.logg("enemyhero changed " + this.enemyHeroHp + " " + p.enemyHeroHp + " " + this.enemyWeaponAttack + " " + p.enemyWeaponAttack + " " + this.enemyHeroDefence + " " + p.enemyHeroDefence + " " + this.enemyWeaponDurability + " " + p.enemyWeaponDurability + " " + this.enemyHeroFrozen + " " + p.enemyHeroFrozen + " " + this.enemyHeroImmune + " " + p.enemyHeroImmune);
                 return false;
             }
 
-            if (this.auchenaiseelenpriesterin != p.auchenaiseelenpriesterin || this.winzigebeschwoererin != p.winzigebeschwoererin || this.zauberlehrling != p.zauberlehrling || this.managespenst != p.managespenst || this.soeldnerDerVenture != p.soeldnerDerVenture || this.beschwoerungsportal != p.beschwoerungsportal || this.doublepriest != p.doublepriest)
+            /*if (this.auchenaiseelenpriesterin != p.auchenaiseelenpriesterin || this.winzigebeschwoererin != p.winzigebeschwoererin || this.zauberlehrling != p.zauberlehrling || this.managespenst != p.managespenst || this.soeldnerDerVenture != p.soeldnerDerVenture || this.beschwoerungsportal != p.beschwoerungsportal || this.doublepriest != p.doublepriest)
             {
                 Helpfunctions.Instance.logg("special minions changed " + this.auchenaiseelenpriesterin + " " + p.auchenaiseelenpriesterin + " " + this.winzigebeschwoererin + " " + p.winzigebeschwoererin + " " + this.zauberlehrling + " " + p.zauberlehrling + " " + this.managespenst + " " + p.managespenst + " " + this.soeldnerDerVenture + " " + p.soeldnerDerVenture + " " + this.beschwoerungsportal + " " + p.beschwoerungsportal + " " + this.doublepriest + " " + p.doublepriest);
                 return false;
-            }
+            }*/
 
             if (this.ownHeroAblility.name != p.ownHeroAblility.name)
             {
-                Helpfunctions.Instance.logg("hero ability changed ");
+                if (logg) Helpfunctions.Instance.logg("hero ability changed ");
                 return false;
             }
 
             if (this.spellpower != p.spellpower)
             {
-                Helpfunctions.Instance.logg("spellpower changed");
+                if (logg) Helpfunctions.Instance.logg("spellpower changed");
                 return false;
             }
 
             if (this.ownMinions.Count != p.ownMinions.Count || this.enemyMinions.Count != p.enemyMinions.Count || this.owncards.Count != p.owncards.Count)
             {
-                Helpfunctions.Instance.logg("minions count or hand changed");
+                if (logg) Helpfunctions.Instance.logg("minions count or hand changed");
                 return false;
             }
 
@@ -1453,7 +1459,7 @@ namespace HREngine.Bots
             }
             if (minionbool == false)
             {
-                Helpfunctions.Instance.logg("ownminions changed");
+                if (logg) Helpfunctions.Instance.logg("ownminions changed");
                 return false;
             }
 
@@ -1471,7 +1477,7 @@ namespace HREngine.Bots
             }
             if (minionbool == false)
             {
-                Helpfunctions.Instance.logg("enemyminions changed");
+                if (logg) Helpfunctions.Instance.logg("enemyminions changed");
                 return false;
             }
 
@@ -1480,7 +1486,7 @@ namespace HREngine.Bots
                 Handmanager.Handcard dishc = this.owncards[i]; Handmanager.Handcard pishc = p.owncards[i];
                 if (dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.getManaCost(this) != pishc.getManaCost(p))
                 {
-                    Helpfunctions.Instance.logg("handcard changed: " + dishc.card.name);
+                    if (logg) Helpfunctions.Instance.logg("handcard changed: " + dishc.card.name);
                     return false;
                 }
             }
@@ -1707,7 +1713,7 @@ namespace HREngine.Bots
                 {
                     if (m.stealth) continue; // cant target stealth
 
-                    if (m.taunt && !m.silenced)
+                    if (m.taunt)
                     {
                         hastanks = true;
                         trgts.Add(new targett(m.id + 10, m.entitiyID));
@@ -1725,7 +1731,7 @@ namespace HREngine.Bots
                 {
                     if (m.stealth) continue; // cant target stealth
 
-                    if (m.taunt && !m.silenced)
+                    if (m.taunt)
                     {
                         hastanks = true;
                         trgts.Add(new targett(m.id, m.entitiyID));
@@ -5192,6 +5198,15 @@ namespace HREngine.Bots
                     this.ownWeaponDurability = 0;
                     this.ownWeaponAttack = 0;
                     this.ownWeaponName = "";
+
+                    foreach (Minion m in this.ownMinions)
+                    {
+                        if (m.playedThisTurn && m.name == "southseadeckhand")
+                        {
+                            m.Ready = false;
+                            m.charge = false;
+                        }
+                    }
                 }
             }
             else
@@ -5238,7 +5253,7 @@ namespace HREngine.Bots
 
             foreach (Minion m in this.ownMinions)
             {
-                if (m.name == "southseadeckhand")
+                if (m.playedThisTurn && m.name == "southseadeckhand")
                 {
                     minionGetCharge(m);
                 }
@@ -6774,6 +6789,19 @@ namespace HREngine.Bots
                 }
             }
 
+            if (c.name == "savageroar")
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                Enchantment e = CardDB.getEnchantmentFromCardID("CS2_011o");
+                e.creator = hc.entity;
+                e.controllerOfCreator = this.ownController;
+                foreach (Minion m in temp)
+                {
+                    addEffectToMinionNoDoubles(m, e, true);
+                }
+                this.ownheroAngr += 2;
+            }
+
             //special cards#######################
 
             if (c.CardID == "PRO_001a")// i am murloc
@@ -7794,6 +7822,7 @@ namespace HREngine.Bots
         private bool useCutingTargets = true;
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
+        private bool useComparison = true;
 
 
         PenalityManager penman = PenalityManager.Instance;
@@ -7828,6 +7857,18 @@ namespace HREngine.Bots
         {
             this.nextMoveGuess = new Playfield();
             this.nextMoveGuess.mana = -1;
+        }
+
+        private void addToPosmoves(Playfield pf)
+        {
+            if (pf.ownHeroHp <= 0) return;
+            /*foreach (Playfield p in this.posmoves)
+            {
+                if (pf.isEqual(p, false)) return;
+            }*/
+            this.posmoves.Add(pf);
+            //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
+            //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
         }
 
         private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
@@ -7973,14 +8014,14 @@ namespace HREngine.Bots
                                 //help.logg(hc.card.name + " is played");
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
                         }
                         else
                         {
                             Playfield pf = new Playfield(p);
                             pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                            this.posmoves.Add(pf);
+                            addToPosmoves(pf);
                         }
 
                     }
@@ -7997,14 +8038,14 @@ namespace HREngine.Bots
                                     //help.logg(hc.card.name + " is played");
                                     Playfield pf = new Playfield(p);
                                     pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
                             }
                             else
                             {
                                 Playfield pf = new Playfield(p);
                                 pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
 
                         }
@@ -8102,7 +8143,7 @@ namespace HREngine.Bots
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
                                             pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                            this.posmoves.Add(pf);
+                                            addToPosmoves(pf);
                                         }
                                     }
                                     else
@@ -8110,7 +8151,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
 
 
@@ -8139,7 +8180,7 @@ namespace HREngine.Bots
                                                 Playfield pf = new Playfield(p);
                                                 havedonesomething = true;
                                                 pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                                this.posmoves.Add(pf);
+                                                addToPosmoves(pf);
                                             }
                                         }
                                         else
@@ -8147,7 +8188,7 @@ namespace HREngine.Bots
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
                                             pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                            this.posmoves.Add(pf);
+                                            addToPosmoves(pf);
                                         }
 
                                     }
@@ -8252,7 +8293,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
                                 }
                                 else
@@ -8260,7 +8301,7 @@ namespace HREngine.Bots
                                     Playfield pf = new Playfield(p);
                                     havedonesomething = true;
                                     pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
 
 
@@ -8313,7 +8354,7 @@ namespace HREngine.Bots
                                 heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
-                            this.posmoves.Add(pf);
+                            addToPosmoves(pf);
                         }
                     }
 
@@ -8363,7 +8404,7 @@ namespace HREngine.Bots
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
                                         pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                        this.posmoves.Add(pf);
+                                        addToPosmoves(pf);
                                     }
                                 }
                                 else
@@ -8371,7 +8412,7 @@ namespace HREngine.Bots
                                     Playfield pf = new Playfield(p);
                                     havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
 
                             }
@@ -8388,14 +8429,14 @@ namespace HREngine.Bots
                                 {
                                     havedonesomething = true;
                                     pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                    this.posmoves.Add(pf);
+                                    addToPosmoves(pf);
                                 }
                             }
                             else
                             {
                                 havedonesomething = true;
                                 pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                this.posmoves.Add(pf);
+                                addToPosmoves(pf);
                             }
 
                         }
@@ -8430,7 +8471,7 @@ namespace HREngine.Bots
                 {
                     this.posmoves.Add(bestold);
                 }
-                this.posmoves.RemoveAll(x => x.ownHeroHp <= 0);
+
                 help.loggonoff(true);
                 int donec = 0;
                 foreach (Playfield p in posmoves)
@@ -8550,7 +8591,32 @@ namespace HREngine.Bots
             int takenumber = this.maxwide;
             List<Playfield> temp = new List<Playfield>();
             posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
-            temp.AddRange(posmoves);
+
+            if (this.useComparison)
+            {
+                int i = 0;
+                foreach (Playfield p in posmoves)
+                {
+                    bool found = false;
+                    foreach (Playfield pp in temp)
+                    {
+                        if (pp.isEqual(p, false))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) temp.Add(p);
+                    i++;
+                    if (i >= this.maxwide) break;
+
+                }
+            }
+            else
+            {
+                temp.AddRange(posmoves);
+            }
+
             posmoves.Clear();
             posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
 
@@ -8710,7 +8776,7 @@ namespace HREngine.Bots
             help.loggonoff(false);
             //do we need to recalc?
             help.logg("recalc-check###########");
-            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess))
+            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess, true))
             {
                 doNextCalcedMove();
             }
@@ -11457,6 +11523,7 @@ namespace HREngine.Bots
             priorityTargets.Add("illidanstormrage", 10);
             priorityTargets.Add("barongeddon", 10);
             priorityTargets.Add("stormwindchampion", 10);
+            priorityTargets.Add("gurubashiberserker", 10);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);
@@ -11498,7 +11565,6 @@ namespace HREngine.Bots
 
 
     }
-
 
     public class CardDB
     {
@@ -11640,6 +11706,8 @@ namespace HREngine.Bots
             public string description = "";
             public int carddraw = 0;
 
+            public bool hasEffect = false;// has the minion an effect, but not battlecry
+
             public int Attack = 0;
             public int Health = 0;
             public int Durability = 0;//for weapons
@@ -11692,6 +11760,7 @@ namespace HREngine.Bots
             public Card(Card c)
             {
                 //this.entityID = c.entityID;
+                this.hasEffect = c.hasEffect;
                 this.rarity = c.rarity;
                 this.AdjacentBuff = c.AdjacentBuff;
                 this.Attack = c.Attack;
@@ -12347,6 +12416,7 @@ namespace HREngine.Bots
                         if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
                         if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
                         if (temp == "succubus") c.specialMin = specialMinions.succubus;
+                        if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 
                     }
                     if (de == 1)
@@ -13832,7 +13902,7 @@ namespace HREngine.Bots
             this.taunt = m.taunt;
             this.wounded = m.wounded;
             this.name = m.name;
-            this.handcard.card = m.handcard.card;
+            this.handcard = m.handcard;
             this.divineshild = m.divineshild;
             this.windfury = m.windfury;
             this.frozen = m.frozen;

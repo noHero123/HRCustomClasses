@@ -110,7 +110,7 @@ namespace HREngine.Bots
             this.taunt = m.taunt;
             this.wounded = m.wounded;
             this.name = m.name;
-            this.handcard.card = m.handcard.card;
+            this.handcard = m.handcard;
             this.divineshild = m.divineshild;
             this.windfury = m.windfury;
             this.frozen = m.frozen;

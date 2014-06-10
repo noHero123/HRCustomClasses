@@ -1678,6 +1678,7 @@ namespace HREngine.Bots
             priorityTargets.Add("illidanstormrage", 10);
             priorityTargets.Add("barongeddon", 10);
             priorityTargets.Add("stormwindchampion", 10);
+            priorityTargets.Add("gurubashiberserker", 10);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);
