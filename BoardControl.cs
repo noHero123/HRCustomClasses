@@ -79,6 +79,7 @@ namespace HREngine.Bots
               if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
               if (m.Angr > 1 || m.Hp > 1) ownMinionsCount++;
               if (m.handcard.card.hasEffect) retval += 1;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
           }
 
           if (p.enemyMinions.Count >= 0)
@@ -89,10 +90,14 @@ namespace HREngine.Bots
           }
 
           int playmobs = 0;
+          bool useAbili = false;
+          bool usecoin = false;
           foreach (Action a in p.playactions)
           {
+              if (a.useability) useAbili = true;
               if (a.useability && a.handcard.card.specialMin ==  CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
+              if ((a.handcard.card.specialMin == CardDB.specialMinions.thecoin || a.handcard.card.specialMin == CardDB.specialMinions.innervate)) usecoin=true;
               if (a.handcard.card.type == CardDB.cardtype.MOB) playmobs++;
               //if (a.handcard.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
 
@@ -101,6 +106,7 @@ namespace HREngine.Bots
               if (p.ownHeroName != HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.specialMin!= CardDB.specialMinions.shieldblock) retval -= 11;
               if (p.ownHeroName == HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
+          if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
 
           int mobsInHand = 0;
           foreach (Handmanager.Handcard hc in p.owncards)

@@ -42,7 +42,7 @@ namespace HREngine.Bots
             retval += p.ownHeroHp + p.ownHeroDefence;
             retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
-            retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10; 
+            retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10;
 
             retval += p.ownWeaponAttack;// +ownWeaponDurability;
             if (!p.enemyHeroFrozen)
@@ -62,13 +62,17 @@ namespace HREngine.Bots
 
             retval += p.ownMaxMana;
 
-
+            bool useAbili = false;
+            bool usecoin = false;
             foreach (Action a in p.playactions)
             {
+                if (a.useability) useAbili = true;
                 if (a.useability && a.handcard.card.specialMin == CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
                 if (!a.cardplay) continue;
+                if ((a.handcard.card.specialMin == CardDB.specialMinions.thecoin || a.handcard.card.specialMin == CardDB.specialMinions.innervate)) usecoin = true;
                 if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
             }
+            if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
 
             foreach (Minion m in p.ownMinions)
             {
@@ -77,6 +81,7 @@ namespace HREngine.Bots
                 retval += m.handcard.card.rarity;
                 if (m.windfury) retval += m.Angr;
                 if (m.taunt) retval += 1;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
             }
 
             foreach (Minion m in p.enemyMinions)
@@ -446,7 +451,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 44;
+        private int versionnumber = 45;
         private bool singleLog = false;
 
 
@@ -10169,6 +10174,19 @@ namespace HREngine.Bots
                 {
                     if (hc.card.name == "execute") return 0;
                 }
+                if (name == "holynova")
+                {
+                    int targets = p.enemyMinions.Count;
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.wounded) targets++;
+                    }
+                    if (targets <= 2)
+                    {
+                        return 20;
+                    }
+
+                }
                 if (p.enemyMinions.Count <= 2)
                 {
                     return 20;
@@ -10581,6 +10599,14 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target - 10];
             }
 
+            if (name == "poweroverwhelming")
+            {
+                if (target >= 0 && target <= 9 && !m.Ready)
+                {
+                    return 500;
+                }
+            }
+
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
@@ -10835,7 +10861,6 @@ namespace HREngine.Bots
                     if (mnn.Ready) pen += 10;
                 }
             }
-
 
             return pen;
         }
@@ -11638,7 +11663,10 @@ namespace HREngine.Bots
             shieldblock,
             soulfire,
             doomguard,
-            succubus
+            succubus,
+            silverhandrecruit,
+            thecoin,
+            innervate
 
         }
 
@@ -12416,6 +12444,10 @@ namespace HREngine.Bots
                         if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
                         if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
                         if (temp == "succubus") c.specialMin = specialMinions.succubus;
+                        if (temp == "silverhandrecruit") c.specialMin = specialMinions.silverhandrecruit;
+                        if (temp == "thecoin") c.specialMin = specialMinions.thecoin;
+                        if (temp == "innervate") c.specialMin = specialMinions.innervate;
+
                         if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 
                     }

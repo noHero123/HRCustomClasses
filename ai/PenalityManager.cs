@@ -324,6 +324,19 @@ namespace HREngine.Bots
                 {
                     if (hc.card.name == "execute") return 0;
                 }
+                if (name == "holynova")
+                {
+                    int targets = p.enemyMinions.Count;
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.wounded) targets++;
+                    }
+                    if (targets <= 2)
+                    {
+                        return 20;
+                    }
+
+                }
                 if (p.enemyMinions.Count <= 2)
                 {
                     return 20;
@@ -736,6 +749,14 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target-10];
             }
 
+            if (name == "poweroverwhelming")
+            {
+                if (target >= 0 && target <= 9 && !m.Ready)
+                {
+                    return 500;
+                }
+            }
+
             if (name == "frothingberserker")
             {
                 if (p.cardsPlayedThisTurn >= 1) pen = 5;
@@ -990,7 +1011,6 @@ namespace HREngine.Bots
                     if (mnn.Ready) pen += 10;
                 }
             }
-
 
             return pen;
         }

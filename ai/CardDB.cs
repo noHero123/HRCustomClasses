@@ -90,7 +90,10 @@ namespace HREngine.Bots
             shieldblock,
             soulfire,
             doomguard,
-            succubus
+            succubus,
+            silverhandrecruit,
+            thecoin,
+            innervate
 
         }
 
@@ -868,6 +871,10 @@ namespace HREngine.Bots
                         if (temp == "soulfire") c.specialMin = specialMinions.soulfire;
                         if (temp == "doomguard") c.specialMin = specialMinions.doomguard;
                         if (temp == "succubus") c.specialMin = specialMinions.succubus;
+                        if (temp == "silverhandrecruit") c.specialMin = specialMinions.silverhandrecruit;
+                        if (temp == "thecoin") c.specialMin = specialMinions.thecoin;
+                        if (temp == "innervate") c.specialMin = specialMinions.innervate;
+
                         if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 
                     }

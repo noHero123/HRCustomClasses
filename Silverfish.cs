@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 44;
+        private int versionnumber = 45;
         private bool singleLog = false;
 
 
@@ -113,8 +113,6 @@ namespace HREngine.Bots
 
         public void updateEverything(Bot botbase)
         {
-
-
 
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();

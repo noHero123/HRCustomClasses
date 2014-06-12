@@ -59,13 +59,17 @@ namespace HREngine.Bots
 
           retval += p.ownMaxMana;
 
-
+          bool useAbili = false;
+          bool usecoin = false;
           foreach (Action a in p.playactions)
           {
+              if (a.useability) useAbili = true;
               if (a.useability && a.handcard.card.specialMin == CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
+              if ((a.handcard.card.specialMin == CardDB.specialMinions.thecoin || a.handcard.card.specialMin == CardDB.specialMinions.innervate)) usecoin = true;
               if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
+          if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
 
           foreach (Minion m in p.ownMinions)
           {
@@ -74,6 +78,7 @@ namespace HREngine.Bots
               retval += m.handcard.card.rarity;
               if (m.windfury) retval += m.Angr;
               if (m.taunt) retval += 1;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
           }
 
           foreach (Minion m in p.enemyMinions)
