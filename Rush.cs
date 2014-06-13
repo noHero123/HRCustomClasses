@@ -78,6 +78,7 @@ namespace HREngine.Bots
               retval += m.handcard.card.rarity;
               if (m.windfury) retval += m.Angr;
               if (m.taunt) retval += 1;
+              if (!m.taunt && m.stealth && penman.specialMinions.ContainsKey(m.name)) retval += 20;
               if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
           }
 

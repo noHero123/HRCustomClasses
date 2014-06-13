@@ -91,7 +91,7 @@ namespace HREngine.Bots
                 sttngs.setLoggFile("UILogg.txt");
                 Helpfunctions.Instance.createNewLoggfile();
             }
-
+            PenalityManager.Instance.setCombos();
             /*OnBattleStateUpdate = UpdateBattleState;
             OnMulliganStateUpdate = UpdateMulliganState;
             RejectedCardList = new Dictionary<int, HRCard>();

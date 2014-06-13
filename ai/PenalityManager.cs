@@ -11,6 +11,8 @@ namespace HREngine.Bots
         //todo acolyteofpain
         //todo better aoe-penality
 
+        ComboBreaker cb ;
+
         public Dictionary<string, int> priorityDatabase = new Dictionary<string, int>();
         Dictionary<string, int> HealTargetDatabase= new Dictionary<string,int>();
         Dictionary<string, int> HealHeroDatabase = new Dictionary<string, int>();
@@ -76,6 +78,10 @@ namespace HREngine.Bots
             setupBuffingMinions();
         }
 
+        public void setCombos()
+        {
+            this.cb = ComboBreaker.Instance;
+        }
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
         {
             int pen = 0;
@@ -130,6 +136,7 @@ namespace HREngine.Bots
             retval += getSpecialCardComboPenalitys( card,  target,  p, lethal);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
+            if(!lethal) retval += cb.getPenalityForDestroyingCombo(card);
 
             return retval;
         }
@@ -228,7 +235,6 @@ namespace HREngine.Bots
         private int getSilencePenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             int pen = 0;
-            if (name == "earthshock") return 0;//earthshock is handled in damage stuff
             if (name == "keeperofthegrove" && choice != 2) return 0; // look at damage penality in this case
 
             if (target >= 0 && target <= 9)
@@ -276,13 +282,17 @@ namespace HREngine.Bots
                        
                         return 500;
                     }
-
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.venturecomercenary && !m.silenced &&(m.Angr <= m.handcard.card.Attack && m.maxHp <= m.handcard.card.Health))
+                    {
+                        return 30;
+                    }
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
                         return -10;
                     }
+
                     //silence nothing
-                    if ((m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health) || !(m.taunt || m.windfury || m.divineshild || m.enchantments.Count >= 1))
+                    if (m.Angr <= m.handcard.card.Attack && m.maxHp <= m.handcard.card.Health && !m.taunt && !m.windfury && !m.divineshild && !m.poisonous && m.enchantments.Count == 0 && !this.specialMinions.ContainsKey(name))
                     {
                         return 30;
                     }
@@ -1635,7 +1645,7 @@ namespace HREngine.Bots
             this.specialMinions.Add("tirionfordring", 0);
             this.specialMinions.Add("tundrarhino", 0);
             this.specialMinions.Add("unboundelemental", 0);
-            this.specialMinions.Add("venturecomercenary", 0);
+            //this.specialMinions.Add("venturecomercenary", 0);
             this.specialMinions.Add("violentteacher", 0);
             this.specialMinions.Add("warsongcommander", 0);
             this.specialMinions.Add("waterelemental", 0);

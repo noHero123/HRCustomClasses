@@ -74,6 +74,7 @@ namespace HREngine.Bots
               if (m.windfury) retval += m.Angr;
               if (m.divineshild) retval += 1;
               if (m.stealth) retval += 1;
+              if (!m.taunt && m.stealth && penman.specialMinions.ContainsKey(m.name)) retval += 20;
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;
               if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
