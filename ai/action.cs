@@ -582,7 +582,7 @@ namespace HREngine.Bots
 
         public void simulateEnemysTurn()
         {
-            int maxwide = 30;
+            int maxwide = 20;
 
             this.enemyAbilityReady = true;
             this.enemyHeroNumAttackThisTurn = 0;
