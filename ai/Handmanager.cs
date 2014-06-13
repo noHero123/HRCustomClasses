@@ -254,7 +254,7 @@ namespace HREngine.Bots
             help.logg("Own Handcards: ");
             foreach (Handmanager.Handcard c in this.handCards)
             {
-                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity);
+                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.CardID);
             }
         }
 

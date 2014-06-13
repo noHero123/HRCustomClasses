@@ -172,9 +172,9 @@ namespace HREngine.Bots
                 {
                     return 20;
                 }
-                if (m.Hp == 1)
+                if (m.Hp == 1 && !m.divineshild)
                 {
-                    return 30;
+                    return 10;
                 }
             }
             return pen;

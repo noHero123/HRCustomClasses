@@ -452,7 +452,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 46;
+        private int versionnumber = 47;
         private bool singleLog = false;
 
 
@@ -7822,8 +7822,8 @@ namespace HREngine.Bots
     public class Ai
     {
         private int maxdeep = 12;
-        private int maxwide = 7000;
-        public bool simulateEnemyTurn = false;
+        private int maxwide = 3000;
+        public bool simulateEnemyTurn = true;
         private bool usePenalityManager = true;
         private bool useCutingTargets = true;
         private bool dontRecalc = true;
@@ -9266,7 +9266,7 @@ namespace HREngine.Bots
             help.logg("Own Handcards: ");
             foreach (Handmanager.Handcard c in this.handCards)
             {
-                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity);
+                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.CardID);
             }
         }
 
@@ -9750,7 +9750,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.CardID + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -9764,7 +9764,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.CardID + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -10023,9 +10023,9 @@ namespace HREngine.Bots
                 {
                     return 20;
                 }
-                if (m.Hp == 1)
+                if (m.Hp == 1 && !m.divineshild)
                 {
-                    return 30;
+                    return 10;
                 }
             }
             return pen;
@@ -13727,6 +13727,7 @@ namespace HREngine.Bots
                         if (counter >= 2) this.ownminions.Add(tempminion);
 
                         string minionname = s.Split(' ')[0];
+                        string minionid = s.Split(' ')[1];
                         int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
@@ -13761,7 +13762,7 @@ namespace HREngine.Bots
 
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -13810,6 +13811,7 @@ namespace HREngine.Bots
                         if (counter >= 2) this.enemyminions.Add(tempminion);
 
                         string minionname = s.Split(' ')[0];
+                        string minionid = s.Split(' ')[1];
                         int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
@@ -13844,7 +13846,7 @@ namespace HREngine.Bots
                         if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -13888,10 +13890,10 @@ namespace HREngine.Bots
                     Handmanager.Handcard card = new Handmanager.Handcard();
 
                     string minionname = s.Split(' ')[2];
+                    string minionid = s.Split(' ')[6];
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
-                    card.card = CardDB.Instance.getCardData(minionname);
-                    if (minionname == "wrath") card.card = CardDB.Instance.getCardDataFromID("EX1_154");
+                    card.card = CardDB.Instance.getCardDataFromID(minionid);
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;

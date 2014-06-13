@@ -200,6 +200,7 @@ namespace HREngine.Bots
                         if (counter >= 2) this.ownminions.Add(tempminion);
 
                         string minionname = s.Split(' ')[0];
+                        string minionid = s.Split(' ')[1];
                         int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
@@ -234,7 +235,7 @@ namespace HREngine.Bots
 
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -283,6 +284,7 @@ namespace HREngine.Bots
                         if (counter >= 2) this.enemyminions.Add(tempminion);
 
                         string minionname = s.Split(' ')[0];
+                        string minionid = s.Split(' ')[1];
                         int attack = Convert.ToInt32(s.Split(new string[] { " A:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int hp = Convert.ToInt32(s.Split(new string[] { " H:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
                         int maxhp = Convert.ToInt32(s.Split(new string[] { " mH:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
@@ -317,7 +319,7 @@ namespace HREngine.Bots
                         if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardData(minionname)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -361,10 +363,10 @@ namespace HREngine.Bots
                     Handmanager.Handcard card = new Handmanager.Handcard();
 
                     string minionname = s.Split(' ')[2];
+                    string minionid = s.Split(' ')[6];
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
-                    card.card = CardDB.Instance.getCardData(minionname);
-                    if (minionname == "wrath") card.card = CardDB.Instance.getCardDataFromID("EX1_154");
+                    card.card = CardDB.Instance.getCardDataFromID(minionid);
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;
