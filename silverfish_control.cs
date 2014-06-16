@@ -176,6 +176,8 @@ namespace HREngine.Bots
       }
 
 
+      
+
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
           HRLog.Write("handle mulligan");
@@ -315,6 +317,7 @@ namespace HREngine.Bots
                               if (choice == 2 && hre.GetCardId() == "EX1_154b") target = hre;
                           }
                       }
+                      Helpfunctions.Instance.logg("chooses the card: " + target.GetCardId());
                       return new HREngine.API.Actions.ChoiceAction(target);
                   }
                   else
@@ -323,6 +326,7 @@ namespace HREngine.Bots
                       List<HREntity> choices = HRChoice.GetChoiceCards();
                       Random r = new Random();
                       int choice = r.Next(0, choices.Count);
+                      Helpfunctions.Instance.logg("chooses a random card");
                       return new HREngine.API.Actions.ChoiceAction(choices[choice]);
                   }
               }
@@ -501,7 +505,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 47;
+        private int versionnumber = 48;
         private bool singleLog = false;
 
 
@@ -5280,7 +5284,7 @@ namespace HREngine.Bots
 
         private void equipWeapon(CardDB.Card c)
         {
-            if (this.ownWeaponDurability >= 1) this.lostWeaponDamage += this.ownWeaponDurability * this.ownWeaponAttack;
+            if (this.ownWeaponDurability >= 1) this.lostWeaponDamage += this.ownWeaponDurability * this.ownWeaponAttack * this.ownWeaponAttack;
             this.ownheroAngr = c.Attack;
             this.ownWeaponAttack = c.Attack;
             this.ownWeaponDurability = c.Durability;
@@ -6584,6 +6588,7 @@ namespace HREngine.Bots
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
+                drawACard("", true);
             }
 
             if (c.name == "sprint")
@@ -7617,12 +7622,26 @@ namespace HREngine.Bots
 
                 if (target == 100)
                 {
+                    if (heal >= 1) return;
                     attackOrHealHero(-1 * heal, true);
                 }
                 else
                 {
                     if (target == 200)
                     {
+                        if (heal >= 1)
+                        {
+                            bool haslightwarden = false;
+                            foreach (Minion mnn in this.enemyMinions)
+                            {
+                                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
+                                {
+                                    haslightwarden = true;
+                                    break;
+                                }
+                            }
+                            if (!haslightwarden) return;
+                        }
                         attackOrHealHero(-1 * heal, false);
                     }
                     else
@@ -9938,6 +9957,7 @@ namespace HREngine.Bots
         Dictionary<string, int> destroyOwnDatabase = new Dictionary<string, int>();
         Dictionary<string, int> destroyDatabase = new Dictionary<string, int>();
         Dictionary<string, int> buffingMinionsDatabase = new Dictionary<string, int>();
+        Dictionary<string, int> buffing1TurnDatabase = new Dictionary<string, int>();
         Dictionary<string, int> heroDamagingAoeDatabase = new Dictionary<string, int>();
 
         Dictionary<string, int> returnHandDatabase = new Dictionary<string, int>();
@@ -10056,12 +10076,9 @@ namespace HREngine.Bots
                     if (hc.card.specialMin == CardDB.specialMinions.biggamehunter) return pen;
                     if (hc.card.specialMin == CardDB.specialMinions.shadowworddeath) return pen;
                 }
-                if (card.name == "crueltaskmaster" && !p.enemyMinions[target - 10].wounded)
+                if (card.name == "crueltaskmaster")
                 {
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        if (hc.card.name == "execute") return 0;
-                    }
+                    return 0;
                 }
                 pen = 500;
             }
@@ -10072,7 +10089,7 @@ namespace HREngine.Bots
                 {
                     return 20;
                 }
-                if (m.Hp == 1 && !m.divineshild)
+                if (m.Hp == 1 && !m.divineshild && !this.buffing1TurnDatabase.ContainsKey(name))
                 {
                     return 10;
                 }
@@ -10373,7 +10390,7 @@ namespace HREngine.Bots
                     m = p.ownMinions[target];
                     int wasted = 0;
                     if (m.Hp == m.maxHp) return 500;
-                    if (m.Hp + heal > m.maxHp) wasted = m.Hp + heal - m.maxHp;
+                    if (m.Hp + heal - 1 > m.maxHp) wasted = m.Hp + heal - m.maxHp;
                     pen = wasted;
                     if (m.taunt && wasted <= 2 && m.Hp < m.maxHp) pen -= 5; // if we heal a taunt, its good :D
                 }
@@ -10470,9 +10487,12 @@ namespace HREngine.Bots
                 if (carddraw == 0) return 2;
             }
 
-            if (p.owncards.Count >= 5) return 0;
-            pen = -carddraw + p.ownMaxMana - p.mana;
-            return pen;
+            if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
+            if (p.owncards.Count > 5) return 10;
+
+            return 0;
+            /*pen = -carddraw + p.ownMaxMana - p.mana;
+            return pen;*/
         }
 
         private int getCardDrawofEffectMinions(CardDB.Card card, Playfield p)
@@ -11574,6 +11594,9 @@ namespace HREngine.Bots
             buffingMinionsDatabase.Add("templeenforcer", 0);
             buffingMinionsDatabase.Add("timberwolf", 0);
 
+            buffing1TurnDatabase.Add("abusivesergeant", 0);
+            buffing1TurnDatabase.Add("darkirondwarf", 0);
+
         }
         private void setupEnemyTargetPriority()
         {
@@ -11609,6 +11632,7 @@ namespace HREngine.Bots
             priorityTargets.Add("barongeddon", 10);
             priorityTargets.Add("stormwindchampion", 10);
             priorityTargets.Add("gurubashiberserker", 10);
+            priorityTargets.Add("cairnebloodhoof", 19);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);
@@ -13581,6 +13605,7 @@ namespace HREngine.Bots
 
 
     }
+    
     public class BoardTester
     {
         int ownPlayer = 1;

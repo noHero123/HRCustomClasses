@@ -4311,7 +4311,7 @@ namespace HREngine.Bots
 
         private void equipWeapon(CardDB.Card c)
         {
-            if (this.ownWeaponDurability >= 1) this.lostWeaponDamage += this.ownWeaponDurability * this.ownWeaponAttack;
+            if (this.ownWeaponDurability >= 1) this.lostWeaponDamage += this.ownWeaponDurability * this.ownWeaponAttack * this.ownWeaponAttack;
             this.ownheroAngr = c.Attack;
             this.ownWeaponAttack = c.Attack;
             this.ownWeaponDurability = c.Durability;
@@ -5615,6 +5615,7 @@ namespace HREngine.Bots
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
+                drawACard("", true);
             }
 
             if (c.name == "sprint")
@@ -6645,15 +6646,29 @@ namespace HREngine.Bots
                 {
                     heal = -1 * 3;
                 }
-
+                
                 if (target == 100)
                 {
+                    if (heal >= 1) return;
                     attackOrHealHero(-1 * heal, true);
                 }
                 else
                 {
                     if (target == 200)
                     {
+                        if (heal >= 1)
+                        {
+                            bool haslightwarden = false;
+                            foreach (Minion mnn in this.enemyMinions)
+                            {
+                                if (mnn.handcard.card.specialMin == CardDB.specialMinions.lightwarden)
+                                {
+                                    haslightwarden = true;
+                                    break;
+                                }
+                            }
+                            if (!haslightwarden) return;
+                        }
                         attackOrHealHero(-1 * heal, false);
                     }
                     else

@@ -33,6 +33,8 @@ namespace HREngine.Bots
           //Ai.Instance.autoTester(this);
       }
 
+
+
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
           HRLog.Write("handle mulligan");
@@ -172,6 +174,7 @@ namespace HREngine.Bots
                              if (choice == 2 && hre.GetCardId() == "EX1_154b") target = hre;
                          }
                      }
+                     Helpfunctions.Instance.logg("chooses the card: " + target.GetCardId());
                      return new HREngine.API.Actions.ChoiceAction(target);
                  }
                  else
@@ -180,6 +183,7 @@ namespace HREngine.Bots
                      List<HREntity> choices = HRChoice.GetChoiceCards(); 
                      Random r = new Random();
                      int choice = r.Next(0,choices.Count);
+                     Helpfunctions.Instance.logg("chooses a random card");
                      return new HREngine.API.Actions.ChoiceAction(choices[choice]);
                  }
              }
