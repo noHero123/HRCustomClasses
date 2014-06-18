@@ -469,7 +469,7 @@ namespace HREngine.Bots
                 m.Ready = true;
                 m.charge = true;
             }
-
+            if (hc.card.Shield) m.divineshild = true;
             if (hc.card.poisionous) m.poisonous = true;
 
             if (hc.card.Stealth) m.stealth = true;

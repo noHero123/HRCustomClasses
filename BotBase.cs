@@ -5,16 +5,6 @@ using System.Collections.Generic;
 
 namespace HREngine.Bots
 {
-   public class PossibleTurnAttack
-   {
-      public int Cost;
-      public int Attack;
-      public int NeededAttack;
-      public List<HRCard> Cards;
-   }
-
-
-
 
    public abstract class Bot : API.IBot
    {

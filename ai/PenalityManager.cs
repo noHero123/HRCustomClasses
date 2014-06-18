@@ -137,7 +137,7 @@ namespace HREngine.Bots
             retval += getSpecialCardComboPenalitys( card,  target,  p, lethal);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
-            if(!lethal) retval += cb.getPenalityForDestroyingCombo(card);
+            if(!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
 
             return retval;
         }
@@ -438,7 +438,14 @@ namespace HREngine.Bots
                     pen = 500;
                 }
             }
-
+            if (target >= 10 && target <= 19)
+            {
+                if (DamageTargetSpecialDatabase.ContainsKey(name))
+                {
+                    Minion m = p.enemyMinions[target-10];
+                    if(name=="soulfire" && m.maxHp <=2) pen=10;
+                }
+            }
 
             return pen;
         }

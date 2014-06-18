@@ -87,6 +87,8 @@ namespace HREngine.Bots
         public bool logging = false;
         public bool sEnemTurn = false;
 
+        public int attackFaceHP = 15;
+
         public int evaluatePenality = 0;
         public int ownController = 0;
 
@@ -220,6 +222,8 @@ namespace HREngine.Bots
 
             this.heroImmune = Hrtprozis.Instance.heroImmune;
             this.enemyHeroImmune = Hrtprozis.Instance.enemyHeroImmune;
+
+            this.attackFaceHP = Hrtprozis.Instance.attackFaceHp;
 
             addMinionsReal(Hrtprozis.Instance.ownMinions, ownMinions);
             addMinionsReal(Hrtprozis.Instance.enemyMinions, enemyMinions);
@@ -368,6 +372,8 @@ namespace HREngine.Bots
             this.ownHeroNumAttackThisTurn = p.ownHeroNumAttackThisTurn;
             this.enemyHeroNumAttackThisTurn = p.enemyHeroNumAttackThisTurn;
             this.ownHeroWindfury = p.ownHeroWindfury;
+
+            this.attackFaceHP = p.attackFaceHP;
 
             this.heroImmune = p.heroImmune;
             this.enemyHeroImmune = p.enemyHeroImmune;
@@ -1210,6 +1216,11 @@ namespace HREngine.Bots
         public void endTurn()
         {
             this.value = int.MinValue;
+
+            //penalty for destroying combo
+
+            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions);
+
             if (this.complete) return;
             endTurnEffect(true);//own turn ends
             endTurnBuffs(true);//end own buffs 
@@ -2194,6 +2205,7 @@ namespace HREngine.Bots
             int controller = this.ownController;
             if (!own)
             {
+                temp.Clear();
                 temp.AddRange(this.enemyMinions);
                 controller = 0;
             }
@@ -3016,12 +3028,12 @@ namespace HREngine.Bots
             }
         }
 
-        private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own)
+        /*private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own)
         {
             minionGetDamagedOrHealed(m, damages, heals, own, false);
-        }
+        }*/
 
-        private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own, bool dontCalcLostDmg)
+        private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own ,  bool dontCalcLostDmg=false, bool isMinionattack=false)
         {
             int damage = damages;
             int heal = heals;
@@ -3036,13 +3048,33 @@ namespace HREngine.Bots
             if (damage >= 1 && m.divineshild)
             {
                 m.divineshild = false;
-                if (!own && !dontCalcLostDmg) this.lostDamage += damage*damage;
+                if (!own && !dontCalcLostDmg)
+                {
+                    if (isMinionattack)
+                    {
+                        this.lostDamage += damage;
+                    }
+                    else
+                    {
+                        this.lostDamage += damage * damage;
+                    }
+                } 
                 return;
             }
 
             if (m.cantLowerHPbelowONE && damage >= 1 && damage >= m.Hp) damage = m.Hp - 1;
 
-            if (!own && !dontCalcLostDmg && m.Hp < damage) this.lostDamage += (damage - m.Hp) * (damage - m.Hp);
+            if (!own && !dontCalcLostDmg && m.Hp < damage)
+            {
+                if (isMinionattack)
+                {
+                    this.lostDamage += (damage - m.Hp);
+                }
+                else
+                {
+                    this.lostDamage += (damage - m.Hp) * (damage - m.Hp);
+                }
+            }
 
             int hpcopy = m.Hp;
 
@@ -3226,7 +3258,7 @@ namespace HREngine.Bots
             else
             {
                 int oldHP = enemy.Hp;
-                minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn);
+                minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn,false,true);
                 if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.specialMin == CardDB.specialMinions.waterelemental) enemy.frozen = true;
             }
 
@@ -3241,7 +3273,7 @@ namespace HREngine.Bots
                 else
                 {
                     int oldHP = m.Hp;
-                    minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn);
+                    minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn,false,true);
                     if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.specialMin == CardDB.specialMinions.waterelemental) m.frozen = true;
                 }
             }
@@ -3359,7 +3391,7 @@ namespace HREngine.Bots
                 m.Ready = true;
                 m.charge = true;
             }
-
+            if (hc.card.Shield) m.divineshild = true;
             if (hc.card.poisionous) m.poisonous = true;
 
             if (hc.card.Stealth) m.stealth = true;
@@ -6074,7 +6106,7 @@ namespace HREngine.Bots
                 {
                     if (m.silenced) continue;
 
-                    if (m.handcard.card.specialMin==  CardDB.specialMinions.knifejuggler)
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.knifejuggler && m.entitiyID != hc.entity)
                     {
                         if (this.enemyMinions.Count >= 1)
                         {
@@ -6095,7 +6127,7 @@ namespace HREngine.Bots
                         }
                     }
 
-                    if (own && m.handcard.card.specialMin==  CardDB.specialMinions.starvingbuzzard && (TAG_RACE)hc.card.race == TAG_RACE.PET)
+                    if (own && m.handcard.card.specialMin == CardDB.specialMinions.starvingbuzzard && (TAG_RACE)hc.card.race == TAG_RACE.PET && m.entitiyID != hc.entity)
                     {
                         //this.owncarddraw++;
                         this.drawACard("", true);

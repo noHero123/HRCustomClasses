@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 48;
+        private int versionnumber = 49;
         private bool singleLog = false;
 
 
@@ -70,10 +70,6 @@ namespace HREngine.Bots
         int ownDecksize = 0;
         int enemyDecksize = 0;
 
-        private Dictionary<int, HRCard> RejectedCardList;
-
-        private PlayCardAction NextFixedAction { get; set; }
-
         public Silverfish()
         {
             HRLog.Write("init Silverfish");
@@ -92,10 +88,6 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.createNewLoggfile();
             }
             PenalityManager.Instance.setCombos();
-            /*OnBattleStateUpdate = UpdateBattleState;
-            OnMulliganStateUpdate = UpdateMulliganState;
-            RejectedCardList = new Dictionary<int, HRCard>();
-            NextFixedAction = null;*/
         }
 
         public void setnewLoggFile()

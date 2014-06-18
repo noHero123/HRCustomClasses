@@ -28,6 +28,8 @@ namespace HREngine.Bots
     public class Hrtprozis
     {
 
+
+        public int attackFaceHp=15;
         public int ownHeroFatigue = 0;
         public int ownDeckSize = 30;
         public int enemyDeckSize = 30;
@@ -111,7 +113,11 @@ namespace HREngine.Bots
 
         private Hrtprozis()
         {
+        }
 
+        public void setAttackFaceHP(int hp)
+        {
+            this.attackFaceHp = hp;
         }
 
         public void clearAll()
@@ -443,7 +449,7 @@ namespace HREngine.Bots
                 m.Ready = true;
                 m.charge = true;
             }
-
+            if (hc.card.Shield) m.divineshild = true;
             if (hc.card.poisionous) m.poisonous = true;
 
             if (hc.card.Stealth) m.stealth = true;

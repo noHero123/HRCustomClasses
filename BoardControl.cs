@@ -45,9 +45,21 @@ namespace HREngine.Bots
           {
               retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
           }
+
           retval += -p.enemyHeroHp - p.enemyHeroDefence;
 
-          retval += p.ownWeaponAttack + p.ownWeaponDurability;
+          if (p.ownWeaponAttack >= 1)
+          {
+              if (p.enemyHeroHp > p.attackFaceHP)
+              {
+                  retval += p.ownWeaponAttack * p.ownWeaponDurability;
+              }
+              else
+              {
+                  retval += (p.ownWeaponAttack - 1) + p.ownWeaponAttack * (p.ownWeaponDurability - 1);
+              }
+          }
+
           if (!p.enemyHeroFrozen)
           {
               retval -= p.enemyWeaponDurability*p.enemyWeaponAttack;
