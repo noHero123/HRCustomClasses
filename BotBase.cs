@@ -217,6 +217,13 @@ namespace HREngine.Bots
                 else
                 {
                     HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                    Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " choice: " + moveTodo.druidchoice);
+                    if (moveTodo.druidchoice >= 1)
+                    {
+                        this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                        this.choiceCardId = moveTodo.handcard.card.CardID;
+
+                    }
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay, null, moveTodo.owntarget + 1);
