@@ -96,7 +96,7 @@ namespace HREngine.Bots
         public int enemyHeroEntity = -1;
 
         public int value = Int32.MinValue;
-        public int guessingHeroDamage = 0;
+        public int guessingHeroHP = 30;
 
         public int mana = 0;
         public int enemyHeroHp = 30;
@@ -818,7 +818,7 @@ namespace HREngine.Bots
             }
             else
             {
-                trgts2.Add(new targett(100, this.ownHeroEntity));
+                
                 foreach (Minion m in this.ownMinions)
                 {
                     if (m.stealth) continue; // cant target stealth
@@ -833,6 +833,8 @@ namespace HREngine.Bots
                         trgts2.Add(new targett(m.id, m.entitiyID));
                     }
                 }
+
+                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -1236,6 +1238,7 @@ namespace HREngine.Bots
             }
             else
             {
+                guessHeroDamage();
                 simulateEnemysTurn();
                 this.complete = true;
             }
@@ -1266,7 +1269,8 @@ namespace HREngine.Bots
                 if (m.taunt && m.divineshild) ghd -= 1;
             }
 
-            this.guessingHeroDamage = Math.Max(0, ghd);
+            int guessingHeroDamage = Math.Max(0, ghd);
+            this.guessingHeroHP = this.ownHeroHp + this.ownHeroDefence - guessingHeroDamage;
         }
 
         private void simulateTraps()

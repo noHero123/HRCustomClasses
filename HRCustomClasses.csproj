@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="ai\BoardTester.cs" />
     <Compile Include="ai\ComboBreaker.cs" />
+    <Compile Include="ai\Mulligan.cs" />
     <Compile Include="BasicBot.cs" />
     <Compile Include="BotBase.cs" />
     <Compile Include="BoardControl.cs" />

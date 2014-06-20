@@ -811,7 +811,9 @@ namespace HREngine.Bots
             }
 
             posmoves.Clear();
-            posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
+            posmoves.AddRange(temp.GetRange(0, Math.Min(takenumber, temp.Count)));
+            //posmoves.Clear();
+            //posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
 
         }
 

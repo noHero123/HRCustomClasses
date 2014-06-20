@@ -114,7 +114,7 @@ namespace HREngine.Bots
             string name = card.name;
             //there is no reason to buff HP of minon (because it is not healed)
 
-            int abuff = getAttackBuffPenality(card, target, p, choice);
+            int abuff = getAttackBuffPenality(card, target, p, choice, lethal);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
             if (name == "markofthewild" && ( (abuff >= 500 && tbuff == 0) || (abuff == 0 && tbuff >= 500)) )
             {
@@ -142,11 +142,27 @@ namespace HREngine.Bots
             return retval;
         }
 
-        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
+        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice, bool lethal)
         {
             string name = card.name;
             int pen = 0;
             //buff enemy?
+
+            if (!lethal && (card.name == "savageroar" || card.name == "bloodlust"))
+            {
+                int targets = 0;
+                foreach (Minion m in p.ownMinions)
+                {
+                    if (m.Ready) targets++;
+                }
+                if ((p.ownHeroReady || p.ownHeroNumAttackThisTurn == 0) && card.name == "savageroar") targets++;
+
+                if (targets <= 2)
+                {
+                    return 20;
+                }
+            }
+
             if (!this.attackBuffDatabase.ContainsKey(name)) return 0;
             if (target >= 10 && target <= 19)
             {
@@ -532,8 +548,17 @@ namespace HREngine.Bots
             if (name == "wrath" && choice != 2) return 0;
             if (name == "nourish" && choice != 2) return 0;
             int carddraw = cardDrawBattleCryDatabase[name];
-            if (name == "harrisonjones") carddraw = p.enemyWeaponDurability;
-            if (name == "divinefavor") carddraw =  p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+            if (name == "harrisonjones")
+            {
+                carddraw = p.enemyWeaponDurability;
+                if (carddraw == 0 && (p.enemyHeroName != HeroEnum.mage && p.enemyHeroName != HeroEnum.warlock && p.enemyHeroName!= HeroEnum.priest)) return 5;
+            }
+            if (name == "divinefavor")
+            {
+                carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+                if (carddraw == 0) return 500;
+            }
+            
             if (name == "battlerage")
             {
                 carddraw = 0;
@@ -541,6 +566,7 @@ namespace HREngine.Bots
                 {
                     if (mnn.wounded) carddraw++;
                 }
+                if (carddraw == 0) return 500;
             }
 
             if (name == "slam")
@@ -576,9 +602,9 @@ namespace HREngine.Bots
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
-            if (p.owncards.Count > 5) return 10;
-            
-            return 0;
+            if (p.owncards.Count > 5) return 5;
+
+            return -carddraw + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }

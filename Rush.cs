@@ -127,7 +127,7 @@ namespace HREngine.Bots
               if (a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus) deletecardsAtLast = 1;
               if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
           }
-          if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
+          if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
 
           p.value = retval;

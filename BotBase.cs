@@ -31,19 +31,42 @@ namespace HREngine.Bots
          if (HRMulligan.IsMulliganActive())
          {
             var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-
-            foreach (var item in list)
+            if (Mulligan.Instance.hasmulliganrules())
             {
-               if (item.GetEntity().GetCost() >= 4)
-               {
-                  HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
-                  HRMulligan.ToggleCard(item);
-               }
-               if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
-               {
-                   HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
-                   HRMulligan.ToggleCard(item);
-               }
+                HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
+                string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
+                List<Mulligan.CardIDEntity> celist= new List<Mulligan.CardIDEntity>();
+                foreach (var item in list)
+                {
+                    celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(),item.GetEntity().GetEntityId()));
+                }
+                List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
+                foreach (var item in list)
+                {
+                    if(mullientitys.Contains(item.GetEntity().GetEntityId()))
+                    {
+                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                        HRMulligan.ToggleCard(item);
+                    }
+                }
+
+
+            }
+            else
+            {
+                foreach (var item in list)
+                {
+                    if (item.GetEntity().GetCost() >= 4)
+                    {
+                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                        HRMulligan.ToggleCard(item);
+                    }
+                    if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                    {
+                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                        HRMulligan.ToggleCard(item);
+                    }
+                }
             }
 
             sf.setnewLoggFile();

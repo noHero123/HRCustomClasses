@@ -130,12 +130,13 @@ namespace HREngine.Bots
                 if (a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus) deletecardsAtLast = 1;
                 if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
             }
-            if (p.enemyHeroHp >= 1 && p.ownHeroHp + p.ownHeroDefence - p.guessingHeroDamage <= 0) retval -= 1000;
+            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
             if (p.ownHeroHp <= 0) retval = -10000;
 
             p.value = retval;
             return retval;
         }
+
 
 
 
@@ -146,18 +147,41 @@ namespace HREngine.Bots
             if (HRMulligan.IsMulliganActive())
             {
                 var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-
-                foreach (var item in list)
+                if (Mulligan.Instance.hasmulliganrules())
                 {
-                    if (item.GetEntity().GetCost() >= 4)
+                    HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
+                    string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
+                    List<Mulligan.CardIDEntity> celist = new List<Mulligan.CardIDEntity>();
+                    foreach (var item in list)
                     {
-                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
-                        HRMulligan.ToggleCard(item);
+                        celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
                     }
-                    if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                    List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
+                    foreach (var item in list)
                     {
-                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
-                        HRMulligan.ToggleCard(item);
+                        if (mullientitys.Contains(item.GetEntity().GetEntityId()))
+                        {
+                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                            HRMulligan.ToggleCard(item);
+                        }
+                    }
+
+
+                }
+                else
+                {
+                    foreach (var item in list)
+                    {
+                        if (item.GetEntity().GetCost() >= 4)
+                        {
+                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                            HRMulligan.ToggleCard(item);
+                        }
+                        if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                        {
+                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                            HRMulligan.ToggleCard(item);
+                        }
                     }
                 }
 
@@ -474,7 +498,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 50;
+        private int versionnumber = 51;
         private bool singleLog = false;
 
 
@@ -551,6 +575,7 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.createNewLoggfile();
             }
             PenalityManager.Instance.setCombos();
+            Mulligan m = Mulligan.Instance; // read the mulligan list
         }
 
         public void setnewLoggFile()
@@ -1013,6 +1038,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class Playfield
     {
         public bool logging = false;
@@ -1027,7 +1053,7 @@ namespace HREngine.Bots
         public int enemyHeroEntity = -1;
 
         public int value = Int32.MinValue;
-        public int guessingHeroDamage = 0;
+        public int guessingHeroHP = 30;
 
         public int mana = 0;
         public int enemyHeroHp = 30;
@@ -1749,7 +1775,7 @@ namespace HREngine.Bots
             }
             else
             {
-                trgts2.Add(new targett(100, this.ownHeroEntity));
+
                 foreach (Minion m in this.ownMinions)
                 {
                     if (m.stealth) continue; // cant target stealth
@@ -1764,6 +1790,8 @@ namespace HREngine.Bots
                         trgts2.Add(new targett(m.id, m.entitiyID));
                     }
                 }
+
+                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -2167,6 +2195,7 @@ namespace HREngine.Bots
             }
             else
             {
+                guessHeroDamage();
                 simulateEnemysTurn();
                 this.complete = true;
             }
@@ -2197,7 +2226,8 @@ namespace HREngine.Bots
                 if (m.taunt && m.divineshild) ghd -= 1;
             }
 
-            this.guessingHeroDamage = Math.Max(0, ghd);
+            int guessingHeroDamage = Math.Max(0, ghd);
+            this.guessingHeroHP = this.ownHeroHp + this.ownHeroDefence - guessingHeroDamage;
         }
 
         private void simulateTraps()
@@ -7877,6 +7907,7 @@ namespace HREngine.Bots
 
     }
 
+
     public class Ai
     {
         private int maxdeep = 12;
@@ -8682,7 +8713,9 @@ namespace HREngine.Bots
             }
 
             posmoves.Clear();
-            posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
+            posmoves.AddRange(temp.GetRange(0, Math.Min(takenumber, temp.Count)));
+            //posmoves.Clear();
+            //posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
 
         }
 
@@ -9840,87 +9873,6 @@ namespace HREngine.Bots
 
     }
 
-
-    public class Helpfunctions
-    {
-
-        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
-        {
-            List<T> retlist = new List<T>();
-            int i = 0;
-
-            foreach (T item in source)
-            {
-                retlist.Add(item);
-                i++;
-
-                if (i >= limit) break;
-            }
-            return retlist;
-        }
-
-
-        public bool runningbot = false;
-
-        private static Helpfunctions instance;
-
-        public static Helpfunctions Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new Helpfunctions();
-                }
-                return instance;
-            }
-        }
-
-        string path = Settings.Instance.logpath;
-
-
-        private Helpfunctions()
-        {
-
-            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
-        }
-
-        private bool writelogg = true;
-        public void loggonoff(bool onoff)
-        {
-            //writelogg = onoff;
-        }
-
-        public void createNewLoggfile()
-        {
-            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
-        }
-
-        public void logg(string s)
-        {
-
-
-            if (!writelogg) return;
-            try
-            {
-                using (StreamWriter sw = File.AppendText(path + Settings.Instance.logfile))
-                {
-                    sw.WriteLine(s);
-                }
-            }
-            catch { }
-        }
-
-        public DateTime UnixTimeStampToDateTime(int unixTimeStamp)
-        {
-            // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
-        }
-
-    }
-
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -10029,7 +9981,7 @@ namespace HREngine.Bots
             string name = card.name;
             //there is no reason to buff HP of minon (because it is not healed)
 
-            int abuff = getAttackBuffPenality(card, target, p, choice);
+            int abuff = getAttackBuffPenality(card, target, p, choice, lethal);
             int tbuff = getTauntBuffPenality(name, target, p, choice);
             if (name == "markofthewild" && ((abuff >= 500 && tbuff == 0) || (abuff == 0 && tbuff >= 500)))
             {
@@ -10057,11 +10009,27 @@ namespace HREngine.Bots
             return retval;
         }
 
-        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice)
+        private int getAttackBuffPenality(CardDB.Card card, int target, Playfield p, int choice, bool lethal)
         {
             string name = card.name;
             int pen = 0;
             //buff enemy?
+
+            if (!lethal && (card.name == "savageroar" || card.name == "bloodlust"))
+            {
+                int targets = 0;
+                foreach (Minion m in p.ownMinions)
+                {
+                    if (m.Ready) targets++;
+                }
+                if ((p.ownHeroReady || p.ownHeroNumAttackThisTurn == 0) && card.name == "savageroar") targets++;
+
+                if (targets <= 2)
+                {
+                    return 20;
+                }
+            }
+
             if (!this.attackBuffDatabase.ContainsKey(name)) return 0;
             if (target >= 10 && target <= 19)
             {
@@ -10447,8 +10415,17 @@ namespace HREngine.Bots
             if (name == "wrath" && choice != 2) return 0;
             if (name == "nourish" && choice != 2) return 0;
             int carddraw = cardDrawBattleCryDatabase[name];
-            if (name == "harrisonjones") carddraw = p.enemyWeaponDurability;
-            if (name == "divinefavor") carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+            if (name == "harrisonjones")
+            {
+                carddraw = p.enemyWeaponDurability;
+                if (carddraw == 0 && (p.enemyHeroName != HeroEnum.mage && p.enemyHeroName != HeroEnum.warlock && p.enemyHeroName != HeroEnum.priest)) return 5;
+            }
+            if (name == "divinefavor")
+            {
+                carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+                if (carddraw == 0) return 500;
+            }
+
             if (name == "battlerage")
             {
                 carddraw = 0;
@@ -10456,6 +10433,7 @@ namespace HREngine.Bots
                 {
                     if (mnn.wounded) carddraw++;
                 }
+                if (carddraw == 0) return 500;
             }
 
             if (name == "slam")
@@ -10491,9 +10469,9 @@ namespace HREngine.Bots
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
-            if (p.owncards.Count > 5) return 10;
+            if (p.owncards.Count > 5) return 5;
 
-            return 0;
+            return -carddraw + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }
@@ -11678,6 +11656,87 @@ namespace HREngine.Bots
 
     }
 
+
+    public class Helpfunctions
+    {
+
+        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
+        {
+            List<T> retlist = new List<T>();
+            int i = 0;
+
+            foreach (T item in source)
+            {
+                retlist.Add(item);
+                i++;
+
+                if (i >= limit) break;
+            }
+            return retlist;
+        }
+
+
+        public bool runningbot = false;
+
+        private static Helpfunctions instance;
+
+        public static Helpfunctions Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Helpfunctions();
+                }
+                return instance;
+            }
+        }
+
+        string path = Settings.Instance.logpath;
+
+
+        private Helpfunctions()
+        {
+
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
+        }
+
+        private bool writelogg = true;
+        public void loggonoff(bool onoff)
+        {
+            //writelogg = onoff;
+        }
+
+        public void createNewLoggfile()
+        {
+            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
+        }
+
+        public void logg(string s)
+        {
+
+
+            if (!writelogg) return;
+            try
+            {
+                using (StreamWriter sw = File.AppendText(path + Settings.Instance.logfile))
+                {
+                    sw.WriteLine(s);
+                }
+            }
+            catch { }
+        }
+
+        public DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+
+    }
+
     public class ComboBreaker
     {
 
@@ -12165,6 +12224,184 @@ namespace HREngine.Bots
 
 
     }
+
+    public class Mulligan
+    {
+        public class CardIDEntity
+        {
+            public string id = "";
+            public int entitiy = 0;
+            public CardIDEntity(string id, int entt)
+            {
+                this.id = id;
+                this.entitiy = entt;
+            }
+        }
+
+        class mulliitem
+        {
+            public string cardid = "";
+            public string enemyclass = "";
+            public int howmuch = 2;
+
+            public mulliitem(string id, string enemy, int number)
+            {
+                this.cardid = id;
+                this.enemyclass = enemy;
+                this.howmuch = number;
+            }
+        }
+
+        List<mulliitem> holdlist = new List<mulliitem>();
+        List<mulliitem> deletelist = new List<mulliitem>();
+        private static Mulligan instance;
+
+        public static Mulligan Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Mulligan();
+                }
+                return instance;
+            }
+        }
+
+        private Mulligan()
+        {
+            readCombos();
+        }
+
+        private void readCombos()
+        {
+            string[] lines = new string[0] { };
+            this.holdlist.Clear();
+            this.deletelist.Clear();
+            try
+            {
+                string path = Settings.Instance.path;
+                lines = System.IO.File.ReadAllLines(path + "_mulligan.txt");
+            }
+            catch
+            {
+                Helpfunctions.Instance.logg("cant find _mulligan.txt");
+                return;
+            }
+            Helpfunctions.Instance.logg("read _mulligan.txt...");
+            foreach (string line in lines)
+            {
+
+                if (line.StartsWith("hold;"))
+                {
+                    try
+                    {
+                        string enemyclass = line.Split(';')[1];
+                        string cardlist = line.Split(';')[2];
+                        foreach (string crd in cardlist.Split(','))
+                        {
+                            if (crd.Contains(":"))
+                            {
+                                this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1])));
+                            }
+                            else
+                            {
+                                this.holdlist.Add(new mulliitem(crd, enemyclass, 2));
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                    }
+                }
+                else
+                {
+                    if (line.StartsWith("discard;"))
+                    {
+                        try
+                        {
+                            string enemyclass = line.Split(';')[1];
+                            string cardlist = line.Split(';')[2];
+                            foreach (string crd in cardlist.Split(','))
+                            {
+                                this.deletelist.Add(new mulliitem(crd, enemyclass, 2));
+                            }
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+            }
+
+        }
+
+        public bool hasmulliganrules()
+        {
+            if (this.holdlist.Count == 0 && this.deletelist.Count == 0) return false;
+            return true;
+        }
+
+        public List<int> whatShouldIMulligan(List<CardIDEntity> cards, string enemclass)
+        {
+            List<int> discarditems = new List<int>();
+
+            foreach (mulliitem mi in this.deletelist)
+            {
+                foreach (CardIDEntity c in cards)
+                {
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    {
+                        if (discarditems.Contains(c.entitiy)) continue;
+                        discarditems.Add(c.entitiy);
+                    }
+                }
+            }
+
+            if (holdlist.Count == 0) return discarditems;
+
+            Dictionary<string, int> holddic = new Dictionary<string, int>();
+            foreach (CardIDEntity c in cards)
+            {
+                foreach (mulliitem mi in this.holdlist)
+                {
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    {
+                        if (holddic.ContainsKey(c.id))
+                        {
+                            if (mi.howmuch == 1)
+                            {
+                                if (discarditems.Contains(c.entitiy)) continue;
+                                discarditems.Add(c.entitiy);
+                            }
+                        }
+                        else
+                        {
+                            holddic.Add(c.id, 1);
+                        }
+                    }
+                    else
+                    {
+                        if (discarditems.Contains(c.entitiy)) continue;
+                        discarditems.Add(c.entitiy);
+                    }
+                }
+
+            }
+
+            return discarditems;
+
+        }
+
+    }
+
 
     public class CardDB
     {

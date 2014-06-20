@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 50;
+        private int versionnumber = 51;
         private bool singleLog = false;
 
 
@@ -88,6 +88,7 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.createNewLoggfile();
             }
             PenalityManager.Instance.setCombos();
+            Mulligan m = Mulligan.Instance; // read the mulligan list
         }
 
         public void setnewLoggFile()
