@@ -548,7 +548,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 51;
+        private int versionnumber = 52;
         private bool singleLog = false;
 
 
@@ -12420,27 +12420,39 @@ namespace HREngine.Bots
             Dictionary<string, int> holddic = new Dictionary<string, int>();
             foreach (CardIDEntity c in cards)
             {
+                bool delete = true;
                 foreach (mulliitem mi in this.holdlist)
                 {
                     if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (holddic.ContainsKey(c.id))
+                        if (holddic.ContainsKey(c.id)) // we are holding one of the cards
                         {
-                            if (mi.howmuch == 1)
+                            if (mi.howmuch == 2)
                             {
-                                if (discarditems.Contains(c.entitiy)) continue;
-                                discarditems.Add(c.entitiy);
+                                delete = false;
                             }
                         }
                         else
                         {
-                            holddic.Add(c.id, 1);
+                            delete = false;
                         }
+                    }
+                }
+
+                if (delete)
+                {
+                    if (discarditems.Contains(c.entitiy)) continue;
+                    discarditems.Add(c.entitiy);
+                }
+                else
+                {
+                    if (holddic.ContainsKey(c.id))
+                    {
+                        holddic[c.id]++;
                     }
                     else
                     {
-                        if (discarditems.Contains(c.entitiy)) continue;
-                        discarditems.Add(c.entitiy);
+                        holddic.Add(c.id, 1);
                     }
                 }
 
@@ -12451,7 +12463,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class CardDB
     {
