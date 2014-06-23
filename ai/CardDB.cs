@@ -93,8 +93,18 @@ namespace HREngine.Bots
             succubus,
             silverhandrecruit,
             thecoin,
-            innervate
-
+            innervate, 
+            ancientwatcher,
+            webspinner,
+            darkcultist,
+            anubarambusher,
+            voidcaller,
+            dancingswords,
+            undertaker,
+            nerubianegg,
+            shadeofnaxxramas,
+            baronrivendare,
+            faeriedragon
         }
 
         public enum ErrorType2
@@ -874,6 +884,19 @@ namespace HREngine.Bots
                         if (temp == "silverhandrecruit") c.specialMin = specialMinions.silverhandrecruit;
                         if (temp == "thecoin") c.specialMin = specialMinions.thecoin;
                         if (temp == "innervate") c.specialMin = specialMinions.innervate;
+                        if (temp == "ancientwatcher") c.specialMin = specialMinions.ancientwatcher;
+                        if (temp == "faeriedragon") c.specialMin = specialMinions.faeriedragon;
+                        //naxx update
+                        if (temp == "webspinner") c.specialMin = specialMinions.webspinner;
+                        if (temp == "darkcultist") c.specialMin = specialMinions.darkcultist;
+                        if (temp == "anubarambusher") c.specialMin = specialMinions.anubarambusher;
+                        if (temp == "voidcaller") c.specialMin = specialMinions.voidcaller;
+                        if (temp == "dancingswords") c.specialMin = specialMinions.dancingswords;
+                        if (temp == "undertaker") c.specialMin = specialMinions.undertaker;
+                        if (temp == "nerubianegg") c.specialMin = specialMinions.nerubianegg;
+                        if (temp == "shadeofnaxxramas") c.specialMin = specialMinions.shadeofnaxxramas;
+                        if (temp == "baronrivendare") c.specialMin = specialMinions.baronrivendare;
+            
 
                         if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 

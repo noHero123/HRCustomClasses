@@ -126,7 +126,7 @@ namespace HREngine.Bots
             }
             retval += getHPBuffPenality(card, target, p, choice);
             retval += getSilencePenality( name,  target,  p,  choice, lethal);
-            retval += getDamagePenality( name,  target,  p,  choice);
+            retval += getDamagePenality( name,  target,  p,  choice, lethal);
             retval += getHealPenality( name,  target,  p,  choice, lethal);
             retval += getCardDrawPenality( name,  target,  p,  choice);
             retval += getCardDrawofEffectMinions( card,  p);
@@ -321,7 +321,7 @@ namespace HREngine.Bots
 
         }
 
-        private int getDamagePenality(string name, int target, Playfield p, int choice)
+        private int getDamagePenality(string name, int target, Playfield p, int choice, bool lethal)
         {
             int pen = 0;
 
@@ -374,6 +374,15 @@ namespace HREngine.Bots
                     pen = 500;
                 }
             }
+
+            if (!lethal && target == 200)
+            {
+                if (name == "baneofdoom")
+                {
+                    pen = 500;
+                }
+            }
+
             if (target >= 0 && target <= 9)
             {
                 if (DamageTargetDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealTargetDatabase.ContainsKey(name)))
@@ -456,10 +465,12 @@ namespace HREngine.Bots
             }
             if (target >= 10 && target <= 19)
             {
-                if (DamageTargetSpecialDatabase.ContainsKey(name))
+                if (DamageTargetSpecialDatabase.ContainsKey(name) || DamageTargetDatabase.ContainsKey(name))
                 {
                     Minion m = p.enemyMinions[target-10];
                     if(name=="soulfire" && m.maxHp <=2) pen=10;
+
+                    if (name == "baneofdoom" && m.Hp >= 3) pen = 10;
                 }
             }
 
@@ -791,6 +802,18 @@ namespace HREngine.Bots
             if (target >= 10 && target <= 19)
             {
                 m = p.enemyMinions[target-10];
+            }
+
+            if (name == "bite")
+            {
+                if ((p.ownHeroNumAttackThisTurn == 0 || (p.ownHeroWindfury && p.ownHeroNumAttackThisTurn == 1)) && !p.ownHeroFrozen)
+                {
+
+                }
+                else
+                {
+                    return 20;
+                }
             }
 
             if (name == "poweroverwhelming")
@@ -1683,6 +1706,17 @@ namespace HREngine.Bots
             this.specialMinions.Add("violentteacher", 0);
             this.specialMinions.Add("warsongcommander", 0);
             this.specialMinions.Add("waterelemental", 0);
+
+            // naxx cards
+            this.specialMinions.Add("baronrivendare", 0);
+            this.specialMinions.Add("nerubianegg", 0);
+            this.specialMinions.Add("undertaker", 0);
+            this.specialMinions.Add("dancingswords", 0);
+            this.specialMinions.Add("voidcaller", 0);
+            this.specialMinions.Add("anubarambusher", 0);
+            this.specialMinions.Add("darkcultist", 0);
+            this.specialMinions.Add("webspinner", 0);
+
         }
 
         private void setupBuffingMinions()

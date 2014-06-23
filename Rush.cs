@@ -43,14 +43,7 @@ namespace HREngine.Bots
 
           if (p.ownWeaponAttack >= 1)
           {
-              if (p.enemyHeroHp > p.attackFaceHP)
-              {
-                  retval += p.ownWeaponAttack * p.ownWeaponDurability;
-              }
-              else
-              {
-                  retval += (p.ownWeaponAttack - 1) + p.ownWeaponAttack * (p.ownWeaponDurability-1);
-              }
+              retval += p.ownWeaponAttack * p.ownWeaponDurability;
           }
 
           if (!p.enemyHeroFrozen)
@@ -74,6 +67,7 @@ namespace HREngine.Bots
           bool usecoin = false;
           foreach (Action a in p.playactions)
           {
+              if (a.heroattack && p.enemyHeroHp <= p.attackFaceHP) retval++;
               if (a.useability) useAbili = true;
               if (a.useability && a.handcard.card.specialMin == CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
@@ -98,8 +92,11 @@ namespace HREngine.Bots
               if (p.enemyMinions.Count >= 4 || m.taunt || (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) || m.Angr >= 5)
               {
                   retval -= m.Hp;
-                  retval -= m.Angr * 2;
-                  if (m.windfury) retval -= m.Angr;
+                  if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
+                  {
+                      retval -= m.Angr * 2;
+                      if (m.windfury) retval -= m.Angr;
+                  }
                   if (m.taunt) retval -= 5;
                   if (m.divineshild) retval -= m.Angr;
                   if (m.frozen) retval += 1; // because its bad for enemy :D
