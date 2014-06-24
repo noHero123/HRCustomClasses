@@ -85,6 +85,7 @@ namespace HREngine.Bots
               if (m.taunt) retval += 1;
               if (!m.taunt && m.stealth && penman.specialMinions.ContainsKey(m.name)) retval += 20;
               if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
           }
 
           foreach (Minion m in p.enemyMinions)

@@ -83,6 +83,7 @@ namespace HREngine.Bots
         {
             this.cb = ComboBreaker.Instance;
         }
+        
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
         {
             int pen = 0;
@@ -103,8 +104,10 @@ namespace HREngine.Bots
                 {
                     if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
                 }
+                if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) hasweapon = true;
                 if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
             }
+            if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) retval += -1;
             return retval;
         }
 
@@ -615,7 +618,7 @@ namespace HREngine.Bots
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
             if (p.owncards.Count > 5) return 5;
 
-            return -carddraw + p.ownMaxMana - p.mana;
+            return -carddraw + p.playactions.Count + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }
@@ -643,7 +646,7 @@ namespace HREngine.Bots
             if (carddraw==0) return 0;
 
             if (p.owncards.Count >= 5) return 0;
-            pen = -carddraw + p.ownMaxMana - p.mana;
+            pen = -carddraw + p.ownMaxMana - p.mana + p.playactions.Count;
 
             return pen;
         }

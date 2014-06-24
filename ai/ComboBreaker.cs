@@ -43,11 +43,13 @@ namespace HREngine.Bots
             public int bonusForPlaying = 0;
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
+            public string requiredWeapon = "";
 
             public combo(string s)
             {
                 int i = 0;
                 this.neededMana = 0;
+                requiredWeapon = "";
                 this.type = combotype.combo;
                 this.twoTurnCombo = false;
                 bool fixmana = false;
@@ -145,7 +147,8 @@ namespace HREngine.Bots
                                 }
                                 else 
                                 {
-                                    if (CardDB.Instance.getCardDataFromID(crd).type == CardDB.cardtype.MOB)
+                                    CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(crd);
+                                    if (lolcrd.type == CardDB.cardtype.MOB)
                                     {
                                         if (this.combocardsTurn0Mobs.ContainsKey(crd))
                                         {
@@ -156,6 +159,10 @@ namespace HREngine.Bots
                                             combocardsTurn0Mobs.Add(crd, 1);
                                         }
                                         this.combot0len++;
+                                    }
+                                    if (lolcrd.type == CardDB.cardtype.WEAPON)
+                                    {
+                                        this.requiredWeapon = lolcrd.name;
                                     }
                                     if (this.combocardsTurn0All.ContainsKey(crd))
                                     {
@@ -206,7 +213,7 @@ namespace HREngine.Bots
                 return 0;
             }
 
-            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins)
+            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins, string weapon)
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
@@ -235,8 +242,9 @@ namespace HREngine.Bots
                                 break;
                             }
                         }
-
                     }
+
+                    if (requiredWeapon != "" && requiredWeapon != weapon) return 1;
 
                     if (turn0requires >= combot0len) return 2;
 
@@ -250,7 +258,7 @@ namespace HREngine.Bots
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0Mobs);
+                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0All);
                 foreach (Handmanager.Handcard hc in hand)
                 {
                     if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
@@ -259,9 +267,9 @@ namespace HREngine.Bots
                         combocardscopy[hc.card.CardID]--;
                     }
                 }
-                if (cardsincombo == this.combot0len && omm < this.neededMana) return 1;
+                if (cardsincombo == this.combot0lenAll && omm < this.neededMana) return 1;
 
-                if (cardsincombo == this.combot0len)
+                if (cardsincombo == this.combot0lenAll)
                 {
                     return 2;
                 }
@@ -417,7 +425,7 @@ namespace HREngine.Bots
                     if (c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
-                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions);
+                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
                         
                         int iic = Math.Max(iia, iib);
                         if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))// it is a card of the combo, is a turn 1 card, but turn 1 is not possible -> we have to play turn 0 cards first
@@ -435,7 +443,7 @@ namespace HREngine.Bots
             
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist)
+        public int checkIfComboWasPlayed(List<Action> alist, string weapon)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely
@@ -453,7 +461,7 @@ namespace HREngine.Bots
                     if (c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);
-                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions);
+                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions, weapon);
                         int iic = Math.Max(iia, iib);
                         if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))
                         {

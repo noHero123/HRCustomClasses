@@ -88,6 +88,7 @@ namespace HREngine.Bots
                 if (m.taunt) retval += 1;
                 if (!m.taunt && m.stealth && penman.specialMinions.ContainsKey(m.name)) retval += 20;
                 if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
             }
 
             foreach (Minion m in p.enemyMinions)
@@ -495,7 +496,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 53;
+        private int versionnumber = 54;
         private bool singleLog = false;
 
 
@@ -1034,7 +1035,6 @@ namespace HREngine.Bots
         }
 
     }
-
 
     public class Playfield
     {
@@ -1927,6 +1927,105 @@ namespace HREngine.Bots
                 }
                 return bestpl;
             }
+
+            int cardIsBuffer = 0;
+            bool placebuff = false;
+            if (card.specialMin == CardDB.specialMinions.flametonguetotem || card.specialMin == CardDB.specialMinions.direwolfalpha)
+            {
+                placebuff = true;
+                if (card.specialMin == CardDB.specialMinions.flametonguetotem) cardIsBuffer = 2;
+                if (card.specialMin == CardDB.specialMinions.direwolfalpha) cardIsBuffer = 1;
+            }
+            bool commander = false;
+            foreach (Minion m in this.ownMinions)
+            {
+                if (m.handcard.card.specialMin == CardDB.specialMinions.warsongcommander) commander = true;
+            }
+            foreach (Minion m in this.ownMinions)
+            {
+                if (m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha) placebuff = true;
+            }
+            //attackmaxing :D
+            if (placebuff)
+            {
+
+
+                int cval = 0;
+                if (card.Charge || (card.Attack <= 3 && commander))
+                {
+                    cval = card.Attack;
+                    if (card.windfury) cval = card.Attack;
+                }
+                i = 0;
+                int[] buffplaces = new int[this.ownMinions.Count];
+                int gesval = 0;
+                foreach (Minion m in this.ownMinions)
+                {
+                    buffplaces[i] = 0;
+                    places[i] = 0;
+                    if (m.Ready)
+                    {
+                        tempval = m.Angr;
+                        if (m.windfury && m.numAttacksThisTurn == 0) tempval += m.Angr;
+
+                    }
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem)
+                    {
+                        buffplaces[i] = 2;
+                    }
+                    if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha)
+                    {
+                        buffplaces[i] = 1;
+                    }
+                    places[i] = tempval;
+                    gesval += tempval;
+                    i++;
+                }
+
+                int bplace = 0;
+                int bvale = 0;
+                tempval = 0;
+                i = 0;
+                for (int j = 0; j <= this.ownMinions.Count; j++)
+                {
+                    tempval = gesval;
+                    int current = cval;
+                    int prev = 0;
+                    int next = 0;
+                    if (i >= 1)
+                    {
+                        tempval -= places[i - 1];
+                        prev = places[i - 1];
+                        prev += cardIsBuffer;
+                        current += buffplaces[i - 1];
+                        if (i < this.ownMinions.Count)
+                        {
+                            prev -= buffplaces[i];
+                        }
+                    }
+                    if (i < this.ownMinions.Count)
+                    {
+                        tempval -= places[i];
+                        next = places[i];
+                        next += cardIsBuffer;
+                        current += buffplaces[i];
+                        if (i >= 1)
+                        {
+                            next -= buffplaces[i - 1];
+                        }
+                    }
+                    tempval += current + prev + next;
+                    if (tempval > bvale)
+                    {
+                        bplace = i;
+                        bvale = tempval;
+                    }
+                    i++;
+                }
+                return bplace;
+
+            }
+
             // normal placement
             int cardvalue = card.Attack * 2 + card.Health;
             if (card.tank)
@@ -2206,7 +2305,7 @@ namespace HREngine.Bots
 
             //penalty for destroying combo
 
-            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions);
+            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName);
 
             if (this.complete) return;
             endTurnEffect(true);//own turn ends
@@ -2812,28 +2911,73 @@ namespace HREngine.Bots
 
                 if (m.name == "poultryizer") // 
                 {
-                    if (this.ownMinions.Count >= 1)
+                    if (own)
                     {
-                        List<Minion> temp2 = new List<Minion>(this.ownMinions);
-                        temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
-                        foreach (Minion mins in temp2)
+                        if (this.enemyMinions.Count >= 1)
                         {
-                            CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
-                            minionTransform(mins, c, true);
+                            List<Minion> temp2 = new List<Minion>(this.enemyMinions);
+                            temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//damage the lowest
+                            foreach (Minion mins in temp2)
+                            {
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                minionTransform(mins, c, false);
+                                break;
+                            }
+
+                        }
+                        else
+                        {
+
+                            List<Minion> temp2 = new List<Minion>(this.ownMinions);
+                            temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
+                            foreach (Minion mins in temp2)
+                            {
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                minionTransform(mins, c, true);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (this.ownMinions.Count >= 1)
+                        {
+                            List<Minion> temp2 = new List<Minion>(this.ownMinions);
+                            temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
+                            foreach (Minion mins in temp2)
+                            {
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                minionTransform(mins, c, true);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (m.name == "alarm-o-bot") // 
+                {
+                    if (own)
+                    {
+                        List<Handmanager.Handcard> temp2 = new List<Handmanager.Handcard>();
+                        foreach (Handmanager.Handcard hc in this.owncards)
+                        {
+                            if (hc.card.type == CardDB.cardtype.MOB) temp2.Add(hc);
+                        }
+                        temp2.Sort((a, b) => -a.card.Attack.CompareTo(b.card.Attack));//damage the stronges
+                        foreach (Handmanager.Handcard mins in temp2)
+                        {
+                            CardDB.Card c = CardDB.Instance.getCardDataFromID(mins.card.CardID);
+                            minionTransform(m, c, true);
+                            this.removeCard(mins);
+                            this.drawACard("alarm-o-bot", true);
                             break;
                         }
                     }
                     else
                     {
-                        List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                        temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//damage the lowest
-                        foreach (Minion mins in temp2)
-                        {
-                            CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
-                            minionTransform(mins, c, false);
-                            break;
-                        }
+                        minionGetBuffed(m, 4, 0, false);
                     }
+
                 }
 
 
@@ -8202,7 +8346,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Ai
     {
         private int maxdeep = 12;
@@ -9404,7 +9547,6 @@ namespace HREngine.Bots
 
     }
 
-
     public class Handmanager
     {
         public class Cardsposi
@@ -10245,6 +10387,7 @@ namespace HREngine.Bots
         {
             this.cb = ComboBreaker.Instance;
         }
+
         public int getAttackWithMininonPenality(Minion m, Playfield p, int target, bool lethal)
         {
             int pen = 0;
@@ -10265,8 +10408,10 @@ namespace HREngine.Bots
                 {
                     if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
                 }
+                if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) hasweapon = true;
                 if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
             }
+            if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) retval += -1;
             return retval;
         }
 
@@ -10777,7 +10922,7 @@ namespace HREngine.Bots
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
             if (p.owncards.Count > 5) return 5;
 
-            return -carddraw + p.ownMaxMana - p.mana;
+            return -carddraw + p.playactions.Count + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }
@@ -10805,7 +10950,7 @@ namespace HREngine.Bots
             if (carddraw == 0) return 0;
 
             if (p.owncards.Count >= 5) return 0;
-            pen = -carddraw + p.ownMaxMana - p.mana;
+            pen = -carddraw + p.ownMaxMana - p.mana + p.playactions.Count;
 
             return pen;
         }
@@ -12102,11 +12247,13 @@ namespace HREngine.Bots
             public int bonusForPlaying = 0;
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
+            public string requiredWeapon = "";
 
             public combo(string s)
             {
                 int i = 0;
                 this.neededMana = 0;
+                requiredWeapon = "";
                 this.type = combotype.combo;
                 this.twoTurnCombo = false;
                 bool fixmana = false;
@@ -12204,7 +12351,8 @@ namespace HREngine.Bots
                             }
                             else
                             {
-                                if (CardDB.Instance.getCardDataFromID(crd).type == CardDB.cardtype.MOB)
+                                CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(crd);
+                                if (lolcrd.type == CardDB.cardtype.MOB)
                                 {
                                     if (this.combocardsTurn0Mobs.ContainsKey(crd))
                                     {
@@ -12215,6 +12363,10 @@ namespace HREngine.Bots
                                         combocardsTurn0Mobs.Add(crd, 1);
                                     }
                                     this.combot0len++;
+                                }
+                                if (lolcrd.type == CardDB.cardtype.WEAPON)
+                                {
+                                    this.requiredWeapon = lolcrd.name;
                                 }
                                 if (this.combocardsTurn0All.ContainsKey(crd))
                                 {
@@ -12265,7 +12417,7 @@ namespace HREngine.Bots
                 return 0;
             }
 
-            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins)
+            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins, string weapon)
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
@@ -12294,8 +12446,9 @@ namespace HREngine.Bots
                                 break;
                             }
                         }
-
                     }
+
+                    if (requiredWeapon != "" && requiredWeapon != weapon) return 1;
 
                     if (turn0requires >= combot0len) return 2;
 
@@ -12309,7 +12462,7 @@ namespace HREngine.Bots
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0Mobs);
+                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0All);
                 foreach (Handmanager.Handcard hc in hand)
                 {
                     if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
@@ -12318,9 +12471,9 @@ namespace HREngine.Bots
                         combocardscopy[hc.card.CardID]--;
                     }
                 }
-                if (cardsincombo == this.combot0len && omm < this.neededMana) return 1;
+                if (cardsincombo == this.combot0lenAll && omm < this.neededMana) return 1;
 
-                if (cardsincombo == this.combot0len)
+                if (cardsincombo == this.combot0lenAll)
                 {
                     return 2;
                 }
@@ -12476,7 +12629,7 @@ namespace HREngine.Bots
                 if (c.isCardInCombo(crd))
                 {
                     int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
-                    int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions);
+                    int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
 
                     int iic = Math.Max(iia, iib);
                     if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))// it is a card of the combo, is a turn 1 card, but turn 1 is not possible -> we have to play turn 0 cards first
@@ -12494,7 +12647,7 @@ namespace HREngine.Bots
 
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist)
+        public int checkIfComboWasPlayed(List<Action> alist, string weapon)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely
@@ -12512,7 +12665,7 @@ namespace HREngine.Bots
                     if (c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);
-                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions);
+                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions, weapon);
                         int iic = Math.Max(iia, iib);
                         if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))
                         {

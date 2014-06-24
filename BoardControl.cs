@@ -86,6 +86,7 @@ namespace HREngine.Bots
               if (m.Angr > 1 || m.Hp > 1) ownMinionsCount++;
               if (m.handcard.card.hasEffect) retval += 1;
               if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
           }
 
           if (p.enemyMinions.Count >= 0)
