@@ -182,9 +182,43 @@ namespace HREngine.Bots
           return retval;
       }
 
-
-
-
+      private void concede()
+      {
+          int totalwin = 0;
+          int totallose = 0;
+          string[] lines = new string[0] { };
+          try
+          {
+              string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+              lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+          }
+          catch
+          {
+              Helpfunctions.Instance.logg("cant find Settings.ini");
+          }
+          foreach (string s in lines)
+          {
+              if (s.Contains("bot.stats.victory"))
+              {
+                  int val1 = s.Length;
+                  string temp1 = s.Substring(18, (val1 - 18));
+                  HRLog.Write(temp1);
+                  totalwin = int.Parse(temp1);
+              }
+              else if (s.Contains("bot.stats.defeat"))
+              {
+                  int val2 = s.Length;
+                  string temp2 = s.Substring(17, (val2 - 17));
+                  HRLog.Write(temp2);
+                  totallose = int.Parse(temp2);
+              }
+          }
+          if (totalwin > totallose)
+          {
+              HRLog.Write("not today!");
+              HRGame.ConcedeGame();
+          }
+      }
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
@@ -230,7 +264,13 @@ namespace HREngine.Bots
                   }
               }
 
+
               sf.setnewLoggFile();
+
+              if (Mulligan.Instance.loserLoserLoser)
+              {
+                  concede();
+              }
               return null;
               //HRMulligan.EndMulligan();
           }
@@ -543,7 +583,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 54;
+        private int versionnumber = 55;
         private bool singleLog = false;
 
 
@@ -12638,6 +12678,7 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("read _combo.txt...");
             foreach (string line in lines)
             {
+
                 if (line.Contains("weapon:"))
                 {
                     try
@@ -12661,6 +12702,7 @@ namespace HREngine.Bots
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
                     }
                 }
+
             }
 
         }
@@ -12782,6 +12824,8 @@ namespace HREngine.Bots
 
         List<mulliitem> holdlist = new List<mulliitem>();
         List<mulliitem> deletelist = new List<mulliitem>();
+        public bool loserLoserLoser = false;
+
         private static Mulligan instance;
 
         public static Mulligan Instance
@@ -12819,6 +12863,11 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("read _mulligan.txt...");
             foreach (string line in lines)
             {
+                if (line.StartsWith("loser"))
+                {
+                    this.loserLoserLoser = true;
+                    continue;
+                }
 
                 if (line.StartsWith("hold;"))
                 {

@@ -387,6 +387,7 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("read _combo.txt...");
             foreach (string line in lines)
             {
+
                 if (line.Contains("weapon:"))
                 {
                     try
@@ -410,6 +411,7 @@ namespace HREngine.Bots
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
                     }
                 }
+
             }
 
         }

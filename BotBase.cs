@@ -24,6 +24,45 @@ namespace HREngine.Bots
       }
 
 
+      private void concede()
+      {
+          int totalwin = 0;
+          int totallose = 0;
+          string[] lines = new string[0] { };
+          try
+          {
+              string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+              lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+          }
+          catch
+          {
+              Helpfunctions.Instance.logg("cant find Settings.ini");
+          }
+          foreach (string s in lines)
+          {
+              if (s.Contains("bot.stats.victory"))
+              {
+                  int val1 = s.Length;
+                  string temp1 = s.Substring(18, (val1 - 18));
+                  HRLog.Write(temp1);
+                  totalwin = int.Parse(temp1);
+              }
+              else if (s.Contains("bot.stats.defeat"))
+              {
+                  int val2 = s.Length;
+                  string temp2 = s.Substring(17, (val2 - 17));
+                  HRLog.Write(temp2);
+                  totallose = int.Parse(temp2);
+              }
+          }
+          if (totalwin > totallose)
+          {
+              HRLog.Write("not today!");
+              HRGame.ConcedeGame();
+          }
+      }
+
+
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
@@ -69,7 +108,13 @@ namespace HREngine.Bots
                 }
             }
 
+            
             sf.setnewLoggFile();
+
+            if (Mulligan.Instance.loserLoserLoser)
+            {
+                concede();
+            }
             return null;
             //HRMulligan.EndMulligan();
          }
@@ -201,10 +246,6 @@ namespace HREngine.Bots
                  }
              }
               
-           
-            //SafeHandleBattleLocalPlayerTurnHandler();
-
-
              sf.updateEverything(this);
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
@@ -367,10 +408,6 @@ namespace HREngine.Bots
           return list;
       }
 
-      protected virtual void SafeHandleBattleLocalPlayerTurnHandler()
-      {
-          
-      }
 
       protected virtual HRCard GetMinionByPriority(HRCard lastMinion = null)
       {

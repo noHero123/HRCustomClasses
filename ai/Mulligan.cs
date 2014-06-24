@@ -35,6 +35,8 @@ namespace HREngine.Bots
 
         List<mulliitem> holdlist = new List<mulliitem>();
         List<mulliitem> deletelist = new List<mulliitem>();
+        public bool loserLoserLoser = false;
+
         private static Mulligan instance;
 
         public static Mulligan Instance
@@ -72,6 +74,11 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("read _mulligan.txt...");
             foreach (string line in lines)
             {
+                if (line.StartsWith("loser"))
+                {
+                    this.loserLoserLoser = true;
+                    continue;
+                }
 
                 if (line.StartsWith("hold;"))
                 {
