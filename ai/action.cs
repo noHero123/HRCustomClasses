@@ -820,6 +820,26 @@ namespace HREngine.Bots
 
         }
 
+        public void prepareNextTurn()
+        {
+            this.ownMaxMana = Math.Min(10, this.ownMaxMana + 1);
+            this.mana = this.ownMaxMana - this.ueberladung;
+            foreach (Minion m in ownMinions)
+            {
+                m.Ready = true;
+                m.numAttacksThisTurn = 0;
+                m.playedThisTurn = false;
+            }
+
+            if (this.ownWeaponName != "") this.ownHeroReady = true;
+            this.ownheroAngr = this.ownWeaponAttack;
+            this.ownHeroFrozen = false;
+            this.ownAbilityReady = true;
+            this.complete = false;
+            this.sEnemTurn = false;
+            this.value = int.MinValue;
+        }
+
         public List<targett> getAttackTargets(bool own)
         {
             List<targett> trgts = new List<targett>();
@@ -1374,7 +1394,6 @@ namespace HREngine.Bots
             }
             
         }
-
 
         private void guessHeroDamage()
         {
