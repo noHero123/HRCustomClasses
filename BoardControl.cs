@@ -115,6 +115,7 @@ namespace HREngine.Bots
               if (p.ownHeroName == HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
           if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
+          if (usecoin && p.mana >= 1) retval -= 20;
 
           int mobsInHand = 0;
           foreach (Handmanager.Handcard hc in p.owncards)

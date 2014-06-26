@@ -75,6 +75,7 @@ namespace HREngine.Bots
               if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
           }
           if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
+          if (usecoin && p.mana >= 1) retval -= 20;
 
           foreach (Minion m in p.ownMinions)
           {

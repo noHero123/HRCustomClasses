@@ -105,7 +105,7 @@ namespace HREngine.Bots
                     if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
                 }
                 if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) hasweapon = true;
-                if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
+                if (hasweapon) retval = -p.ownWeaponAttack - 2; // so he doesnt "lose" the weapon in evaluation :D
             }
             if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) retval += -1;
             return retval;
@@ -178,9 +178,31 @@ namespace HREngine.Bots
                 }
                 if (card.name == "crueltaskmaster")
                 {
-                    return 0;
+                    int maxhp = 0;
+                    Minion m = p.enemyMinions[target - 10];
+
+                    if (m.Hp == 1)
+                    {
+                        return 0;
+                    }
+
+                    if (m.Angr >= 4 || m.Hp >= 5)
+                    {
+                        maxhp++;
+                    }
+                    if (maxhp >= 1)
+                    {
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == "execute") return 0;
+                        }
+                    }
+                    pen = 30;
                 }
-                pen = 500;
+                else
+                {
+                    pen = 500;
+                }
             }
             if (target >= 0 && target <= 9)
             {
@@ -334,9 +356,20 @@ namespace HREngine.Bots
 
             if (this.DamageAllDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealAllDatabase.ContainsKey(name))) // aoe penality
             {
-                foreach (Handmanager.Handcard hc in p.owncards)
+                int maxhp = 0;
+                foreach (Minion m in p.enemyMinions)
                 {
-                    if (hc.card.name == "execute") return 0;
+                    if (m.Angr >= 4 || m.Hp >= 5)
+                    {
+                        maxhp++;
+                    }
+                }
+                if (maxhp >= 1)
+                {
+                    foreach (Handmanager.Handcard hc in p.owncards)
+                    {
+                        if (hc.card.name == "execute") return 0;
+                    }
                 }
 
                 if( p.enemyMinions.Count <=1 || p.enemyMinions.Count +1 <= p.ownMinions.Count || p.ownMinions.Count >=3)
@@ -347,10 +380,22 @@ namespace HREngine.Bots
 
             if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
             {
-                foreach (Handmanager.Handcard hc in p.owncards)
+                int maxhp = 0;
+                foreach (Minion m in p.enemyMinions)
                 {
-                    if (hc.card.name == "execute") return 0;
+                    if (m.Angr >= 4 || m.Hp >= 5)
+                    {
+                        maxhp++;
+                    }
                 }
+                if (maxhp >= 4)
+                {
+                    foreach (Handmanager.Handcard hc in p.owncards)
+                    {
+                        if (hc.card.name == "execute") return 0;
+                    }
+                }
+
                 if (name == "holynova")
                 {
                     int targets = p.enemyMinions.Count;
@@ -474,6 +519,8 @@ namespace HREngine.Bots
                     if(name=="soulfire" && m.maxHp <=2) pen=10;
 
                     if (name == "baneofdoom" && m.Hp >= 3) pen = 10;
+
+                    if (name == "shieldslam" && (m.Hp <= 4 || m.Angr <= 4)) pen = 20;
                 }
             }
 
@@ -680,6 +727,27 @@ namespace HREngine.Bots
             int pen = 0;
             if ((name == "brawl" || name == "deathwing" || name == "twistingnether") && p.mobsplayedThisTurn >= 1) return 500;
 
+            if (name == "brawl" || name == "twistingnether")
+            {
+                int highminion = 0;
+                int veryhighminion = 0;
+                foreach (Minion m in p.enemyMinions)
+                {
+                    if (m.Angr >= 5 || m.Hp >= 5) highminion++;
+                    if (m.Angr >= 8 || m.Hp >= 8) veryhighminion++;
+                }
+
+                if (highminion >= 2 || veryhighminion >= 1)
+                {
+                    return 0;
+                }
+
+                if (p.enemyMinions.Count <= 2 || p.enemyMinions.Count + 2 <= p.ownMinions.Count || p.ownMinions.Count >= 3)
+                {
+                    return 30;
+                }
+            }
+
             if (target >= 0 && target <= 9)
             {
                 // dont destroy owns ;_; (except mins with deathrattle effects)
@@ -716,9 +784,13 @@ namespace HREngine.Bots
 
                 Minion m = p.enemyMinions[target-10];
 
-                if (m.Angr <= 4)
+                if (m.Angr >= 4 || m.Hp >= 5)
                 {
-                    pen += 25; // so we dont destroy cheap ones :D
+                    pen = 0; // so we dont destroy cheap ones :D
+                }
+                else
+                {
+                    pen = 25;
                 }
 
             }
@@ -805,6 +877,14 @@ namespace HREngine.Bots
             if (target >= 10 && target <= 19)
             {
                 m = p.enemyMinions[target-10];
+            }
+
+            if (name == "sylvanaswindrunner")
+            {
+                if (p.enemyMinions.Count == 0)
+                {
+                    return 10;
+                }
             }
 
             if (name == "bite")
@@ -902,13 +982,13 @@ namespace HREngine.Bots
             {
                 if (target == -1 ) 
                 {
-                    return 21;
+                    return 50;
                 }
-                if (m.Angr>=5 || m.handcard.card.cost>=5)
+                if (m.Angr>=5 || m.handcard.card.cost>=5 || ( m.handcard.card.rarity == 5 || m.handcard.card.cost>=3))
                 {
                     return 0;
                 }
-                return 20;
+                return 49;
             }
 
             if (name == "knifejuggler")
@@ -942,9 +1022,13 @@ namespace HREngine.Bots
                 return 19;
             }
 
+            if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 1)
+            {
+                return 20;
+            }
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
             {
-                return 10;
+                return 30;
             }
 
             if (name == "unleashthehounds") 
