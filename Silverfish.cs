@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 55;
+        private int versionnumber = 56;
         private bool singleLog = false;
 
 
@@ -142,9 +142,9 @@ namespace HREngine.Bots
             Handmanager.Instance.printcards();
 
             // calculate stuff
-            HRLog.Write("calculating stuff...");
+            HRLog.Write("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
-            HRLog.Write("calculating ended!");
+            HRLog.Write("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
 
         }
 

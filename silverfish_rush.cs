@@ -668,9 +668,9 @@ namespace HREngine.Bots
             Handmanager.Instance.printcards();
 
             // calculate stuff
-            HRLog.Write("calculating stuff...");
+            HRLog.Write("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
-            HRLog.Write("calculating ended!");
+            HRLog.Write("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
 
         }
 
@@ -10442,7 +10442,7 @@ namespace HREngine.Bots
             int retval = 0;
 
             //no penality, but a bonus, if he has weapon on hand!
-            if (p.ownWeaponDurability == 1)
+            if (p.ownWeaponDurability >= 1)
             {
                 bool hasweapon = false;
                 foreach (Handmanager.Handcard c in p.owncards)
@@ -10450,7 +10450,7 @@ namespace HREngine.Bots
                     if (c.card.type == CardDB.cardtype.WEAPON) hasweapon = true;
                 }
                 if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) hasweapon = true;
-                if (hasweapon) retval = -p.ownWeaponAttack - 2; // so he doesnt "lose" the weapon in evaluation :D
+                if (hasweapon) retval = -p.ownWeaponAttack - 1; // so he doesnt "lose" the weapon in evaluation :D
             }
             if (p.ownWeaponAttack == 1 && p.ownHeroName == HeroEnum.thief) retval += -1;
             return retval;
@@ -10988,7 +10988,7 @@ namespace HREngine.Bots
                 }
                 carddraw = 0;
                 if (m.Hp >= 3) carddraw = 1;
-                if (carddraw == 0) return 2;
+                if (carddraw == 0) return 4;
             }
 
             if (name == "mortalcoil")
@@ -11004,7 +11004,7 @@ namespace HREngine.Bots
                 }
                 carddraw = 0;
                 if (m.Hp == 1) carddraw = 1;
-                if (carddraw == 0) return 2;
+                if (carddraw == 0) return 3;
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
@@ -11224,6 +11224,11 @@ namespace HREngine.Bots
                 m = p.enemyMinions[target - 10];
             }
 
+            if (card.specialMin == CardDB.specialMinions.flametonguetotem && p.ownMinions.Count == 0)
+            {
+                return 100;
+            }
+
             if (name == "sylvanaswindrunner")
             {
                 if (p.enemyMinions.Count == 0)
@@ -11362,9 +11367,9 @@ namespace HREngine.Bots
 
             }
 
-            if ((card.specialMin == CardDB.specialMinions.biggamehunter) && target == -1)
+            if ((card.specialMin == CardDB.specialMinions.biggamehunter) && (target == -1 || target <= 9))
             {
-                return 19;
+                return 40;
             }
 
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 1)
@@ -11403,12 +11408,16 @@ namespace HREngine.Bots
 
             if (name == "theblackknight")
             {
+                if (target == -1)
+                {
+                    return 50;
+                }
 
                 foreach (Minion mnn in p.enemyMinions)
                 {
                     if (mnn.taunt && (m.Angr >= 3 || m.Hp >= 3)) return 0;
                 }
-                return 10;
+                return 20;
             }
 
             if (name == "innerfire")
@@ -12213,6 +12222,7 @@ namespace HREngine.Bots
             priorityTargets.Add("stormwindchampion", 10);
             priorityTargets.Add("gurubashiberserker", 10);
             priorityTargets.Add("cairnebloodhoof", 19);
+            priorityTargets.Add("harvestgolem", 16);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);

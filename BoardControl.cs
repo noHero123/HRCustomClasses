@@ -120,12 +120,12 @@ namespace HREngine.Bots
           int mobsInHand = 0;
           foreach (Handmanager.Handcard hc in p.owncards)
           {
-              if (hc.card.type == CardDB.cardtype.MOB) mobsInHand++;
+              if (hc.card.type == CardDB.cardtype.MOB && hc.card.Attack >=3) mobsInHand++;
           }
 
           if (ownMinionsCount - p.enemyMinions.Count >= 4 && mobsInHand >= 1)
           {
-              retval += mobsInHand * 20;
+              retval += mobsInHand * 25;
           }
 
           
