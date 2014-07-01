@@ -5638,7 +5638,7 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));
+                temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));
                 temp.AddRange(Helpfunctions.TakeList(temp2, 1));
                 foreach (Minion enemy in temp)
                 {
@@ -6574,11 +6574,18 @@ namespace HREngine.Bots
                             int damage = 1;
                             List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                             temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                            temp.AddRange(Helpfunctions.TakeList(temp2, 1));
-                            foreach (Minion enemy in temp)
+                            bool dmgdone = false;
+                            foreach (Minion enemy in temp2)
                             {
-                                minionGetDamagedOrHealed(enemy, damage, 0, false);
+                                if (enemy.Hp > 1)
+                                {
+                                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                                    dmgdone = true;
+                                    break;
+                                }
+                                if (!dmgdone) this.attackOrHealHero(1, false);
                             }
+
 
                         }
                         else
@@ -6870,11 +6877,14 @@ namespace HREngine.Bots
             {
 
                 Minion enemy = this.enemyMinions[target - 10];
+
+                int enem_attack = enemy.Angr;
+
                 minionGetDamagedOrHealed(enemy, this.ownheroAngr, 0, false);
 
                 if (!this.heroImmuneWhileAttacking)
                 {
-                    attackOrHealHero(enemy.Angr, true);
+                    attackOrHealHero(enem_attack, true);
                     if (!enemy.silenced && enemy.handcard.card.specialMin ==  CardDB.specialMinions.waterelemental)
                     {
                         this.ownHeroFrozen = true;

@@ -89,6 +89,15 @@ namespace HREngine.Bots
             int pen = 0;
             pen = getAttackSecretPenality(m,p,target);
             if (!lethal && m.name == "bloodimp") pen = 50;
+            if (m.name == "leeroyjenkins")
+            {
+                if (target >= 10 && target <= 19)
+                {
+                    Minion t = p.enemyMinions[target - 10];
+                    if (t.name == "whelp") return 500;
+                }
+                
+            }
             return pen;
         }
 
@@ -546,7 +555,7 @@ namespace HREngine.Bots
             {
                 heal = HealTargetDatabase[name];
                 if (target == 200) return 500; // dont heal enemy
-                if ((target == 100) && p.ownHeroHp == 30) return 500;
+                if ((target == 100) && p.ownHeroHp == 30) return 150;
                 if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
                 Minion m = new Minion();
 
@@ -557,7 +566,10 @@ namespace HREngine.Bots
                     if (m.Hp == m.maxHp) return 500;
                     if (m.Hp + heal-1 > m.maxHp) wasted = m.Hp + heal - m.maxHp;
                     pen=wasted;
+                    
                     if (m.taunt && wasted <= 2 && m.Hp < m.maxHp) pen -= 5; // if we heal a taunt, its good :D
+
+                    if (m.Hp + heal <= m.maxHp) pen = -1;
                 }
 
                 if (target >= 10 && target < 20)
@@ -587,7 +599,7 @@ namespace HREngine.Bots
 
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.card.name == "slam") return pen;
+                        if (hc.card.name == "slam" && m.Hp < 2) return pen;
                         if (hc.card.name == "backstab") return pen;
                     }
 
@@ -904,6 +916,27 @@ namespace HREngine.Bots
                 }
             }
 
+            if (name == "deadlypoison")
+            {
+                    return p.ownWeaponDurability * 2;
+            }
+
+            if (name == "coldblood")
+            {
+                if (lethal) return 0;
+                return 25;
+            }
+
+            if (name == "bloodmagethalnos")
+            {
+                return 10;
+            }
+
+            if (name == "frostbolt")
+            {
+                return 15;
+            }
+
             if (name == "poweroverwhelming")
             {
                 if (target >= 0 && target <= 9 && !m.Ready)
@@ -1029,11 +1062,11 @@ namespace HREngine.Bots
 
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 1)
             {
-                return 20;
+                return 40;
             }
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
             {
-                return 30;
+                return 50;
             }
 
             if (name == "unleashthehounds") 

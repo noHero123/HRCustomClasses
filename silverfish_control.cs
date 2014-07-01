@@ -15,21 +15,76 @@ namespace HREngine.Bots
 
     public class Bot : IBot
    {
-
+       private int concedeLvl = 5; // the rank, till you want to concede
        private int dirtytarget = -1;
        private int dirtychoice = -1;
        private string choiceCardId = "";
        PenalityManager penman = PenalityManager.Instance;
        Silverfish sf;
 
-      public Bot()
-      {
-          OnBattleStateUpdate = HandleOnBattleStateUpdate;
-          OnMulliganStateUpdate = HandleBattleMulliganPhase;
-          this.sf = new Silverfish();
-          sf.setnewLoggFile();
-          //Ai.Instance.autoTester(this);
-      }
+       public Bot()
+       {
+           OnBattleStateUpdate = HandleOnBattleStateUpdate;
+           OnMulliganStateUpdate = HandleBattleMulliganPhase;
+           bool concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
+           bool writeToSingleFile = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.singleLog") == "true") ? true : false;
+           try
+           {
+               this.concedeLvl = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.concedelvl")));
+               if (this.concedeLvl >= 20) this.concedeLvl = 20;
+               if (concede)
+               {
+                   HRLog.Write("concede till lvl " + concedeLvl);
+               }
+           }
+           catch
+           {
+               HRLog.Write("cant read your concede-Lvl");
+           }
+
+           this.sf = new Silverfish(writeToSingleFile);
+
+
+
+
+
+           Mulligan.Instance.setAutoConcede(concede);
+
+           sf.setnewLoggFile();
+
+           try
+           {
+               int enfacehp = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyfacehp")));
+               HRLog.Write("set enemy-face-hp to: " + enfacehp);
+               ComboBreaker.Instance.attackFaceHP = enfacehp;
+           }
+           catch
+           {
+               HRLog.Write("error in reading enemy-face-hp");
+           }
+
+           try
+           {
+               int mxwde = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.maxwide")));
+               if (mxwde != 3000)
+               {
+                   Ai.Instance.setMaxWide(mxwde);
+                   HRLog.Write("set maxwide to: " + mxwde);
+               }
+           }
+           catch
+           {
+               HRLog.Write("error in reading Maxwide from settings, please recheck the entry");
+           }
+
+           HRLog.Write("write to single log file is: " + writeToSingleFile);
+
+           if (HRSettings.Get.ReadSetting("silverfish.xml", "uai.teststuff") == "true")
+           {
+               bool printstuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.longteststuff") == "true") ? true : false;
+               Ai.Instance.autoTester(this, printstuff);
+           }
+       }
 
 
       public int getPlayfieldValue(Playfield p)
@@ -97,6 +152,7 @@ namespace HREngine.Bots
               if (m.handcard.card.hasEffect) retval += 1;
               if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
               if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.bloodmagethalnos) retval += 10;
           }
 
           if (p.enemyMinions.Count >= 0)
@@ -147,7 +203,10 @@ namespace HREngine.Bots
               {
                   retval -= m.Angr * 2;
                   if (m.windfury) retval -= m.Angr;
+                  if (m.Angr >= 4) retval -= 20;
+                  if (m.Angr >= 7) retval -= 50;
               }
+              if (m.Angr == 0) retval += 5;
               retval -= m.handcard.card.rarity;
               if (m.taunt) retval -= 5;
               if (m.divineshild) retval -= m.Angr;
@@ -158,8 +217,7 @@ namespace HREngine.Bots
 
               if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
 
-              if (m.Angr >= 4) retval -= 20;
-              if (m.Angr >= 7) retval -= 50;
+
           }
 
           retval -= p.enemySecretCount;
@@ -185,7 +243,7 @@ namespace HREngine.Bots
 
       private void concede()
       {
-          int totalwin = 0;
+          /*int totalwin = 0;
           int totallose = 0;
           string[] lines = new string[0] { };
           try
@@ -218,12 +276,27 @@ namespace HREngine.Bots
           {
               HRLog.Write("not today!");
               HRGame.ConcedeGame();
+          }*/
+          int curlvl = HRPlayer.GetLocalPlayer().GetRank();
+          if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
+          if (curlvl < this.concedeLvl)
+          {
+              HRLog.Write("not today!");
+              HRGame.ConcedeGame();
           }
       }
+
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
           HRLog.Write("handle mulligan");
+
+          if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
+          {
+              HRLog.Write("but we have to wait :D");
+              return null;
+          }
+
           if (HRMulligan.IsMulliganActive())
           {
               var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
@@ -234,7 +307,10 @@ namespace HREngine.Bots
                   List<Mulligan.CardIDEntity> celist = new List<Mulligan.CardIDEntity>();
                   foreach (var item in list)
                   {
-                      celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
+                      if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
+                      {
+                          celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
+                      }
                   }
                   List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
                   foreach (var item in list)
@@ -584,7 +660,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 56;
+        private int versionnumber = 57;
         private bool singleLog = false;
 
 
@@ -643,12 +719,13 @@ namespace HREngine.Bots
         int ownDecksize = 0;
         int enemyDecksize = 0;
 
-        public Silverfish()
+        public Silverfish(bool snglLg)
         {
+            this.singleLog = snglLg;
             HRLog.Write("init Silverfish");
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
-            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Bots" + System.IO.Path.DirectorySeparatorChar + "silver" + System.IO.Path.DirectorySeparatorChar);
 
             if (!singleLog)
             {
@@ -1862,6 +1939,26 @@ namespace HREngine.Bots
 
         }
 
+        public void prepareNextTurn()
+        {
+            this.ownMaxMana = Math.Min(10, this.ownMaxMana + 1);
+            this.mana = this.ownMaxMana - this.ueberladung;
+            foreach (Minion m in ownMinions)
+            {
+                m.Ready = true;
+                m.numAttacksThisTurn = 0;
+                m.playedThisTurn = false;
+            }
+
+            if (this.ownWeaponName != "") this.ownHeroReady = true;
+            this.ownheroAngr = this.ownWeaponAttack;
+            this.ownHeroFrozen = false;
+            this.ownAbilityReady = true;
+            this.complete = false;
+            this.sEnemTurn = false;
+            this.value = int.MinValue;
+        }
+
         public List<targett> getAttackTargets(bool own)
         {
             List<targett> trgts = new List<targett>();
@@ -2416,7 +2513,6 @@ namespace HREngine.Bots
             }
 
         }
-
 
         private void guessHeroDamage()
         {
@@ -6661,7 +6757,7 @@ namespace HREngine.Bots
             {
                 List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));
+                temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));
                 temp.AddRange(Helpfunctions.TakeList(temp2, 1));
                 foreach (Minion enemy in temp)
                 {
@@ -7597,11 +7693,18 @@ namespace HREngine.Bots
                             int damage = 1;
                             List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                             temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                            temp.AddRange(Helpfunctions.TakeList(temp2, 1));
-                            foreach (Minion enemy in temp)
+                            bool dmgdone = false;
+                            foreach (Minion enemy in temp2)
                             {
-                                minionGetDamagedOrHealed(enemy, damage, 0, false);
+                                if (enemy.Hp > 1)
+                                {
+                                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                                    dmgdone = true;
+                                    break;
+                                }
+                                if (!dmgdone) this.attackOrHealHero(1, false);
                             }
+
 
                         }
                         else
@@ -7893,11 +7996,14 @@ namespace HREngine.Bots
             {
 
                 Minion enemy = this.enemyMinions[target - 10];
+
+                int enem_attack = enemy.Angr;
+
                 minionGetDamagedOrHealed(enemy, this.ownheroAngr, 0, false);
 
                 if (!this.heroImmuneWhileAttacking)
                 {
-                    attackOrHealHero(enemy.Angr, true);
+                    attackOrHealHero(enem_attack, true);
                     if (!enemy.silenced && enemy.handcard.card.specialMin == CardDB.specialMinions.waterelemental)
                     {
                         this.ownHeroFrozen = true;
@@ -8478,6 +8584,12 @@ namespace HREngine.Bots
         {
             this.nextMoveGuess = new Playfield();
             this.nextMoveGuess.mana = -1;
+        }
+
+        public void setMaxWide(int mw)
+        {
+            this.maxwide = mw;
+            if (maxwide <= 100) this.maxwide = 100;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -9433,7 +9545,7 @@ namespace HREngine.Bots
 
         }
 
-        public void autoTester(Bot bbase)
+        public void autoTester(Bot bbase, bool printstuff)
         {
             help.logg("simulating board ");
 
@@ -9480,7 +9592,7 @@ namespace HREngine.Bots
             }
             help.logg("bestfield");
             bestboard.printBoard();
-            //simmulateWholeTurn();
+            if (printstuff) simmulateWholeTurn();
         }
 
         public void simmulateWholeTurn()
@@ -10481,6 +10593,15 @@ namespace HREngine.Bots
             int pen = 0;
             pen = getAttackSecretPenality(m, p, target);
             if (!lethal && m.name == "bloodimp") pen = 50;
+            if (m.name == "leeroyjenkins")
+            {
+                if (target >= 10 && target <= 19)
+                {
+                    Minion t = p.enemyMinions[target - 10];
+                    if (t.name == "whelp") return 500;
+                }
+
+            }
             return pen;
         }
 
@@ -10938,7 +11059,7 @@ namespace HREngine.Bots
             {
                 heal = HealTargetDatabase[name];
                 if (target == 200) return 500; // dont heal enemy
-                if ((target == 100) && p.ownHeroHp == 30) return 500;
+                if ((target == 100) && p.ownHeroHp == 30) return 150;
                 if ((target == 100) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
                 Minion m = new Minion();
 
@@ -10949,7 +11070,10 @@ namespace HREngine.Bots
                     if (m.Hp == m.maxHp) return 500;
                     if (m.Hp + heal - 1 > m.maxHp) wasted = m.Hp + heal - m.maxHp;
                     pen = wasted;
+
                     if (m.taunt && wasted <= 2 && m.Hp < m.maxHp) pen -= 5; // if we heal a taunt, its good :D
+
+                    if (m.Hp + heal <= m.maxHp) pen = -1;
                 }
 
                 if (target >= 10 && target < 20)
@@ -10979,7 +11103,7 @@ namespace HREngine.Bots
 
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
-                        if (hc.card.name == "slam") return pen;
+                        if (hc.card.name == "slam" && m.Hp < 2) return pen;
                         if (hc.card.name == "backstab") return pen;
                     }
 
@@ -11296,6 +11420,27 @@ namespace HREngine.Bots
                 }
             }
 
+            if (name == "deadlypoison")
+            {
+                return p.ownWeaponDurability * 2;
+            }
+
+            if (name == "coldblood")
+            {
+                if (lethal) return 0;
+                return 25;
+            }
+
+            if (name == "bloodmagethalnos")
+            {
+                return 10;
+            }
+
+            if (name == "frostbolt")
+            {
+                return 15;
+            }
+
             if (name == "poweroverwhelming")
             {
                 if (target >= 0 && target <= 9 && !m.Ready)
@@ -11421,11 +11566,11 @@ namespace HREngine.Bots
 
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 1)
             {
-                return 20;
+                return 40;
             }
             if ((name == "defenderofargus" || name == "sunfuryprotector") && p.ownMinions.Count == 0)
             {
-                return 30;
+                return 50;
             }
 
             if (name == "unleashthehounds")
@@ -13084,6 +13229,11 @@ namespace HREngine.Bots
 
         }
 
+        public void setAutoConcede(bool mode)
+        {
+            this.loserLoserLoser = mode;
+        }
+
     }
 
     public class CardDB
@@ -13172,7 +13322,8 @@ namespace HREngine.Bots
             nerubianegg,
             shadeofnaxxramas,
             baronrivendare,
-            faeriedragon
+            faeriedragon,
+            bloodmagethalnos
         }
 
         public enum ErrorType2
@@ -13954,6 +14105,7 @@ namespace HREngine.Bots
                         if (temp == "innervate") c.specialMin = specialMinions.innervate;
                         if (temp == "ancientwatcher") c.specialMin = specialMinions.ancientwatcher;
                         if (temp == "faeriedragon") c.specialMin = specialMinions.faeriedragon;
+                        if (temp == "bloodmagethalnos") c.specialMin = specialMinions.bloodmagethalnos;
                         //naxx update
                         if (temp == "webspinner") c.specialMin = specialMinions.webspinner;
                         if (temp == "darkcultist") c.specialMin = specialMinions.darkcultist;

@@ -87,6 +87,7 @@ namespace HREngine.Bots
               if (m.handcard.card.hasEffect) retval += 1;
               if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
               if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
+              if (m.handcard.card.specialMin == CardDB.specialMinions.bloodmagethalnos) retval += 10;
           }
 
           if (p.enemyMinions.Count >= 0)
@@ -137,7 +138,10 @@ namespace HREngine.Bots
               {
                   retval -= m.Angr * 2;
                   if (m.windfury) retval -= m.Angr;
+                  if (m.Angr >= 4) retval -= 20;
+                  if (m.Angr >= 7) retval -= 50;
               }
+              if (m.Angr == 0) retval += 5;
               retval -= m.handcard.card.rarity;
               if (m.taunt) retval -= 5;
               if (m.divineshild) retval -= m.Angr;
@@ -148,8 +152,7 @@ namespace HREngine.Bots
 
               if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
 
-              if (m.Angr >= 4) retval -= 20;
-              if (m.Angr >= 7) retval -= 50;
+ 
           }
 
           retval -= p.enemySecretCount;

@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 56;
+        private int versionnumber = 57;
         private bool singleLog = false;
 
 
@@ -70,12 +70,13 @@ namespace HREngine.Bots
         int ownDecksize = 0;
         int enemyDecksize = 0;
 
-        public Silverfish()
+        public Silverfish( bool snglLg)
         {
+            this.singleLog = snglLg;
             HRLog.Write("init Silverfish");
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
-            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Bots" + System.IO.Path.DirectorySeparatorChar + "silver" + System.IO.Path.DirectorySeparatorChar);
 
             if (!singleLog)
             {

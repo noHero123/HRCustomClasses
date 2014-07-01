@@ -199,7 +199,12 @@ namespace HREngine.Bots
             return discarditems;
 
         }
-    
+
+        public void setAutoConcede(bool mode)
+        {
+            this.loserLoserLoser = mode;
+        }
+
     }
 
 }

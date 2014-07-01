@@ -104,7 +104,8 @@ namespace HREngine.Bots
             nerubianegg,
             shadeofnaxxramas,
             baronrivendare,
-            faeriedragon
+            faeriedragon,
+            bloodmagethalnos
         }
 
         public enum ErrorType2
@@ -886,6 +887,7 @@ namespace HREngine.Bots
                         if (temp == "innervate") c.specialMin = specialMinions.innervate;
                         if (temp == "ancientwatcher") c.specialMin = specialMinions.ancientwatcher;
                         if (temp == "faeriedragon") c.specialMin = specialMinions.faeriedragon;
+                        if (temp == "bloodmagethalnos") c.specialMin = specialMinions.bloodmagethalnos;
                         //naxx update
                         if (temp == "webspinner") c.specialMin = specialMinions.webspinner;
                         if (temp == "darkcultist") c.specialMin = specialMinions.darkcultist;
@@ -896,7 +898,7 @@ namespace HREngine.Bots
                         if (temp == "nerubianegg") c.specialMin = specialMinions.nerubianegg;
                         if (temp == "shadeofnaxxramas") c.specialMin = specialMinions.shadeofnaxxramas;
                         if (temp == "baronrivendare") c.specialMin = specialMinions.baronrivendare;
-            
+                        
 
                         if (PenalityManager.Instance.specialMinions.ContainsKey(temp)) c.hasEffect = true;
 

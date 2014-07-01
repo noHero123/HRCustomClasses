@@ -8,25 +8,80 @@ namespace HREngine.Bots
 
    public abstract class Bot : API.IBot
    {
-       
+       private int concedeLvl = 5; // the rank, till you want to concede
        private int dirtytarget = -1;
        private int dirtychoice = -1;
        private string choiceCardId = "";
        Silverfish sf;
 
-      public Bot()
-      {
-          OnBattleStateUpdate = HandleOnBattleStateUpdate;
-          OnMulliganStateUpdate = HandleBattleMulliganPhase;
-          this.sf = new Silverfish();
-          sf.setnewLoggFile();
-          //Ai.Instance.autoTester(this);
-      }
+       public Bot()
+       {
+           OnBattleStateUpdate = HandleOnBattleStateUpdate;
+           OnMulliganStateUpdate = HandleBattleMulliganPhase;
+           bool concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
+           bool writeToSingleFile = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.singleLog") == "true") ? true : false;
+           try
+           {
+               this.concedeLvl = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.concedelvl")));
+               if (this.concedeLvl >= 20) this.concedeLvl = 20;
+               if (concede)
+               {
+                   HRLog.Write("concede till lvl " + concedeLvl);
+               }
+           }
+           catch
+           {
+               HRLog.Write("cant read your concede-Lvl");
+           }
+
+           this.sf = new Silverfish(writeToSingleFile);
+
+
+
+
+
+           Mulligan.Instance.setAutoConcede(concede);
+
+           sf.setnewLoggFile();
+
+           try
+           {
+               int enfacehp = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyfacehp")));
+               HRLog.Write("set enemy-face-hp to: " + enfacehp);
+               ComboBreaker.Instance.attackFaceHP = enfacehp;
+           }
+           catch
+           {
+               HRLog.Write("error in reading enemy-face-hp");
+           }
+
+           try
+           {
+               int mxwde = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.maxwide")));
+               if (mxwde != 3000)
+               {
+                   Ai.Instance.setMaxWide(mxwde);
+                   HRLog.Write("set maxwide to: " + mxwde);
+               }
+           }
+           catch
+           {
+               HRLog.Write("error in reading Maxwide from settings, please recheck the entry");
+           }
+
+           HRLog.Write("write to single log file is: " + writeToSingleFile);
+
+           if (HRSettings.Get.ReadSetting("silverfish.xml", "uai.teststuff") == "true")
+           {
+               bool printstuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.longteststuff") == "true") ? true : false;
+               Ai.Instance.autoTester(this, printstuff);
+           }
+       }
 
 
       private void concede()
       {
-          int totalwin = 0;
+          /*int totalwin = 0;
           int totallose = 0;
           string[] lines = new string[0] { };
           try
@@ -59,6 +114,13 @@ namespace HREngine.Bots
           {
               HRLog.Write("not today!");
               HRGame.ConcedeGame();
+          }*/
+          int curlvl = HRPlayer.GetLocalPlayer().GetRank();
+          if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
+          if(curlvl  < this.concedeLvl)
+          {
+              HRLog.Write("not today!");
+              HRGame.ConcedeGame();
           }
       }
 
@@ -67,7 +129,14 @@ namespace HREngine.Bots
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
           HRLog.Write("handle mulligan");
-         if (HRMulligan.IsMulliganActive())
+
+          if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
+          {
+              HRLog.Write("but we have to wait :D");
+              return null;
+          }
+
+          if (HRMulligan.IsMulliganActive())
          {
             var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
             if (Mulligan.Instance.hasmulliganrules())
@@ -77,7 +146,10 @@ namespace HREngine.Bots
                 List<Mulligan.CardIDEntity> celist= new List<Mulligan.CardIDEntity>();
                 foreach (var item in list)
                 {
-                    celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(),item.GetEntity().GetEntityId()));
+                    if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
+                    {
+                        celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
+                    }
                 }
                 List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
                 foreach (var item in list)

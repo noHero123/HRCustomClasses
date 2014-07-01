@@ -52,6 +52,12 @@ namespace HREngine.Bots
             this.nextMoveGuess.mana = -1;
         }
 
+        public void setMaxWide(int mw)
+        {
+            this.maxwide = mw;
+            if (maxwide <= 100) this.maxwide = 100;
+        }
+
         private void addToPosmoves(Playfield pf)
         {
             if (pf.ownHeroHp <= 0) return;
@@ -1005,7 +1011,7 @@ namespace HREngine.Bots
 
         }
 
-        public void autoTester(Bot bbase)
+        public void autoTester(Bot bbase, bool printstuff)
         {
             help.logg("simulating board ");
 
@@ -1052,7 +1058,7 @@ namespace HREngine.Bots
             }
             help.logg("bestfield");
             bestboard.printBoard();
-            //simmulateWholeTurn();
+            if(printstuff) simmulateWholeTurn();
         }
 
         public void simmulateWholeTurn()
