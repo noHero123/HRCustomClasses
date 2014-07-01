@@ -39,7 +39,7 @@ namespace HREngine.Bots
           retval += p.ownHeroHp + p.ownHeroDefence;
           retval += -(p.enemyHeroHp + p.enemyHeroDefence);
 
-          retval += p.ownMaxMana*10 - p.enemyMaxMana*10;
+          retval += p.ownMaxMana*15 - p.enemyMaxMana*15;
 
           if (p.ownWeaponAttack >= 1)
           {
@@ -60,8 +60,6 @@ namespace HREngine.Bots
 
           retval += p.owncarddraw * 5;
           retval -= p.enemycarddraw * 5;
-
-          retval += p.ownMaxMana;
 
           bool useAbili = false;
           bool usecoin = false;

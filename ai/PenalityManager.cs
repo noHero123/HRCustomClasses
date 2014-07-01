@@ -146,7 +146,7 @@ namespace HREngine.Bots
             retval += getDestroyOwnPenality(name, target, p, lethal);
             
             retval += getDestroyPenality( name,  target,  p);
-            retval += getSpecialCardComboPenalitys( card,  target,  p, lethal);
+            retval += getSpecialCardComboPenalitys( card,  target,  p, lethal, choice);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
             if(!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
@@ -810,7 +810,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal, int choice)
         {
             string name = card.name;
 
@@ -934,8 +934,19 @@ namespace HREngine.Bots
 
             if (name == "frostbolt")
             {
+                if (target >= 10 && target <= 19)
+                {
+                    if (m.handcard.card.cost <= 2)
+                        return 15;
+                }
                 return 15;
             }
+
+            if (!lethal && choice == 1 && name == "druidoftheclaw")
+            {
+                 return 20;
+            }
+
 
             if (name == "poweroverwhelming")
             {

@@ -100,7 +100,7 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
-          retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10;
+          retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20;
 
           if (p.ownHeroHp + p.ownHeroDefence > 10)
           {
@@ -133,7 +133,6 @@ namespace HREngine.Bots
           retval += p.owncarddraw * 5;
           retval -= p.enemycarddraw * 5;
 
-          retval += p.ownMaxMana;
           int owntaunt = 0;
           int ownMinionsCount = 0;
           foreach (Minion m in p.ownMinions)
@@ -660,7 +659,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 57;
+        private int versionnumber = 58;
         private bool singleLog = false;
 
 
@@ -10650,7 +10649,7 @@ namespace HREngine.Bots
             retval += getDestroyOwnPenality(name, target, p, lethal);
 
             retval += getDestroyPenality(name, target, p);
-            retval += getSpecialCardComboPenalitys(card, target, p, lethal);
+            retval += getSpecialCardComboPenalitys(card, target, p, lethal, choice);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
             if (!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
@@ -11314,7 +11313,7 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal)
+        private int getSpecialCardComboPenalitys(CardDB.Card card, int target, Playfield p, bool lethal, int choice)
         {
             string name = card.name;
 
@@ -11438,8 +11437,19 @@ namespace HREngine.Bots
 
             if (name == "frostbolt")
             {
+                if (target >= 10 && target <= 19)
+                {
+                    if (m.handcard.card.cost <= 2)
+                        return 15;
+                }
                 return 15;
             }
+
+            if (!lethal && choice == 1 && name == "druidoftheclaw")
+            {
+                return 20;
+            }
+
 
             if (name == "poweroverwhelming")
             {

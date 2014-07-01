@@ -35,7 +35,7 @@ namespace HREngine.Bots
           retval += p.ownMinions.Count * 10;
           retval -= p.enemyMinions.Count * 10;
 
-          retval += p.ownMaxMana * 10 - p.enemyMaxMana * 10; 
+          retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20; 
 
           if (p.ownHeroHp + p.ownHeroDefence > 10)
           {
@@ -68,7 +68,6 @@ namespace HREngine.Bots
           retval += p.owncarddraw * 5;
           retval -= p.enemycarddraw * 5;
 
-          retval += p.ownMaxMana;
           int owntaunt = 0;
           int ownMinionsCount = 0;
           foreach (Minion m in p.ownMinions)
