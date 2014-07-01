@@ -78,6 +78,21 @@ namespace HREngine.Bots
                HRLog.Write("error in reading Maxwide from settings, please recheck the entry");
            }
 
+           try
+           {
+               bool twots = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.simulateTwoTurns") == "true") ? true : false;
+               if (twots)
+               {
+                   Ai.Instance.setTwoTurnSimulation(twots);
+                   HRLog.Write("activated two turn simulation");
+               }
+
+           }
+           catch
+           {
+               HRLog.Write("error in reading two-turn-simulation from settings");
+           }
+
            HRLog.Write("write to single log file is: " + writeToSingleFile);
 
            bool teststuff = false;

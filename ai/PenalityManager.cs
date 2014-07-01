@@ -675,7 +675,7 @@ namespace HREngine.Bots
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
-            if (p.owncards.Count > 5) return 5;
+            if (p.owncards.Count + p.cardsPlayedThisTurn > 5) return 5;
 
             return -carddraw + p.playactions.Count + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;

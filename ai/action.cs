@@ -613,7 +613,7 @@ namespace HREngine.Bots
             return true;
         }
 
-        public void simulateEnemysTurn()
+        public void simulateEnemysTurn(bool simulateTwoTurns)
         {
             int maxwide = 20;
 
@@ -817,6 +817,12 @@ namespace HREngine.Bots
             }
 
             this.value = bestplay.value;
+            if (simulateTwoTurns)
+            {
+                bestplay.prepareNextTurn();
+                MiniSimulator ms = new MiniSimulator();
+                this.value = (int)(0.5 * bestval + 0.5 * ms.doallmoves(bestplay));
+            }
 
         }
 
@@ -1365,7 +1371,7 @@ namespace HREngine.Bots
 
         }
 
-        public void endTurn()
+        public void endTurn(bool simulateTwoTurns)
         {
             this.value = int.MinValue;
 
@@ -1389,7 +1395,7 @@ namespace HREngine.Bots
             else
             {
                 guessHeroDamage();
-                simulateEnemysTurn();
+                simulateEnemysTurn(simulateTwoTurns);
                 this.complete = true;
             }
             
@@ -1887,6 +1893,14 @@ namespace HREngine.Bots
                 }
             }
 
+            foreach (Minion m in enemymins)
+            {
+                if (m.name == "gruul") // gain +1/+1
+                {
+                    minionGetBuffed(m, 1, 1, !own);
+                }
+            }
+
         }
 
         private void startTurnEffect(bool own)
@@ -2040,7 +2054,8 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        minionGetBuffed(m, 4, 0, false);
+                        minionGetBuffed(m, 4, 4, false);
+                        m.Hp = m.maxHp;
                     }
                     
                 }
@@ -7249,7 +7264,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardData("searingtotem");
                 callKid(kid, posi, false);
             }
 
@@ -7345,6 +7360,7 @@ namespace HREngine.Bots
         public void printBoard()
         {
             Helpfunctions.Instance.logg("board: " + value);
+            Helpfunctions.Instance.logg("pen " + this.evaluatePenality);
             Helpfunctions.Instance.logg("cardsplayed: " + this.cardsPlayedThisTurn + " handsize: " + this.owncards.Count);
             Helpfunctions.Instance.logg("ownhero: ");
             Helpfunctions.Instance.logg("ownherohp: " + this.ownHeroHp + " + " + this.ownHeroDefence);

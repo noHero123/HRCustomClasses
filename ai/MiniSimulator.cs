@@ -1,69 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace HREngine.Bots
 {
-
-
-    public class Ai
+    public class MiniSimulator
     {
-        private int maxdeep = 12;
-        private int maxwide = 3000;
-        public bool simulateEnemyTurn = true;
+        //#####################################################################################################################
+        private int maxdeep = 6;
+        private int maxwide = 10;
+        private int totalboards = 50;
         private bool usePenalityManager = true;
         private bool useCutingTargets = true;
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
-
-        private bool simulateSecondTurn = false;
-
-
-        PenalityManager penman = PenalityManager.Instance;
-
-        List<Playfield> posmoves = new List<Playfield>(7000);
-
-        Hrtprozis hp = Hrtprozis.Instance;
-        Handmanager hm = Handmanager.Instance;
-        Helpfunctions help = Helpfunctions.Instance;
-
-        public Action bestmove = new Action();
+        List<Playfield> posmoves = new List<Playfield>(100);
         public int bestmoveValue = 0;
-        Playfield bestboard = new Playfield();
-        Playfield nextMoveGuess = new Playfield();
-        public Bot botBase = null;
-
-        private static Ai instance;
-
-        public static Ai Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new Ai();
-                }
-                return instance;
-            }
-        }
-
-        private Ai()
-        {
-            this.nextMoveGuess = new Playfield();
-            this.nextMoveGuess.mana = -1;
-        }
-
-        public void setMaxWide(int mw)
-        {
-            this.maxwide = mw;
-            if (maxwide <= 100) this.maxwide = 100;
-        }
-
-        public void setTwoTurnSimulation(bool stts)
-        {
-            this.simulateSecondTurn = stts;
-        }
+        public Bot botBase = Ai.Instance.botBase;
+        private int calculated = 0;
 
         private void addToPosmoves(Playfield pf)
         {
@@ -75,6 +31,7 @@ namespace HREngine.Bots
             this.posmoves.Add(pf);
             //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
+            this.calculated++;
         }
 
         private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
@@ -214,7 +171,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = penman.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
+                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
                                 //help.logg(hc.card.name + " is played");
@@ -238,7 +195,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                cardplayPenality = penman.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
+                                cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     //help.logg(hc.card.name + " is played");
@@ -266,16 +223,20 @@ namespace HREngine.Bots
         }
 
 
-        private void doallmoves(bool test, bool isLethalCheck)
+        public int doallmoves(Playfield playf)
         {
-
+            //Helpfunctions.Instance.logg("NXTTRN" + playf.mana);
+            bool test = false;
+            bool isLethalCheck = false;
+            this.addToPosmoves(playf);
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
-
+            //Helpfunctions.Instance.logg("NXTTRN" + playf.mana + " " + posmoves.Count);
+            this.calculated = 0;
             while (havedonesomething)
             {
-                help.logg("ailoop");
+                //Helpfunctions.Instance.logg("ailoopNXTTRN");
                 GC.Collect();
                 temp.Clear();
                 temp.AddRange(this.posmoves);
@@ -295,6 +256,7 @@ namespace HREngine.Bots
 
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
+                        if (this.calculated > this.totalboards) continue;
                         CardDB.Card c = hc.card;
                         //help.logg("try play crd" + c.name + " " + c.getManaCost(p) + " " + c.canplayCard(p));
                         if (playedcards.Contains(c.name)) continue; // dont play the same card in one loop
@@ -314,7 +276,7 @@ namespace HREngine.Bots
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
-                                if (isLethalCheck && (penman.DamageTargetDatabase.ContainsKey(c.name) || penman.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                if (isLethalCheck && (PenalityManager.Instance.DamageTargetDatabase.ContainsKey(c.name) || PenalityManager.Instance.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
                                 {
                                     targett trg = trgts.Find(x => x.target == 200);
                                     if (trg != null)
@@ -343,7 +305,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = penman.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
+                                        cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             Playfield pf = new Playfield(p);
@@ -380,7 +342,7 @@ namespace HREngine.Bots
 
                                         if (usePenalityManager)
                                         {
-                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
+                                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
                                             if (cardplayPenality <= 499)
                                             {
                                                 Playfield pf = new Playfield(p);
@@ -412,6 +374,7 @@ namespace HREngine.Bots
 
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (this.calculated > this.totalboards) continue;
 
                         if (m.Ready && m.Angr >= 1 && !m.frozen)
                         {
@@ -419,13 +382,13 @@ namespace HREngine.Bots
                             // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
-                            bool isSpecial = penman.specialMinions.ContainsKey(m.name);
+                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
                             foreach (Minion mnn in tempoo)
                             {
                                 // special minions are allowed to attack in silended and unsilenced state!
                                 //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                                bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
 
                                 if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                                 {
@@ -493,7 +456,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    attackPenality = penman.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
+                                    attackPenality = PenalityManager.Instance.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
                                     if (attackPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -523,6 +486,7 @@ namespace HREngine.Bots
                     // attack with hero
                     if (p.ownHeroReady)
                     {
+                        if (this.calculated > this.totalboards) continue;
                         List<targett> trgts = p.getAttackTargets(true);
 
                         havedonesomething = true;
@@ -557,7 +521,7 @@ namespace HREngine.Bots
                             int heroAttackPen = 0;
                             if (usePenalityManager)
                             {
-                                heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
+                                heroAttackPen = PenalityManager.Instance.getAttackWithHeroPenality(trgt.target, p);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             addToPosmoves(pf);
@@ -568,6 +532,7 @@ namespace HREngine.Bots
                     /// TODO check if ready after manaup
                     if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
                     {
+                        if (this.calculated > this.totalboards) continue;
                         int abilityPenality = 0;
 
                         havedonesomething = true;
@@ -604,7 +569,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
+                                    abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
                                     if (abilityPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -630,7 +595,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
+                                abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -656,7 +621,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(simulateSecondTurn);
+                        p.endTurn(false);
                     }
 
                     //sort stupid stuff ouf
@@ -671,6 +636,7 @@ namespace HREngine.Bots
                         posmoves.Remove(p);
                     }
 
+                    if (this.calculated > this.totalboards) break;
                 }
 
                 if (!test && bestoldval >= -10000 && bestold != null)
@@ -678,22 +644,23 @@ namespace HREngine.Bots
                     this.posmoves.Add(bestold);
                 }
 
-                help.loggonoff(true);
+                //Helpfunctions.Instance.loggonoff(true);
                 int donec = 0;
                 foreach (Playfield p in posmoves)
                 {
                     if (p.complete) donec++;
                 }
-                help.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
+                //Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
 
                 if (!test)
                 {
                     cuttingposibilities();
                 }
-                help.logg("cut to len " + this.posmoves.Count);
-                help.loggonoff(false);
+                //Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+                //Helpfunctions.Instance.loggonoff(false);
                 deep++;
 
+                if (this.calculated > this.totalboards) break;
                 if (deep >= this.maxdeep) break;//remove this?
             }
 
@@ -707,87 +674,33 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(simulateSecondTurn);
+                        p.endTurn(false);
                     }
                 }
             }
-
-            int bestval = int.MinValue;
-            int bestanzactions = 1000;
-            Playfield bestplay = posmoves[0];//temp[0]
-            foreach (Playfield p in posmoves)//temp
+            // Helpfunctions.Instance.logg("find best ");
+            if (posmoves.Count >= 1)
             {
-                int val = botBase.getPlayfieldValue(p);
-                if (bestval <= val)
+                int bestval = int.MinValue;
+                int bestanzactions = 1000;
+                Playfield bestplay = posmoves[0];//temp[0]
+                foreach (Playfield p in posmoves)//temp
                 {
-                    if (bestval == val && bestanzactions < p.playactions.Count) continue;
-                    bestplay = p;
-                    bestval = val;
-                    bestanzactions = p.playactions.Count;
-                }
-
-            }
-            help.loggonoff(true);
-            help.logg("-------------------------------------");
-            help.logg("bestPlayvalue " + bestval);
-
-            bestplay.printActions();
-            this.bestmove = bestplay.getNextAction();
-            this.bestmoveValue = bestval;
-            this.bestboard = new Playfield(bestplay);
-            /*if (bestmove != null && bestmove.cardplay && bestmove.handcard.card.type == CardDB.cardtype.MOB)
-            {
-                Playfield pf = new Playfield();
-                help.logg("bestplaces:");
-                pf.getBestPlacePrint(bestmove.card);
-            }*/
-
-            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
-            {
-                this.nextMoveGuess = new Playfield();
-                if (bestmove.cardplay)
-                {
-                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                    Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
-
-                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    int val = botBase.getPlayfieldValue(p);
+                    if (bestval <= val)
                     {
-                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                        if (bestval == val && bestanzactions < p.playactions.Count) continue;
+                        bestplay = p;
+                        bestval = val;
+                        bestanzactions = p.playactions.Count;
                     }
-                    else
-                    {
-                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
-                    }
-                    //this.nextMoveGuess.playCard(bestmove.card, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
 
                 }
-
-                if (bestmove.minionplay)
-                {
-                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                    Minion m = this.nextMoveGuess.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
-                    this.nextMoveGuess.attackWithMinion(m, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-
-                }
-
-                if (bestmove.heroattack)
-                {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-                if (bestmove.useability)
-                {
-                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                    this.nextMoveGuess.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-                this.bestboard.playactions.RemoveAt(0);
+                //Helpfunctions.Instance.logg("return");
+                return bestval;
             }
-            else
-            {
-                nextMoveGuess.mana = -1;
-            }
-
+            //Helpfunctions.Instance.logg("return");
+            return -10000;
         }
 
 
@@ -862,13 +775,13 @@ namespace HREngine.Bots
 
                     bool goingtoadd = true;
                     List<Minion> temp = new List<Minion>(addedmins);
-                    bool isSpecial = penman.specialMinions.ContainsKey(m.name);
+                    bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
                     foreach (Minion mnn in temp)
                     {
                         // special minions are allowed to attack in silended and unsilenced state!
                         //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                        bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
+                        bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
 
                         if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                         {
@@ -909,316 +822,7 @@ namespace HREngine.Bots
             return retvalues;
         }
 
-        private void doNextCalcedMove()
-        {
-            help.logg("noRecalcNeeded!!!-----------------------------------");
-            this.bestboard.printActions();
-            this.bestmove = this.bestboard.getNextAction();
-
-            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
-            {
-                this.nextMoveGuess = new Playfield();
-                if (bestmove.cardplay)
-                {
-                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                    Handmanager.Handcard hc = this.nextMoveGuess.owncards.Find(x => x.entity == bestmove.cardEntitiy);
-                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
-                    {
-                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
-                    }
-                    else
-                    {
-                        this.nextMoveGuess.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
-                    }
-
-
-                }
-
-                if (bestmove.minionplay)
-                {
-                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                    Minion m = this.nextMoveGuess.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
-                    this.nextMoveGuess.attackWithMinion(m, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-
-                }
-
-                if (bestmove.heroattack)
-                {
-                    this.nextMoveGuess.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-                if (bestmove.useability)
-                {
-                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                    this.nextMoveGuess.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-                this.bestboard.playactions.RemoveAt(0);
-            }
-            else
-            {
-                nextMoveGuess.mana = -1;
-            }
-
-        }
-
-        public void dosomethingclever(Bot bbase)
-        {
-            //return;
-            //turncheck
-            //help.moveMouse(950,750);
-            //help.Screenshot();
-            this.botBase = bbase;
-            hp.updatePositions();
-
-            posmoves.Clear();
-            posmoves.Add(new Playfield());
-            posmoves[0].sEnemTurn = this.simulateEnemyTurn;
-            /* foreach (var item in this.posmoves[0].owncards)
-             {
-                 help.logg("card " + item.handcard.card.name + " is playable :" + item.handcard.card.canplayCard(posmoves[0]) + " cost/mana: " + item.handcard.card.cost + "/" + posmoves[0].mana);
-             }
-             */
-            //help.logg("is hero ready?" + posmoves[0].ownHeroReady);
-
-            help.loggonoff(false);
-            //do we need to recalc?
-            help.logg("recalc-check###########");
-            if (this.dontRecalc && posmoves[0].isEqual(this.nextMoveGuess, true))
-            {
-                doNextCalcedMove();
-            }
-            else
-            {
-                help.logg("Leathal-check###########");
-                bestmoveValue = -1000000;
-                DateTime strt = DateTime.Now;
-                if (useLethalCheck)
-                {
-                    strt = DateTime.Now;
-                    doallmoves(false, true);
-                    help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
-                }
-
-                if (bestmoveValue < 10000)
-                {
-                    posmoves.Clear();
-                    posmoves.Add(new Playfield());
-                    posmoves[0].sEnemTurn = this.simulateEnemyTurn;
-                    help.logg("no lethal, do something random######");
-                    strt = DateTime.Now;
-                    doallmoves(false, false);
-                    help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
-
-                }
-            }
-
-
-            //help.logging(true);
-
-        }
-
-        public void autoTester(Bot bbase, bool printstuff)
-        {
-            help.logg("simulating board ");
-
-            BoardTester bt = new BoardTester();
-            this.botBase = bbase;
-            hp.printHero();
-            hp.printOwnMinions();
-            hp.printEnemyMinions();
-            hm.printcards();
-            //calculate the stuff
-            posmoves.Clear();
-            posmoves.Add(new Playfield());
-            posmoves[0].sEnemTurn = this.simulateEnemyTurn;
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
-            help.logg("ownminionscount " + posmoves[0].ownMinions.Count);
-            help.logg("owncardscount " + posmoves[0].owncards.Count);
-
-            foreach (var item in this.posmoves[0].owncards)
-            {
-                help.logg("card " + item.card.name + " is playable :" + item.canplayCard(posmoves[0]) + " cost/mana: " + item.manacost + "/" + posmoves[0].mana);
-            }
-            help.logg("ability " + posmoves[0].ownHeroAblility.name + " is playable :" + posmoves[0].ownHeroAblility.canplayCard(posmoves[0], 2) + " cost/mana: " + posmoves[0].ownHeroAblility.getManaCost(posmoves[0], 2) + "/" + posmoves[0].mana);
-
-            // lethalcheck + normal
-            DateTime strt = DateTime.Now;
-            doallmoves(false, true);
-            help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
-            if (bestmoveValue < 10000)
-            {
-                posmoves.Clear();
-                posmoves.Add(new Playfield());
-                posmoves[0].sEnemTurn = this.simulateEnemyTurn;
-                strt = DateTime.Now;
-                doallmoves(false, false);
-                help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
-            }
-
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
-            help.logg("bestfield");
-            bestboard.printBoard();
-            if(printstuff) simmulateWholeTurn();
-        }
-
-        public void simmulateWholeTurn()
-        {
-            help.logg("simulate best board");
-            //this.bestboard.printActions();
-
-            Playfield tempbestboard = new Playfield();
-
-            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
-            {
-                bestmove.print();
-                if (bestmove.cardplay)
-                {
-                    help.logg("card");
-                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                    Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmove.cardEntitiy);
-                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
-                    {
-                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
-                    }
-                    else
-                    {
-                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
-                    }
-                }
-
-                if (bestmove.minionplay)
-                {
-                    help.logg("min");
-                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                    Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
-                    help.logg("min");
-                    tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                    help.logg("min");
-                }
-
-                if (bestmove.heroattack)
-                {
-                    help.logg("hero");
-                    tempbestboard.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-                if (bestmove.useability)
-                {
-                    help.logg("abi");
-                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                    tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                }
-
-            }
-            else
-            {
-                tempbestboard.mana = -1;
-            }
-            help.logg("-------------");
-            help.logg("OwnMinions:");
-
-
-            foreach (Minion m in tempbestboard.ownMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-            help.logg("EnemyMinions:");
-            foreach (Minion m in tempbestboard.enemyMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-
-
-            foreach (Action bestmovee in bestboard.playactions)
-            {
-
-                help.logg("stepp");
-
-
-                if (bestmovee != null) // save the guessed move, so we doesnt need to recalc!
-                {
-                    bestmovee.print();
-                    if (bestmovee.cardplay)
-                    {
-                        help.logg("card");
-                        //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                        Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmovee.cardEntitiy);
-                        if (bestmovee.owntarget >= 0 && bestmovee.enemytarget >= 0 && bestmovee.enemytarget <= 9 && bestmovee.owntarget < bestmovee.enemytarget)
-                        {
-                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
-                        }
-                        else
-                        {
-                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
-                        }
-                    }
-
-                    if (bestmovee.minionplay)
-                    {
-                        help.logg("min");
-                        //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                        Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
-                        help.logg("min");
-                        tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
-                        help.logg("min");
-                    }
-
-                    if (bestmovee.heroattack)
-                    {
-                        help.logg("hero");
-                        tempbestboard.attackWithWeapon(bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
-                    }
-
-                    if (bestmovee.useability)
-                    {
-                        help.logg("abi");
-                        //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                        tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
-                    }
-
-                }
-                else
-                {
-                    tempbestboard.mana = -1;
-                }
-                help.logg("-------------");
-                help.logg("OwnMinions:");
-                foreach (Minion m in tempbestboard.ownMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
-                help.logg("EnemyMinions:");
-                foreach (Minion m in tempbestboard.enemyMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
-            }
-        }
 
     }
-
 
 }
