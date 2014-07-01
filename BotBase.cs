@@ -18,15 +18,24 @@ namespace HREngine.Bots
        {
            OnBattleStateUpdate = HandleOnBattleStateUpdate;
            OnMulliganStateUpdate = HandleBattleMulliganPhase;
-           bool concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
-           bool writeToSingleFile = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.singleLog") == "true") ? true : false;
+           bool concede = false;
+           bool writeToSingleFile = false;
+           try
+           {
+               concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
+               writeToSingleFile = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.singleLog") == "true") ? true : false;
+           }
+           catch
+           {
+               HRLog.Write("a wild error occurrs! cant read the settings...");
+           }
            try
            {
                this.concedeLvl = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.concedelvl")));
                if (this.concedeLvl >= 20) this.concedeLvl = 20;
                if (concede)
                {
-                   HRLog.Write("concede till lvl " + concedeLvl);
+                   HRLog.Write("concede till rank " + concedeLvl);
                }
            }
            catch
@@ -71,9 +80,21 @@ namespace HREngine.Bots
 
            HRLog.Write("write to single log file is: " + writeToSingleFile);
 
-           if (HRSettings.Get.ReadSetting("silverfish.xml", "uai.teststuff") == "true")
+           bool teststuff = false;
+           bool printstuff = false;
+           try
            {
-               bool printstuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.longteststuff") == "true") ? true : false;
+
+               printstuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.longteststuff") == "true") ? true : false;
+               teststuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.teststuff") == "true") ? true : false;
+           }
+           catch
+           {
+               HRLog.Write("something went wrong with simulating stuff!");
+           }
+
+           if (teststuff)
+           {
                Ai.Instance.autoTester(this, printstuff);
            }
        }

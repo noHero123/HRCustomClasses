@@ -904,6 +904,11 @@ namespace HREngine.Bots
                 }
             }
 
+            if (name == "houndmaster")
+            {
+                if(target == -1) return 50;
+            }
+
             if (name == "bite")
             {
                 if ((p.ownHeroNumAttackThisTurn == 0 || (p.ownHeroWindfury && p.ownHeroNumAttackThisTurn == 1)) && !p.ownHeroFrozen)
