@@ -643,7 +643,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 61;
+        private int versionnumber = 62;
         private bool singleLog = false;
 
 
@@ -13185,12 +13185,16 @@ namespace HREngine.Bots
             public string cardid = "";
             public string enemyclass = "";
             public int howmuch = 2;
+            public string[] requiresCard = null;
+            public int manarule = -1;
 
-            public mulliitem(string id, string enemy, int number)
+            public mulliitem(string id, string enemy, int number, string[] req = null, int mrule = -1)
             {
                 this.cardid = id;
                 this.enemyclass = enemy;
                 this.howmuch = number;
+                this.requiresCard = req;
+                this.manarule = mrule;
             }
         }
 
@@ -13253,13 +13257,28 @@ namespace HREngine.Bots
                         {
                             if (crd.Contains(":"))
                             {
-                                this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1])));
+                                if ((crd.Split(':')).Length == 3)
+                                {
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1]), crd.Split(':')[2].Split('/')));
+                                }
+                                else
+                                {
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1])));
+                                }
+
                             }
                             else
                             {
                                 this.holdlist.Add(new mulliitem(crd, enemyclass, 2));
                             }
                         }
+
+                        if (line.Split(';').Length == 4)
+                        {
+                            int manarule = Convert.ToInt32(line.Split(';')[3]);
+                            this.holdlist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
+                        }
+
                     }
                     catch
                     {
@@ -13277,8 +13296,16 @@ namespace HREngine.Bots
                             string cardlist = line.Split(';')[2];
                             foreach (string crd in cardlist.Split(','))
                             {
+                                if (crd == null || crd == "") continue;
                                 this.deletelist.Add(new mulliitem(crd, enemyclass, 2));
                             }
+
+                            if (line.Split(';').Length == 4)
+                            {
+                                int manarule = Convert.ToInt32(line.Split(';')[3]);
+                                this.deletelist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
+                            }
+
                         }
                         catch
                         {
@@ -13310,6 +13337,16 @@ namespace HREngine.Bots
             {
                 foreach (CardIDEntity c in cards)
                 {
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    {
+                        if (CardDB.Instance.getCardDataFromID(c.id).cost >= mi.manarule)
+                        {
+                            if (discarditems.Contains(c.entitiy)) continue;
+                            discarditems.Add(c.entitiy);
+                        }
+                        continue;
+                    }
+
                     if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
                         if (discarditems.Contains(c.entitiy)) continue;
@@ -13326,18 +13363,63 @@ namespace HREngine.Bots
                 bool delete = true;
                 foreach (mulliitem mi in this.holdlist)
                 {
+
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    {
+                        if (CardDB.Instance.getCardDataFromID(c.id).cost <= mi.manarule)
+                        {
+                            delete = false;
+                        }
+                        continue;
+                    }
+
                     if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (holddic.ContainsKey(c.id)) // we are holding one of the cards
+
+                        if (mi.requiresCard == null)
                         {
-                            if (mi.howmuch == 2)
+
+                            if (holddic.ContainsKey(c.id)) // we are holding one of the cards
+                            {
+                                if (mi.howmuch == 2)
+                                {
+                                    delete = false;
+                                }
+                            }
+                            else
                             {
                                 delete = false;
                             }
                         }
                         else
                         {
-                            delete = false;
+                            bool hasRequirements = false;
+                            foreach (CardIDEntity reqs in cards)
+                            {
+                                foreach (string s in mi.requiresCard)
+                                {
+                                    if (s == reqs.id)
+                                    {
+                                        hasRequirements = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (hasRequirements)
+                            {
+                                if (holddic.ContainsKey(c.id)) // we are holding one of the cards
+                                {
+                                    if (mi.howmuch == 2)
+                                    {
+                                        delete = false;
+                                    }
+                                }
+                                else
+                                {
+                                    delete = false;
+                                }
+                            }
+
                         }
                     }
                 }
@@ -13349,6 +13431,8 @@ namespace HREngine.Bots
                 }
                 else
                 {
+                    discarditems.RemoveAll(x => x == c.entitiy);
+
                     if (holddic.ContainsKey(c.id))
                     {
                         holddic[c.id]++;
