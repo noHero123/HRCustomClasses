@@ -27,7 +27,7 @@ namespace HREngine.Bots
            }
            catch
            {
-               HRLog.Write("a wild error occurrs! cant read the settings...");
+               Helpfunctions.Instance.ErrorLog("a wild error occurrs! cant read the settings...");
            }
            try
            {
@@ -35,12 +35,12 @@ namespace HREngine.Bots
                if (this.concedeLvl >= 20) this.concedeLvl = 20;
                if (concede)
                {
-                   HRLog.Write("concede till rank " + concedeLvl);
+                   Helpfunctions.Instance.ErrorLog("concede till rank " + concedeLvl);
                }
            }
            catch
            {
-               HRLog.Write("cant read your concede-Lvl");
+               Helpfunctions.Instance.ErrorLog("cant read your concede-Lvl");
            }
 
            this.sf = new Silverfish(writeToSingleFile);
@@ -56,12 +56,12 @@ namespace HREngine.Bots
            try
            {
                int enfacehp = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyfacehp")));
-               HRLog.Write("set enemy-face-hp to: " + enfacehp);
+               Helpfunctions.Instance.ErrorLog("set enemy-face-hp to: " + enfacehp);
                ComboBreaker.Instance.attackFaceHP = enfacehp;
            }
            catch
            {
-               HRLog.Write("error in reading enemy-face-hp");
+               Helpfunctions.Instance.ErrorLog("error in reading enemy-face-hp");
            }
 
            try
@@ -70,12 +70,12 @@ namespace HREngine.Bots
                if (mxwde != 3000)
                {
                    Ai.Instance.setMaxWide(mxwde);
-                   HRLog.Write("set maxwide to: " + mxwde);
+                   Helpfunctions.Instance.ErrorLog("set maxwide to: " + mxwde);
                }
            }
            catch
            {
-               HRLog.Write("error in reading Maxwide from settings, please recheck the entry");
+               Helpfunctions.Instance.ErrorLog("error in reading Maxwide from settings, please recheck the entry");
            }
 
            try
@@ -84,16 +84,16 @@ namespace HREngine.Bots
                if (twots)
                {
                    Ai.Instance.setTwoTurnSimulation(twots);
-                   HRLog.Write("activated two turn simulation");
+                   Helpfunctions.Instance.ErrorLog("activated two turn simulation");
                }
 
            }
            catch
            {
-               HRLog.Write("error in reading two-turn-simulation from settings");
+               Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
            }
 
-           HRLog.Write("write to single log file is: " + writeToSingleFile);
+           Helpfunctions.Instance.ErrorLog("write to single log file is: " + writeToSingleFile);
 
            bool teststuff = false;
            bool printstuff = false;
@@ -105,7 +105,7 @@ namespace HREngine.Bots
            }
            catch
            {
-               HRLog.Write("something went wrong with simulating stuff!");
+               Helpfunctions.Instance.ErrorLog("something went wrong with simulating stuff!");
            }
 
            if (teststuff)
@@ -135,27 +135,27 @@ namespace HREngine.Bots
               {
                   int val1 = s.Length;
                   string temp1 = s.Substring(18, (val1 - 18));
-                  HRLog.Write(temp1);
+                  Helpfunctions.Instance.ErrorLog(temp1);
                   totalwin = int.Parse(temp1);
               }
               else if (s.Contains("bot.stats.defeat"))
               {
                   int val2 = s.Length;
                   string temp2 = s.Substring(17, (val2 - 17));
-                  HRLog.Write(temp2);
+                  Helpfunctions.Instance.ErrorLog(temp2);
                   totallose = int.Parse(temp2);
               }
           }
           if (totalwin > totallose)
           {
-              HRLog.Write("not today!");
+              Helpfunctions.Instance.ErrorLog("not today!");
               HRGame.ConcedeGame();
           }*/
           int curlvl = HRPlayer.GetLocalPlayer().GetRank();
           if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
           if(curlvl  < this.concedeLvl)
           {
-              HRLog.Write("not today!");
+                Helpfunctions.Instance.ErrorLog("not today!");
               HRGame.ConcedeGame();
           }
       }
@@ -164,11 +164,11 @@ namespace HREngine.Bots
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {
-          HRLog.Write("handle mulligan");
+          Helpfunctions.Instance.ErrorLog("handle mulligan");
 
           if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
           {
-              HRLog.Write("but we have to wait :D");
+              Helpfunctions.Instance.ErrorLog("but we have to wait :D");
               return null;
           }
 
@@ -192,7 +192,7 @@ namespace HREngine.Bots
                 {
                     if(mullientitys.Contains(item.GetEntity().GetEntityId()))
                     {
-                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
                         HRMulligan.ToggleCard(item);
                     }
                 }
@@ -205,12 +205,12 @@ namespace HREngine.Bots
                 {
                     if (item.GetEntity().GetCost() >= 4)
                     {
-                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
                         HRMulligan.ToggleCard(item);
                     }
                     if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
                     {
-                        HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
                         HRMulligan.ToggleCard(item);
                     }
                 }
@@ -243,7 +243,7 @@ namespace HREngine.Bots
          {
              if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
              {
-                 HRLog.Write("dirty targeting...");
+                 Helpfunctions.Instance.ErrorLog("dirty targeting...");
                  HREntity target = getEntityWithNumber(dirtytarget);
                  
                  dirtytarget = -1;
@@ -358,10 +358,10 @@ namespace HREngine.Bots
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
             {
-                HRLog.Write("end turn");
+                Helpfunctions.Instance.ErrorLog("end turn");
                 return null;
             }
-            HRLog.Write("play action");
+            Helpfunctions.Instance.ErrorLog("play action");
             moveTodo.print();
             if (moveTodo.cardplay)
             {
@@ -369,7 +369,7 @@ namespace HREngine.Bots
                 if (moveTodo.enemytarget >= 0)
                 {
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                    HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                    Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
                     Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " choice: " + moveTodo.druidchoice);
                     if (moveTodo.druidchoice >= 1)
                     {
@@ -388,7 +388,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                    Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
                     Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " choice: " + moveTodo.druidchoice);
                     if (moveTodo.druidchoice >= 1)
                     {
@@ -409,7 +409,7 @@ namespace HREngine.Bots
             {
                 HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
                 HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                HRLog.Write("minion attack: " + attacker.GetName() + " target: " + target.GetName());
+                Helpfunctions.Instance.ErrorLog("minion attack: " + attacker.GetName() + " target: " + target.GetName());
                 Helpfunctions.Instance.logg("minion attack: " + attacker.GetName() + " target: " + target.GetName());
                 return new HREngine.API.Actions.AttackAction(attacker,target);
 
@@ -420,16 +420,15 @@ namespace HREngine.Bots
                 HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
                 HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                 this.dirtytarget = moveTodo.enemyEntitiy;
-                //HRLog.Write("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
-                HRLog.Write("heroattack: " + attacker.GetName() + " target: " + target.GetName());
+                Helpfunctions.Instance.ErrorLog("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                 Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                 if (HRPlayer.GetLocalPlayer().HasWeapon() )
                 {
-                    HRLog.Write("hero attack with weapon");
+                    Helpfunctions.Instance.ErrorLog("hero attack with weapon");
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                 }
-                HRLog.Write("hero attack without weapon");
-                //HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
+                Helpfunctions.Instance.ErrorLog("hero attack without weapon");
+                //Helpfunctions.Instance.ErrorLog("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
                 return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
             }
@@ -441,14 +440,14 @@ namespace HREngine.Bots
                 if (moveTodo.enemytarget >= 0)
                 {
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                    HRLog.Write("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
+                    Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
                     Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
                     return new HREngine.API.Actions.PlayCardAction(cardtoplay, target);
 
                 }
                 else
                 {
-                    HRLog.Write("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                    Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
                     Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
                     return new HREngine.API.Actions.PlayCardAction(cardtoplay);
                 }
@@ -457,8 +456,8 @@ namespace HREngine.Bots
          }
          catch (Exception Exception)
          {
-            HRLog.Write(Exception.Message);
-            HRLog.Write(Environment.StackTrace);
+             Helpfunctions.Instance.ErrorLog(Exception.Message);
+             Helpfunctions.Instance.ErrorLog(Environment.StackTrace);
          }
          return null;
          //HRBattle.FinishRound();

@@ -16,10 +16,48 @@ namespace HREngine.Bots
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
-        List<Playfield> posmoves = new List<Playfield>(100);
+
+        private bool printNormalstuff = false;
+
+        List<Playfield> posmoves = new List<Playfield>(7000);
+
+        public Action bestmove = new Action();
         public int bestmoveValue = 0;
-        public Bot botBase = Ai.Instance.botBase;
+        public Playfield bestboard = new Playfield();
+
+        public Bot botBase = null;
         private int calculated = 0;
+
+        private bool simulateSecondTurn = false;
+
+        PenalityManager pen = PenalityManager.Instance;
+
+        public MiniSimulator()
+        {
+        }
+        public MiniSimulator(int deep, int wide, int ttlboards)
+        {
+            this.maxdeep = deep;
+            this.maxwide = wide;
+            this.totalboards = ttlboards;
+        }
+
+        public void updateParams(int deep, int wide, int ttlboards)
+        {
+            this.maxdeep = deep;
+            this.maxwide = wide;
+            this.totalboards = ttlboards;
+        }
+
+        public void setPrintingstuff(bool sp)
+        {
+            this.printNormalstuff = sp;
+        }
+
+        public void setSecondTurnSimu(bool sts)
+        {
+            this.simulateSecondTurn = sts;
+        }
 
         private void addToPosmoves(Playfield pf)
         {
@@ -31,7 +69,10 @@ namespace HREngine.Bots
             this.posmoves.Add(pf);
             //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
-            this.calculated++;
+            if (this.totalboards >= 1)
+            {
+                this.calculated++;
+            }
         }
 
         private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
@@ -171,7 +212,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
+                            cardplayPenality = pen.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
                                 //help.logg(hc.card.name + " is played");
@@ -195,7 +236,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
+                                cardplayPenality = pen.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     //help.logg(hc.card.name + " is played");
@@ -222,12 +263,12 @@ namespace HREngine.Bots
             return havedonesomething;
         }
 
-
-        public int doallmoves(Playfield playf)
+        public int doallmoves(Playfield playf, bool isLethalCheck)
         {
             //Helpfunctions.Instance.logg("NXTTRN" + playf.mana);
+            if (botBase == null) botBase = Ai.Instance.botBase;
             bool test = false;
-            bool isLethalCheck = false;
+            this.posmoves.Clear();
             this.addToPosmoves(playf);
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
@@ -236,7 +277,7 @@ namespace HREngine.Bots
             this.calculated = 0;
             while (havedonesomething)
             {
-                //Helpfunctions.Instance.logg("ailoopNXTTRN");
+                if (this.printNormalstuff) Helpfunctions.Instance.logg("ailoop");
                 GC.Collect();
                 temp.Clear();
                 temp.AddRange(this.posmoves);
@@ -276,7 +317,7 @@ namespace HREngine.Bots
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
-                                if (isLethalCheck && (PenalityManager.Instance.DamageTargetDatabase.ContainsKey(c.name) || PenalityManager.Instance.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                if (isLethalCheck && (pen.DamageTargetDatabase.ContainsKey(c.name) || pen.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
                                 {
                                     targett trg = trgts.Find(x => x.target == 200);
                                     if (trg != null)
@@ -305,7 +346,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
+                                        cardplayPenality = pen.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             Playfield pf = new Playfield(p);
@@ -342,7 +383,7 @@ namespace HREngine.Bots
 
                                         if (usePenalityManager)
                                         {
-                                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
+                                            cardplayPenality = pen.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
                                             if (cardplayPenality <= 499)
                                             {
                                                 Playfield pf = new Playfield(p);
@@ -382,13 +423,13 @@ namespace HREngine.Bots
                             // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
-                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                            bool isSpecial = pen.specialMinions.ContainsKey(m.name);
                             foreach (Minion mnn in tempoo)
                             {
                                 // special minions are allowed to attack in silended and unsilenced state!
                                 //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+                                bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
 
                                 if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                                 {
@@ -456,7 +497,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    attackPenality = PenalityManager.Instance.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
+                                    attackPenality = pen.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
                                     if (attackPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -521,7 +562,7 @@ namespace HREngine.Bots
                             int heroAttackPen = 0;
                             if (usePenalityManager)
                             {
-                                heroAttackPen = PenalityManager.Instance.getAttackWithHeroPenality(trgt.target, p);
+                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             addToPosmoves(pf);
@@ -569,7 +610,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
+                                    abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
                                     if (abilityPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -595,7 +636,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
+                                abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -621,7 +662,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(false);
+                        p.endTurn(this.simulateSecondTurn);
                     }
 
                     //sort stupid stuff ouf
@@ -645,18 +686,25 @@ namespace HREngine.Bots
                 }
 
                 //Helpfunctions.Instance.loggonoff(true);
-                int donec = 0;
-                foreach (Playfield p in posmoves)
+                if (this.printNormalstuff)
                 {
-                    if (p.complete) donec++;
+                    int donec = 0;
+                    foreach (Playfield p in posmoves)
+                    {
+                        if (p.complete) donec++;
+                    }
+                    Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
                 }
-                //Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
 
                 if (!test)
                 {
                     cuttingposibilities();
                 }
-                //Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+
+                if (this.printNormalstuff)
+                {
+                    Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+                }
                 //Helpfunctions.Instance.loggonoff(false);
                 deep++;
 
@@ -674,7 +722,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(false);
+                        p.endTurn(this.simulateSecondTurn);
                     }
                 }
             }
@@ -696,13 +744,19 @@ namespace HREngine.Bots
                     }
 
                 }
+
+                this.bestmove = bestplay.getNextAction();
+                this.bestmoveValue = bestval;
+                this.bestboard = new Playfield(bestplay);
                 //Helpfunctions.Instance.logg("return");
                 return bestval;
             }
             //Helpfunctions.Instance.logg("return");
+            this.bestmove = null;
+            this.bestmoveValue = -100000;
+            this.bestboard = playf;
             return -10000;
         }
-
 
         public void cuttingposibilities()
         {
@@ -743,7 +797,6 @@ namespace HREngine.Bots
 
         }
 
-
         public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
         {
             List<targett> retvalues = new List<targett>();
@@ -775,13 +828,13 @@ namespace HREngine.Bots
 
                     bool goingtoadd = true;
                     List<Minion> temp = new List<Minion>(addedmins);
-                    bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                    bool isSpecial = pen.specialMinions.ContainsKey(m.name);
                     foreach (Minion mnn in temp)
                     {
                         // special minions are allowed to attack in silended and unsilenced state!
                         //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                        bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+                        bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
 
                         if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                         {
@@ -822,6 +875,13 @@ namespace HREngine.Bots
             return retvalues;
         }
 
+        public void printPosmoves()
+        {
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+        }
 
     }
 

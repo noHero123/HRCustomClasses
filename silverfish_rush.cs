@@ -35,7 +35,7 @@ namespace HREngine.Bots
             }
             catch
             {
-                HRLog.Write("a wild error occurrs! cant read the settings...");
+                Helpfunctions.Instance.ErrorLog("a wild error occurrs! cant read the settings...");
             }
             try
             {
@@ -43,12 +43,12 @@ namespace HREngine.Bots
                 if (this.concedeLvl >= 20) this.concedeLvl = 20;
                 if (concede)
                 {
-                    HRLog.Write("concede till rank " + concedeLvl);
+                    Helpfunctions.Instance.ErrorLog("concede till rank " + concedeLvl);
                 }
             }
             catch
             {
-                HRLog.Write("cant read your concede-Lvl");
+                Helpfunctions.Instance.ErrorLog("cant read your concede-Lvl");
             }
 
             this.sf = new Silverfish(writeToSingleFile);
@@ -64,12 +64,12 @@ namespace HREngine.Bots
             try
             {
                 int enfacehp = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyfacehp")));
-                HRLog.Write("set enemy-face-hp to: " + enfacehp);
+                Helpfunctions.Instance.ErrorLog("set enemy-face-hp to: " + enfacehp);
                 ComboBreaker.Instance.attackFaceHP = enfacehp;
             }
             catch
             {
-                HRLog.Write("error in reading enemy-face-hp");
+                Helpfunctions.Instance.ErrorLog("error in reading enemy-face-hp");
             }
 
             try
@@ -78,12 +78,12 @@ namespace HREngine.Bots
                 if (mxwde != 3000)
                 {
                     Ai.Instance.setMaxWide(mxwde);
-                    HRLog.Write("set maxwide to: " + mxwde);
+                    Helpfunctions.Instance.ErrorLog("set maxwide to: " + mxwde);
                 }
             }
             catch
             {
-                HRLog.Write("error in reading Maxwide from settings, please recheck the entry");
+                Helpfunctions.Instance.ErrorLog("error in reading Maxwide from settings, please recheck the entry");
             }
 
             try
@@ -92,15 +92,16 @@ namespace HREngine.Bots
                 if (twots)
                 {
                     Ai.Instance.setTwoTurnSimulation(twots);
-                    HRLog.Write("activated two turn simulation");
+                    Helpfunctions.Instance.ErrorLog("activated two turn simulation");
                 }
+
             }
             catch
             {
-                HRLog.Write("error in reading two-turn-simulation from settings");
+                Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
             }
 
-            HRLog.Write("write to single log file is: " + writeToSingleFile);
+            Helpfunctions.Instance.ErrorLog("write to single log file is: " + writeToSingleFile);
 
             bool teststuff = false;
             bool printstuff = false;
@@ -112,7 +113,7 @@ namespace HREngine.Bots
             }
             catch
             {
-                HRLog.Write("something went wrong with simulating stuff!");
+                Helpfunctions.Instance.ErrorLog("something went wrong with simulating stuff!");
             }
 
             if (teststuff)
@@ -243,27 +244,27 @@ namespace HREngine.Bots
                 {
                     int val1 = s.Length;
                     string temp1 = s.Substring(18, (val1 - 18));
-                    HRLog.Write(temp1);
+                    Helpfunctions.Instance.ErrorLog(temp1);
                     totalwin = int.Parse(temp1);
                 }
                 else if (s.Contains("bot.stats.defeat"))
                 {
                     int val2 = s.Length;
                     string temp2 = s.Substring(17, (val2 - 17));
-                    HRLog.Write(temp2);
+                    Helpfunctions.Instance.ErrorLog(temp2);
                     totallose = int.Parse(temp2);
                 }
             }
             if (totalwin > totallose)
             {
-                HRLog.Write("not today!");
+                Helpfunctions.Instance.ErrorLog("not today!");
                 HRGame.ConcedeGame();
             }*/
             int curlvl = HRPlayer.GetLocalPlayer().GetRank();
             if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
             if (curlvl < this.concedeLvl)
             {
-                HRLog.Write("not today!");
+                Helpfunctions.Instance.ErrorLog("not today!");
                 HRGame.ConcedeGame();
             }
         }
@@ -271,11 +272,11 @@ namespace HREngine.Bots
 
         private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
         {
-            HRLog.Write("handle mulligan");
+            Helpfunctions.Instance.ErrorLog("handle mulligan");
 
             if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
             {
-                HRLog.Write("but we have to wait :D");
+                Helpfunctions.Instance.ErrorLog("but we have to wait :D");
                 return null;
             }
 
@@ -299,7 +300,7 @@ namespace HREngine.Bots
                     {
                         if (mullientitys.Contains(item.GetEntity().GetEntityId()))
                         {
-                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
                             HRMulligan.ToggleCard(item);
                         }
                     }
@@ -312,12 +313,12 @@ namespace HREngine.Bots
                     {
                         if (item.GetEntity().GetCost() >= 4)
                         {
-                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
                             HRMulligan.ToggleCard(item);
                         }
                         if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
                         {
-                            HRLog.Write("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
                             HRMulligan.ToggleCard(item);
                         }
                     }
@@ -350,7 +351,7 @@ namespace HREngine.Bots
             {
                 if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
                 {
-                    HRLog.Write("dirty targeting...");
+                    Helpfunctions.Instance.ErrorLog("dirty targeting...");
                     HREntity target = getEntityWithNumber(dirtytarget);
 
                     dirtytarget = -1;
@@ -469,10 +470,10 @@ namespace HREngine.Bots
                 Action moveTodo = Ai.Instance.bestmove;
                 if (moveTodo == null)
                 {
-                    HRLog.Write("end turn");
+                    Helpfunctions.Instance.ErrorLog("end turn");
                     return null;
                 }
-                HRLog.Write("play action");
+                Helpfunctions.Instance.ErrorLog("play action");
                 moveTodo.print();
                 if (moveTodo.cardplay)
                 {
@@ -480,7 +481,7 @@ namespace HREngine.Bots
                     if (moveTodo.enemytarget >= 0)
                     {
                         HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
+                        Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
                         Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " choice: " + moveTodo.druidchoice);
                         if (moveTodo.druidchoice >= 1)
                         {
@@ -499,7 +500,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        HRLog.Write("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                        Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
                         Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " choice: " + moveTodo.druidchoice);
                         if (moveTodo.druidchoice >= 1)
                         {
@@ -520,7 +521,7 @@ namespace HREngine.Bots
                 {
                     HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                    HRLog.Write("minion attack: " + attacker.GetName() + " target: " + target.GetName());
+                    Helpfunctions.Instance.ErrorLog("minion attack: " + attacker.GetName() + " target: " + target.GetName());
                     Helpfunctions.Instance.logg("minion attack: " + attacker.GetName() + " target: " + target.GetName());
                     return new HREngine.API.Actions.AttackAction(attacker, target);
 
@@ -531,16 +532,16 @@ namespace HREngine.Bots
                     HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
                     HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                     this.dirtytarget = moveTodo.enemyEntitiy;
-                    //HRLog.Write("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
-                    HRLog.Write("heroattack: " + attacker.GetName() + " target: " + target.GetName());
+                    //Helpfunctions.Instance.ErrorLog("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
+                    Helpfunctions.Instance.ErrorLog("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                     Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                     if (HRPlayer.GetLocalPlayer().HasWeapon())
                     {
-                        HRLog.Write("hero attack with weapon");
+                        Helpfunctions.Instance.ErrorLog("hero attack with weapon");
                         return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
                     }
-                    HRLog.Write("hero attack without weapon");
-                    //HRLog.Write("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
+                    Helpfunctions.Instance.ErrorLog("hero attack without weapon");
+                    //Helpfunctions.Instance.ErrorLog("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
                     return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
 
                 }
@@ -552,14 +553,14 @@ namespace HREngine.Bots
                     if (moveTodo.enemytarget >= 0)
                     {
                         HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                        HRLog.Write("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
+                        Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
                         Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay, target);
 
                     }
                     else
                     {
-                        HRLog.Write("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
+                        Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
                         Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
                         return new HREngine.API.Actions.PlayCardAction(cardtoplay);
                     }
@@ -568,8 +569,8 @@ namespace HREngine.Bots
             }
             catch (Exception Exception)
             {
-                HRLog.Write(Exception.Message);
-                HRLog.Write(Environment.StackTrace);
+                Helpfunctions.Instance.ErrorLog(Exception.Message);
+                Helpfunctions.Instance.ErrorLog(Environment.StackTrace);
             }
             return null;
             //HRBattle.FinishRound();
@@ -642,7 +643,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 60;
+        private int versionnumber = 61;
         private bool singleLog = false;
 
 
@@ -704,7 +705,7 @@ namespace HREngine.Bots
         public Silverfish(bool snglLg)
         {
             this.singleLog = snglLg;
-            HRLog.Write("init Silverfish");
+            Helpfunctions.Instance.ErrorLog("init Silverfish");
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
             sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Bots" + System.IO.Path.DirectorySeparatorChar + "silver" + System.IO.Path.DirectorySeparatorChar);
@@ -774,9 +775,9 @@ namespace HREngine.Bots
             Handmanager.Instance.printcards();
 
             // calculate stuff
-            HRLog.Write("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            Helpfunctions.Instance.ErrorLog("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
-            HRLog.Write("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            Helpfunctions.Instance.ErrorLog("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
 
         }
 
@@ -851,7 +852,7 @@ namespace HREngine.Bots
             this.heroHasWindfury = ownhero.HasWindfury();
             //int numberofattacks = ownhero.GetNumAttacksThisTurn();
 
-            //HRLog.Write(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
+            //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
             if (exausted == true)
             {
@@ -876,7 +877,7 @@ namespace HREngine.Bots
                     this.heroImmuneToDamageWhileAttacking = true;
                 }
 
-                //HRLog.Write("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
+                //Helpfunctions.Instance.ErrorLog("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
 
             }
 
@@ -928,7 +929,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetCardType() == HRCardType.MINION && zp >= 1)
                 {
-                    //HRLog.Write("zonepos " + zp);
+                    //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
                     Minion m = new Minion();
                     m.name = c.name;
@@ -973,7 +974,7 @@ namespace HREngine.Bots
 
                     m.enchantments.Clear();
 
-                    //HRLog.Write(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
+                    //Helpfunctions.Instance.ErrorLog(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
@@ -1009,7 +1010,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetCardType() == HRCardType.WEAPON)
                 {
-                    //HRLog.Write("found weapon!");
+                    //Helpfunctions.Instance.ErrorLog("found weapon!");
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
                     {
                         this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name;
@@ -1065,7 +1066,7 @@ namespace HREngine.Bots
                     if (m.entitiyID == bhu.GetAttached())
                     {
                         m.enchantments.Add(ench);
-                        //HRLog.Write("add enchantment " +bhu.GetCardId()+" to: " + m.entitiyID);
+                        //Helpfunctions.Instance.ErrorLog("add enchantment " +bhu.GetCardId()+" to: " + m.entitiyID);
                     }
 
                 }
@@ -1804,7 +1805,7 @@ namespace HREngine.Bots
 
                             if (true)//(this.useCutingTargets)
                             {
-                                trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                                trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
                             }
 
                             foreach (targett trgt in trgts)
@@ -1835,7 +1836,7 @@ namespace HREngine.Bots
 
                         if (true)//(this.useCutingTargets)
                         {
-                            trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                            trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
                         }
 
                         foreach (targett trgt in trgts)
@@ -1921,8 +1922,7 @@ namespace HREngine.Bots
             if (simulateTwoTurns)
             {
                 bestplay.prepareNextTurn();
-                MiniSimulator ms = new MiniSimulator();
-                this.value = (int)(0.5 * bestval + 0.5 * ms.doallmoves(bestplay));
+                this.value = (int)(0.5 * bestval + 0.5 * Ai.Instance.nextTurnSimulator.doallmoves(bestplay, false));
             }
 
         }
@@ -2540,7 +2540,7 @@ namespace HREngine.Bots
 
                     //call 3 snakes (if possible)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
@@ -2609,7 +2609,7 @@ namespace HREngine.Bots
                 {
                     //summon snake ( a weak minion)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
                     callKid(kid, posi, true);
                 }
                 if (secretID == "tt_010") //spellbender
@@ -2652,7 +2652,7 @@ namespace HREngine.Bots
                 {
                     //spawn a 2/1 taunt!
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("frostwolfgrunt");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_121");//frostwolfgrunt
                     callKid(kid, posi, true);
                     this.ownMinions[this.ownMinions.Count - 1].maxHp = 1;
                     this.ownMinions[this.ownMinions.Count - 1].Hp = 1;
@@ -2923,7 +2923,7 @@ namespace HREngine.Bots
                 if (m.name == "hogger") // summon
                 {
                     int posi = m.id;
-                    CardDB.Card kid = CardDB.Instance.getCardData("gnoll");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_040t");//gnoll
                     callKid(kid, posi, own);
                 }
 
@@ -2933,7 +2933,7 @@ namespace HREngine.Bots
                     if (m.Hp == 1) posi--;
                     minionGetDamagedOrHealed(m, 1, 0, own);
 
-                    CardDB.Card kid = CardDB.Instance.getCardData("imp");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_598");//imp
                     callKid(kid, posi, own);
                 }
 
@@ -3736,20 +3736,20 @@ namespace HREngine.Bots
                 //real deathrattles
                 if (m.handcard.card.CardID == "EX1_534")//m.name == "savannenhochmaehne"
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("hyena");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_534t");//hyena
                     callKid(c, m.id - 1, own);
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == "harvestgolem")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("damagedgolem");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("skele21");//damagedgolem
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == "cairnebloodhoof")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("bainebloodhoof");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_110");//bainebloodhoof
                     callKid(c, m.id - 1, own);
                     //penaltity for summon this thing :D (so we dont kill it only to have a new minion)
                     this.evaluatePenality += 5;
@@ -3759,7 +3759,7 @@ namespace HREngine.Bots
 
                 if (m.name == "thebeast")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("finkleeinhorn");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_finkle");//finkleeinhorn
                     callKid(c, m.id - 1, own);
 
                 }
@@ -3824,7 +3824,7 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        CardDB.Card c = CardDB.Instance.getCardData("ashbringer");
+                        CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_383t");//ashbringer
                         this.equipWeapon(c);
                     }
                     else
@@ -3878,7 +3878,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.nerubianegg)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("nerubian");
+                    CardDB.Card c = CardDB.Instance.getCardData("nerubian");//nerubian
                     callKid(c, m.id - 1, own);
                 }
                 if (m.handcard.card.specialMin == CardDB.specialMinions.dancingswords)
@@ -3913,7 +3913,7 @@ namespace HREngine.Bots
                     {
                         if (enemyAnzCards + enemycarddraw >= 1)
                         {
-                            CardDB.Card c = CardDB.Instance.getCardData("felguard");
+                            CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_301");//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
                         }
                     }
@@ -5405,7 +5405,7 @@ namespace HREngine.Bots
 
             if (c.name == "arathiweaponsmith")
             {
-                CardDB.Card wcard = CardDB.Instance.getCardData("battleaxe");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_398t");//battleaxe
                 this.equipWeapon(wcard);
 
 
@@ -5640,28 +5640,28 @@ namespace HREngine.Bots
             if (c.name == "murloctidehunter")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("murlocscout");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_506a");//murlocscout
                 callKid(kid, position, own);
 
             }
             if (c.name == "razorfenhunter")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("boar");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_boar");//boar
                 callKid(kid, position, own);
 
             }
             if (c.name == "dragonlingmechanic")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("mechanicaldragonling");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_025t");//mechanicaldragonling
                 callKid(kid, position, own);
 
             }
             if (c.name == "leeroyjenkins")
             {
                 kids = 2;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
                 int pos = this.ownMinions.Count - 1;
                 if (own) pos = this.enemyMinions.Count - 1;
                 callKid(kid, pos, !own);
@@ -5682,14 +5682,14 @@ namespace HREngine.Bots
             if (c.name == "silverhandknight")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("squire");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_152");//squire
                 callKid(kid, position, own);
 
             }
             if (c.name == "gelbinmekkatorque")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("homingchicken");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("Mekka1");//homingchicken
                 callKid(kid, position, own);
 
             }
@@ -5697,19 +5697,18 @@ namespace HREngine.Bots
             if (c.name == "defiasringleader" && this.cardsPlayedThisTurn >= 1) //needs combo for spawn
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("defiasbandit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_131t");//defiasbandit
                 callKid(kid, position, own);
 
             }
             if (c.name == "onyxia")
             {
                 kids = 7 - this.ownMinions.Count;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
                 for (int i = 0; i < kids; i++)
                 {
                     callKid(kid, position, own);
                 }
-
 
             }
             return kids;
@@ -6429,7 +6428,7 @@ namespace HREngine.Bots
                 if (getSpellDamageDamage(2) >= m.Hp && !m.divineshild && !m.immune)
                 {
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("bloodimp");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_059");//bloodimp
                     callKid(kid, posi, true);
                 }
             }
@@ -6719,7 +6718,7 @@ namespace HREngine.Bots
             }
             if (c.name == "animalcompanion")
             {
-                CardDB.Card c2 = CardDB.Instance.getCardData("misha");
+                CardDB.Card c2 = CardDB.Instance.getCardDataFromID("NEW1_032");//misha
                 int placeoffather = this.ownMinions.Count - 1;
                 callKid(c2, placeoffather, true);
             }
@@ -6743,7 +6742,7 @@ namespace HREngine.Bots
             {
                 int anz = this.enemyMinions.Count;
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("hound");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_538t");//hound
                 for (int i = 0; i < anz; i++)
                 {
                     callKid(kid, posi, true);
@@ -6836,7 +6835,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    CardDB.Card wcard = CardDB.Instance.getCardData("heavyaxe");
+                    CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_409t");//heavyaxe
                     this.equipWeapon(wcard);
                 }
 
@@ -7267,7 +7266,7 @@ namespace HREngine.Bots
             if (c.name == "feralspirit")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("spiritwolf");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk11");//spiritwolf
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
@@ -7791,7 +7790,7 @@ namespace HREngine.Bots
                 if (m.handcard.card.specialMin == CardDB.specialMinions.violetteacher)
                 {
 
-                    CardDB.Card d = CardDB.Instance.getCardData("violetapprentice");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID("NEW1_026t");//violetapprentice
                     callKid(d, m.id, true);
                 }
 
@@ -7946,7 +7945,7 @@ namespace HREngine.Bots
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.illidanstormrage)
                 {
-                    CardDB.Card d = CardDB.Instance.getCardData("flameofazzinoth");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID("EX1_614t");//flameofazzinoth
                     callKid(d, mnn.id, true);
                 }
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.questingadventurer)
@@ -8175,7 +8174,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");
                 this.equipWeapon(wcard);
             }
 
@@ -8198,21 +8197,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_009");//healingtotem
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
                 callKid(kid, posi, true);
             }
 
@@ -8328,7 +8327,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");//wickedknife
                 this.enemyheroAngr = wcard.Attack;
                 this.enemyWeaponAttack = wcard.Attack;
                 this.enemyWeaponDurability = wcard.Durability;
@@ -8358,21 +8357,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("searingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_050");//searingtotem
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
                 callKid(kid, posi, false);
             }
 
@@ -8549,8 +8548,8 @@ namespace HREngine.Bots
         private bool useLethalCheck = true;
         private bool useComparison = true;
 
-        private bool simulateSecondTurn = false;
-
+        public MiniSimulator nextTurnSimulator;
+        MiniSimulator mainTurnSimulator;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -8584,681 +8583,30 @@ namespace HREngine.Bots
         {
             this.nextMoveGuess = new Playfield();
             this.nextMoveGuess.mana = -1;
+            this.nextTurnSimulator = new MiniSimulator();
+            this.mainTurnSimulator = new MiniSimulator(maxdeep, maxwide, 0); // 0 for unlimited
+            this.mainTurnSimulator.setPrintingstuff(true);
         }
 
         public void setMaxWide(int mw)
         {
             this.maxwide = mw;
             if (maxwide <= 100) this.maxwide = 100;
+            this.mainTurnSimulator.updateParams(maxdeep, maxwide, 0);
         }
 
         public void setTwoTurnSimulation(bool stts)
         {
-            this.simulateSecondTurn = stts;
+            this.mainTurnSimulator.setSecondTurnSimu(stts);
         }
-
-        private void addToPosmoves(Playfield pf)
-        {
-            if (pf.ownHeroHp <= 0) return;
-            /*foreach (Playfield p in this.posmoves)
-            {
-                if (pf.isEqual(p, false)) return;
-            }*/
-            this.posmoves.Add(pf);
-            //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
-            //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
-        }
-
-        private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
-        {
-            bool havedonesomething = false;
-
-            for (int i = 1; i < 3; i++)
-            {
-                CardDB.Card c = hc.card;
-                if (c.name == "keeperofthegrove")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
-                    }
-                }
-
-                if (c.name == "starfall")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007b");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007a");
-                    }
-                }
-
-                if (c.name == "ancientoflore")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008b");
-                    }
-                }
-
-                if (c.name == "powerofthewild")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160b");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160a");
-                    }
-                }
-                if (c.name == "ancientofwar")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178b");
-                    }
-                }
-                if (c.name == "druidoftheclaw")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t1");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t2");
-                    }
-                }
-                //cenarius dont need
-                if (c.name == "keeperofthegrove")//keeper of the grove
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
-                    }
-                }
-                if (c.name == "markofnature")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155b");
-                    }
-                }
-                if (c.name == "nourish")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164b");
-                    }
-                }
-                if (c.name == "wrath")
-                {
-                    if (i == 1)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154a");
-                    }
-                    if (i == 2)
-                    {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154b");
-                    }
-                }
-
-                if (c.canplayCard(p, hc.manacost))
-                {
-                    havedonesomething = true;
-
-
-
-                    int bestplace = p.getBestPlace(c, lethalcheck);
-                    List<targett> trgts = c.getTargetsForCard(p);
-                    int cardplayPenality = 0;
-                    if (trgts.Count == 0)
-                    {
-
-
-                        if (usePenalityManager)
-                        {
-                            cardplayPenality = penman.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
-                            if (cardplayPenality <= 499)
-                            {
-                                //help.logg(hc.card.name + " is played");
-                                Playfield pf = new Playfield(p);
-                                pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                                addToPosmoves(pf);
-                            }
-                        }
-                        else
-                        {
-                            Playfield pf = new Playfield(p);
-                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
-                            addToPosmoves(pf);
-                        }
-
-                    }
-                    else
-                    {
-                        foreach (targett trgt in trgts)
-                        {
-
-                            if (usePenalityManager)
-                            {
-                                cardplayPenality = penman.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
-                                if (cardplayPenality <= 499)
-                                {
-                                    //help.logg(hc.card.name + " is played");
-                                    Playfield pf = new Playfield(p);
-                                    pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                    addToPosmoves(pf);
-                                }
-                            }
-                            else
-                            {
-                                Playfield pf = new Playfield(p);
-                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
-                                addToPosmoves(pf);
-                            }
-
-                        }
-                    }
-
-                }
-
-            }
-
-
-            return havedonesomething;
-        }
-
 
         private void doallmoves(bool test, bool isLethalCheck)
         {
+            this.mainTurnSimulator.doallmoves(this.posmoves[0], isLethalCheck);
 
-            bool havedonesomething = true;
-            List<Playfield> temp = new List<Playfield>();
-            int deep = 0;
+            Playfield bestplay = this.mainTurnSimulator.bestboard;
+            int bestval = this.mainTurnSimulator.bestmoveValue;
 
-            while (havedonesomething)
-            {
-                help.logg("ailoop");
-                GC.Collect();
-                temp.Clear();
-                temp.AddRange(this.posmoves);
-                havedonesomething = false;
-                Playfield bestold = null;
-                int bestoldval = -20000000;
-                foreach (Playfield p in temp)
-                {
-
-                    if (p.complete || p.ownHeroHp <= 0)
-                    {
-                        continue;
-                    }
-
-                    //take a card and play it
-                    List<string> playedcards = new List<string>();
-
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        CardDB.Card c = hc.card;
-                        //help.logg("try play crd" + c.name + " " + c.getManaCost(p) + " " + c.canplayCard(p));
-                        if (playedcards.Contains(c.name)) continue; // dont play the same card in one loop
-                        playedcards.Add(c.name);
-                        if (c.choice)
-                        {
-                            if (doAllChoices(p, hc, isLethalCheck))
-                            {
-                                havedonesomething = true;
-                            }
-                        }
-                        else
-                        {
-                            int bestplace = p.getBestPlace(c, isLethalCheck);
-                            if (hc.canplayCard(p))
-                            {
-                                havedonesomething = true;
-                                List<targett> trgts = c.getTargetsForCard(p);
-
-                                if (isLethalCheck && (penman.DamageTargetDatabase.ContainsKey(c.name) || penman.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
-                                {
-                                    targett trg = trgts.Find(x => x.target == 200);
-                                    if (trg != null)
-                                    {
-                                        trgts.Clear();
-                                        trgts.Add(trg);
-                                    }
-                                    else
-                                    {
-                                        // no enemy hero -> enemy have taunts ->kill the taunts from left to right
-                                        if (trgts.Count >= 1)
-                                        {
-                                            trg = trgts[0];
-                                            trgts.Clear();
-                                            trgts.Add(trg);
-                                        }
-                                    }
-                                }
-
-
-                                int cardplayPenality = 0;
-
-                                if (trgts.Count == 0)
-                                {
-
-
-                                    if (usePenalityManager)
-                                    {
-                                        cardplayPenality = penman.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
-                                        if (cardplayPenality <= 499)
-                                        {
-                                            Playfield pf = new Playfield(p);
-                                            havedonesomething = true;
-                                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                            addToPosmoves(pf);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Playfield pf = new Playfield(p);
-                                        havedonesomething = true;
-                                        pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
-                                        addToPosmoves(pf);
-                                    }
-
-
-                                }
-                                else
-                                {
-                                    if (isLethalCheck)// only target enemy hero during Lethal check!
-                                    {
-                                        targett trg = trgts.Find(x => x.target == 200);
-                                        if (trg != null)
-                                        {
-                                            trgts.Clear();
-                                            trgts.Add(trg);
-                                        }
-                                    }
-
-                                    foreach (targett trgt in trgts)
-                                    {
-
-
-                                        if (usePenalityManager)
-                                        {
-                                            cardplayPenality = penman.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
-                                            if (cardplayPenality <= 499)
-                                            {
-                                                Playfield pf = new Playfield(p);
-                                                havedonesomething = true;
-                                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                                addToPosmoves(pf);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Playfield pf = new Playfield(p);
-                                            havedonesomething = true;
-                                            pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                            addToPosmoves(pf);
-                                        }
-
-                                    }
-
-                                }
-
-
-                            }
-                        }
-                    }
-
-                    //attack with a minion
-
-                    List<Minion> playedMinions = new List<Minion>(8);
-
-                    foreach (Minion m in p.ownMinions)
-                    {
-
-                        if (m.Ready && m.Angr >= 1 && !m.frozen)
-                        {
-                            //BEGIN:cut (double/similar) attacking minions out#####################################
-                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
-                            List<Minion> tempoo = new List<Minion>(playedMinions);
-                            bool dontattacked = true;
-                            bool isSpecial = penman.specialMinions.ContainsKey(m.name);
-                            foreach (Minion mnn in tempoo)
-                            {
-                                // special minions are allowed to attack in silended and unsilenced state!
-                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
-
-                                bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
-
-                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
-                                {
-                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
-                                    continue;
-                                }
-
-                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
-                                {
-                                    if (m.name != mnn.name) // different name -> take it
-                                    {
-                                        continue;
-                                    }
-                                    // same name -> test whether they are equal
-                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
-                                    continue;
-                                }
-
-                            }
-
-                            if (dontattacked)
-                            {
-                                playedMinions.Add(m);
-                            }
-                            else
-                            {
-                                //help.logg(m.name + " doesnt need to attack!");
-                                continue;
-                            }
-                            //END: cut (double/similar) attacking minions out#####################################
-
-                            //help.logg(m.name + " is going to attack!");
-                            List<targett> trgts = p.getAttackTargets(true);
-
-
-                            if (isLethalCheck)// only target enemy hero during Lethal check!
-                            {
-                                targett trg = trgts.Find(x => x.target == 200);
-                                if (trg != null)
-                                {
-                                    trgts.Clear();
-                                    trgts.Add(trg);
-                                }
-                                else
-                                {
-                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
-                                    if (trgts.Count >= 1)
-                                    {
-                                        trg = trgts[0];
-                                        trgts.Clear();
-                                        trgts.Add(trg);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
-                            }
-
-                            foreach (targett trgt in trgts)
-                            {
-
-
-                                int attackPenality = 0;
-
-                                if (usePenalityManager)
-                                {
-                                    attackPenality = penman.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
-                                    if (attackPenality <= 499)
-                                    {
-                                        Playfield pf = new Playfield(p);
-                                        havedonesomething = true;
-                                        pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                        addToPosmoves(pf);
-                                    }
-                                }
-                                else
-                                {
-                                    Playfield pf = new Playfield(p);
-                                    havedonesomething = true;
-                                    pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
-                                    addToPosmoves(pf);
-                                }
-
-
-                            }
-                            if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
-                            {
-                                break;
-                            }
-                        }
-
-                    }
-
-                    // attack with hero
-                    if (p.ownHeroReady)
-                    {
-                        List<targett> trgts = p.getAttackTargets(true);
-
-                        havedonesomething = true;
-
-                        if (isLethalCheck)// only target enemy hero during Lethal check!
-                        {
-                            targett trg = trgts.Find(x => x.target == 200);
-                            if (trg != null)
-                            {
-                                trgts.Clear();
-                                trgts.Add(trg);
-                            }
-                            else
-                            {
-                                // no enemy hero -> enemy have taunts ->kill the taunts from left to right
-                                if (trgts.Count >= 1)
-                                {
-                                    trg = trgts[0];
-                                    trgts.Clear();
-                                    trgts.Add(trg);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
-                        }
-
-                        foreach (targett trgt in trgts)
-                        {
-                            Playfield pf = new Playfield(p);
-                            int heroAttackPen = 0;
-                            if (usePenalityManager)
-                            {
-                                heroAttackPen = penman.getAttackWithHeroPenality(trgt.target, p);
-                            }
-                            pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
-                            addToPosmoves(pf);
-                        }
-                    }
-
-                    // use ability
-                    /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
-                    {
-                        int abilityPenality = 0;
-
-                        havedonesomething = true;
-                        // if we have mage or priest, we have to target something####################################################
-                        if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
-                        {
-
-                            List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
-
-                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
-                            {
-                                targett trg = trgts.Find(x => x.target == 200);
-                                if (trg != null)
-                                {
-                                    trgts.Clear();
-                                    trgts.Add(trg);
-                                }
-                                else
-                                {
-                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
-                                    if (trgts.Count >= 1)
-                                    {
-                                        trg = trgts[0];
-                                        trgts.Clear();
-                                        trgts.Add(trg);
-                                    }
-                                }
-                            }
-
-                            foreach (targett trgt in trgts)
-                            {
-
-
-
-                                if (usePenalityManager)
-                                {
-                                    abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
-                                    if (abilityPenality <= 499)
-                                    {
-                                        Playfield pf = new Playfield(p);
-                                        havedonesomething = true;
-                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                        addToPosmoves(pf);
-                                    }
-                                }
-                                else
-                                {
-                                    Playfield pf = new Playfield(p);
-                                    havedonesomething = true;
-                                    pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                    addToPosmoves(pf);
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            // the other classes dont have to target####################################################
-                            Playfield pf = new Playfield(p);
-
-                            if (usePenalityManager)
-                            {
-                                abilityPenality = penman.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
-                                if (abilityPenality <= 499)
-                                {
-                                    havedonesomething = true;
-                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                    addToPosmoves(pf);
-                                }
-                            }
-                            else
-                            {
-                                havedonesomething = true;
-                                pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                addToPosmoves(pf);
-                            }
-
-                        }
-
-                    }
-
-
-                    if (isLethalCheck)
-                    {
-                        p.complete = true;
-                    }
-                    else
-                    {
-                        p.endTurn(simulateSecondTurn);
-                    }
-
-                    //sort stupid stuff ouf
-
-                    if (botBase.getPlayfieldValue(p) > bestoldval)
-                    {
-                        bestoldval = botBase.getPlayfieldValue(p);
-                        bestold = p;
-                    }
-                    if (!test)
-                    {
-                        posmoves.Remove(p);
-                    }
-
-                }
-
-                if (!test && bestoldval >= -10000 && bestold != null)
-                {
-                    this.posmoves.Add(bestold);
-                }
-
-                help.loggonoff(true);
-                int donec = 0;
-                foreach (Playfield p in posmoves)
-                {
-                    if (p.complete) donec++;
-                }
-                help.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
-
-                if (!test)
-                {
-                    cuttingposibilities();
-                }
-                help.logg("cut to len " + this.posmoves.Count);
-                help.loggonoff(false);
-                deep++;
-
-                if (deep >= this.maxdeep) break;//remove this?
-            }
-
-            foreach (Playfield p in posmoves)//temp
-            {
-                if (!p.complete)
-                {
-                    if (isLethalCheck)
-                    {
-                        p.complete = true;
-                    }
-                    else
-                    {
-                        p.endTurn(simulateSecondTurn);
-                    }
-                }
-            }
-
-            int bestval = int.MinValue;
-            int bestanzactions = 1000;
-            Playfield bestplay = posmoves[0];//temp[0]
-            foreach (Playfield p in posmoves)//temp
-            {
-                int val = botBase.getPlayfieldValue(p);
-                if (bestval <= val)
-                {
-                    if (bestval == val && bestanzactions < p.playactions.Count) continue;
-                    bestplay = p;
-                    bestval = val;
-                    bestanzactions = p.playactions.Count;
-                }
-
-            }
             help.loggonoff(true);
             help.logg("-------------------------------------");
             help.logg("bestPlayvalue " + bestval);
@@ -9267,12 +8615,6 @@ namespace HREngine.Bots
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
             this.bestboard = new Playfield(bestplay);
-            /*if (bestmove != null && bestmove.cardplay && bestmove.handcard.card.type == CardDB.cardtype.MOB)
-            {
-                Playfield pf = new Playfield();
-                help.logg("bestplaces:");
-                pf.getBestPlacePrint(bestmove.card);
-            }*/
 
             if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
             {
@@ -9320,125 +8662,6 @@ namespace HREngine.Bots
                 nextMoveGuess.mana = -1;
             }
 
-        }
-
-
-        public void cuttingposibilities()
-        {
-            // take the x best values
-            int takenumber = this.maxwide;
-            List<Playfield> temp = new List<Playfield>();
-            posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
-
-            if (this.useComparison)
-            {
-                int i = 0;
-                foreach (Playfield p in posmoves)
-                {
-                    bool found = false;
-                    foreach (Playfield pp in temp)
-                    {
-                        if (pp.isEqual(p, false))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) temp.Add(p);
-                    i++;
-                    if (i >= this.maxwide) break;
-
-                }
-            }
-            else
-            {
-                temp.AddRange(posmoves);
-            }
-
-            posmoves.Clear();
-            posmoves.AddRange(temp.GetRange(0, Math.Min(takenumber, temp.Count)));
-            //posmoves.Clear();
-            //posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
-
-        }
-
-
-        public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
-        {
-            List<targett> retvalues = new List<targett>();
-            List<Minion> addedmins = new List<Minion>(8);
-
-            bool priomins = false;
-            List<targett> retvaluesPrio = new List<targett>();
-            foreach (targett t in oldlist)
-            {
-                if ((own && t.target == 200) || (!own && t.target == 100))
-                {
-                    retvalues.Add(t);
-                    continue;
-                }
-                if ((own && t.target >= 10 && t.target <= 19) || (!own && t.target >= 0 && t.target <= 9))
-                {
-                    Minion m = null;
-                    if (own) m = p.enemyMinions[t.target - 10];
-                    if (!own) m = p.ownMinions[t.target];
-                    /*if (penman.priorityDatabase.ContainsKey(m.name))
-                    {
-                        //retvalues.Add(t);
-                        retvaluesPrio.Add(t);
-                        priomins = true;
-                        //help.logg(m.name + " is added to targetlist");
-                        continue;
-                    }*/
-
-
-                    bool goingtoadd = true;
-                    List<Minion> temp = new List<Minion>(addedmins);
-                    bool isSpecial = penman.specialMinions.ContainsKey(m.name);
-                    foreach (Minion mnn in temp)
-                    {
-                        // special minions are allowed to attack in silended and unsilenced state!
-                        //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
-
-                        bool otherisSpecial = penman.specialMinions.ContainsKey(mnn.name);
-
-                        if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
-                        {
-                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
-                            continue;
-                        }
-
-                        if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
-                        {
-                            if (m.name != mnn.name) // different name -> take it
-                            {
-                                continue;
-                            }
-                            // same name -> test whether they are equal
-                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
-                            continue;
-                        }
-
-                    }
-
-                    if (goingtoadd)
-                    {
-                        addedmins.Add(m);
-                        retvalues.Add(t);
-                        //help.logg(m.name + " " + m.id +" is added to targetlist");
-                    }
-                    else
-                    {
-                        //help.logg(m.name + " is not needed to attack");
-                        continue;
-                    }
-
-                }
-            }
-            //help.logg("end targetcutting");
-            if (priomins) return retvaluesPrio;
-
-            return retvalues;
         }
 
         private void doNextCalcedMove()
@@ -9591,10 +8814,8 @@ namespace HREngine.Bots
                 help.logg("calculated " + (DateTime.Now - strt).TotalSeconds);
             }
 
-            foreach (Playfield p in this.posmoves)
-            {
-                p.printBoard();
-            }
+            this.mainTurnSimulator.printPosmoves();
+
             help.logg("bestfield");
             bestboard.printBoard();
             if (printstuff) simmulateWholeTurn();
@@ -9763,10 +8984,48 @@ namespace HREngine.Bots
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
-        List<Playfield> posmoves = new List<Playfield>(100);
+
+        private bool printNormalstuff = false;
+
+        List<Playfield> posmoves = new List<Playfield>(7000);
+
+        public Action bestmove = new Action();
         public int bestmoveValue = 0;
-        public Bot botBase = Ai.Instance.botBase;
+        public Playfield bestboard = new Playfield();
+
+        public Bot botBase = null;
         private int calculated = 0;
+
+        private bool simulateSecondTurn = false;
+
+        PenalityManager pen = PenalityManager.Instance;
+
+        public MiniSimulator()
+        {
+        }
+        public MiniSimulator(int deep, int wide, int ttlboards)
+        {
+            this.maxdeep = deep;
+            this.maxwide = wide;
+            this.totalboards = ttlboards;
+        }
+
+        public void updateParams(int deep, int wide, int ttlboards)
+        {
+            this.maxdeep = deep;
+            this.maxwide = wide;
+            this.totalboards = ttlboards;
+        }
+
+        public void setPrintingstuff(bool sp)
+        {
+            this.printNormalstuff = sp;
+        }
+
+        public void setSecondTurnSimu(bool sts)
+        {
+            this.simulateSecondTurn = sts;
+        }
 
         private void addToPosmoves(Playfield pf)
         {
@@ -9778,7 +9037,10 @@ namespace HREngine.Bots
             this.posmoves.Add(pf);
             //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
             //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
-            this.calculated++;
+            if (this.totalboards >= 1)
+            {
+                this.calculated++;
+            }
         }
 
         private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
@@ -9918,7 +9180,7 @@ namespace HREngine.Bots
 
                         if (usePenalityManager)
                         {
-                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
+                            cardplayPenality = pen.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
                             if (cardplayPenality <= 499)
                             {
                                 //help.logg(hc.card.name + " is played");
@@ -9942,7 +9204,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                cardplayPenality = PenalityManager.Instance.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
+                                cardplayPenality = pen.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
                                 if (cardplayPenality <= 499)
                                 {
                                     //help.logg(hc.card.name + " is played");
@@ -9969,12 +9231,12 @@ namespace HREngine.Bots
             return havedonesomething;
         }
 
-
-        public int doallmoves(Playfield playf)
+        public int doallmoves(Playfield playf, bool isLethalCheck)
         {
             //Helpfunctions.Instance.logg("NXTTRN" + playf.mana);
+            if (botBase == null) botBase = Ai.Instance.botBase;
             bool test = false;
-            bool isLethalCheck = false;
+            this.posmoves.Clear();
             this.addToPosmoves(playf);
             bool havedonesomething = true;
             List<Playfield> temp = new List<Playfield>();
@@ -9983,7 +9245,7 @@ namespace HREngine.Bots
             this.calculated = 0;
             while (havedonesomething)
             {
-                //Helpfunctions.Instance.logg("ailoopNXTTRN");
+                if (this.printNormalstuff) Helpfunctions.Instance.logg("ailoop");
                 GC.Collect();
                 temp.Clear();
                 temp.AddRange(this.posmoves);
@@ -10023,7 +9285,7 @@ namespace HREngine.Bots
                                 havedonesomething = true;
                                 List<targett> trgts = c.getTargetsForCard(p);
 
-                                if (isLethalCheck && (PenalityManager.Instance.DamageTargetDatabase.ContainsKey(c.name) || PenalityManager.Instance.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                if (isLethalCheck && (pen.DamageTargetDatabase.ContainsKey(c.name) || pen.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
                                 {
                                     targett trg = trgts.Find(x => x.target == 200);
                                     if (trg != null)
@@ -10052,7 +9314,7 @@ namespace HREngine.Bots
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
+                                        cardplayPenality = pen.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
                                         if (cardplayPenality <= 499)
                                         {
                                             Playfield pf = new Playfield(p);
@@ -10089,7 +9351,7 @@ namespace HREngine.Bots
 
                                         if (usePenalityManager)
                                         {
-                                            cardplayPenality = PenalityManager.Instance.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
+                                            cardplayPenality = pen.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
                                             if (cardplayPenality <= 499)
                                             {
                                                 Playfield pf = new Playfield(p);
@@ -10129,13 +9391,13 @@ namespace HREngine.Bots
                             // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
                             List<Minion> tempoo = new List<Minion>(playedMinions);
                             bool dontattacked = true;
-                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                            bool isSpecial = pen.specialMinions.ContainsKey(m.name);
                             foreach (Minion mnn in tempoo)
                             {
                                 // special minions are allowed to attack in silended and unsilenced state!
                                 //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+                                bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
 
                                 if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                                 {
@@ -10203,7 +9465,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    attackPenality = PenalityManager.Instance.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
+                                    attackPenality = pen.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
                                     if (attackPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -10268,7 +9530,7 @@ namespace HREngine.Bots
                             int heroAttackPen = 0;
                             if (usePenalityManager)
                             {
-                                heroAttackPen = PenalityManager.Instance.getAttackWithHeroPenality(trgt.target, p);
+                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             addToPosmoves(pf);
@@ -10316,7 +9578,7 @@ namespace HREngine.Bots
 
                                 if (usePenalityManager)
                                 {
-                                    abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
+                                    abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
                                     if (abilityPenality <= 499)
                                     {
                                         Playfield pf = new Playfield(p);
@@ -10342,7 +9604,7 @@ namespace HREngine.Bots
 
                             if (usePenalityManager)
                             {
-                                abilityPenality = PenalityManager.Instance.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
+                                abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
                                 if (abilityPenality <= 499)
                                 {
                                     havedonesomething = true;
@@ -10368,7 +9630,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(false);
+                        p.endTurn(this.simulateSecondTurn);
                     }
 
                     //sort stupid stuff ouf
@@ -10392,18 +9654,25 @@ namespace HREngine.Bots
                 }
 
                 //Helpfunctions.Instance.loggonoff(true);
-                int donec = 0;
-                foreach (Playfield p in posmoves)
+                if (this.printNormalstuff)
                 {
-                    if (p.complete) donec++;
+                    int donec = 0;
+                    foreach (Playfield p in posmoves)
+                    {
+                        if (p.complete) donec++;
+                    }
+                    Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
                 }
-                //Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
 
                 if (!test)
                 {
                     cuttingposibilities();
                 }
-                //Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+
+                if (this.printNormalstuff)
+                {
+                    Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+                }
                 //Helpfunctions.Instance.loggonoff(false);
                 deep++;
 
@@ -10421,7 +9690,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(false);
+                        p.endTurn(this.simulateSecondTurn);
                     }
                 }
             }
@@ -10443,13 +9712,19 @@ namespace HREngine.Bots
                     }
 
                 }
+
+                this.bestmove = bestplay.getNextAction();
+                this.bestmoveValue = bestval;
+                this.bestboard = new Playfield(bestplay);
                 //Helpfunctions.Instance.logg("return");
                 return bestval;
             }
             //Helpfunctions.Instance.logg("return");
+            this.bestmove = null;
+            this.bestmoveValue = -100000;
+            this.bestboard = playf;
             return -10000;
         }
-
 
         public void cuttingposibilities()
         {
@@ -10490,7 +9765,6 @@ namespace HREngine.Bots
 
         }
 
-
         public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
         {
             List<targett> retvalues = new List<targett>();
@@ -10522,13 +9796,13 @@ namespace HREngine.Bots
 
                     bool goingtoadd = true;
                     List<Minion> temp = new List<Minion>(addedmins);
-                    bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                    bool isSpecial = pen.specialMinions.ContainsKey(m.name);
                     foreach (Minion mnn in temp)
                     {
                         // special minions are allowed to attack in silended and unsilenced state!
                         //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
 
-                        bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+                        bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
 
                         if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
                         {
@@ -10569,9 +9843,15 @@ namespace HREngine.Bots
             return retvalues;
         }
 
+        public void printPosmoves()
+        {
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+        }
 
     }
-
 
     public class Handmanager
     {
@@ -13377,6 +12657,12 @@ namespace HREngine.Bots
             return dtDateTime;
         }
 
+        public void ErrorLog(string s)
+        {
+            HREngine.API.Utilities.HRLog.Write(s);
+        }
+
+
     }
 
     public class ComboBreaker
@@ -13755,9 +13041,11 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find _combo.txt");
+                Helpfunctions.Instance.ErrorLog("cant find _combo.txt (if you dont created your own combos, ignore this message)");
                 return;
             }
             Helpfunctions.Instance.logg("read _combo.txt...");
+            Helpfunctions.Instance.ErrorLog("read _combo.txt...");
             foreach (string line in lines)
             {
 
@@ -13770,6 +13058,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
                     }
                 }
                 else
@@ -13782,6 +13071,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
                     }
                 }
 
@@ -13940,9 +13230,11 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find _mulligan.txt");
+                Helpfunctions.Instance.ErrorLog("cant find _mulligan.txt (if you dont created your own mulliganfile, ignore this message)");
                 return;
             }
             Helpfunctions.Instance.logg("read _mulligan.txt...");
+            Helpfunctions.Instance.ErrorLog("read _mulligan.txt...");
             foreach (string line in lines)
             {
                 if (line.StartsWith("loser"))
@@ -13972,6 +13264,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
                     }
                 }
                 else
@@ -13990,6 +13283,7 @@ namespace HREngine.Bots
                         catch
                         {
                             Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
                         }
                     }
                     else
@@ -14717,6 +14011,7 @@ namespace HREngine.Bots
         }
 
         List<Card> cardlist = new List<Card>();
+        Dictionary<string, Card> cardidToCardList = new Dictionary<string, Card>();
 
         private static CardDB instance;
 
@@ -14742,9 +14037,12 @@ namespace HREngine.Bots
             }
             catch
             {
-                Helpfunctions.Instance.logg("cant find carddb.txt");
+                Helpfunctions.Instance.logg("cant find _carddb.txt");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("cant find _carddb.txt");
             }
             cardlist.Clear();
+            this.cardidToCardList.Clear();
             Card c = new Card();
             int de = 0;
             bool targettext = false;
@@ -14770,6 +14068,10 @@ namespace HREngine.Bots
                     {
                         //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
+                        if (!this.cardidToCardList.ContainsKey(c.CardID))
+                        {
+                            this.cardidToCardList.Add(c.CardID, c);
+                        }
                     }
 
                 }
@@ -15291,39 +14593,13 @@ namespace HREngine.Bots
 
         public Card getCardDataFromID(string id)
         {
-            string target = id;
-            Card c = new Card();
-
-            foreach (Card ca in this.cardlist)
+            if (this.cardidToCardList.ContainsKey(id))
             {
-                if (ca.CardID == target)
-                {
-                    return ca;
-                }
+                return new Card(cardidToCardList[id]);
             }
 
-            return new Card(c);
+            return new Card();
         }
-
-        private void rdtxt()
-        {
-
-            foreach (Card c in this.cardlist)
-            {
-                if (c.description.Contains("karte") && c.description.Contains("zieht"))
-                {
-                    c.carddraw = 1;
-                }
-                if (c.description.Contains("waehlt aus") && c.description.Contains("oder"))
-                {
-                    c.choice = true;
-                }
-
-
-
-            }
-        }
-
 
         public static Enchantment getEnchantmentFromCardID(string cardID)
         {
@@ -15919,6 +15195,7 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find test.txt");
+                Helpfunctions.Instance.ErrorLog("cant find test.txt");
                 return;
             }
 

@@ -90,6 +90,11 @@ namespace HREngine.Bots
             return dtDateTime;
         }
 
+        public void ErrorLog(string s)
+        {
+            HREngine.API.Utilities.HRLog.Write(s);
+        }
+
     }
 
 }

@@ -69,9 +69,11 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find _mulligan.txt");
+                Helpfunctions.Instance.ErrorLog("cant find _mulligan.txt (if you dont created your own mulliganfile, ignore this message)");
                 return;
             }
             Helpfunctions.Instance.logg("read _mulligan.txt...");
+            Helpfunctions.Instance.ErrorLog("read _mulligan.txt...");
             foreach (string line in lines)
             {
                 if (line.StartsWith("loser"))
@@ -101,6 +103,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
                     }
                 }
                 else
@@ -119,6 +122,7 @@ namespace HREngine.Bots
                         catch
                         {
                             Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
                         }
                     }
                     else

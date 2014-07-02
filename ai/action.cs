@@ -703,7 +703,7 @@ namespace HREngine.Bots
 
                             if (true)//(this.useCutingTargets)
                             {
-                                trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                                trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
                             }
 
                             foreach (targett trgt in trgts)
@@ -734,7 +734,7 @@ namespace HREngine.Bots
 
                         if (true)//(this.useCutingTargets)
                         {
-                            trgts = Ai.Instance.cutAttackTargets(trgts, p, false);
+                            trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
                         }
 
                         foreach (targett trgt in trgts)
@@ -820,8 +820,7 @@ namespace HREngine.Bots
             if (simulateTwoTurns)
             {
                 bestplay.prepareNextTurn();
-                MiniSimulator ms = new MiniSimulator();
-                this.value = (int)(0.5 * bestval + 0.5 * ms.doallmoves(bestplay));
+                this.value = (int)(0.5 * bestval + 0.5 * Ai.Instance.nextTurnSimulator.doallmoves(bestplay, false));
             }
 
         }
@@ -1439,7 +1438,7 @@ namespace HREngine.Bots
 
                     //call 3 snakes (if possible)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
@@ -1508,7 +1507,7 @@ namespace HREngine.Bots
                 {
                     //summon snake ( a weak minion)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("snake");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
                     callKid(kid, posi, true);
                 }
                 if (secretID == "tt_010") //spellbender
@@ -1551,7 +1550,7 @@ namespace HREngine.Bots
                 {
                     //spawn a 2/1 taunt!
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("frostwolfgrunt");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_121");//frostwolfgrunt
                     callKid(kid, posi, true);
                     this.ownMinions[this.ownMinions.Count - 1].maxHp = 1;
                     this.ownMinions[this.ownMinions.Count - 1].Hp = 1;
@@ -1822,7 +1821,7 @@ namespace HREngine.Bots
                 if (m.name == "hogger") // summon
                 {
                     int posi = m.id;
-                    CardDB.Card kid = CardDB.Instance.getCardData("gnoll");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_040t");//gnoll
                     callKid(kid, posi, own);
                 }
 
@@ -1832,7 +1831,7 @@ namespace HREngine.Bots
                     if (m.Hp == 1) posi--;
                     minionGetDamagedOrHealed(m, 1, 0, own);
 
-                    CardDB.Card kid = CardDB.Instance.getCardData("imp");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_598");//imp
                     callKid(kid, posi, own);
                 }
 
@@ -2635,20 +2634,20 @@ namespace HREngine.Bots
                 //real deathrattles
                 if (m.handcard.card.CardID == "EX1_534")//m.name == "savannenhochmaehne"
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("hyena");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_534t");//hyena
                     callKid(c, m.id - 1, own);
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == "harvestgolem")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("damagedgolem");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("skele21");//damagedgolem
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == "cairnebloodhoof")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("bainebloodhoof");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_110");//bainebloodhoof
                     callKid(c, m.id - 1, own);
                     //penaltity for summon this thing :D (so we dont kill it only to have a new minion)
                     this.evaluatePenality += 5;
@@ -2658,7 +2657,7 @@ namespace HREngine.Bots
 
                 if (m.name == "thebeast")
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("finkleeinhorn");
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_finkle");//finkleeinhorn
                     callKid(c, m.id - 1, own);
 
                 }
@@ -2723,7 +2722,7 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        CardDB.Card c = CardDB.Instance.getCardData("ashbringer");
+                        CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_383t");//ashbringer
                         this.equipWeapon(c);
                     }
                     else
@@ -2777,7 +2776,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.specialMin == CardDB.specialMinions.nerubianegg)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData("nerubian");
+                    CardDB.Card c = CardDB.Instance.getCardData("nerubian");//nerubian
                     callKid(c, m.id - 1, own);
                 }
                 if (m.handcard.card.specialMin == CardDB.specialMinions.dancingswords)
@@ -2812,7 +2811,7 @@ namespace HREngine.Bots
                     {
                         if (enemyAnzCards + enemycarddraw >= 1)
                         {
-                            CardDB.Card c = CardDB.Instance.getCardData("felguard");
+                            CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_301");//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
                         }
                     }
@@ -4304,7 +4303,7 @@ namespace HREngine.Bots
 
             if (c.name == "arathiweaponsmith")
             {
-                CardDB.Card wcard = CardDB.Instance.getCardData("battleaxe");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_398t");//battleaxe
                 this.equipWeapon(wcard);
                 
 
@@ -4539,28 +4538,28 @@ namespace HREngine.Bots
             if (c.name == "murloctidehunter")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("murlocscout");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_506a");//murlocscout
                 callKid(kid, position, own);
 
             }
             if (c.name == "razorfenhunter")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("boar");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_boar");//boar
                 callKid(kid, position, own);
 
             }
             if (c.name == "dragonlingmechanic")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("mechanicaldragonling");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_025t");//mechanicaldragonling
                 callKid(kid, position, own);
 
             }
             if (c.name == "leeroyjenkins")
             {
                 kids = 2;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
                 int pos = this.ownMinions.Count - 1;
                 if (own) pos = this.enemyMinions.Count - 1;
                 callKid(kid, pos, !own);
@@ -4581,14 +4580,14 @@ namespace HREngine.Bots
             if (c.name == "silverhandknight")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("squire");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_152");//squire
                 callKid(kid, position, own);
 
             }
             if (c.name == "gelbinmekkatorque")
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("homingchicken");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("Mekka1");//homingchicken
                 callKid(kid, position, own);
 
             }
@@ -4596,19 +4595,18 @@ namespace HREngine.Bots
             if (c.name == "defiasringleader" && this.cardsPlayedThisTurn >= 1) //needs combo for spawn
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("defiasbandit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_131t");//defiasbandit
                 callKid(kid, position, own);
 
             }
             if (c.name == "onyxia")
             {
                 kids = 7 - this.ownMinions.Count;
-                CardDB.Card kid = CardDB.Instance.getCardData("whelp");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
                 for (int i = 0; i < kids; i++)
                 {
                     callKid(kid, position, own);
                 }
-
 
             }
             return kids;
@@ -5328,7 +5326,7 @@ namespace HREngine.Bots
                 if (getSpellDamageDamage(2) >= m.Hp && !m.divineshild && !m.immune)
                 {
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardData("bloodimp");
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_059");//bloodimp
                     callKid(kid, posi, true);
                 }
             }
@@ -5618,7 +5616,7 @@ namespace HREngine.Bots
             }
             if (c.name == "animalcompanion")
             {
-                CardDB.Card c2 = CardDB.Instance.getCardData("misha");
+                CardDB.Card c2 = CardDB.Instance.getCardDataFromID("NEW1_032");//misha
                 int placeoffather = this.ownMinions.Count - 1;
                 callKid(c2, placeoffather, true);
             }
@@ -5642,7 +5640,7 @@ namespace HREngine.Bots
             {
                 int anz = this.enemyMinions.Count;
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("hound");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_538t");//hound
                 for (int i = 0; i < anz; i++)
                 {
                     callKid(kid, posi, true);
@@ -5735,7 +5733,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    CardDB.Card wcard = CardDB.Instance.getCardData("heavyaxe");
+                    CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_409t");//heavyaxe
                     this.equipWeapon(wcard);
                 }
 
@@ -6166,7 +6164,7 @@ namespace HREngine.Bots
             if (c.name == "feralspirit")
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("spiritwolf");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk11");//spiritwolf
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
@@ -6690,7 +6688,7 @@ namespace HREngine.Bots
                 if (m.handcard.card.specialMin == CardDB.specialMinions.violetteacher)
                 {
 
-                    CardDB.Card d = CardDB.Instance.getCardData("violetapprentice");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID("NEW1_026t");//violetapprentice
                     callKid(d, m.id, true);
                 }
 
@@ -6845,7 +6843,7 @@ namespace HREngine.Bots
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.illidanstormrage)
                 {
-                    CardDB.Card d = CardDB.Instance.getCardData("flameofazzinoth");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID("EX1_614t");//flameofazzinoth
                     callKid(d, mnn.id, true);
                 }
                 if (mnn.handcard.card.specialMin == CardDB.specialMinions.questingadventurer)
@@ -7074,7 +7072,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");
                 this.equipWeapon(wcard);
             }
 
@@ -7097,21 +7095,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("healingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_009");//healingtotem
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
                 callKid(kid, posi, true);
             }
 
@@ -7227,7 +7225,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardData("wickedknife");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");//wickedknife
                 this.enemyheroAngr = wcard.Attack;
                 this.enemyWeaponAttack = wcard.Attack;
                 this.enemyWeaponDurability = wcard.Durability;
@@ -7257,21 +7255,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("silverhandrecruit");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("searingtotem");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_050");//searingtotem
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardData("infernal");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
                 callKid(kid, posi, false);
             }
 

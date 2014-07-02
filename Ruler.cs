@@ -134,8 +134,8 @@ namespace HREngine.Bots
             }
             catch (Exception e)
             {
-                HRLog.Write("Exception when deserialize XML Rule.");
-                HRLog.Write(e.Message);
+                Helpfunctions.Instance.ErrorLog("Exception when deserialize XML Rule.");
+                Helpfunctions.Instance.ErrorLog(e.Message);
             }
 
             return null;

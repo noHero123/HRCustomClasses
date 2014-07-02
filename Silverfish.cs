@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 60;
+        private int versionnumber = 61;
         private bool singleLog = false;
 
 
@@ -73,7 +73,7 @@ namespace HREngine.Bots
         public Silverfish( bool snglLg)
         {
             this.singleLog = snglLg;
-            HRLog.Write("init Silverfish");
+            Helpfunctions.Instance.ErrorLog("init Silverfish");
             string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
             System.IO.Directory.CreateDirectory(path);
             sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Bots" + System.IO.Path.DirectorySeparatorChar + "silver" + System.IO.Path.DirectorySeparatorChar);
@@ -143,9 +143,9 @@ namespace HREngine.Bots
             Handmanager.Instance.printcards();
 
             // calculate stuff
-            HRLog.Write("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            Helpfunctions.Instance.ErrorLog("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
-            HRLog.Write("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            Helpfunctions.Instance.ErrorLog("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
 
         }
 
@@ -220,7 +220,7 @@ namespace HREngine.Bots
             this.heroHasWindfury = ownhero.HasWindfury();
             //int numberofattacks = ownhero.GetNumAttacksThisTurn();
 
-            //HRLog.Write(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
+            //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
             if (exausted == true)
             {
@@ -245,7 +245,7 @@ namespace HREngine.Bots
                     this.heroImmuneToDamageWhileAttacking = true;
                 }
 
-                //HRLog.Write("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
+                //Helpfunctions.Instance.ErrorLog("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
 
             }
 
@@ -297,7 +297,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetCardType() == HRCardType.MINION && zp >= 1)
                 {
-                    //HRLog.Write("zonepos " + zp);
+                    //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
                     Minion m = new Minion();
                     m.name = c.name;
@@ -342,7 +342,7 @@ namespace HREngine.Bots
 
                     m.enchantments.Clear();
 
-                    //HRLog.Write(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
+                    //Helpfunctions.Instance.ErrorLog(  m.name + " ready params ex: " + m.exhausted + " charge: " +m.charge + " attcksthisturn: " + m.numAttacksThisTurn + " playedthisturn " + m.playedThisTurn );
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
@@ -378,7 +378,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetCardType() == HRCardType.WEAPON)
                 {
-                    //HRLog.Write("found weapon!");
+                    //Helpfunctions.Instance.ErrorLog("found weapon!");
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
                     {
                         this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name;
@@ -434,7 +434,7 @@ namespace HREngine.Bots
                     if (m.entitiyID == bhu.GetAttached())
                     {
                         m.enchantments.Add(ench);
-                        //HRLog.Write("add enchantment " +bhu.GetCardId()+" to: " + m.entitiyID);
+                        //Helpfunctions.Instance.ErrorLog("add enchantment " +bhu.GetCardId()+" to: " + m.entitiyID);
                     }
 
                 }

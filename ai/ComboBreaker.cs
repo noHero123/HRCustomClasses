@@ -382,9 +382,11 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find _combo.txt");
+                Helpfunctions.Instance.ErrorLog("cant find _combo.txt (if you dont created your own combos, ignore this message)");
                 return;
             }
             Helpfunctions.Instance.logg("read _combo.txt...");
+            Helpfunctions.Instance.ErrorLog("read _combo.txt...");
             foreach (string line in lines)
             {
 
@@ -397,6 +399,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
                     }
                 }
                 else
@@ -409,6 +412,7 @@ namespace HREngine.Bots
                     catch
                     {
                         Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
                     }
                 }
 

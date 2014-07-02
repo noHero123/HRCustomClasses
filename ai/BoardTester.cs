@@ -62,6 +62,7 @@ namespace HREngine.Bots
             catch
             {
                 Helpfunctions.Instance.logg("cant find test.txt");
+                Helpfunctions.Instance.ErrorLog("cant find test.txt");
                 return;
             }
 
@@ -486,7 +487,5 @@ namespace HREngine.Bots
 
 
     }
-
-
 
 }

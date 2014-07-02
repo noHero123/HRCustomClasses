@@ -657,6 +657,7 @@ namespace HREngine.Bots
         }
 
         List<Card> cardlist = new List<Card>();
+        Dictionary<string, Card> cardidToCardList = new Dictionary<string, Card>();
 
         private static CardDB instance;
 
@@ -682,9 +683,12 @@ namespace HREngine.Bots
             }
             catch
             {
-                Helpfunctions.Instance.logg("cant find carddb.txt");
+                Helpfunctions.Instance.logg("cant find _carddb.txt");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("cant find _carddb.txt");
             }
             cardlist.Clear();
+            this.cardidToCardList.Clear();
             Card c = new Card();
             int de = 0;
             bool targettext = false;
@@ -710,6 +714,10 @@ namespace HREngine.Bots
                     {
                         //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
+                        if (!this.cardidToCardList.ContainsKey(c.CardID))
+                        {
+                            this.cardidToCardList.Add(c.CardID, c);
+                        }
                     }
 
                 }
@@ -1231,39 +1239,13 @@ namespace HREngine.Bots
 
         public Card getCardDataFromID(string id)
         {
-            string target = id;
-            Card c = new Card();
-
-            foreach (Card ca in this.cardlist)
+            if (this.cardidToCardList.ContainsKey(id))
             {
-                if (ca.CardID == target)
-                {
-                    return ca;
-                }
+                return new Card(cardidToCardList[id]);
             }
 
-            return new Card(c);
+            return new Card();
         }
-
-        private void rdtxt()
-        {
-
-            foreach (Card c in this.cardlist)
-            {
-                if (c.description.Contains("karte") && c.description.Contains("zieht"))
-                {
-                    c.carddraw = 1;
-                }
-                if (c.description.Contains("waehlt aus") && c.description.Contains("oder"))
-                {
-                    c.choice = true;
-                }
-
-
-
-            }
-        }
-
 
         public static Enchantment getEnchantmentFromCardID(string cardID)
         {
