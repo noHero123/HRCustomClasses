@@ -643,7 +643,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 62;
+        private int versionnumber = 63;
         private bool singleLog = false;
 
 
@@ -12614,13 +12614,10 @@ namespace HREngine.Bots
             }
         }
 
-        string path = Settings.Instance.logpath;
-
-
         private Helpfunctions()
         {
 
-            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
+            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
         }
 
         private bool writelogg = true;
@@ -12631,7 +12628,7 @@ namespace HREngine.Bots
 
         public void createNewLoggfile()
         {
-            System.IO.File.WriteAllText(path + Settings.Instance.logfile, "");
+            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
         }
 
         public void logg(string s)
@@ -12641,7 +12638,7 @@ namespace HREngine.Bots
             if (!writelogg) return;
             try
             {
-                using (StreamWriter sw = File.AppendText(path + Settings.Instance.logfile))
+                using (StreamWriter sw = File.AppendText(Settings.Instance.logpath + Settings.Instance.logfile))
                 {
                     sw.WriteLine(s);
                 }
@@ -12661,7 +12658,6 @@ namespace HREngine.Bots
         {
             HREngine.API.Utilities.HRLog.Write(s);
         }
-
 
     }
 
