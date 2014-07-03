@@ -10,6 +10,8 @@ namespace HREngine.Bots
     {
         int ownPlayer = 1;
 
+        int enemmaxman = 0;
+
         int mana = 0;
         int maxmana = 0;
         string ownheroname = "";
@@ -104,6 +106,12 @@ namespace HREngine.Bots
                     string ss = s.Replace("mana ", "");
                     mana = Convert.ToInt32(ss.Split('/')[0]);
                     maxmana = Convert.ToInt32(ss.Split('/')[1]);
+                }
+
+                if (s.StartsWith("emana "))
+                {
+                    string ss = s.Replace("emana ", "");
+                    enemmaxman = Convert.ToInt32(ss);
                 }
 
                 if (readstate == 42 && counter == 1) // player
@@ -433,7 +441,7 @@ namespace HREngine.Bots
             int numattttHero = 0;
             bool herowindfury = false;
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury, this.heroImmune);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune, enemmaxman);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
             

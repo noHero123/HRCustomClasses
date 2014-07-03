@@ -29,6 +29,7 @@ namespace HREngine.Bots
         private int calculated = 0;
 
         private bool simulateSecondTurn = false;
+        private bool playaround = false;
 
         PenalityManager pen = PenalityManager.Instance;
 
@@ -57,6 +58,11 @@ namespace HREngine.Bots
         public void setSecondTurnSimu(bool sts)
         {
             this.simulateSecondTurn = sts;
+        }
+
+        public void setPlayAround(bool spa)
+        {
+            this.playaround = spa;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -662,7 +668,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn);
+                        p.endTurn(this.simulateSecondTurn, this.playaround);
                     }
 
                     //sort stupid stuff ouf
@@ -722,7 +728,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn);
+                        p.endTurn(this.simulateSecondTurn, this.playaround);
                     }
                 }
             }
@@ -884,5 +890,4 @@ namespace HREngine.Bots
         }
 
     }
-
 }

@@ -340,7 +340,7 @@ namespace HREngine.Bots
             this.heroImmune = hisim;
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim, int enemMM)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -352,6 +352,7 @@ namespace HREngine.Bots
             this.enemyfrozen = frozen;
             this.enemyAbility = eab;
             this.enemyHeroImmune = ehisim;
+            this.enemyMaxMana = enemMM;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)

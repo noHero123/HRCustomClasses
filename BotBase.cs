@@ -87,6 +87,24 @@ namespace HREngine.Bots
                    Helpfunctions.Instance.ErrorLog("activated two turn simulation");
                }
 
+              
+
+           }
+           catch
+           {
+               Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
+           }
+
+           try
+           {
+               bool playaround = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAround") == "true") ? true : false;
+
+               if (playaround)
+               {
+                   Ai.Instance.setPlayAround(playaround);
+                   Helpfunctions.Instance.ErrorLog("activated playaround");
+               }
+
            }
            catch
            {

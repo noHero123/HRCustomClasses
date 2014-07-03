@@ -95,6 +95,24 @@ namespace HREngine.Bots
                     Helpfunctions.Instance.ErrorLog("activated two turn simulation");
                 }
 
+
+
+            }
+            catch
+            {
+                Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
+            }
+
+            try
+            {
+                bool playaround = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAround") == "true") ? true : false;
+
+                if (playaround)
+                {
+                    Ai.Instance.setPlayAround(playaround);
+                    Helpfunctions.Instance.ErrorLog("activated playaround");
+                }
+
             }
             catch
             {
@@ -643,7 +661,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 63;
+        private int versionnumber = 64;
         private bool singleLog = false;
 
 
@@ -662,6 +680,7 @@ namespace HREngine.Bots
         int cardsPlayedThisTurn = 0;
         int ueberladung = 0;
 
+        int enemyMaxMana = 0;
 
 
         string ownHeroWeapon = "";
@@ -761,7 +780,7 @@ namespace HREngine.Bots
             Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
 
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury, this.heroImmune);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility, this.enemyHeroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility, this.enemyHeroImmune, this.enemyMaxMana);
 
             Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
             Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
@@ -795,12 +814,14 @@ namespace HREngine.Bots
             //player stuff#########################
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             this.currentMana = ownPlayer.GetNumAvailableResources();
-            this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);//ownPlayer.GetRealTimeTempMana();
+            this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);
+            this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
+            Helpfunctions.Instance.logg("emana " + enemyMaxMana);
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
             enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
             enemySecretCount = 0;
@@ -1242,7 +1263,12 @@ namespace HREngine.Bots
         public int enemyHeroDefence = 0;
 
         public int doublepriest = 0;
+        public int enemydoublepriest = 0;
         public int spellpower = 0;
+
+        public int enemyspellpower = 0;
+
+
         public bool auchenaiseelenpriesterin = false;
         public bool ownBaronRivendare = false;
         public bool enemyBaronRivendare = false;
@@ -1445,6 +1471,8 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.silenced) continue;
+                this.enemyspellpower = this.enemyspellpower + m.handcard.card.spellpowervalue;
+                if (m.name == "prophetvelen") this.enemydoublepriest++;
                 if (m.name == "manawraith")
                 {
                     this.managespenst++;
@@ -1578,7 +1606,8 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.silenced) continue;
-
+                this.enemyspellpower = this.enemyspellpower + m.handcard.card.spellpowervalue;
+                if (m.handcard.card.specialMin == CardDB.specialMinions.prophetvelen) this.enemydoublepriest++;
                 if (m.handcard.card.specialMin == CardDB.specialMinions.manawraith) this.managespenst++;
                 if (m.handcard.card.specialMin == CardDB.specialMinions.baronrivendare)
                 {
@@ -1715,7 +1744,7 @@ namespace HREngine.Bots
             return true;
         }
 
-        public void simulateEnemysTurn(bool simulateTwoTurns)
+        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print)
         {
             int maxwide = 20;
 
@@ -1732,7 +1761,8 @@ namespace HREngine.Bots
             posmoves.Add(new Playfield(this));
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
-
+            int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
+            if (playaround) posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
 
             while (havedonesomething)
             {
@@ -1908,6 +1938,7 @@ namespace HREngine.Bots
 
             int bestval = int.MaxValue;
             Playfield bestplay = posmoves[0];
+            if (print) bestplay.printBoard();
             foreach (Playfield p in posmoves)
             {
                 int val = Ai.Instance.botBase.getPlayfieldValue(p);
@@ -1925,6 +1956,219 @@ namespace HREngine.Bots
                 this.value = (int)(0.5 * bestval + 0.5 * Ai.Instance.nextTurnSimulator.doallmoves(bestplay, false));
             }
 
+
+
+        }
+
+
+        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount)
+        {
+            int mana = currmana;
+            if (cardcount == 0) return currmana;
+            if (enemyHeroNamee == HeroEnum.mage)
+            {
+                mana = EnemyPlaysACard("flamestrike", mana);
+                mana = EnemyPlaysACard("blizzard", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.hunter)
+            {
+                mana = EnemyPlaysACard("unleashthehounds", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.priest)
+            {
+                mana = EnemyPlaysACard("holynova", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.shaman)
+            {
+                mana = EnemyPlaysACard("lightningstorm", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.warrior)
+            {
+                mana = EnemyPlaysACard("whirlwind", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.pala)
+            {
+                mana = EnemyPlaysACard("consecration", mana);
+            }
+
+            if (enemyHeroNamee == HeroEnum.druid)
+            {
+                mana = EnemyPlaysACard("swipe", mana);
+            }
+
+
+
+            return mana;
+        }
+
+        private int EnemyPlaysACard(string cardname, int currmana)
+        {
+
+            //todo manacosts
+
+            if (cardname == "flamestrike" && currmana >= 7)
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                int damage = getEnemySpellDamageDamage(4);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+
+                currmana -= 7;
+                return currmana;
+            }
+
+            if (cardname == "blizzard" && currmana >= 6)
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                int damage = getEnemySpellDamageDamage(2);
+                foreach (Minion enemy in temp)
+                {
+                    enemy.frozen = true;
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+
+                currmana -= 6;
+                return currmana;
+            }
+
+
+            if (cardname == "unleashthehounds" && currmana >= 5)
+            {
+                int anz = this.ownMinions.Count;
+                int posi = this.enemyMinions.Count - 1;
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_538t");//hound
+                for (int i = 0; i < anz; i++)
+                {
+                    callKid(kid, posi, false);
+                }
+                currmana -= 5;
+                return currmana;
+            }
+
+
+
+
+
+            if (cardname == "holynova" && currmana >= 5)
+            {
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int heal = 2;
+                int damage = getEnemySpellDamageDamage(2);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, 0, heal, false, true);
+                }
+                attackOrHealHero(-heal, false);
+                temp.Clear();
+                temp.AddRange(this.ownMinions);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+                attackOrHealHero(damage, true);
+                currmana -= 5;
+                return currmana;
+            }
+
+
+
+
+            if (cardname == "lightningstorm" && currmana >= 3)
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                int damage = getEnemySpellDamageDamage(2);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+                currmana -= 3;
+                return currmana;
+            }
+
+
+
+            if (cardname == "whirlwind" && currmana >= 1)
+            {
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int damage = getEnemySpellDamageDamage(1);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, false, true);
+                }
+                temp.Clear();
+                temp = new List<Minion>(this.ownMinions);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+                currmana -= 1;
+                return currmana;
+            }
+
+
+
+            if (cardname == "consecration" && currmana >= 4)
+            {
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                int damage = getEnemySpellDamageDamage(2);
+                foreach (Minion enemy in temp)
+                {
+                    minionGetDamagedOrHealed(enemy, damage, 0, true, true);
+                }
+
+                attackOrHealHero(damage, true);
+                currmana -= 4;
+                return currmana;
+            }
+
+
+
+            if (cardname == "swipe" && currmana >= 4)
+            {
+                int damage = getEnemySpellDamageDamage(4);
+                // all others get 1 spelldamage
+                int damage1 = getEnemySpellDamageDamage(1);
+
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                int target = 10;
+                foreach (Minion mnn in temp)
+                {
+                    if (mnn.Hp <= damage || PenalityManager.Instance.specialMinions.ContainsKey(mnn.name))
+                    {
+                        target = mnn.id;
+                    }
+                }
+                foreach (Minion mnn in temp)
+                {
+                    if (mnn.id + 10 != target)
+                    {
+                        minionGetDamagedOrHealed(mnn, damage1, 0, false);
+                    }
+                }
+                currmana -= 4;
+                return currmana;
+            }
+
+
+
+
+
+            return currmana;
+        }
+
+        private int getEnemySpellDamageDamage(int dmg)
+        {
+            int retval = dmg;
+            retval += this.enemyspellpower;
+            if (this.enemydoublepriest >= 1) retval *= (2 * this.enemydoublepriest);
+            return retval;
         }
 
         public void prepareNextTurn()
@@ -2472,7 +2716,7 @@ namespace HREngine.Bots
 
         }
 
-        public void endTurn(bool simulateTwoTurns)
+        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false)
         {
             this.value = int.MinValue;
 
@@ -2496,7 +2740,7 @@ namespace HREngine.Bots
             else
             {
                 guessHeroDamage();
-                simulateEnemysTurn(simulateTwoTurns);
+                simulateEnemysTurn(simulateTwoTurns, playaround, print);
                 this.complete = true;
             }
 
@@ -3208,6 +3452,8 @@ namespace HREngine.Bots
             if (this.doublepriest >= 1) retval *= (2 * this.doublepriest);
             return retval;
         }
+
+
 
         private int getSpellHeal(int heal)
         {
@@ -7263,6 +7509,7 @@ namespace HREngine.Bots
                 this.lostDamage += Math.Max(0, damage - maxHp);
 
             }
+
             if (c.name == "feralspirit")
             {
                 int posi = this.ownMinions.Count - 1;
@@ -7758,6 +8005,7 @@ namespace HREngine.Bots
 
 
         }
+
         private void triggerPlayedASpell(CardDB.Card c)
         {
 
@@ -8565,6 +8813,9 @@ namespace HREngine.Bots
         Playfield nextMoveGuess = new Playfield();
         public Bot botBase = null;
 
+        private bool secondturnsim = false;
+        private bool playaround = false;
+
         private static Ai instance;
 
         public static Ai Instance
@@ -8598,6 +8849,13 @@ namespace HREngine.Bots
         public void setTwoTurnSimulation(bool stts)
         {
             this.mainTurnSimulator.setSecondTurnSimu(stts);
+            this.secondturnsim = stts;
+        }
+
+        public void setPlayAround(bool spa)
+        {
+            this.mainTurnSimulator.setPlayAround(spa);
+            this.playaround = spa;
         }
 
         private void doallmoves(bool test, bool isLethalCheck)
@@ -8969,6 +9227,10 @@ namespace HREngine.Bots
                     }
                 }
             }
+
+            help.logg("AFTER ENEMY TURN:");
+            tempbestboard.sEnemTurn = this.simulateEnemyTurn;
+            tempbestboard.endTurn(this.secondturnsim, this.playaround, true);
         }
 
     }
@@ -8997,6 +9259,7 @@ namespace HREngine.Bots
         private int calculated = 0;
 
         private bool simulateSecondTurn = false;
+        private bool playaround = false;
 
         PenalityManager pen = PenalityManager.Instance;
 
@@ -9025,6 +9288,11 @@ namespace HREngine.Bots
         public void setSecondTurnSimu(bool sts)
         {
             this.simulateSecondTurn = sts;
+        }
+
+        public void setPlayAround(bool spa)
+        {
+            this.playaround = spa;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -9630,7 +9898,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn);
+                        p.endTurn(this.simulateSecondTurn, this.playaround);
                     }
 
                     //sort stupid stuff ouf
@@ -9690,7 +9958,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn);
+                        p.endTurn(this.simulateSecondTurn, this.playaround);
                     }
                 }
             }
@@ -10437,7 +10705,7 @@ namespace HREngine.Bots
             this.heroImmune = hisim;
         }
 
-        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim)
+        public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim, int enemMM)
         {
             this.enemyHeroWeapon = weapon;
             this.enemyWeaponAttack = watt;
@@ -10449,6 +10717,7 @@ namespace HREngine.Bots
             this.enemyfrozen = frozen;
             this.enemyAbility = eab;
             this.enemyHeroImmune = ehisim;
+            this.enemyMaxMana = enemMM;
         }
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
@@ -15223,6 +15492,8 @@ namespace HREngine.Bots
     {
         int ownPlayer = 1;
 
+        int enemmaxman = 0;
+
         int mana = 0;
         int maxmana = 0;
         string ownheroname = "";
@@ -15317,6 +15588,12 @@ namespace HREngine.Bots
                     string ss = s.Replace("mana ", "");
                     mana = Convert.ToInt32(ss.Split('/')[0]);
                     maxmana = Convert.ToInt32(ss.Split('/')[1]);
+                }
+
+                if (s.StartsWith("emana "))
+                {
+                    string ss = s.Replace("emana ", "");
+                    enemmaxman = Convert.ToInt32(ss);
                 }
 
                 if (readstate == 42 && counter == 1) // player
@@ -15646,7 +15923,7 @@ namespace HREngine.Bots
             int numattttHero = 0;
             bool herowindfury = false;
             Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.ownHeroWeaponAttack, this.ownHeroWeaponDurability, ownHeroimmunewhileattacking, this.ownHeroAttack, this.ownherohp, this.ownherodefence, this.ownheroname, this.ownheroready, this.ownHeroFrozen, heroability, abilityReady, numattttHero, herowindfury, this.heroImmune);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune);
+            Hrtprozis.Instance.updateEnemyHero(this.enemyWeapon, this.enemyWeaponAttack, this.enemyWeaponDur, this.enemyWeaponAttack, this.enemyherohp, this.enemyherodefence, this.enemyheroname, this.enemyFrozen, enemyability, enemyHeroImmune, enemmaxman);
 
             Hrtprozis.Instance.updateMinions(this.ownminions, this.enemyminions);
 

@@ -34,6 +34,9 @@ namespace HREngine.Bots
         Playfield nextMoveGuess = new Playfield();
         public Bot botBase = null;
 
+        private bool secondturnsim = false;
+        private bool playaround = false;
+
         private static Ai instance;
 
         public static Ai Instance
@@ -67,6 +70,13 @@ namespace HREngine.Bots
         public void setTwoTurnSimulation(bool stts)
         {
             this.mainTurnSimulator.setSecondTurnSimu(stts);
+            this.secondturnsim = stts;
+        }
+
+        public void setPlayAround(bool spa)
+        {
+            this.mainTurnSimulator.setPlayAround(spa);
+            this.playaround = spa;
         }
 
         private void doallmoves(bool test, bool isLethalCheck)
@@ -438,6 +448,10 @@ namespace HREngine.Bots
                     }
                 }
             }
+
+            help.logg("AFTER ENEMY TURN:");
+            tempbestboard.sEnemTurn = this.simulateEnemyTurn;
+            tempbestboard.endTurn(this.secondturnsim, this.playaround, true);
         }
 
     }
