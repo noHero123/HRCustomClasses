@@ -879,6 +879,8 @@ namespace HREngine.Bots
                     }
                 }
             }
+
+
             //some effects, which are bad :D
             int pen = 0;
             Minion m = new Minion();
@@ -896,6 +898,11 @@ namespace HREngine.Bots
                 return 100;
             }
 
+            if ((name == "wildgrowth" || name == "nourish")  && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
+            {
+                return 500;
+            }
+
             if (name == "sylvanaswindrunner")
             {
                 if (p.enemyMinions.Count == 0)
@@ -903,6 +910,12 @@ namespace HREngine.Bots
                     return 10;
                 }
             }
+
+            if (name == "betrayal" && target >=10 && target <= 19)
+            {
+                if (m.Angr == 0) return 30;
+            }
+
 
             if (name == "houndmaster")
             {

@@ -639,7 +639,27 @@ namespace HREngine.Bots
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
             int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
-            if (playaround) posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+
+            if (playaround)
+            {
+                int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+                int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                if (oldval < newval)
+                {
+                    posmoves.Clear();
+                    posmoves.Add(new Playfield(this));
+                }
+            }
+
+            foreach (Minion m in posmoves[0].enemyMinions)
+            {
+                if (m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced) continue;
+                m.Ready = true;
+                m.numAttacksThisTurn = 0;
+            }
 
             while (havedonesomething)
             {
@@ -756,8 +776,8 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-                    
-                    if (p.enemyAbilityReady && p.enemyHeroAblility.canplayCard(p, 0))
+
+                    if (p.enemyAbilityReady && enemMana>=2 && p.enemyHeroAblility.canplayCard(p, 0))
                     {
                         int abilityPenality = 0;
 
@@ -842,6 +862,33 @@ namespace HREngine.Bots
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
+
+            bool useAOE = false;
+            int mobscount = 0;
+            foreach (Minion min in this.ownMinions)
+            {
+                if (min.maxHp >= 2 && min.Angr >= 2) mobscount++;
+            }
+
+            if (mobscount >= 3) useAOE = true;
+
+            if (enemyHeroNamee == HeroEnum.warrior)
+            {
+                bool usewhirlwind = true;
+                foreach (Minion m in this.enemyMinions)
+                {
+                    if (m.Hp == 1) usewhirlwind = false;
+                }
+                if (this.ownMinions.Count <= 3) usewhirlwind = false;
+
+                if (usewhirlwind)
+                {
+                    mana = EnemyPlaysACard("whirlwind", mana);
+                }
+            }
+
+            if (!useAOE) return mana;
+
             if (enemyHeroNamee == HeroEnum.mage)
             {
                     mana = EnemyPlaysACard("flamestrike", mana);
@@ -861,11 +908,6 @@ namespace HREngine.Bots
             if (enemyHeroNamee == HeroEnum.shaman)
             {
                 mana = EnemyPlaysACard("lightningstorm", mana);
-            }
-
-            if (enemyHeroNamee == HeroEnum.warrior)
-            {
-                mana = EnemyPlaysACard("whirlwind", mana);
             }
 
             if (enemyHeroNamee == HeroEnum.pala)
@@ -957,7 +999,7 @@ namespace HREngine.Bots
 
 
 
-                if (cardname == "lightningstorm" && currmana >= 3)
+                if (cardname == "lightningstorm" && currmana >= 4)//3
                 {
                     List<Minion> temp = new List<Minion>(this.ownMinions);
                     int damage = getEnemySpellDamageDamage(2);
@@ -971,7 +1013,7 @@ namespace HREngine.Bots
                 
 
 
-                if (cardname == "whirlwind" && currmana >= 1 )
+                if (cardname == "whirlwind" && currmana >= 3 )//1
                 {
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     int damage = getEnemySpellDamageDamage(1);
@@ -1109,7 +1151,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
+                //if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -3656,11 +3698,11 @@ namespace HREngine.Bots
                 {
                     if (isMinionattack)
                     {
-                        this.lostDamage += damage;
+                        this.lostDamage += damage-1;
                     }
                     else
                     {
-                        this.lostDamage += damage * damage;
+                        this.lostDamage += (damage-1) * (damage-1);
                     }
                 } 
                 return;
@@ -7086,6 +7128,7 @@ namespace HREngine.Bots
 
         public void attackWithWeapon(int target, int targetEntity, int penality)
         {
+            this.evaluatePenality += penality;
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;
             if ((this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 2) || (!this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1))

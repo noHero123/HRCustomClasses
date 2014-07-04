@@ -26,6 +26,9 @@ namespace HREngine.Bots
       {
           if (p.value >= -2000000) return p.value;
           int retval = 0;
+
+          int aggroboarder = 11;
+
           retval -= p.evaluatePenality;
           retval += p.owncards.Count * 1;
 
@@ -46,7 +49,15 @@ namespace HREngine.Bots
               retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
           }
 
-          retval += -p.enemyHeroHp - p.enemyHeroDefence;
+
+          if (p.enemyHeroHp + p.enemyHeroDefence > aggroboarder)
+          {
+              retval += -p.enemyHeroHp - p.enemyHeroDefence;
+          }
+          else
+          {
+              retval += (int)Math.Pow((aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence),4);
+          }
 
           if (p.ownWeaponAttack >= 1)
           {

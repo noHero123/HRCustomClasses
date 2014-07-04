@@ -144,6 +144,9 @@ namespace HREngine.Bots
       {
           if (p.value >= -2000000) return p.value;
           int retval = 0;
+
+          int aggroboarder = 11;
+
           retval -= p.evaluatePenality;
           retval += p.owncards.Count * 1;
 
@@ -164,7 +167,15 @@ namespace HREngine.Bots
               retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
           }
 
-          retval += -p.enemyHeroHp - p.enemyHeroDefence;
+
+          if (p.enemyHeroHp + p.enemyHeroDefence > aggroboarder)
+          {
+              retval += -p.enemyHeroHp - p.enemyHeroDefence;
+          }
+          else
+          {
+              retval += (int)Math.Pow((aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence), 4);
+          }
 
           if (p.ownWeaponAttack >= 1)
           {
@@ -712,7 +723,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 64;
+        private int versionnumber = 65;
         private bool singleLog = false;
 
 
@@ -1813,7 +1824,27 @@ namespace HREngine.Bots
             List<Playfield> temp = new List<Playfield>();
             int deep = 0;
             int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
-            if (playaround) posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+
+            if (playaround)
+            {
+                int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+                int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                if (oldval < newval)
+                {
+                    posmoves.Clear();
+                    posmoves.Add(new Playfield(this));
+                }
+            }
+
+            foreach (Minion m in posmoves[0].enemyMinions)
+            {
+                if (m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced) continue;
+                m.Ready = true;
+                m.numAttacksThisTurn = 0;
+            }
 
             while (havedonesomething)
             {
@@ -1931,7 +1962,7 @@ namespace HREngine.Bots
                     // use ability
                     /// TODO check if ready after manaup
 
-                    if (p.enemyAbilityReady && p.enemyHeroAblility.canplayCard(p, 0))
+                    if (p.enemyAbilityReady && enemMana >= 2 && p.enemyHeroAblility.canplayCard(p, 0))
                     {
                         int abilityPenality = 0;
 
@@ -2016,6 +2047,33 @@ namespace HREngine.Bots
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
+
+            bool useAOE = false;
+            int mobscount = 0;
+            foreach (Minion min in this.ownMinions)
+            {
+                if (min.maxHp >= 2 && min.Angr >= 2) mobscount++;
+            }
+
+            if (mobscount >= 3) useAOE = true;
+
+            if (enemyHeroNamee == HeroEnum.warrior)
+            {
+                bool usewhirlwind = true;
+                foreach (Minion m in this.enemyMinions)
+                {
+                    if (m.Hp == 1) usewhirlwind = false;
+                }
+                if (this.ownMinions.Count <= 3) usewhirlwind = false;
+
+                if (usewhirlwind)
+                {
+                    mana = EnemyPlaysACard("whirlwind", mana);
+                }
+            }
+
+            if (!useAOE) return mana;
+
             if (enemyHeroNamee == HeroEnum.mage)
             {
                 mana = EnemyPlaysACard("flamestrike", mana);
@@ -2035,11 +2093,6 @@ namespace HREngine.Bots
             if (enemyHeroNamee == HeroEnum.shaman)
             {
                 mana = EnemyPlaysACard("lightningstorm", mana);
-            }
-
-            if (enemyHeroNamee == HeroEnum.warrior)
-            {
-                mana = EnemyPlaysACard("whirlwind", mana);
             }
 
             if (enemyHeroNamee == HeroEnum.pala)
@@ -2131,7 +2184,7 @@ namespace HREngine.Bots
 
 
 
-            if (cardname == "lightningstorm" && currmana >= 3)
+            if (cardname == "lightningstorm" && currmana >= 4)//3
             {
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
@@ -2145,7 +2198,7 @@ namespace HREngine.Bots
 
 
 
-            if (cardname == "whirlwind" && currmana >= 1)
+            if (cardname == "whirlwind" && currmana >= 3)//1
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getEnemySpellDamageDamage(1);
@@ -2283,7 +2336,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
+                //if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -4830,11 +4883,11 @@ namespace HREngine.Bots
                 {
                     if (isMinionattack)
                     {
-                        this.lostDamage += damage;
+                        this.lostDamage += damage - 1;
                     }
                     else
                     {
-                        this.lostDamage += damage * damage;
+                        this.lostDamage += (damage - 1) * (damage - 1);
                     }
                 }
                 return;
@@ -8260,6 +8313,7 @@ namespace HREngine.Bots
 
         public void attackWithWeapon(int target, int targetEntity, int penality)
         {
+            this.evaluatePenality += penality;
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;
             if ((this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 2) || (!this.ownHeroWindfury && this.ownHeroNumAttackThisTurn == 1))
@@ -9160,9 +9214,7 @@ namespace HREngine.Bots
                     help.logg("min");
                     //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                     Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
-                    help.logg("min");
                     tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                    help.logg("min");
                 }
 
                 if (bestmove.heroattack)
@@ -9184,27 +9236,7 @@ namespace HREngine.Bots
                 tempbestboard.mana = -1;
             }
             help.logg("-------------");
-            help.logg("OwnMinions:");
-
-
-            foreach (Minion m in tempbestboard.ownMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-            help.logg("EnemyMinions:");
-            foreach (Minion m in tempbestboard.enemyMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-
+            tempbestboard.printBoard();
 
             foreach (Action bestmovee in bestboard.playactions)
             {
@@ -9235,9 +9267,7 @@ namespace HREngine.Bots
                         help.logg("min");
                         //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                         Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
-                        help.logg("min");
                         tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
-                        help.logg("min");
                     }
 
                     if (bestmovee.heroattack)
@@ -9259,24 +9289,7 @@ namespace HREngine.Bots
                     tempbestboard.mana = -1;
                 }
                 help.logg("-------------");
-                help.logg("OwnMinions:");
-                foreach (Minion m in tempbestboard.ownMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
-                help.logg("EnemyMinions:");
-                foreach (Minion m in tempbestboard.enemyMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
+                tempbestboard.printBoard();
             }
 
             help.logg("AFTER ENEMY TURN:");
@@ -11809,6 +11822,8 @@ namespace HREngine.Bots
                     }
                 }
             }
+
+
             //some effects, which are bad :D
             int pen = 0;
             Minion m = new Minion();
@@ -11826,6 +11841,11 @@ namespace HREngine.Bots
                 return 100;
             }
 
+            if ((name == "wildgrowth" || name == "nourish") && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
+            {
+                return 500;
+            }
+
             if (name == "sylvanaswindrunner")
             {
                 if (p.enemyMinions.Count == 0)
@@ -11833,6 +11853,12 @@ namespace HREngine.Bots
                     return 10;
                 }
             }
+
+            if (name == "betrayal" && target >= 10 && target <= 19)
+            {
+                if (m.Angr == 0) return 30;
+            }
+
 
             if (name == "houndmaster")
             {

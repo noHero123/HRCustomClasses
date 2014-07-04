@@ -330,9 +330,7 @@ namespace HREngine.Bots
                     help.logg("min");
                     //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                     Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
-                    help.logg("min");
                     tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
-                    help.logg("min");
                 }
 
                 if (bestmove.heroattack)
@@ -354,27 +352,7 @@ namespace HREngine.Bots
                 tempbestboard.mana = -1;
             }
             help.logg("-------------");
-            help.logg("OwnMinions:");
-
-
-            foreach (Minion m in tempbestboard.ownMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-            help.logg("EnemyMinions:");
-            foreach (Minion m in tempbestboard.enemyMinions)
-            {
-                help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                foreach (Enchantment e in m.enchantments)
-                {
-                    help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                }
-            }
-
+            tempbestboard.printBoard();
 
             foreach (Action bestmovee in bestboard.playactions)
             {
@@ -405,9 +383,7 @@ namespace HREngine.Bots
                         help.logg("min");
                         //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
                         Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
-                        help.logg("min");
                         tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
-                        help.logg("min");
                     }
 
                     if (bestmovee.heroattack)
@@ -429,24 +405,7 @@ namespace HREngine.Bots
                     tempbestboard.mana = -1;
                 }
                 help.logg("-------------");
-                help.logg("OwnMinions:");
-                foreach (Minion m in tempbestboard.ownMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
-                help.logg("EnemyMinions:");
-                foreach (Minion m in tempbestboard.enemyMinions)
-                {
-                    help.logg(m.name + " id " + m.id + " zp " + m.zonepos + " " + " e:" + m.entitiyID + " " + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " sil:" + m.silenced + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted);
-                    foreach (Enchantment e in m.enchantments)
-                    {
-                        help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
-                    }
-                }
+                tempbestboard.printBoard();
             }
 
             help.logg("AFTER ENEMY TURN:");
