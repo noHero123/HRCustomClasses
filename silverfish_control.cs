@@ -174,7 +174,7 @@ namespace HREngine.Bots
           }
           else
           {
-              retval += (int)Math.Pow((aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence), 4);
+              retval += (int)Math.Pow((aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence), 2);
           }
 
           if (p.ownWeaponAttack >= 1)
@@ -723,7 +723,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 65;
+        private int versionnumber = 66;
         private bool singleLog = false;
 
 
