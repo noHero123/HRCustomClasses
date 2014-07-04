@@ -1779,7 +1779,10 @@ namespace HREngine.Bots
 
             foreach (Minion m in posmoves[0].enemyMinions)
             {
-                if (m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced) continue;
+                if (m.frozen || (m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
+                {
+                    m.Ready = false;
+                }
                 m.Ready = true;
                 m.numAttacksThisTurn = 0;
             }
