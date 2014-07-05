@@ -183,8 +183,8 @@ namespace HREngine.Bots
                 if ((a.handcard.card.specialMin == CardDB.specialMinions.thecoin || a.handcard.card.specialMin == CardDB.specialMinions.innervate)) usecoin = true;
                 if (a.handcard.card.specialMin == CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
             }
-            if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
-            if (usecoin && p.mana >= 1) retval -= 20;
+            if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 40;
+            //if (usecoin && p.mana >= 1) retval -= 20;
 
             foreach (Minion m in p.ownMinions)
             {
@@ -200,32 +200,14 @@ namespace HREngine.Bots
 
             foreach (Minion m in p.enemyMinions)
             {
-                if (p.enemyMinions.Count >= 4 || m.taunt || (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) || m.Angr >= 5)
-                {
-                    retval -= m.Hp;
-                    if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
-                    {
-                        retval -= m.Angr * 2;
-                        if (m.windfury) retval -= m.Angr;
-                    }
-                    if (m.taunt) retval -= 5;
-                    if (m.divineshild) retval -= m.Angr;
-                    if (m.frozen) retval += 1; // because its bad for enemy :D
-                    if (m.poisonous) retval -= 4;
-                    retval -= m.handcard.card.rarity;
-                }
-
-
-                if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
-                if (m.Angr >= 4) retval -= 20;
-                if (m.Angr >= 7) retval -= 50;
+                retval -= this.getEnemyMinionValue(m, p);
             }
 
             retval -= p.enemySecretCount;
             retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
             retval -= p.lostWeaponDamage;
             if (p.ownMinions.Count == 0) retval -= 20;
-            if (p.enemyMinions.Count >= 4) retval -= 200;
+            if (p.enemyMinions.Count >= 4) retval -= 20;
             if (p.enemyHeroHp <= 0) retval = 10000;
             //soulfire etc
             int deletecardsAtLast = 0;
@@ -239,6 +221,31 @@ namespace HREngine.Bots
             if (p.ownHeroHp <= 0) retval = -10000;
 
             p.value = retval;
+            return retval;
+        }
+
+        public int getEnemyMinionValue(Minion m, Playfield p)
+        {
+            int retval = 0;
+            if (p.enemyMinions.Count >= 4 || m.taunt || (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) || m.Angr >= 5)
+            {
+                retval += m.Hp;
+                if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
+                {
+                    retval += m.Angr * 2;
+                    if (m.windfury) retval += 2 * m.Angr;
+                }
+                if (m.taunt) retval += 5;
+                if (m.divineshild) retval += m.Angr;
+                if (m.frozen) retval -= 1; // because its bad for enemy :D
+                if (m.poisonous) retval += 4;
+                retval += m.handcard.card.rarity;
+            }
+
+
+            if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
+            if (m.Angr >= 4) retval += 20;
+            if (m.Angr >= 7) retval += 50;
             return retval;
         }
 
@@ -661,7 +668,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 66;
+        private int versionnumber = 67;
         private bool singleLog = false;
 
 
@@ -749,6 +756,9 @@ namespace HREngine.Bots
             {
                 sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
                 Helpfunctions.Instance.createNewLoggfile();
+                Helpfunctions.Instance.ErrorLog("#######################################################");
+                Helpfunctions.Instance.ErrorLog("fight is logged in: " + sttngs.logpath + sttngs.logfile);
+                Helpfunctions.Instance.ErrorLog("#######################################################");
             }
             else
             {
@@ -4051,7 +4061,9 @@ namespace HREngine.Bots
                 if (m.name == "thebeast")
                 {
                     CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_finkle");//finkleeinhorn
-                    callKid(c, m.id - 1, own);
+                    int place = this.enemyMinions.Count - 1;
+                    if (!own) place = this.ownMinions.Count - 1;
+                    callKid(c, place, !own);
 
                 }
 
@@ -4346,6 +4358,24 @@ namespace HREngine.Bots
             {
                 temp.AddRange(this.enemyMinions);
                 temp2.AddRange(this.ownMinions);
+
+                bool ancestral = false;
+                if (m.enchantments.Count >= 1)
+                {
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        if (e.CARDID == "CS2_038e")
+                        {
+                            ancestral = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (m.handcard.card.specialMin == CardDB.specialMinions.cairnebloodhoof || m.handcard.card.specialMin == CardDB.specialMinions.harvestgolem || ancestral)
+                {
+                    this.evaluatePenality -= Ai.Instance.botBase.getEnemyMinionValue(m, this) - 1;
+                }
             }
 
             foreach (Minion mnn in temp)
@@ -11218,6 +11248,7 @@ namespace HREngine.Bots
                     {
                         return 30;
                     }
+
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
                         return -10;
@@ -11304,7 +11335,7 @@ namespace HREngine.Bots
                 }
                 if (p.enemyMinions.Count <= 2)
                 {
-                    return 20;
+                    return 20 * p.enemyMinions.Count;
                 }
             }
 
@@ -11781,6 +11812,8 @@ namespace HREngine.Bots
             {
                 return 100;
             }
+
+            if (name == "windfury" && !m.Ready) return 500;
 
             if ((name == "wildgrowth" || name == "nourish") && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
             {
@@ -12822,8 +12855,8 @@ namespace HREngine.Bots
             priorityTargets.Add("barongeddon", 10);
             priorityTargets.Add("stormwindchampion", 10);
             priorityTargets.Add("gurubashiberserker", 10);
-            priorityTargets.Add("cairnebloodhoof", 19);
-            priorityTargets.Add("harvestgolem", 16);
+            //priorityTargets.Add("cairnebloodhoof", 19);
+            //priorityTargets.Add("harvestgolem", 16);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);
@@ -13826,7 +13859,9 @@ namespace HREngine.Bots
             shadeofnaxxramas,
             baronrivendare,
             faeriedragon,
-            bloodmagethalnos
+            bloodmagethalnos,
+            harvestgolem,
+            cairnebloodhoof
         }
 
         public enum ErrorType2
@@ -14617,6 +14652,8 @@ namespace HREngine.Bots
                         if (temp == "ancientwatcher") c.specialMin = specialMinions.ancientwatcher;
                         if (temp == "faeriedragon") c.specialMin = specialMinions.faeriedragon;
                         if (temp == "bloodmagethalnos") c.specialMin = specialMinions.bloodmagethalnos;
+                        if (temp == "cairnebloodhoof") c.specialMin = specialMinions.cairnebloodhoof;
+                        if (temp == "harvestgolem") c.specialMin = specialMinions.harvestgolem;
                         //naxx update
                         if (temp == "webspinner") c.specialMin = specialMinions.webspinner;
                         if (temp == "darkcultist") c.specialMin = specialMinions.darkcultist;

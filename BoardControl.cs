@@ -36,7 +36,6 @@ namespace HREngine.Bots
           retval -= p.enemyMaxMana;
 
           retval += p.ownMinions.Count * 10;
-          retval -= p.enemyMinions.Count * 10;
 
           retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20; 
 
@@ -100,12 +99,12 @@ namespace HREngine.Bots
               if (m.handcard.card.specialMin == CardDB.specialMinions.bloodmagethalnos) retval += 10;
           }
 
-          if (p.enemyMinions.Count >= 0)
+          /*if (p.enemyMinions.Count >= 0)
           {
               int anz = p.enemyMinions.Count;
               if (owntaunt == 0) retval -= 10 * anz;
               retval += owntaunt * 10 - 11 * anz;
-          }
+          }*/
 
           int playmobs = 0;
           bool useAbili = false;
@@ -125,8 +124,8 @@ namespace HREngine.Bots
               if (p.ownHeroName != HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.specialMin!= CardDB.specialMinions.shieldblock) retval -= 11;
               if (p.ownHeroName == HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
-          if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 20;
-          if (usecoin && p.mana >= 1) retval -= 20;
+          if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 40;
+          //if (usecoin && p.mana >= 1) retval -= 20;
 
           int mobsInHand = 0;
           foreach (Handmanager.Handcard hc in p.owncards)
@@ -143,26 +142,7 @@ namespace HREngine.Bots
 
           foreach (Minion m in p.enemyMinions)
           {
-              retval -= m.Hp*2;
-              if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
-              {
-                  retval -= m.Angr * 2;
-                  if (m.windfury) retval -= m.Angr;
-                  if (m.Angr >= 4) retval -= 20;
-                  if (m.Angr >= 7) retval -= 50;
-              }
-              if (m.Angr == 0) retval += 5;
-              retval -= m.handcard.card.rarity;
-              if (m.taunt) retval -= 5;
-              if (m.divineshild) retval -= m.Angr;
-              if (m.divineshild && m.taunt) retval -= 5;
-              if (m.stealth) retval -= 1;
-              
-              if (m.poisonous) retval -= 4;
-
-              if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval -= penman.priorityTargets[m.name];
-
- 
+              retval -= this.getEnemyMinionValue(m, p);
           }
 
           retval -= p.enemySecretCount;
@@ -185,6 +165,35 @@ namespace HREngine.Bots
           p.value = retval;
           return retval;
       }
+
+       
+
+       protected override int evaluateEnemyMinion(Minion m, Playfield p)
+       {
+           int retval = 10;
+           retval += m.Hp * 2;
+           if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
+           {
+               retval += m.Angr * 2;
+               if (m.windfury) retval += m.Angr * 2;
+               if (m.Angr >= 4) retval += 10;
+               if (m.Angr >= 7) retval += 50;
+           }
+
+           if (m.Angr == 0) retval -= 7;
+
+           retval += m.handcard.card.rarity;
+           if (m.taunt) retval += 5;
+           if (m.divineshild) retval += m.Angr;
+           if (m.divineshild && m.taunt) retval += 5;
+           if (m.stealth) retval += 1;
+
+           if (m.poisonous) retval += 4;
+
+           if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
+           return retval;
+       }
    
+
    }
 }

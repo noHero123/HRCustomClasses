@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 66;
+        private int versionnumber = 67;
         private bool singleLog = false;
 
 
@@ -99,6 +99,9 @@ namespace HREngine.Bots
             {
                 sttngs.setLoggFile("UILogg" + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss") + ".txt");
                 Helpfunctions.Instance.createNewLoggfile();
+                Helpfunctions.Instance.ErrorLog("#######################################################");
+                Helpfunctions.Instance.ErrorLog("fight is logged in: " + sttngs.logpath + sttngs.logfile);
+                Helpfunctions.Instance.ErrorLog("#######################################################");
             }
             else
             {

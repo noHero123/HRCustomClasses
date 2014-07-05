@@ -544,6 +544,11 @@ namespace HREngine.Bots
           return evaluatePlayfield(p);
       }
 
+      public int getEnemyMinionValue(Minion m, Playfield p)
+      {
+          return evaluateEnemyMinion(m, p);
+      }
+
       public int getRulesEditorPenality(string cardId, Playfield p)
       {
           
@@ -551,6 +556,11 @@ namespace HREngine.Bots
       }
 
       protected virtual int evaluatePlayfield(Playfield p)
+      {
+          return 0;
+      }
+
+      protected virtual int evaluateEnemyMinion(Minion m, Playfield p)
       {
           return 0;
       }

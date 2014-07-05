@@ -2928,7 +2928,9 @@ namespace HREngine.Bots
                 if (m.name == "thebeast")
                 {
                     CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_finkle");//finkleeinhorn
-                    callKid(c, m.id - 1, own);
+                    int place = this.enemyMinions.Count-1;
+                    if(!own) place = this.ownMinions.Count-1;
+                    callKid(c, place, !own);
 
                 }
 
@@ -3223,6 +3225,24 @@ namespace HREngine.Bots
             {
                 temp.AddRange(this.enemyMinions);
                 temp2.AddRange(this.ownMinions);
+
+                bool ancestral = false;
+                if (m.enchantments.Count >= 1)
+                {
+                    foreach (Enchantment e in m.enchantments)
+                    {
+                        if (e.CARDID == "CS2_038e")
+                        {
+                            ancestral = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (m.handcard.card.specialMin == CardDB.specialMinions.cairnebloodhoof || m.handcard.card.specialMin == CardDB.specialMinions.harvestgolem || ancestral)
+                {
+                    this.evaluatePenality -= Ai.Instance.botBase.getEnemyMinionValue(m, this) - 1;
+                }
             }
 
             foreach (Minion mnn in temp)

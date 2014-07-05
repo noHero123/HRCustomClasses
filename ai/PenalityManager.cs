@@ -334,6 +334,7 @@ namespace HREngine.Bots
                     {
                         return 30;
                     }
+
                     if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                     {
                         return -10;
@@ -420,7 +421,7 @@ namespace HREngine.Bots
                 }
                 if (p.enemyMinions.Count <= 2)
                 {
-                    return 20;
+                    return 20 * p.enemyMinions.Count;
                 }
             }
 
@@ -897,6 +898,8 @@ namespace HREngine.Bots
             {
                 return 100;
             }
+
+            if (name == "windfury" && !m.Ready) return 500;
 
             if ((name == "wildgrowth" || name == "nourish")  && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
             {
@@ -1938,8 +1941,8 @@ namespace HREngine.Bots
             priorityTargets.Add("barongeddon", 10);
             priorityTargets.Add("stormwindchampion", 10);
             priorityTargets.Add("gurubashiberserker", 10);
-            priorityTargets.Add("cairnebloodhoof", 19);
-            priorityTargets.Add("harvestgolem", 16);
+            //priorityTargets.Add("cairnebloodhoof", 19);
+            //priorityTargets.Add("harvestgolem", 16);
 
             //warrior cards
             priorityTargets.Add("frothingberserker", 10);

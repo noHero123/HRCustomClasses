@@ -105,7 +105,9 @@ namespace HREngine.Bots
             shadeofnaxxramas,
             baronrivendare,
             faeriedragon,
-            bloodmagethalnos
+            bloodmagethalnos,
+            harvestgolem,
+            cairnebloodhoof
         }
 
         public enum ErrorType2
@@ -896,6 +898,8 @@ namespace HREngine.Bots
                         if (temp == "ancientwatcher") c.specialMin = specialMinions.ancientwatcher;
                         if (temp == "faeriedragon") c.specialMin = specialMinions.faeriedragon;
                         if (temp == "bloodmagethalnos") c.specialMin = specialMinions.bloodmagethalnos;
+                        if (temp == "cairnebloodhoof") c.specialMin = specialMinions.cairnebloodhoof;
+                        if (temp == "harvestgolem") c.specialMin = specialMinions.harvestgolem;
                         //naxx update
                         if (temp == "webspinner") c.specialMin = specialMinions.webspinner;
                         if (temp == "darkcultist") c.specialMin = specialMinions.darkcultist;
