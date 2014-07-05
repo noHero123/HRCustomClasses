@@ -668,7 +668,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 67;
+        private int versionnumber = 68;
         private bool singleLog = false;
 
 
@@ -14158,6 +14158,7 @@ namespace HREngine.Bots
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_WITH_RACE))
                 {
+                    retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
                     foreach (Minion m in p.ownMinions)
                     {
                         if (!(m.handcard.card.race == this.needRaceForPlaying))
