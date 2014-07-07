@@ -668,7 +668,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 68;
+        private int versionnumber = 69;
         private bool singleLog = false;
 
 
@@ -11587,6 +11587,11 @@ namespace HREngine.Bots
                 carddraw = 0;
                 if (m.Hp == 1) carddraw = 1;
                 if (carddraw == 0) return 3;
+            }
+
+            if (name == "lifetap" && p.owncards.Count <= 2)
+            {
+                return 0;
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);

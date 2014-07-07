@@ -675,6 +675,11 @@ namespace HREngine.Bots
                 if (carddraw == 0) return 3;
             }
 
+            if (name == "lifetap" && p.owncards.Count <=2)
+            {
+                return 0;
+            }
+
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
             if (p.owncards.Count + p.cardsPlayedThisTurn > 5) return 5;
 
