@@ -43,13 +43,13 @@ namespace HREngine.Bots
             public int bonusForPlaying = 0;
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
-            public string requiredWeapon = "";
+            public CardDB.cardName requiredWeapon = CardDB.cardName.unknown;
 
             public combo(string s)
             {
                 int i = 0;
                 this.neededMana = 0;
-                requiredWeapon = "";
+                requiredWeapon = CardDB.cardName.unknown;
                 this.type = combotype.combo;
                 this.twoTurnCombo = false;
                 bool fixmana = false;
@@ -213,7 +213,7 @@ namespace HREngine.Bots
                 return 0;
             }
 
-            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins, string weapon)
+            public int isMultiTurnComboTurn1(List<Handmanager.Handcard> hand, int omm, List<Minion> ownmins, CardDB.cardName weapon)
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
@@ -244,7 +244,7 @@ namespace HREngine.Bots
                         }
                     }
 
-                    if (requiredWeapon != "" && requiredWeapon != weapon) return 1;
+                    if (requiredWeapon != CardDB.cardName.unknown && requiredWeapon != weapon) return 1;
 
                     if (turn0requires >= combot0len) return 2;
 
@@ -449,7 +449,7 @@ namespace HREngine.Bots
             
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist, string weapon)
+        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely

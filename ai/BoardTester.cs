@@ -274,7 +274,7 @@ namespace HREngine.Bots
                     {
                         try
                         {
-                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
+                            Enchantment e = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[0]));
                             e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
                             e.creator = Convert.ToInt32(s.Split(' ')[1]);
                             tempminion.enchantments.Add(e);
@@ -354,7 +354,7 @@ namespace HREngine.Bots
                     {
                         try
                         {
-                            Enchantment e = CardDB.getEnchantmentFromCardID(s.Split(' ')[0]);
+                            Enchantment e = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[0]));
                             e.controllerOfCreator = Convert.ToInt32(s.Split(' ')[2]);
                             e.creator = Convert.ToInt32(s.Split(' ')[1]);
                             tempminion.enchantments.Add(e);
@@ -483,7 +483,7 @@ namespace HREngine.Bots
 
             if (hc.card.Stealth) m.stealth = true;
 
-            if (m.name == "lightspawn" && !m.silenced)
+            if (m.name == CardDB.cardName.lightspawn && !m.silenced)
             {
                 m.Angr = m.Hp;
             }

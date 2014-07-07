@@ -49,7 +49,7 @@ namespace HREngine.Bots
         public int ownHeroNumAttacksThisTurn = 0;
         public bool ownHeroWindfury = false;
 
-        public List<string> ownSecretList = new List<string>();
+        public List<CardDB.cardIDEnum> ownSecretList = new List<CardDB.cardIDEnum>();
         public int enemySecretCount = 0;
 
 
@@ -70,11 +70,11 @@ namespace HREngine.Bots
 
         public int enemyWeaponDurability = 0;
         public int enemyWeaponAttack = 0;
-        public string enemyHeroWeapon = "";
+        public CardDB.cardName enemyHeroWeapon = CardDB.cardName.unknown;
 
         public int heroWeaponDurability = 0;
         public int heroWeaponAttack = 0;
-        public string ownHeroWeapon = "";
+        public CardDB.cardName ownHeroWeapon = CardDB.cardName.unknown;
         public bool heroImmuneToDamageWhileAttacking = false;
         public bool heroImmune = false;
         public bool enemyHeroImmune = false;
@@ -159,8 +159,8 @@ namespace HREngine.Bots
             enemyMinions.Clear();
             heroImmune = false;
             enemyHeroImmune = false;
-            this.ownHeroWeapon = "";
-            this.enemyHeroWeapon = "";
+            this.ownHeroWeapon = CardDB.cardName.unknown;
+            this.enemyHeroWeapon = CardDB.cardName.unknown;
         }
 
 
@@ -303,7 +303,7 @@ namespace HREngine.Bots
             this.ownSecretList.Clear();
             foreach (string s in ownsecs)
             {
-                this.ownSecretList.Add(s);
+                this.ownSecretList.Add(CardDB.Instance.cardIdstringToEnum(s));
             }
             this.enemySecretCount = numEnemSec;
         }
@@ -323,7 +323,7 @@ namespace HREngine.Bots
 
         public void updateOwnHero(string weapon, int watt, int wdur, bool heroimunewhileattack, int heroatt, int herohp, int herodef, string heron, bool heroready, bool frozen, CardDB.Card hab, bool habrdy, int numAttacksTTurn, bool windfury, bool hisim)
         {
-            this.ownHeroWeapon = weapon;
+            this.ownHeroWeapon = CardDB.Instance.cardNamestringToEnum(weapon);
             this.heroWeaponAttack = watt;
             this.heroWeaponDurability = wdur;
             this.heroImmuneToDamageWhileAttacking = heroimunewhileattack;
@@ -342,7 +342,7 @@ namespace HREngine.Bots
 
         public void updateEnemyHero(string weapon, int watt, int wdur, int heroatt, int herohp, int herodef, string heron, bool frozen, CardDB.Card eab, bool ehisim, int enemMM)
         {
-            this.enemyHeroWeapon = weapon;
+            this.enemyHeroWeapon = CardDB.Instance.cardNamestringToEnum(weapon);
             this.enemyWeaponAttack = watt;
             this.enemyWeaponDurability = wdur;
             this.enemyAtk = heroatt;
@@ -368,7 +368,7 @@ namespace HREngine.Bots
             foreach (BattleField.HrtUnit bhu in enchantments)
             {
                 //create enchantment
-                Enchantment ench = CardDB.getEnchantmentFromCardID(bhu.CardID);
+                Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(bhu.CardID));
                 ench.creator = bhu.getTag(GAME_TAG.CREATOR);
                 ench.cantBeDispelled = false;
                 if (bhu.getTag(GAME_TAG.CANT_BE_DISPELLED) == 1) ench.cantBeDispelled = true;
@@ -455,7 +455,7 @@ namespace HREngine.Bots
 
             if (hc.card.Stealth) m.stealth = true;
 
-            if (m.name == "lightspawn" && !m.silenced)
+            if (m.name == CardDB.cardName.lightspawn && !m.silenced)
             {
                 m.Angr = m.Hp;
             }
@@ -475,7 +475,7 @@ namespace HREngine.Bots
             help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon );
             help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
             string secs = "";
-            foreach (string sec in this.ownSecretList)
+            foreach (CardDB.cardIDEnum sec in this.ownSecretList)
             {
                 secs += sec + " ";
             }

@@ -88,7 +88,7 @@ namespace HREngine.Bots
             for (int i = 1; i < 3; i++)
             {
                 CardDB.Card c = hc.card;
-                if (c.name == "keeperofthegrove")
+                if (c.name == CardDB.cardName.keeperofthegrove)
                 {
                     if (i == 1)
                     {
@@ -100,7 +100,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (c.name == "starfall")
+                if (c.name == CardDB.cardName.starfall)
                 {
                     if (i == 1)
                     {
@@ -112,7 +112,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (c.name == "ancientoflore")
+                if (c.name == CardDB.cardName.ancientoflore)
                 {
                     if (i == 1)
                     {
@@ -124,7 +124,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                if (c.name == "powerofthewild")
+                if (c.name == CardDB.cardName.powerofthewild)
                 {
                     if (i == 1)
                     {
@@ -135,7 +135,7 @@ namespace HREngine.Bots
                         c = CardDB.Instance.getCardDataFromID("EX1_160a");
                     }
                 }
-                if (c.name == "ancientofwar")
+                if (c.name == CardDB.cardName.ancientofwar)
                 {
                     if (i == 1)
                     {
@@ -146,7 +146,7 @@ namespace HREngine.Bots
                         c = CardDB.Instance.getCardDataFromID("EX1_178b");
                     }
                 }
-                if (c.name == "druidoftheclaw")
+                if (c.name == CardDB.cardName.druidoftheclaw)
                 {
                     if (i == 1)
                     {
@@ -158,7 +158,7 @@ namespace HREngine.Bots
                     }
                 }
                 //cenarius dont need
-                if (c.name == "keeperofthegrove")//keeper of the grove
+                if (c.name == CardDB.cardName.keeperofthegrove)//keeper of the grove
                 {
                     if (i == 1)
                     {
@@ -169,7 +169,7 @@ namespace HREngine.Bots
                         c = CardDB.Instance.getCardDataFromID("EX1_166b");
                     }
                 }
-                if (c.name == "markofnature")
+                if (c.name == CardDB.cardName.markofnature)
                 {
                     if (i == 1)
                     {
@@ -180,7 +180,7 @@ namespace HREngine.Bots
                         c = CardDB.Instance.getCardDataFromID("EX1_155b");
                     }
                 }
-                if (c.name == "nourish")
+                if (c.name == CardDB.cardName.nourish)
                 {
                     if (i == 1)
                     {
@@ -191,7 +191,7 @@ namespace HREngine.Bots
                         c = CardDB.Instance.getCardDataFromID("EX1_164b");
                     }
                 }
-                if (c.name == "wrath")
+                if (c.name == CardDB.cardName.wrath)
                 {
                     if (i == 1)
                     {
@@ -299,7 +299,7 @@ namespace HREngine.Bots
                     }
 
                     //take a card and play it
-                    List<string> playedcards = new List<string>();
+                    List<CardDB.cardName> playedcards = new List<CardDB.cardName>();
 
                     foreach (Handmanager.Handcard hc in p.owncards)
                     {
@@ -589,7 +589,7 @@ namespace HREngine.Bots
 
                             List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
 
-                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && p.ownHeroAblility.name != "lesserheal")))// only target enemy hero during Lethal check!
+                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && p.ownHeroAblility.name != CardDB.cardName.lesserheal)))// only target enemy hero during Lethal check!
                             {
                                 targett trg = trgts.Find(x => x.target == 200);
                                 if (trg != null)

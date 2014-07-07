@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 69;
+        private int versionnumber = 70;
         private bool singleLog = false;
 
 
@@ -204,7 +204,7 @@ namespace HREngine.Bots
             if (enemyPlayer.HasWeapon())
             {
                 HREntity weapon = enemyPlayer.GetWeaponCard().GetEntity();
-                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name;
+                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
                 this.enemyWeaponAttack = weapon.GetATK();
                 this.enemyWeaponDurability = weapon.GetDurability();
 
@@ -242,7 +242,7 @@ namespace HREngine.Bots
             if (ownPlayer.HasWeapon())
             {
                 HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
-                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name;
+                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
                 this.heroWeaponAttack = weapon.GetATK();
                 this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
@@ -363,7 +363,7 @@ namespace HREngine.Bots
                         m.Ready = true;
                     }
 
-                    if (!m.silenced && (m.name == "ancientwatcher" || m.name == "ragnarosthefirelord"))
+                    if (!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
                     {
                         m.Ready = false;
                     }
@@ -387,7 +387,7 @@ namespace HREngine.Bots
                     //Helpfunctions.Instance.ErrorLog("found weapon!");
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
                     {
-                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name;
+                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
                         this.heroWeaponAttack = entitiy.GetATK();
                         this.heroWeaponDurability = entitiy.GetDurability();
                         //this.heroImmuneToDamageWhileAttacking = false;
@@ -396,7 +396,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name;
+                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
                         this.enemyWeaponAttack = entitiy.GetATK();
                         this.enemyWeaponDurability = entitiy.GetDurability();
                     }
@@ -429,7 +429,7 @@ namespace HREngine.Bots
             foreach (HREntity bhu in enchantments)
             {
                 //create enchantment
-                Enchantment ench = CardDB.getEnchantmentFromCardID(bhu.GetCardId());
+                Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(bhu.GetCardId()));
                 ench.creator = bhu.GetCreatorId();
                 ench.controllerOfCreator = bhu.GetControllerId();
                 ench.cantBeDispelled = false;

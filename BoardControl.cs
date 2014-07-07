@@ -91,12 +91,12 @@ namespace HREngine.Bots
               if (!m.taunt && m.stealth && penman.specialMinions.ContainsKey(m.name)) retval += 20;
               //if (m.poisonous) retval += 1;
               if (m.divineshild && m.taunt) retval += 4;
-              if (m.taunt && m.handcard.card.specialMin == CardDB.specialMinions.frog) owntaunt++;
+              if (m.taunt && m.handcard.card.name == CardDB.cardName.frog) owntaunt++;
               if (m.Angr > 1 || m.Hp > 1) ownMinionsCount++;
               if (m.handcard.card.hasEffect) retval += 1;
-              if (m.handcard.card.specialMin == CardDB.specialMinions.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
-              if (m.handcard.card.specialMin == CardDB.specialMinions.direwolfalpha || m.handcard.card.specialMin == CardDB.specialMinions.flametonguetotem || m.handcard.card.specialMin == CardDB.specialMinions.stormwindchampion || m.handcard.card.specialMin == CardDB.specialMinions.raidleader) retval += 10;
-              if (m.handcard.card.specialMin == CardDB.specialMinions.bloodmagethalnos) retval += 10;
+              if (m.handcard.card.name == CardDB.cardName.silverhandrecruit && m.Angr == 1 && m.Hp == 1) retval -= 5;
+              if (m.handcard.card.name == CardDB.cardName.direwolfalpha || m.handcard.card.name == CardDB.cardName.flametonguetotem || m.handcard.card.name == CardDB.cardName.stormwindchampion || m.handcard.card.name == CardDB.cardName.raidleader) retval += 10;
+              if (m.handcard.card.name == CardDB.cardName.bloodmagethalnos) retval += 10;
           }
 
           /*if (p.enemyMinions.Count >= 0)
@@ -113,15 +113,15 @@ namespace HREngine.Bots
           {
               if (a.heroattack && p.enemyHeroHp <= p.attackFaceHP) retval++;
               if (a.useability) useAbili = true;
-              if (a.useability && a.handcard.card.specialMin ==  CardDB.specialMinions.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
+              if (a.useability && a.handcard.card.name == CardDB.cardName.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
               if (!a.cardplay) continue;
-              if ((a.handcard.card.specialMin == CardDB.specialMinions.thecoin || a.handcard.card.specialMin == CardDB.specialMinions.innervate)) usecoin=true;
+              if ((a.handcard.card.name == CardDB.cardName.thecoin || a.handcard.card.name == CardDB.cardName.innervate)) usecoin = true;
               if (a.handcard.card.type == CardDB.cardtype.MOB) playmobs++;
               //if (a.handcard.card.name == "arcanemissiles" && a.numEnemysBeforePlayed == 0) retval -= 10; // arkane missles on enemy hero is bad :D
 
-              if (a.handcard.card.specialMin ==  CardDB.specialMinions.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
+              if (a.handcard.card.name == CardDB.cardName.flamestrike && a.numEnemysBeforePlayed <= 2) retval -= 20;
               //save spell for all classes: (except for rouge if he has no combo)
-              if (p.ownHeroName != HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.specialMin!= CardDB.specialMinions.shieldblock) retval -= 11;
+              if (p.ownHeroName != HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.numEnemysBeforePlayed == 0 || a.enemytarget == 200) && a.handcard.card.name != CardDB.cardName.shieldblock) retval -= 11;
               if (p.ownHeroName == HeroEnum.thief && a.handcard.card.type == CardDB.cardtype.SPELL && (a.enemytarget == 200)) retval -= 11;
           }
           if (usecoin && useAbili && p.ownMaxMana <= 2) retval -= 40;
@@ -156,8 +156,8 @@ namespace HREngine.Bots
           foreach (Action a in p.playactions)
           {
               if (!a.cardplay) continue;
-              if (a.handcard.card.specialMin ==  CardDB.specialMinions.soulfire || a.handcard.card.specialMin ==  CardDB.specialMinions.doomguard || a.handcard.card.specialMin ==  CardDB.specialMinions.succubus) deletecardsAtLast = 1;
-              if (deletecardsAtLast == 1 && !(a.handcard.card.specialMin == CardDB.specialMinions.soulfire || a.handcard.card.specialMin == CardDB.specialMinions.doomguard || a.handcard.card.specialMin == CardDB.specialMinions.succubus)) retval -= 20;
+              if (a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus) deletecardsAtLast = 1;
+              if (deletecardsAtLast == 1 && !(a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus)) retval -= 20;
           }
           if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
           if (p.ownHeroHp <= 0) retval = -10000;
@@ -172,7 +172,7 @@ namespace HREngine.Bots
        {
            int retval = 10;
            retval += m.Hp * 2;
-           if (!m.frozen && !(m.handcard.card.specialMin == CardDB.specialMinions.ancientwatcher && !m.silenced))
+           if (!m.frozen && !(m.handcard.card.name == CardDB.cardName.ancientwatcher && !m.silenced))
            {
                retval += m.Angr * 2;
                if (m.windfury) retval += m.Angr * 2;

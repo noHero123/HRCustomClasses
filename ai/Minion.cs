@@ -9,7 +9,7 @@ namespace HREngine.Bots
     public class Enchantment
     {
         public bool cantBeDispelled = false;
-        public string CARDID = "";
+        public CardDB.cardIDEnum CARDID = CardDB.cardIDEnum.None;
         public int creator = 0;
         public int angrbuff = 0;
         public int hpbuff = 0;
@@ -44,7 +44,7 @@ namespace HREngine.Bots
         public bool Ready = false;
         public bool taunt = false;
         public bool wounded = false;//hp red?
-        public string name = "";
+        public CardDB.cardName name = CardDB.cardName.unknown;
         public Handmanager.Handcard handcard;
         public bool divineshild = false;
         public bool windfury = false;
