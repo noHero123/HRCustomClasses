@@ -393,7 +393,7 @@ namespace HREngine.Bots
                     {
                         if(moveTodo.enemyEntitiy>=0) this.dirtytarget = moveTodo.enemyEntitiy;
                         this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                        this.choiceCardId = moveTodo.handcard.card.CardID;
+                        this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
 
                     }
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
@@ -411,7 +411,7 @@ namespace HREngine.Bots
                     if (moveTodo.druidchoice >= 1)
                     {
                         this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                        this.choiceCardId = moveTodo.handcard.card.CardID;
+                        this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
 
                     }
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)

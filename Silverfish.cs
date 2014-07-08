@@ -204,7 +204,7 @@ namespace HREngine.Bots
             if (enemyPlayer.HasWeapon())
             {
                 HREntity weapon = enemyPlayer.GetWeaponCard().GetEntity();
-                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
+                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
                 this.enemyWeaponAttack = weapon.GetATK();
                 this.enemyWeaponDurability = weapon.GetDurability();
 
@@ -242,7 +242,7 @@ namespace HREngine.Bots
             if (ownPlayer.HasWeapon())
             {
                 HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
-                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
+                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
                 this.heroWeaponAttack = weapon.GetATK();
                 this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
@@ -273,10 +273,10 @@ namespace HREngine.Bots
 
             //own hero ablity stuff###########################################################
 
-            this.heroAbility = CardDB.Instance.getCardDataFromID(ownHeroAbility.GetCardId());
+            this.heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ownHeroAbility.GetCardId()));
             this.ownAbilityisReady = (ownHeroAbility.IsExhausted()) ? false : true; // if exhausted, ability is NOT ready
 
-            this.enemyAbility = CardDB.Instance.getCardDataFromID(enemyhero.GetHeroPower().GetCardId());
+            this.enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(enemyhero.GetHeroPower().GetCardId()));
 
 
 
@@ -304,7 +304,7 @@ namespace HREngine.Bots
                 if (entitiy.GetCardType() == HRCardType.MINION && zp >= 1)
                 {
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
                     Minion m = new Minion();
                     m.name = c.name;
                     m.handcard.card = c;
@@ -387,7 +387,7 @@ namespace HREngine.Bots
                     //Helpfunctions.Instance.ErrorLog("found weapon!");
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
                     {
-                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
+                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
                         this.heroWeaponAttack = entitiy.GetATK();
                         this.heroWeaponDurability = entitiy.GetDurability();
                         //this.heroImmuneToDamageWhileAttacking = false;
@@ -396,7 +396,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
+                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
                         this.enemyWeaponAttack = entitiy.GetATK();
                         this.enemyWeaponDurability = entitiy.GetDurability();
                     }
@@ -473,7 +473,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetControllerId() == this.ownPlayerController && entitiy.GetZonePosition() >= 1) // own handcard
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
                     //c.cost = entitiy.GetCost();
                     //c.entityID = entitiy.GetEntityId();
 

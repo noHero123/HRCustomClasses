@@ -59,7 +59,6 @@
     <Compile Include="ai\Settings.cs" />
     <Compile Include="Silverfish.cs" />
     <Compile Include="ai\action.cs" />
-    <Compile Include="ai\Battlefield.cs" />
     <Compile Include="ai\CardDB.cs" />
     <Compile Include="ai\Ai.cs" />
     <Compile Include="ai\Handmanager.cs" />

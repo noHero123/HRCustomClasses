@@ -551,10 +551,6 @@ namespace HREngine.Bots
                   }
               }
 
-
-              //SafeHandleBattleLocalPlayerTurnHandler();
-
-
               sf.updateEverything(this);
               Action moveTodo = Ai.Instance.bestmove;
               if (moveTodo == null)
@@ -576,7 +572,7 @@ namespace HREngine.Bots
                       {
                           if (moveTodo.enemyEntitiy >= 0) this.dirtytarget = moveTodo.enemyEntitiy;
                           this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                          this.choiceCardId = moveTodo.handcard.card.CardID;
+                          this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
 
                       }
                       if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
@@ -594,7 +590,7 @@ namespace HREngine.Bots
                       if (moveTodo.druidchoice >= 1)
                       {
                           this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                          this.choiceCardId = moveTodo.handcard.card.CardID;
+                          this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
 
                       }
                       if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
@@ -621,7 +617,6 @@ namespace HREngine.Bots
                   HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
                   HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
                   this.dirtytarget = moveTodo.enemyEntitiy;
-                  //Helpfunctions.Instance.ErrorLog("heroattack: attkr:" + moveTodo.ownEntitiy + " defender: " + moveTodo.enemyEntitiy);
                   Helpfunctions.Instance.ErrorLog("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                   Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
                   if (HRPlayer.GetLocalPlayer().HasWeapon())
@@ -732,7 +727,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 70;
+        private int versionnumber = 71;
         private bool singleLog = false;
 
 
@@ -925,7 +920,7 @@ namespace HREngine.Bots
             if (enemyPlayer.HasWeapon())
             {
                 HREntity weapon = enemyPlayer.GetWeaponCard().GetEntity();
-                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
+                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
                 this.enemyWeaponAttack = weapon.GetATK();
                 this.enemyWeaponDurability = weapon.GetDurability();
 
@@ -963,7 +958,7 @@ namespace HREngine.Bots
             if (ownPlayer.HasWeapon())
             {
                 HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
-                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(weapon.GetCardId()).name.ToString();
+                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
                 this.heroWeaponAttack = weapon.GetATK();
                 this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
                 this.heroImmuneToDamageWhileAttacking = false;
@@ -994,10 +989,10 @@ namespace HREngine.Bots
 
             //own hero ablity stuff###########################################################
 
-            this.heroAbility = CardDB.Instance.getCardDataFromID(ownHeroAbility.GetCardId());
+            this.heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ownHeroAbility.GetCardId()));
             this.ownAbilityisReady = (ownHeroAbility.IsExhausted()) ? false : true; // if exhausted, ability is NOT ready
 
-            this.enemyAbility = CardDB.Instance.getCardDataFromID(enemyhero.GetHeroPower().GetCardId());
+            this.enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(enemyhero.GetHeroPower().GetCardId()));
 
 
 
@@ -1025,7 +1020,7 @@ namespace HREngine.Bots
                 if (entitiy.GetCardType() == HRCardType.MINION && zp >= 1)
                 {
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
                     Minion m = new Minion();
                     m.name = c.name;
                     m.handcard.card = c;
@@ -1108,7 +1103,7 @@ namespace HREngine.Bots
                     //Helpfunctions.Instance.ErrorLog("found weapon!");
                     if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
                     {
-                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
+                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
                         this.heroWeaponAttack = entitiy.GetATK();
                         this.heroWeaponDurability = entitiy.GetDurability();
                         //this.heroImmuneToDamageWhileAttacking = false;
@@ -1117,7 +1112,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(entitiy.GetCardId()).name.ToString();
+                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
                         this.enemyWeaponAttack = entitiy.GetATK();
                         this.enemyWeaponDurability = entitiy.GetDurability();
                     }
@@ -1194,7 +1189,7 @@ namespace HREngine.Bots
 
                 if (entitiy.GetControllerId() == this.ownPlayerController && entitiy.GetZonePosition() >= 1) // own handcard
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(entitiy.GetCardId());
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
                     //c.cost = entitiy.GetCost();
                     //c.entityID = entitiy.GetEntityId();
 
@@ -2162,7 +2157,7 @@ namespace HREngine.Bots
             {
                 int anz = this.ownMinions.Count;
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_538t");//hound
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_538t);//hound
                 for (int i = 0; i < anz; i++)
                 {
                     callKid(kid, posi, false);
@@ -2737,7 +2732,7 @@ namespace HREngine.Bots
 
                     //call 3 snakes (if possible)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_554t);//snake
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
                     callKid(kid, posi, true);
@@ -2806,7 +2801,7 @@ namespace HREngine.Bots
                 {
                     //summon snake ( a weak minion)
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_554t");//snake
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_554t);//snake
                     callKid(kid, posi, true);
                 }
                 if (secretID == CardDB.cardIDEnum.tt_010) //spellbender
@@ -2849,7 +2844,7 @@ namespace HREngine.Bots
                 {
                     //spawn a 2/1 taunt!
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_121");//frostwolfgrunt
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_121);//frostwolfgrunt
                     callKid(kid, posi, true);
                     this.ownMinions[this.ownMinions.Count - 1].maxHp = 1;
                     this.ownMinions[this.ownMinions.Count - 1].Hp = 1;
@@ -3120,7 +3115,7 @@ namespace HREngine.Bots
                 if (m.name == CardDB.cardName.hogger) // summon
                 {
                     int posi = m.id;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_040t");//gnoll
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_040t);//gnoll
                     callKid(kid, posi, own);
                 }
 
@@ -3130,7 +3125,7 @@ namespace HREngine.Bots
                     if (m.Hp == 1) posi--;
                     minionGetDamagedOrHealed(m, 1, 0, own);
 
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_598");//imp
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_598);//imp
                     callKid(kid, posi, own);
                 }
 
@@ -3296,7 +3291,7 @@ namespace HREngine.Bots
                             temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//damage the lowest
                             foreach (Minion mins in temp2)
                             {
-                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka4t);
                                 minionTransform(mins, c, false);
                                 break;
                             }
@@ -3309,7 +3304,7 @@ namespace HREngine.Bots
                             temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
                             foreach (Minion mins in temp2)
                             {
-                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka4t);
                                 minionTransform(mins, c, true);
                                 break;
                             }
@@ -3323,7 +3318,7 @@ namespace HREngine.Bots
                             temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
                             foreach (Minion mins in temp2)
                             {
-                                CardDB.Card c = CardDB.Instance.getCardDataFromID("Mekka4t");
+                                CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka4t);
                                 minionTransform(mins, c, true);
                                 break;
                             }
@@ -3343,7 +3338,7 @@ namespace HREngine.Bots
                         temp2.Sort((a, b) => -a.card.Attack.CompareTo(b.card.Attack));//damage the stronges
                         foreach (Handmanager.Handcard mins in temp2)
                         {
-                            CardDB.Card c = CardDB.Instance.getCardDataFromID(mins.card.CardID);
+                            CardDB.Card c = CardDB.Instance.getCardDataFromID(mins.card.cardIDenum);
                             minionTransform(m, c, true);
                             this.removeCard(mins);
                             this.drawACard(CardDB.cardName.alarmobot, true);
@@ -3636,8 +3631,6 @@ namespace HREngine.Bots
 
         private void adjacentBuffUpdate(bool own)
         {
-            int before = -1;
-            int after = 1;
             List<Minion> lm = new List<Minion>();
             if (own)
             {
@@ -3649,24 +3642,7 @@ namespace HREngine.Bots
             }
             foreach (Minion m in lm)
             {
-                /*
-                if (m.name == CardDB.cardName.direwolfalpha")
-                {
-                    string enchantment = "EX1_162o";
-                    //help.logg("buffupdate " + m.entitiyID);
-                    adjacentBuffer(m, enchantment, before, after, own);
-                }
-                if (m.name == CardDB.cardName.flametonguetotem")
-                {
-                    string enchantment = "EX1_565o";
-                    adjacentBuffer(m, enchantment, before, after, own);
-                }
-                before++;
-                after++;
-                */
                 getNewEffects(m, own, m.id, false);
-
-
             }
 
         }
@@ -3935,20 +3911,20 @@ namespace HREngine.Bots
                 //real deathrattles
                 if (m.handcard.card.cardIDenum == CardDB.cardIDEnum.EX1_534)//m.name == CardDB.cardName.savannenhochmaehne"
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_534t");//hyena
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_534t);//hyena
                     callKid(c, m.id - 1, own);
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == CardDB.cardName.harvestgolem)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID("skele21");//damagedgolem
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.skele21);//damagedgolem
                     callKid(c, m.id - 1, own);
                 }
 
                 if (m.name == CardDB.cardName.cairnebloodhoof)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_110");//bainebloodhoof
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_110);//bainebloodhoof
                     callKid(c, m.id - 1, own);
                     //penaltity for summon this thing :D (so we dont kill it only to have a new minion)
                     this.evaluatePenality += 5;
@@ -3958,7 +3934,7 @@ namespace HREngine.Bots
 
                 if (m.name == CardDB.cardName.thebeast)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_finkle");//finkleeinhorn
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_finkle);//finkleeinhorn
                     int place = this.enemyMinions.Count - 1;
                     if (!own) place = this.ownMinions.Count - 1;
                     callKid(c, place, !own);
@@ -4025,7 +4001,7 @@ namespace HREngine.Bots
                 {
                     if (own)
                     {
-                        CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_383t");//ashbringer
+                        CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_383t);//ashbringer
                         this.equipWeapon(c);
                     }
                     else
@@ -4114,7 +4090,7 @@ namespace HREngine.Bots
                     {
                         if (enemyAnzCards + enemycarddraw >= 1)
                         {
-                            CardDB.Card c = CardDB.Instance.getCardDataFromID("EX1_301");//felguard
+                            CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_301);//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
                         }
                     }
@@ -4233,7 +4209,7 @@ namespace HREngine.Bots
                 if (e.CARDID == CardDB.cardIDEnum.EX1_158e)
                 {
                     //revive minion due to "geist der ahnen"
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_158t");//Treant
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_158t);//Treant
                     int pos = this.ownMinions.Count - 1;
                     if (!own) pos = this.enemyMinions.Count - 1;
                     callKid(kid, pos, own);
@@ -4839,7 +4815,7 @@ namespace HREngine.Bots
         {
             target.name = source.name;
             target.Angr = source.Angr;
-            target.handcard.card = CardDB.Instance.getCardDataFromID(source.handcard.card.CardID);
+            target.handcard.card = CardDB.Instance.getCardDataFromID(source.handcard.card.cardIDenum);
             target.charge = source.charge;
             target.divineshild = source.divineshild;
             target.exhausted = source.exhausted;
@@ -5521,7 +5497,7 @@ namespace HREngine.Bots
 
             if (c.name == CardDB.cardName.lordjaraxxus)
             {
-                this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_tk33");
+                this.ownHeroAblility = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk33);
                 this.ownHeroName = HeroEnum.lordjaraxxus;
                 this.ownHeroHp = c.Hp;
             }
@@ -5624,7 +5600,7 @@ namespace HREngine.Bots
 
             if (c.name == CardDB.cardName.arathiweaponsmith)
             {
-                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_398t");//battleaxe
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_398t);//battleaxe
                 this.equipWeapon(wcard);
 
 
@@ -5859,28 +5835,28 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.murloctidehunter)
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_506a");//murlocscout
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_506a);//murlocscout
                 callKid(kid, position, own);
 
             }
             if (c.name == CardDB.cardName.razorfenhunter)
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_boar");//boar
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_boar);//boar
                 callKid(kid, position, own);
 
             }
             if (c.name == CardDB.cardName.dragonlingmechanic)
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_025t");//mechanicaldragonling
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_025t);//mechanicaldragonling
                 callKid(kid, position, own);
 
             }
             if (c.name == CardDB.cardName.leeroyjenkins)
             {
                 kids = 2;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_116t);//whelp
                 int pos = this.ownMinions.Count - 1;
                 if (own) pos = this.enemyMinions.Count - 1;
                 callKid(kid, pos, !own);
@@ -5891,7 +5867,7 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.cenarius && choice == 2)
             {
                 kids = 2;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_573t"); //special treant
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_573t); //special treant
                 int pos = this.ownMinions.Count - 1;
                 if (!own) pos = this.enemyMinions.Count - 1;
                 callKid(kid, pos, own);
@@ -5901,14 +5877,14 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.silverhandknight)
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_152");//squire
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_152);//squire
                 callKid(kid, position, own);
 
             }
             if (c.name == CardDB.cardName.gelbinmekkatorque)
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("Mekka1");//homingchicken
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka1);//homingchicken
                 callKid(kid, position, own);
 
             }
@@ -5916,14 +5892,14 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.defiasringleader && this.cardsPlayedThisTurn >= 1) //needs combo for spawn
             {
                 kids = 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_131t");//defiasbandit
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_131t);//defiasbandit
                 callKid(kid, position, own);
 
             }
             if (c.name == CardDB.cardName.onyxia)
             {
                 kids = 7 - this.ownMinions.Count;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_116t");//whelp
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_116t);//whelp
                 for (int i = 0; i < kids; i++)
                 {
                     callKid(kid, position, own);
@@ -6648,7 +6624,7 @@ namespace HREngine.Bots
                 if (getSpellDamageDamage(2) >= m.Hp && !m.divineshild && !m.immune)
                 {
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_059");//bloodimp
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_059);//bloodimp
                     callKid(kid, posi, true);
                 }
             }
@@ -6837,8 +6813,8 @@ namespace HREngine.Bots
                         }
                     }
                 }
-                if (sheep) minionTransform(m, CardDB.Instance.getCardDataFromID("CS2_tk1"), own);
-                if (frogg) minionTransform(m, CardDB.Instance.getCardDataFromID("hexfrog"), own);
+                if (sheep) minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_tk1), own);
+                if (frogg) minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.hexfrog), own);
                 if (setHPtoONE)
                 {
                     m.Hp = 1; m.maxHp = 1;
@@ -6881,8 +6857,8 @@ namespace HREngine.Bots
                         }
                     }
                 }
-                if (sheep) minionTransform(m, CardDB.Instance.getCardDataFromID("CS2_tk1"), own);
-                if (frogg) minionTransform(m, CardDB.Instance.getCardDataFromID("hexfrog"), own);
+                if (sheep) minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_tk1), own);
+                if (frogg) minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.hexfrog), own);
                 if (setHPtoONE)
                 {
                     m.Hp = 1; m.maxHp = 1;
@@ -6938,7 +6914,7 @@ namespace HREngine.Bots
             }
             if (c.name == CardDB.cardName.animalcompanion)
             {
-                CardDB.Card c2 = CardDB.Instance.getCardDataFromID("NEW1_032");//misha
+                CardDB.Card c2 = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_032);//misha
                 int placeoffather = this.ownMinions.Count - 1;
                 callKid(c2, placeoffather, true);
             }
@@ -6962,7 +6938,7 @@ namespace HREngine.Bots
             {
                 int anz = this.enemyMinions.Count;
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_538t");//hound
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_538t);//hound
                 for (int i = 0; i < anz; i++)
                 {
                     callKid(kid, posi, true);
@@ -7055,7 +7031,7 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    CardDB.Card wcard = CardDB.Instance.getCardDataFromID("EX1_409t");//heavyaxe
+                    CardDB.Card wcard = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_409t);//heavyaxe
                     this.equipWeapon(wcard);
                 }
 
@@ -7175,7 +7151,7 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.mirrorimage)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_mirror");
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_mirror);
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
@@ -7322,19 +7298,19 @@ namespace HREngine.Bots
             {
                 if (this.ownHeroAblility.cardIDenum == CardDB.cardIDEnum.CS1h_001) // lesser heal becomes mind spike
                 {
-                    this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t");
+                    this.ownHeroAblility = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_625t);
                     this.ownAbilityReady = true;
                 }
                 else
                 {
-                    this.ownHeroAblility = CardDB.Instance.getCardDataFromID("EX1_625t2");  // mindspike becomes mind shatter
+                    this.ownHeroAblility = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_625t2);  // mindspike becomes mind shatter
                     this.ownAbilityReady = true;
                 }
             }
 
             if (c.name == CardDB.cardName.mindgames)
             {
-                CardDB.Card copymin = CardDB.Instance.getCardDataFromID("CS2_152"); //we draw a knappe :D (worst case)
+                CardDB.Card copymin = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_152); //we draw a knappe :D (worst case)
                 callKid(copymin, this.ownMinions.Count - 1, true);
             }
 
@@ -7487,7 +7463,7 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.feralspirit)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk11");//spiritwolf
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk11);//spiritwolf
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
             }
@@ -7607,7 +7583,7 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.forceofnature)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk9");//Treant
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk9);//Treant
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
@@ -7625,7 +7601,7 @@ namespace HREngine.Bots
                 if (choice == 2)
                 {
                     int posi = this.ownMinions.Count - 1;
-                    CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_160t");//panther
+                    CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160t);//panther
                     callKid(kid, posi, true);
                 }
             }
@@ -7696,7 +7672,7 @@ namespace HREngine.Bots
             if (c.cardIDenum == CardDB.cardIDEnum.PRO_001a)// i am murloc
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("PRO_001at");//panther
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.PRO_001at);//panther
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
                 callKid(kid, posi, true);
@@ -7706,7 +7682,7 @@ namespace HREngine.Bots
             if (c.cardIDenum == CardDB.cardIDEnum.PRO_001c)// i am murloc
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_021");//scharfseher
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_021);//scharfseher
                 callKid(kid, posi, true);
 
             }
@@ -7783,12 +7759,12 @@ namespace HREngine.Bots
                 }
                 for (int i = 0; i < ownanz; i++)
                 {
-                    CardDB.Card d = CardDB.Instance.getCardDataFromID("EX1_158t");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_158t);
                     callKid(d, 0, true);
                 }
                 for (int i = 0; i < enemanz; i++)
                 {
-                    CardDB.Card d = CardDB.Instance.getCardDataFromID("EX1_158t");
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_158t);
                     callKid(d, 0, false);
                 }
             }
@@ -8010,7 +7986,7 @@ namespace HREngine.Bots
                 if (m.handcard.card.name == CardDB.cardName.violetteacher)
                 {
 
-                    CardDB.Card d = CardDB.Instance.getCardDataFromID("NEW1_026t");//violetapprentice
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_026t);//violetapprentice
                     callKid(d, m.id, true);
                 }
 
@@ -8165,7 +8141,7 @@ namespace HREngine.Bots
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.name == CardDB.cardName.illidanstormrage)
                 {
-                    CardDB.Card d = CardDB.Instance.getCardDataFromID("EX1_614t");//flameofazzinoth
+                    CardDB.Card d = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_614t);//flameofazzinoth
                     callKid(d, mnn.id, true);
                 }
                 if (mnn.handcard.card.name == CardDB.cardName.questingadventurer)
@@ -8395,7 +8371,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_082);
                 this.equipWeapon(wcard);
             }
 
@@ -8418,21 +8394,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_101t);//silverhandrecruit
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("NEW1_009");//healingtotem
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_009);//healingtotem
                 callKid(kid, posi, true);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.ownMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk34);//infernal
                 callKid(kid, posi, true);
             }
 
@@ -8548,7 +8524,7 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.thief)
             {
 
-                CardDB.Card wcard = CardDB.Instance.getCardDataFromID("CS2_082");//wickedknife
+                CardDB.Card wcard = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_082);//wickedknife
                 this.enemyheroAngr = wcard.Attack;
                 this.enemyWeaponAttack = wcard.Attack;
                 this.enemyWeaponDurability = wcard.Durability;
@@ -8578,21 +8554,21 @@ namespace HREngine.Bots
             if (heroname == HeroEnum.pala)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_101t");//silverhandrecruit
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_101t);//silverhandrecruit
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.shaman)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("CS2_050");//searingtotem
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_050);//searingtotem
                 callKid(kid, posi, false);
             }
 
             if (heroname == HeroEnum.lordjaraxxus)
             {
                 int posi = this.enemyMinions.Count - 1;
-                CardDB.Card kid = CardDB.Instance.getCardDataFromID("EX1_tk34");//infernal
+                CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk34);//infernal
                 callKid(kid, posi, false);
             }
 
@@ -9254,11 +9230,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
                     }
                 }
 
@@ -9266,11 +9242,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007b);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007a);
                     }
                 }
 
@@ -9278,11 +9254,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008b);
                     }
                 }
 
@@ -9290,33 +9266,33 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160b);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160a);
                     }
                 }
                 if (c.name == CardDB.cardName.ancientofwar)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178b);
                     }
                 }
                 if (c.name == CardDB.cardName.druidoftheclaw)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t1");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t1);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t2");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t2);
                     }
                 }
                 //cenarius dont need
@@ -9324,44 +9300,44 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
                     }
                 }
                 if (c.name == CardDB.cardName.markofnature)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155b);
                     }
                 }
                 if (c.name == CardDB.cardName.nourish)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164b);
                     }
                 }
                 if (c.name == CardDB.cardName.wrath)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154b);
                     }
                 }
 
@@ -10103,8 +10079,6 @@ namespace HREngine.Bots
             }
         }
 
-        private BattleField bf = BattleField.Instance;
-
         public List<Cardsposi> cardsdata = new List<Cardsposi>();
 
         public List<Handcard> handCards = new List<Handcard>();
@@ -10300,7 +10274,7 @@ namespace HREngine.Bots
             help.logg("Own Handcards: ");
             foreach (Handmanager.Handcard c in this.handCards)
             {
-                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.CardID);
+                help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.cardIDenum);
             }
         }
 
@@ -10335,7 +10309,6 @@ namespace HREngine.Bots
         public int ownHeroEntity = -1;
         public int enemyHeroEntitiy = -1;
         public DateTime roundstart = DateTime.Now;
-        BattleField bf = BattleField.Instance;
         bool tempwounded = false;
         public int currentMana = 0;
         public int heroHp = 30, enemyHp = 30;
@@ -10660,38 +10633,6 @@ namespace HREngine.Bots
             this.enemyHeroFatigue = ehf;
         }
 
-        public void setEnchantments(List<BattleField.HrtUnit> enchantments)
-        {
-            foreach (BattleField.HrtUnit bhu in enchantments)
-            {
-                //create enchantment
-                Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(bhu.CardID));
-                ench.creator = bhu.getTag(GAME_TAG.CREATOR);
-                ench.cantBeDispelled = false;
-                if (bhu.getTag(GAME_TAG.CANT_BE_DISPELLED) == 1) ench.cantBeDispelled = true;
-
-                foreach (Minion m in this.ownMinions)
-                {
-                    if (m.entitiyID == bhu.getTag(GAME_TAG.ATTACHED))
-                    {
-                        m.enchantments.Add(ench);
-                    }
-
-                }
-
-                foreach (Minion m in this.enemyMinions)
-                {
-                    if (m.entitiyID == bhu.getTag(GAME_TAG.ATTACHED))
-                    {
-                        m.enchantments.Add(ench);
-                    }
-
-                }
-
-            }
-
-        }
-
         public void updatePositions()
         {
             this.ownMinions.Sort((a, b) => a.zonepos.CompareTo(b.zonepos));
@@ -10770,7 +10711,7 @@ namespace HREngine.Bots
             help.logg("ownhero:");
             help.logg(this.heroname + " " + heroHp + " " + heroDefence + " " + this.heroImmuneToDamageWhileAttacking + " " + this.heroImmune);
             help.logg("ready: " + this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon);
-            help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
+            help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.cardIDenum);
             string secs = "";
             foreach (CardDB.cardIDEnum sec in this.ownSecretList)
             {
@@ -10780,7 +10721,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen + " " + this.enemyHeroImmune);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
-            help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
+            help.logg("ability: " + "true" + " " + this.enemyAbility.cardIDenum);
             help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }
@@ -10791,7 +10732,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " " + m.handcard.card.CardID + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.cardIDenum + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -10805,7 +10746,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " " + m.handcard.card.CardID + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.cardIDenum + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);
@@ -10917,6 +10858,10 @@ namespace HREngine.Bots
             int retval = 0;
 
             //no penality, but a bonus, if he has weapon on hand!
+            if (target == 200 && p.ownWeaponName == CardDB.cardName.gorehowl && p.ownWeaponAttack >= 3)
+            {
+                return 10;
+            }
             if (p.ownWeaponDurability >= 1)
             {
                 bool hasweapon = false;
@@ -11733,6 +11678,7 @@ namespace HREngine.Bots
             if (name == CardDB.cardName.betrayal && target >= 10 && target <= 19)
             {
                 if (m.Angr == 0) return 30;
+                if (p.enemyMinions.Count == 1) return 30;
             }
 
 
@@ -12906,11 +12852,11 @@ namespace HREngine.Bots
         {
             public combotype type = combotype.combo;
             public int neededMana = 0;
-            public Dictionary<string, int> combocards = new Dictionary<string, int>();
-            public Dictionary<string, int> cardspen = new Dictionary<string, int>();
-            public Dictionary<string, int> combocardsTurn0Mobs = new Dictionary<string, int>();
-            public Dictionary<string, int> combocardsTurn0All = new Dictionary<string, int>();
-            public Dictionary<string, int> combocardsTurn1 = new Dictionary<string, int>();
+            public Dictionary<CardDB.cardIDEnum, int> combocards = new Dictionary<CardDB.cardIDEnum, int>();
+            public Dictionary<CardDB.cardIDEnum, int> cardspen = new Dictionary<CardDB.cardIDEnum, int>();
+            public Dictionary<CardDB.cardIDEnum, int> combocardsTurn0Mobs = new Dictionary<CardDB.cardIDEnum, int>();
+            public Dictionary<CardDB.cardIDEnum, int> combocardsTurn0All = new Dictionary<CardDB.cardIDEnum, int>();
+            public Dictionary<CardDB.cardIDEnum, int> combocardsTurn1 = new Dictionary<CardDB.cardIDEnum, int>();
             public int penality = 0;
             public int combolength = 0;
             public int combot0len = 0;
@@ -12989,22 +12935,22 @@ namespace HREngine.Bots
                         string crd = crdl.Split(',')[0];
                         if (t1)
                         {
-                            manat1 += CardDB.Instance.getCardDataFromID(crd).cost;
+                            manat1 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
                         }
                         else
                         {
-                            manat0 += CardDB.Instance.getCardDataFromID(crd).cost;
+                            manat0 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
                         }
                         this.combolength++;
 
-                        if (combocards.ContainsKey(crd))
+                        if (combocards.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
                         {
-                            combocards[crd]++;
+                            combocards[CardDB.Instance.cardIdstringToEnum(crd)]++;
                         }
                         else
                         {
-                            combocards.Add(crd, 1);
-                            cardspen.Add(crd, Convert.ToInt32(crdl.Split(',')[1]));
+                            combocards.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
+                            cardspen.Add(CardDB.Instance.cardIdstringToEnum(crd), Convert.ToInt32(crdl.Split(',')[1]));
                         }
 
                         if (this.twoTurnCombo)
@@ -13012,28 +12958,28 @@ namespace HREngine.Bots
 
                             if (t1)
                             {
-                                if (this.combocardsTurn1.ContainsKey(crd))
+                                if (this.combocardsTurn1.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
                                 {
-                                    combocardsTurn1[crd]++;
+                                    combocardsTurn1[CardDB.Instance.cardIdstringToEnum(crd)]++;
                                 }
                                 else
                                 {
-                                    combocardsTurn1.Add(crd, 1);
+                                    combocardsTurn1.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
                                 }
                                 this.combot1len++;
                             }
                             else
                             {
-                                CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(crd);
+                                CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd));
                                 if (lolcrd.type == CardDB.cardtype.MOB)
                                 {
-                                    if (this.combocardsTurn0Mobs.ContainsKey(crd))
+                                    if (this.combocardsTurn0Mobs.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
                                     {
-                                        combocardsTurn0Mobs[crd]++;
+                                        combocardsTurn0Mobs[CardDB.Instance.cardIdstringToEnum(crd)]++;
                                     }
                                     else
                                     {
-                                        combocardsTurn0Mobs.Add(crd, 1);
+                                        combocardsTurn0Mobs.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
                                     }
                                     this.combot0len++;
                                 }
@@ -13041,13 +12987,13 @@ namespace HREngine.Bots
                                 {
                                     this.requiredWeapon = lolcrd.name;
                                 }
-                                if (this.combocardsTurn0All.ContainsKey(crd))
+                                if (this.combocardsTurn0All.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
                                 {
-                                    combocardsTurn0All[crd]++;
+                                    combocardsTurn0All[CardDB.Instance.cardIdstringToEnum(crd)]++;
                                 }
                                 else
                                 {
-                                    combocardsTurn0All.Add(crd, 1);
+                                    combocardsTurn0All.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
                                 }
                                 this.combot0lenAll++;
                             }
@@ -13075,13 +13021,13 @@ namespace HREngine.Bots
             public int isInCombo(List<Handmanager.Handcard> hand, int omm)
             {
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocards);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocards);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
                 if (cardsincombo == this.combolength && omm < this.neededMana) return 1;
@@ -13094,13 +13040,13 @@ namespace HREngine.Bots
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn1);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocardsTurn1);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
                 if (cardsincombo == this.combot1len && omm < this.neededMana) return 1;
@@ -13109,11 +13055,11 @@ namespace HREngine.Bots
                 {
                     //search for required minions on field
                     int turn0requires = 0;
-                    foreach (string s in combocardsTurn0Mobs.Keys)
+                    foreach (CardDB.cardIDEnum s in combocardsTurn0Mobs.Keys)
                     {
                         foreach (Minion m in ownmins)
                         {
-                            if (!m.playedThisTurn && m.handcard.card.CardID == s)
+                            if (!m.playedThisTurn && m.handcard.card.cardIDenum == s)
                             {
                                 turn0requires++;
                                 break;
@@ -13135,13 +13081,13 @@ namespace HREngine.Bots
             {
                 if (!twoTurnCombo) return 0;
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0All);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocardsTurn0All);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
                 if (cardsincombo == this.combot0lenAll && omm < this.neededMana) return 1;
@@ -13157,7 +13103,7 @@ namespace HREngine.Bots
 
             public bool isMultiTurn1Card(CardDB.Card card)
             {
-                if (this.combocardsTurn1.ContainsKey(card.CardID))
+                if (this.combocardsTurn1.ContainsKey(card.cardIDenum))
                 {
                     return true;
                 }
@@ -13166,7 +13112,7 @@ namespace HREngine.Bots
 
             public bool isCardInCombo(CardDB.Card card)
             {
-                if (this.combocards.ContainsKey(card.CardID))
+                if (this.combocards.ContainsKey(card.cardIDenum))
                 {
                     return true;
                 }
@@ -13176,13 +13122,13 @@ namespace HREngine.Bots
             public int hasPlayedCombo(List<Handmanager.Handcard> hand)
             {
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocards);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocards);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
 
@@ -13193,13 +13139,13 @@ namespace HREngine.Bots
             public int hasPlayedTurn0Combo(List<Handmanager.Handcard> hand)
             {
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn0All);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocardsTurn0All);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
 
@@ -13210,13 +13156,13 @@ namespace HREngine.Bots
             public int hasPlayedTurn1Combo(List<Handmanager.Handcard> hand)
             {
                 int cardsincombo = 0;
-                Dictionary<string, int> combocardscopy = new Dictionary<string, int>(this.combocardsTurn1);
+                Dictionary<CardDB.cardIDEnum, int> combocardscopy = new Dictionary<CardDB.cardIDEnum, int>(this.combocardsTurn1);
                 foreach (Handmanager.Handcard hc in hand)
                 {
-                    if (combocardscopy.ContainsKey(hc.card.CardID) && combocardscopy[hc.card.CardID] >= 1)
+                    if (combocardscopy.ContainsKey(hc.card.cardIDenum) && combocardscopy[hc.card.cardIDenum] >= 1)
                     {
                         cardsincombo++;
-                        combocardscopy[hc.card.CardID]--;
+                        combocardscopy[hc.card.cardIDenum]--;
                     }
                 }
 
@@ -13316,7 +13262,7 @@ namespace HREngine.Bots
                         iic = 1;
                     }
                     if (iic == 1) found = true;
-                    if (iic == 1 && pen > c.cardspen[crd.CardID]) pen = c.cardspen[crd.CardID];//iic==1 will destroy combo
+                    if (iic == 1 && pen > c.cardspen[crd.cardIDenum]) pen = c.cardspen[crd.cardIDenum];//iic==1 will destroy combo
                     if (iic == 2) pen = 0;//card is ok to play
                 }
 
@@ -13557,7 +13503,7 @@ namespace HREngine.Bots
                 {
                     if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (CardDB.Instance.getCardDataFromID(c.id).cost >= mi.manarule)
+                        if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost >= mi.manarule)
                         {
                             if (discarditems.Contains(c.entitiy)) continue;
                             discarditems.Add(c.entitiy);
@@ -13584,7 +13530,7 @@ namespace HREngine.Bots
 
                     if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (CardDB.Instance.getCardDataFromID(c.id).cost <= mi.manarule)
+                        if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost <= mi.manarule)
                         {
                             delete = false;
                         }
@@ -16311,14 +16257,14 @@ namespace HREngine.Bots
 
         public class Card
         {
-            public string CardID = "";
+            //public string CardID = "";
             public cardName name = cardName.unknown;
             public int race = 0;
             public int rarity = 0;
             public int cost = 0;
             public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
-            public string description = "";
+            //public string description = "";
             public int carddraw = 0;
 
             public bool hasEffect = false;// has the minion an effect, but not battlecry
@@ -16327,7 +16273,7 @@ namespace HREngine.Bots
             public int Health = 0;
             public int Durability = 0;//for weapons
             public bool target = false;
-            public string targettext = "";
+            //public string targettext = "";
             public bool tank = false;
             public bool Silence = false;
             public bool choice = false;
@@ -16382,14 +16328,14 @@ namespace HREngine.Bots
                 this.Aura = c.Aura;
                 this.battlecry = c.battlecry;
                 this.carddraw = c.carddraw;
-                this.CardID = c.CardID;
+                //this.CardID = c.CardID;
                 this.Charge = c.Charge;
                 this.choice = c.choice;
                 this.Combo = c.Combo;
                 this.cost = c.cost;
                 this.crdtype = c.crdtype;
                 this.deathrattle = c.deathrattle;
-                this.description = c.description;
+                //this.description = c.description;
                 this.Durability = c.Durability;
                 this.Elite = c.Elite;
                 this.Enrage = c.Enrage;
@@ -16422,7 +16368,7 @@ namespace HREngine.Bots
                 this.Stealth = c.Stealth;
                 this.tank = c.tank;
                 this.target = c.target;
-                this.targettext = c.targettext;
+                //this.targettext = c.targettext;
                 this.type = c.type;
                 this.windfury = c.windfury;
             }
@@ -16806,7 +16752,7 @@ namespace HREngine.Bots
         }
 
         List<Card> cardlist = new List<Card>();
-        Dictionary<string, Card> cardidToCardList = new Dictionary<string, Card>();
+        Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
 
         private static CardDB instance;
@@ -16865,9 +16811,9 @@ namespace HREngine.Bots
                     {
                         //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
-                        if (!this.cardidToCardList.ContainsKey(c.CardID))
+                        if (!this.cardidToCardList.ContainsKey(c.cardIDenum))
                         {
-                            this.cardidToCardList.Add(c.CardID, c);
+                            this.cardidToCardList.Add(c.cardIDenum, c);
                         }
                     }
 
@@ -16879,7 +16825,7 @@ namespace HREngine.Bots
                     targettext = false;
                     string temp = s.Replace("<Entity version=\"2\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
-                    c.CardID = temp;
+                    //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
@@ -16891,7 +16837,7 @@ namespace HREngine.Bots
                     targettext = false;
                     string temp = s.Replace("<Entity version=\"1\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
-                    c.CardID = temp;
+                    //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
@@ -16996,8 +16942,9 @@ namespace HREngine.Bots
                     }
                     if (de == 1)
                     {
-                        c.description = temp;
-                        if (c.description.Contains("choose one"))
+                        //c.description = temp;
+                        //if (c.description.Contains("choose one"))
+                        if (temp.Contains("choose one"))
                         {
                             c.choice = true;
                             //Helpfunctions.Instance.logg(c.name + " is choice");
@@ -17005,7 +16952,7 @@ namespace HREngine.Bots
                     }
                     if (targettext)
                     {
-                        c.targettext = temp;
+                        //c.targettext = temp;
                         targettext = false;
                     }
 
@@ -17319,7 +17266,7 @@ namespace HREngine.Bots
             return new Card(c);
         }
 
-        public Card getCardDataFromID(string id)
+        public Card getCardDataFromID(cardIDEnum id)
         {
             if (this.cardidToCardList.ContainsKey(id))
             {
@@ -17983,8 +17930,8 @@ namespace HREngine.Bots
                 return;
             }
 
-            CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
-            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID("CS2_034");
+            CardDB.Card heroability = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_034);
+            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_034);
             bool abilityReady = false;
 
             int readstate = 0;
@@ -18071,7 +18018,7 @@ namespace HREngine.Bots
                 if (readstate == 1 && counter == 3) // ability + abilityready
                 {
                     abilityReady = (s.Split(' ')[1] == "True") ? true : false;
-                    heroability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                    heroability = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[2]));
                 }
 
                 if (readstate == 1 && counter >= 5) // secrets
@@ -18107,7 +18054,7 @@ namespace HREngine.Bots
                 }
                 if (readstate == 2 && counter == 3) // ability
                 {
-                    enemyability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                    enemyability = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[2]));
                 }
                 if (readstate == 2 && counter == 4) // fatigue
                 {
@@ -18159,7 +18106,7 @@ namespace HREngine.Bots
 
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid))), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -18243,7 +18190,7 @@ namespace HREngine.Bots
                         if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid))), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -18290,7 +18237,7 @@ namespace HREngine.Bots
                     string minionid = s.Split(' ')[6];
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
-                    card.card = CardDB.Instance.getCardDataFromID(minionid);
+                    card.card = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid));
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;
@@ -18531,59 +18478,6 @@ namespace HREngine.Bots
             this.entitiyID = m.entitiyID;
             this.enchantments.Clear();
             this.enchantments.AddRange(m.enchantments);
-        }
-    }
-
-
-    public class BattleField
-    {
-
-        public class tagpair
-        {
-            public int Name = 0;
-            public int Value = 0;
-        }
-
-
-        public class HrtUnit
-        {
-
-            public string CardID = "";
-
-            public int entitiyID = 0;
-
-            public List<tagpair> tags = new List<tagpair>();
-
-            public int getTag(GAME_TAG gt)
-            {
-                foreach (tagpair t in tags)
-                {
-                    if ((GAME_TAG)t.Name == gt)
-                    {
-                        return t.Value;
-                    }
-                }
-                return 0;
-            }
-
-        }
-
-        private static BattleField instance;
-
-        public static BattleField Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new BattleField();
-                }
-                return instance;
-            }
-        }
-
-        private BattleField()
-        {
         }
     }
 

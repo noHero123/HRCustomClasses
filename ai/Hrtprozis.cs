@@ -38,7 +38,6 @@ namespace HREngine.Bots
         public int ownHeroEntity = -1;
         public int enemyHeroEntitiy = -1;
         public DateTime roundstart = DateTime.Now;
-        BattleField bf = BattleField.Instance;
         bool tempwounded = false;
         public int currentMana = 0;
         public int heroHp = 30, enemyHp = 30;
@@ -363,38 +362,6 @@ namespace HREngine.Bots
             this.enemyHeroFatigue = ehf;
         }
 
-        public void setEnchantments(List<BattleField.HrtUnit> enchantments)
-        {
-            foreach (BattleField.HrtUnit bhu in enchantments)
-            {
-                //create enchantment
-                Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(bhu.CardID));
-                ench.creator = bhu.getTag(GAME_TAG.CREATOR);
-                ench.cantBeDispelled = false;
-                if (bhu.getTag(GAME_TAG.CANT_BE_DISPELLED) == 1) ench.cantBeDispelled = true;
-
-                foreach (Minion m in this.ownMinions)
-                {
-                    if (m.entitiyID == bhu.getTag(GAME_TAG.ATTACHED))
-                    {
-                        m.enchantments.Add(ench);
-                    }
-
-                }
-
-                foreach (Minion m in this.enemyMinions)
-                {
-                    if (m.entitiyID == bhu.getTag(GAME_TAG.ATTACHED))
-                    {
-                        m.enchantments.Add(ench);
-                    }
-
-                }
-
-            }
-
-        }
-
         public void updatePositions()
         {
             this.ownMinions.Sort((a, b) => a.zonepos.CompareTo(b.zonepos));
@@ -473,7 +440,7 @@ namespace HREngine.Bots
             help.logg("ownhero:");
             help.logg(this.heroname + " " + heroHp + " " + heroDefence + " " + this.heroImmuneToDamageWhileAttacking + " " + this.heroImmune);
             help.logg("ready: "+this.ownheroisread + " alreadyattacked: " + this.ownHeroNumAttacksThisTurn + " frzn: " + this.herofrozen + " attack: " + heroAtk + " " + heroWeaponAttack + " " + heroWeaponDurability + " " + ownHeroWeapon );
-            help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.CardID);
+            help.logg("ability: " + this.ownAbilityisReady + " " + this.heroAbility.cardIDenum);
             string secs = "";
             foreach (CardDB.cardIDEnum sec in this.ownSecretList)
             {
@@ -483,7 +450,7 @@ namespace HREngine.Bots
             help.logg("enemyhero:");
             help.logg(this.enemyHeroname + " " + enemyHp + " " + enemyDefence + " " + this.enemyfrozen + " " + this.enemyHeroImmune);
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability +" " + this.enemyHeroWeapon);
-            help.logg("ability: " + "true" + " " + this.enemyAbility.CardID);
+            help.logg("ability: " + "true" + " " + this.enemyAbility.cardIDenum);
             help.logg("fatigue: " + this.ownDeckSize + " " +this.ownHeroFatigue + " "+ this.enemyDeckSize + " " + this.enemyHeroFatigue);
 
         }
@@ -494,7 +461,7 @@ namespace HREngine.Bots
             help.logg("OwnMinions:");
             foreach (Minion m in this.ownMinions)
             {
-                help.logg(m.name + " " + m.handcard.card.CardID + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.cardIDenum + " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " ptt:" + m.playedThisTurn + " wndfr:" + m.windfury + " natt:" + m.numAttacksThisTurn + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID +" "+e.creator + " " +e.controllerOfCreator);
@@ -508,7 +475,7 @@ namespace HREngine.Bots
             help.logg("EnemyMinions:");
             foreach (Minion m in this.enemyMinions)
             {
-                help.logg(m.name + " " + m.handcard.card.CardID +  " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID  + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
+                help.logg(m.name + " " + m.handcard.card.cardIDenum +  " id:" + m.id + " zp:" + m.zonepos + " e:" + m.entitiyID  + " A:" + m.Angr + " H:" + m.Hp + " mH:" + m.maxHp + " rdy:" + m.Ready + " tnt:" + m.taunt + " frz:" + m.frozen + " silenced:" + m.silenced + " divshield:" + m.divineshild + " wndfr:" + m.windfury + " stl:" + m.stealth + " poi:" + m.poisonous + " imm:" + m.immune + " ex:" + m.exhausted + " chrg:" + m.charge);
                 foreach (Enchantment e in m.enchantments)
                 {
                     help.logg(e.CARDID + " " + e.creator + " " + e.controllerOfCreator);

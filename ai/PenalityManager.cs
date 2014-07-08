@@ -106,6 +106,10 @@ namespace HREngine.Bots
             int retval = 0;
 
             //no penality, but a bonus, if he has weapon on hand!
+            if (target == 200 && p.ownWeaponName == CardDB.cardName.gorehowl && p.ownWeaponAttack >= 3)
+            {
+                return 10;
+            }
             if (p.ownWeaponDurability >= 1)
             {
                 bool hasweapon = false;
@@ -922,6 +926,7 @@ namespace HREngine.Bots
             if (name == CardDB.cardName.betrayal && target >=10 && target <= 19)
             {
                 if (m.Angr == 0) return 30;
+                if (p.enemyMinions.Count == 1) return 30;
             }
 
 

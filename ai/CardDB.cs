@@ -2655,14 +2655,14 @@ namespace HREngine.Bots
 
         public class Card
         {
-            public string CardID = "";
+            //public string CardID = "";
             public cardName name = cardName.unknown;
             public int race = 0;
             public int rarity = 0;
             public int cost = 0;
             public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
-            public string description = "";
+            //public string description = "";
             public int carddraw = 0;
 
             public bool hasEffect = false;// has the minion an effect, but not battlecry
@@ -2671,7 +2671,7 @@ namespace HREngine.Bots
             public int Health = 0;
             public int Durability = 0;//for weapons
             public bool target = false;
-            public string targettext = "";
+            //public string targettext = "";
             public bool tank = false;
             public bool Silence = false;
             public bool choice = false;
@@ -2726,14 +2726,14 @@ namespace HREngine.Bots
                 this.Aura = c.Aura;
                 this.battlecry = c.battlecry;
                 this.carddraw = c.carddraw;
-                this.CardID = c.CardID;
+                //this.CardID = c.CardID;
                 this.Charge = c.Charge;
                 this.choice = c.choice;
                 this.Combo = c.Combo;
                 this.cost = c.cost;
                 this.crdtype = c.crdtype;
                 this.deathrattle = c.deathrattle;
-                this.description = c.description;
+                //this.description = c.description;
                 this.Durability = c.Durability;
                 this.Elite = c.Elite;
                 this.Enrage = c.Enrage;
@@ -2766,7 +2766,7 @@ namespace HREngine.Bots
                 this.Stealth = c.Stealth;
                 this.tank = c.tank;
                 this.target = c.target;
-                this.targettext = c.targettext;
+                //this.targettext = c.targettext;
                 this.type = c.type;
                 this.windfury = c.windfury;
             }
@@ -3150,7 +3150,7 @@ namespace HREngine.Bots
         }
 
         List<Card> cardlist = new List<Card>();
-        Dictionary<string, Card> cardidToCardList = new Dictionary<string, Card>();
+        Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
 
         private static CardDB instance;
@@ -3209,9 +3209,9 @@ namespace HREngine.Bots
                     {
                         //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
-                        if (!this.cardidToCardList.ContainsKey(c.CardID))
+                        if (!this.cardidToCardList.ContainsKey(c.cardIDenum))
                         {
-                            this.cardidToCardList.Add(c.CardID, c);
+                            this.cardidToCardList.Add(c.cardIDenum, c);
                         }
                     }
 
@@ -3223,7 +3223,7 @@ namespace HREngine.Bots
                     targettext = false;
                     string temp = s.Replace("<Entity version=\"2\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
-                    c.CardID = temp;
+                    //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
@@ -3235,7 +3235,7 @@ namespace HREngine.Bots
                     targettext = false;
                     string temp = s.Replace("<Entity version=\"1\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
-                    c.CardID = temp;
+                    //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
@@ -3340,8 +3340,9 @@ namespace HREngine.Bots
                     }
                     if (de == 1)
                     {
-                        c.description = temp;
-                        if (c.description.Contains("choose one"))
+                        //c.description = temp;
+                        //if (c.description.Contains("choose one"))
+                        if (temp.Contains("choose one"))
                         {
                             c.choice = true;
                             //Helpfunctions.Instance.logg(c.name + " is choice");
@@ -3349,7 +3350,7 @@ namespace HREngine.Bots
                     }
                     if (targettext)
                     {
-                        c.targettext = temp;
+                        //c.targettext = temp;
                         targettext = false;
                     }
 
@@ -3663,7 +3664,7 @@ namespace HREngine.Bots
             return new Card(c);
         }
 
-        public Card getCardDataFromID(string id)
+        public Card getCardDataFromID(cardIDEnum id)
         {
             if (this.cardidToCardList.ContainsKey(id))
             {

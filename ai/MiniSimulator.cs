@@ -92,11 +92,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
                     }
                 }
 
@@ -104,11 +104,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007b);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_007a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007a);
                     }
                 }
 
@@ -116,11 +116,11 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("NEW1_008b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008b);
                     }
                 }
 
@@ -128,33 +128,33 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160b);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_160a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160a);
                     }
                 }
                 if (c.name == CardDB.cardName.ancientofwar)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_178b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178b);
                     }
                 }
                 if (c.name == CardDB.cardName.druidoftheclaw)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t1");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t1);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_165t2");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t2);
                     }
                 }
                 //cenarius dont need
@@ -162,44 +162,44 @@ namespace HREngine.Bots
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_166b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
                     }
                 }
                 if (c.name == CardDB.cardName.markofnature)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_155b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155b);
                     }
                 }
                 if (c.name == CardDB.cardName.nourish)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_164b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164b);
                     }
                 }
                 if (c.name == CardDB.cardName.wrath)
                 {
                     if (i == 1)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154a");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154a);
                     }
                     if (i == 2)
                     {
-                        c = CardDB.Instance.getCardDataFromID("EX1_154b");
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154b);
                     }
                 }
 
@@ -890,4 +890,5 @@ namespace HREngine.Bots
         }
 
     }
+
 }

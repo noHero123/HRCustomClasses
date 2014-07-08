@@ -68,8 +68,8 @@ namespace HREngine.Bots
                 return;
             }
 
-            CardDB.Card heroability = CardDB.Instance.getCardDataFromID("CS2_034");
-            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID("CS2_034");
+            CardDB.Card heroability = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_034);
+            CardDB.Card enemyability = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_034);
             bool abilityReady = false;
 
             int readstate = 0;
@@ -156,7 +156,7 @@ namespace HREngine.Bots
                 if (readstate == 1 && counter == 3) // ability + abilityready
                 {
                     abilityReady = (s.Split(' ')[1] == "True") ? true : false;
-                    heroability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                    heroability = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[2]));
                 }
 
                 if (readstate == 1 && counter >= 5) // secrets
@@ -192,7 +192,7 @@ namespace HREngine.Bots
                 }
                 if (readstate == 2 && counter == 3) // ability
                 {
-                    enemyability = CardDB.Instance.getCardDataFromID(s.Split(' ')[2]);
+                    enemyability = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(s.Split(' ')[2]));
                 }
                 if (readstate == 2 && counter == 4) // fatigue
                 {
@@ -244,7 +244,7 @@ namespace HREngine.Bots
 
 
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid))), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -328,7 +328,7 @@ namespace HREngine.Bots
                         if (s.Contains(" ex:")) ex = s.Split(new string[] { " ex:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0] == "True" ? true : false;
                         
                         int id = Convert.ToInt32(s.Split(new string[] { " id:" }, StringSplitOptions.RemoveEmptyEntries)[1].Split(' ')[0]);
-                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(minionid)), id);
+                        tempminion = createNewMinion(new Handmanager.Handcard(CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid))), id);
                         tempminion.Angr = attack;
                         tempminion.Hp = hp;
                         tempminion.maxHp = maxhp;
@@ -375,7 +375,7 @@ namespace HREngine.Bots
                     string minionid = s.Split(' ')[6];
                     int pos = Convert.ToInt32(s.Split(' ')[1]);
                     int mana = Convert.ToInt32(s.Split(' ')[3]);
-                    card.card = CardDB.Instance.getCardDataFromID(minionid);
+                    card.card = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(minionid));
                     card.entity = Convert.ToInt32(s.Split(' ')[5]);
                     card.manacost = mana;
                     card.position = pos;

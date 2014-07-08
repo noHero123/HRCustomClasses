@@ -177,7 +177,7 @@ namespace HREngine.Bots
                 {
                     if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (CardDB.Instance.getCardDataFromID(c.id).cost >= mi.manarule)
+                        if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost >= mi.manarule)
                         {
                             if (discarditems.Contains(c.entitiy)) continue;
                             discarditems.Add(c.entitiy);
@@ -204,7 +204,7 @@ namespace HREngine.Bots
 
                     if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
-                        if (CardDB.Instance.getCardDataFromID(c.id).cost <= mi.manarule)
+                        if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost <= mi.manarule)
                         {
                             delete = false;
                         }
