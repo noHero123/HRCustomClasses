@@ -675,15 +675,15 @@ namespace HREngine.Bots
                 if (carddraw == 0) return 3;
             }
 
-            if (name == CardDB.cardName.lifetap && p.owncards.Count <=2)
+            if (name == CardDB.cardName.lifetap )
             {
-                return 0;
+                return Math.Max(-carddraw + 2*p.playactions.Count + p.ownMaxMana - p.mana,0);
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
             if (p.owncards.Count + p.cardsPlayedThisTurn > 5) return 5;
 
-            return -carddraw + p.playactions.Count + p.ownMaxMana - p.mana;
+            return -carddraw + 2*p.playactions.Count + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }

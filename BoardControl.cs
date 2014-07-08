@@ -26,7 +26,8 @@ namespace HREngine.Bots
       {
           if (p.value >= -2000000) return p.value;
           int retval = 0;
-
+          int hpboarder = 10;
+          if (p.ownHeroName == HeroEnum.warlock && p.enemyHeroName != HeroEnum.mage) hpboarder = 6;
           int aggroboarder = 11;
 
           retval -= p.evaluatePenality;
@@ -37,15 +38,15 @@ namespace HREngine.Bots
 
           retval += p.ownMinions.Count * 10;
 
-          retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20; 
+          retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20;
 
-          if (p.ownHeroHp + p.ownHeroDefence > 10)
+          if (p.ownHeroHp + p.ownHeroDefence > hpboarder)
           {
               retval += p.ownHeroHp + p.ownHeroDefence;
           }
           else
           {
-              retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
+              retval -= (hpboarder + 1 - p.ownHeroHp - p.ownHeroDefence) * (hpboarder+1 - p.ownHeroHp - p.ownHeroDefence);
           }
 
 

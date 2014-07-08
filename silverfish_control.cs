@@ -144,7 +144,8 @@ namespace HREngine.Bots
       {
           if (p.value >= -2000000) return p.value;
           int retval = 0;
-
+          int hpboarder = 10;
+          if (p.ownHeroName == HeroEnum.warlock && p.enemyHeroName != HeroEnum.mage) hpboarder = 6;
           int aggroboarder = 11;
 
           retval -= p.evaluatePenality;
@@ -157,14 +158,16 @@ namespace HREngine.Bots
 
           retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20;
 
-          if (p.ownHeroHp + p.ownHeroDefence > 10)
+          if (p.ownHeroHp + p.ownHeroDefence > hpboarder)
           {
               retval += p.ownHeroHp + p.ownHeroDefence;
           }
           else
           {
-              retval -= (11 - p.ownHeroHp - p.ownHeroDefence) * (11 - p.ownHeroHp - p.ownHeroDefence);
+              retval -= (hpboarder + 1 - p.ownHeroHp - p.ownHeroDefence) * (hpboarder + 1 - p.ownHeroHp - p.ownHeroDefence);
           }
+
+
 
 
           if (p.enemyHeroHp + p.enemyHeroDefence > aggroboarder)
@@ -11483,15 +11486,15 @@ namespace HREngine.Bots
                 if (carddraw == 0) return 3;
             }
 
-            if (name == CardDB.cardName.lifetap && p.owncards.Count <= 2)
+            if (name == CardDB.cardName.lifetap)
             {
-                return 0;
+                return Math.Max(-carddraw + 2 * p.playactions.Count + p.ownMaxMana - p.mana, 0);
             }
 
             if (p.owncards.Count + carddraw > 10) return 15 * (p.owncarddraw + p.owncards.Count - 10);
             if (p.owncards.Count + p.cardsPlayedThisTurn > 5) return 5;
 
-            return -carddraw + p.playactions.Count + p.ownMaxMana - p.mana;
+            return -carddraw + 2 * p.playactions.Count + p.ownMaxMana - p.mana;
             /*pen = -carddraw + p.ownMaxMana - p.mana;
             return pen;*/
         }
