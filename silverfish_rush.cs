@@ -663,7 +663,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 71;
+        private int versionnumber = 72;
         private bool singleLog = false;
 
 
@@ -1939,7 +1939,7 @@ namespace HREngine.Bots
                     }
 
                     p.endEnemyTurn();
-
+                    p.guessingHeroHP = this.guessingHeroHP;
                     if (Ai.Instance.botBase.getPlayfieldValue(p) < bestoldval) // want the best enemy-play-> worst for us
                     {
                         bestoldval = Ai.Instance.botBase.getPlayfieldValue(p);
@@ -1969,6 +1969,7 @@ namespace HREngine.Bots
             if (print) bestplay.printBoard();
             foreach (Playfield p in posmoves)
             {
+                p.guessingHeroHP = this.guessingHeroHP;
                 int val = Ai.Instance.botBase.getPlayfieldValue(p);
                 if (bestval > val)// we search the worst value
                 {
