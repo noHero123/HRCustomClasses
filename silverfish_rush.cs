@@ -249,9 +249,10 @@ namespace HREngine.Bots
             return retval;
         }
 
+        int KeepConcede = 0;
         private void concede()
         {
-            /*int totalwin = 0;
+            int totalwin = 0;
             int totallose = 0;
             string[] lines = new string[0] { };
             try
@@ -269,27 +270,26 @@ namespace HREngine.Bots
                 {
                     int val1 = s.Length;
                     string temp1 = s.Substring(18, (val1 - 18));
-                    Helpfunctions.Instance.ErrorLog(temp1);
+                    //HRLog.Write(temp1);
                     totalwin = int.Parse(temp1);
                 }
                 else if (s.Contains("bot.stats.defeat"))
                 {
                     int val2 = s.Length;
                     string temp2 = s.Substring(17, (val2 - 17));
-                    Helpfunctions.Instance.ErrorLog(temp2);
+                    //HRLog.Write(temp2);
                     totallose = int.Parse(temp2);
                 }
             }
-            if (totalwin > totallose)
-            {
-                Helpfunctions.Instance.ErrorLog("not today!");
-                HRGame.ConcedeGame();
-            }*/
+            Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+
+
             int curlvl = HRPlayer.GetLocalPlayer().GetRank();
             if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
             if (curlvl < this.concedeLvl)
             {
                 Helpfunctions.Instance.ErrorLog("not today!");
+                KeepConcede++;
                 HRGame.ConcedeGame();
             }
         }
@@ -663,7 +663,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 72;
+        private int versionnumber = 73;
         private bool singleLog = false;
 
 
@@ -2625,7 +2625,10 @@ namespace HREngine.Bots
             else
             {
                 guessHeroDamage();
-                simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                if (this.guessingHeroHP >= 1)
+                {
+                    simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                }
                 this.complete = true;
             }
 
@@ -16250,6 +16253,7 @@ namespace HREngine.Bots
             public cardIDEnum cardIDenum = cardIDEnum.None;
             public List<ErrorType2> playrequires;
 
+
             public Card()
             {
                 playrequires = new List<ErrorType2>();
@@ -16308,6 +16312,7 @@ namespace HREngine.Bots
                 //this.targettext = c.targettext;
                 this.type = c.type;
                 this.windfury = c.windfury;
+                this.cardIDenum = c.cardIDenum;
             }
 
             public bool isRequirementInList(CardDB.ErrorType2 et)
@@ -16714,6 +16719,7 @@ namespace HREngine.Bots
             {
                 string path = Settings.Instance.path;
                 lines = System.IO.File.ReadAllLines(path + "_carddb.txt");
+                Helpfunctions.Instance.ErrorLog("read carddb.txt");
             }
             catch
             {

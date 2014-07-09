@@ -133,52 +133,50 @@ namespace HREngine.Bots
        }
 
 
-      private void concede()
-      {
-          /*int totalwin = 0;
-          int totallose = 0;
-          string[] lines = new string[0] { };
-          try
-          {
-              string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-              lines = System.IO.File.ReadAllLines(path + "Settings.ini");
-          }
-          catch
-          {
-              Helpfunctions.Instance.logg("cant find Settings.ini");
-          }
-          foreach (string s in lines)
-          {
-              if (s.Contains("bot.stats.victory"))
-              {
-                  int val1 = s.Length;
-                  string temp1 = s.Substring(18, (val1 - 18));
-                  Helpfunctions.Instance.ErrorLog(temp1);
-                  totalwin = int.Parse(temp1);
-              }
-              else if (s.Contains("bot.stats.defeat"))
-              {
-                  int val2 = s.Length;
-                  string temp2 = s.Substring(17, (val2 - 17));
-                  Helpfunctions.Instance.ErrorLog(temp2);
-                  totallose = int.Parse(temp2);
-              }
-          }
-          if (totalwin > totallose)
-          {
-              Helpfunctions.Instance.ErrorLog("not today!");
-              HRGame.ConcedeGame();
-          }*/
-          int curlvl = HRPlayer.GetLocalPlayer().GetRank();
-          if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
-          if(curlvl  < this.concedeLvl)
-          {
-                Helpfunctions.Instance.ErrorLog("not today!");
-              HRGame.ConcedeGame();
-          }
-      }
-
-
+       int KeepConcede=0;
+       private void concede()
+       {
+           int totalwin = 0;
+           int totallose = 0;
+           string[] lines = new string[0] { };
+           try
+           {
+               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+               lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+           }
+           catch
+           {
+               Helpfunctions.Instance.logg("cant find Settings.ini");
+           }
+           foreach (string s in lines)
+           {
+               if (s.Contains("bot.stats.victory"))
+               {
+                   int val1 = s.Length;
+                   string temp1 = s.Substring(18, (val1 - 18));
+                   //HRLog.Write(temp1);
+                   totalwin = int.Parse(temp1);
+               }
+               else if (s.Contains("bot.stats.defeat"))
+               {
+                   int val2 = s.Length;
+                   string temp2 = s.Substring(17, (val2 - 17));
+                   //HRLog.Write(temp2);
+                   totallose = int.Parse(temp2);
+               }
+           }
+           Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+           
+           
+           int curlvl = HRPlayer.GetLocalPlayer().GetRank();
+           if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
+           if (curlvl < this.concedeLvl)
+           {
+               Helpfunctions.Instance.ErrorLog("not today!");
+               KeepConcede++;
+               HRGame.ConcedeGame();
+           }
+       }
 
       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
       {

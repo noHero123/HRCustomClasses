@@ -2711,6 +2711,7 @@ namespace HREngine.Bots
             public cardIDEnum cardIDenum = cardIDEnum.None;
             public List<ErrorType2> playrequires;
 
+
             public Card()
             {
                 playrequires = new List<ErrorType2>();
@@ -2769,6 +2770,7 @@ namespace HREngine.Bots
                 //this.targettext = c.targettext;
                 this.type = c.type;
                 this.windfury = c.windfury;
+                this.cardIDenum = c.cardIDenum;
             }
 
             public bool isRequirementInList(CardDB.ErrorType2 et)
@@ -3175,6 +3177,7 @@ namespace HREngine.Bots
             {
                 string path = Settings.Instance.path;
                 lines = System.IO.File.ReadAllLines(path + "_carddb.txt");
+                Helpfunctions.Instance.ErrorLog("read carddb.txt");
             }
             catch
             {

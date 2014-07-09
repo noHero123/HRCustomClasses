@@ -1497,7 +1497,10 @@ namespace HREngine.Bots
             else
             {
                 guessHeroDamage();
-                simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                if (this.guessingHeroHP >= 1)
+                {
+                    simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                }
                 this.complete = true;
             }
             
