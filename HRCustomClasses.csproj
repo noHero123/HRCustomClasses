@@ -45,8 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ai\Behavior.cs" />
+    <Compile Include="ai\BehaviorControl.cs" />
     <Compile Include="ai\BoardTester.cs" />
     <Compile Include="ai\ComboBreaker.cs" />
+    <Compile Include="ai\BehaviorRush.cs" />
     <Compile Include="ai\MiniSimulator.cs" />
     <Compile Include="ai\Mulligan.cs" />
     <Compile Include="BasicBot.cs" />

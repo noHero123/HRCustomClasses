@@ -25,7 +25,7 @@ namespace HREngine.Bots
         public int bestmoveValue = 0;
         public Playfield bestboard = new Playfield();
 
-        public Bot botBase = null;
+        public Behavior botBase = null;
         private int calculated = 0;
 
         private bool simulateSecondTurn = false;

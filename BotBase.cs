@@ -14,8 +14,12 @@ namespace HREngine.Bots
        private string choiceCardId = "";
        Silverfish sf;
 
+       Behavior behave;
+
        public Bot()
        {
+           behave = this.getBotBehave();
+
            OnBattleStateUpdate = HandleOnBattleStateUpdate;
            OnMulliganStateUpdate = HandleBattleMulliganPhase;
            bool concede = false;
@@ -128,7 +132,7 @@ namespace HREngine.Bots
 
            if (teststuff)
            {
-               Ai.Instance.autoTester(this, printstuff);
+               Ai.Instance.autoTester(behave, printstuff);
            }
        }
 
@@ -371,8 +375,8 @@ namespace HREngine.Bots
                      return new HREngine.API.Actions.ChoiceAction(choices[choice]);
                  }
              }
-              
-             sf.updateEverything(this);
+
+             sf.updateEverything(behave);
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
             {
@@ -539,31 +543,10 @@ namespace HREngine.Bots
          return null;
       }
 
-      public int getPlayfieldValue(Playfield p)
-      {
-          return evaluatePlayfield(p);
-      }
 
-      public int getEnemyMinionValue(Minion m, Playfield p)
+      protected virtual Behavior getBotBehave()
       {
-          return evaluateEnemyMinion(m, p);
+          return null;
       }
-
-      public int getRulesEditorPenality(string cardId, Playfield p)
-      {
-          
-          return 0;
-      }
-
-      protected virtual int evaluatePlayfield(Playfield p)
-      {
-          return 0;
-      }
-
-      protected virtual int evaluateEnemyMinion(Minion m, Playfield p)
-      {
-          return 0;
-      }
-   
    }
 }

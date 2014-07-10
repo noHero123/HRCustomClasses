@@ -32,7 +32,7 @@ namespace HREngine.Bots
         public int bestmoveValue = 0;
         Playfield bestboard = new Playfield();
         Playfield nextMoveGuess = new Playfield();
-        public Bot botBase = null;
+        public Behavior botBase = null;
 
         private bool secondturnsim = false;
         private bool playaround = false;
@@ -196,7 +196,7 @@ namespace HREngine.Bots
 
         }
 
-        public void dosomethingclever(Bot bbase)
+        public void dosomethingclever(Behavior bbase)
         {
             //return;
             //turncheck
@@ -252,7 +252,7 @@ namespace HREngine.Bots
 
         }
 
-        public void autoTester(Bot bbase, bool printstuff)
+        public void autoTester(Behavior bbase, bool printstuff)
         {
             help.logg("simulating board ");
 

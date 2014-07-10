@@ -109,7 +109,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void updateEverything(Bot botbase)
+        public void updateEverything(Behavior botbase)
         {
 
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
