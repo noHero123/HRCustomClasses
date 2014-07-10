@@ -568,7 +568,7 @@ namespace HREngine.Bots
                             int heroAttackPen = 0;
                             if (usePenalityManager)
                             {
-                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p);
+                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p, isLethalCheck);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             addToPosmoves(pf);

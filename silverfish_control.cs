@@ -727,7 +727,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        private int versionnumber = 73;
+        private int versionnumber = 74;
         private bool singleLog = false;
 
 
@@ -2704,6 +2704,10 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.frozen) continue;
+                if (m.name == CardDB.cardName.ancientwatcher && !m.silenced)
+                {
+                    continue;
+                }
                 ghd += m.Angr;
                 if (m.windfury) ghd += m.Angr;
             }
@@ -2773,7 +2777,7 @@ namespace HREngine.Bots
                 {
                     // first damage to your hero is nulled -> lower guessingHeroDamage
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
-                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    temp.Sort((a, b) => -a.Angr.CompareTo(b.Angr));//take the strongest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
                     m.Angr = 0;
@@ -4986,17 +4990,28 @@ namespace HREngine.Bots
 
             //draw a card if the minion has enchantment from: Segen der weisheit 
             int segenderweisheitAnz = 0;
+            int segenderweisheitAnzEnemy = 0;
             foreach (Enchantment e in ownMinion.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2 && e.controllerOfCreator == this.ownController)
+                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2)
                 {
-                    segenderweisheitAnz++;
+                    if (e.controllerOfCreator == this.ownController)
+                    {
+                        segenderweisheitAnz++;
+                    }
+                    else
+                    {
+                        segenderweisheitAnzEnemy++;
+                    }
                 }
             }
-            this.owncarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
             {
                 this.drawACard(CardDB.cardName.unknown, true);
+            }
+            for (int i = 0; i < segenderweisheitAnzEnemy; i++)
+            {
+                this.drawACard(CardDB.cardName.unknown, false);
             }
         }
 
@@ -5007,15 +5022,26 @@ namespace HREngine.Bots
             attack(ownMinion.id + 10, target, false);
             //draw a card if the minion has enchantment from: Segen der weisheit 
             int segenderweisheitAnz = 0;
+            int segenderweisheitAnzEnemy = 0;
             foreach (Enchantment e in ownMinion.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2 && e.controllerOfCreator != this.ownController)
+                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2)
                 {
-                    segenderweisheitAnz++;
+                    if (e.controllerOfCreator == this.ownController)
+                    {
+                        segenderweisheitAnz++;
+                    }
+                    else
+                    {
+                        segenderweisheitAnzEnemy++;
+                    }
                 }
             }
-            this.enemycarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
+            {
+                this.drawACard(CardDB.cardName.unknown, true);
+            }
+            for (int i = 0; i < segenderweisheitAnzEnemy; i++)
             {
                 this.drawACard(CardDB.cardName.unknown, false);
             }
@@ -6636,7 +6662,8 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.siphonsoul)
             {
                 destroy = true;
-                attackOrHealHero(3, true);
+                int h = getSpellHeal(3);
+                attackOrHealHero(-h, true);
 
             }
 
@@ -9710,7 +9737,7 @@ namespace HREngine.Bots
                             int heroAttackPen = 0;
                             if (usePenalityManager)
                             {
-                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p);
+                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p, isLethalCheck);
                             }
                             pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
                             addToPosmoves(pf);
@@ -10857,9 +10884,23 @@ namespace HREngine.Bots
             return pen;
         }
 
-        public int getAttackWithHeroPenality(int target, Playfield p)
+        public int getAttackWithHeroPenality(int target, Playfield p, bool leathal)
         {
             int retval = 0;
+
+            if (p.ownWeaponDurability == 1 && p.ownWeaponName == CardDB.cardName.eaglehornbow)
+            {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == CardDB.cardName.arcaneshot || hc.card.name == CardDB.cardName.killcommand) return -p.ownWeaponAttack - 1;
+                }
+                if (p.ownSecretsIDList.Count >= 1) return 20;
+
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.Secret) return 20;
+                }
+            }
 
             //no penality, but a bonus, if he has weapon on hand!
             if (target == 200 && p.ownWeaponName == CardDB.cardName.gorehowl && p.ownWeaponAttack >= 3)
@@ -10905,7 +10946,7 @@ namespace HREngine.Bots
             retval += getCardDiscardPenality(name, p);
             retval += getDestroyOwnPenality(name, target, p, lethal);
 
-            retval += getDestroyPenality(name, target, p);
+            retval += getDestroyPenality(name, target, p, lethal);
             retval += getSpecialCardComboPenalitys(card, target, p, lethal, choice);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
@@ -11181,7 +11222,7 @@ namespace HREngine.Bots
                 }
                 if (p.enemyMinions.Count <= 2)
                 {
-                    return 20 * p.enemyMinions.Count;
+                    return 20 * (3 - p.enemyMinions.Count);
                 }
             }
 
@@ -11551,11 +11592,18 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyPenality(CardDB.cardName name, int target, Playfield p)
+        private int getDestroyPenality(CardDB.cardName name, int target, Playfield p, bool lethal)
         {
-            if (!this.destroyDatabase.ContainsKey(name)) return 0;
+            if (!this.destroyDatabase.ContainsKey(name) || lethal) return 0;
             int pen = 0;
-
+            if (target >= 0 && target <= 9)
+            {
+                Minion m = p.ownMinions[target];
+                if (!m.handcard.card.deathrattle)
+                {
+                    pen = 500;
+                }
+            }
             if (target >= 10 && target <= 19)
             {
                 // dont destroy owns ;_; (except mins with deathrattle effects)
@@ -11568,7 +11616,12 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    pen = 25;
+                    pen = 30;
+                }
+
+                if (name == CardDB.cardName.mindcontrol && (m.name == CardDB.cardName.direwolfalpha || m.name == CardDB.cardName.raidleader || m.name == CardDB.cardName.flametonguetotem) && p.enemyMinions.Count == 1)
+                {
+                    pen = 50;
                 }
 
             }

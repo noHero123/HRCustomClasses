@@ -101,9 +101,23 @@ namespace HREngine.Bots
             return pen;
         }
 
-        public int getAttackWithHeroPenality(int target, Playfield p)
+        public int getAttackWithHeroPenality(int target, Playfield p, bool leathal)
         {
             int retval = 0;
+
+            if (p.ownWeaponDurability == 1 && p.ownWeaponName == CardDB.cardName.eaglehornbow)
+            {
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.name == CardDB.cardName.arcaneshot || hc.card.name == CardDB.cardName.killcommand) return -p.ownWeaponAttack - 1;
+                }
+                if (p.ownSecretsIDList.Count >= 1) return 20;
+
+                foreach (Handmanager.Handcard hc in p.owncards)
+                {
+                    if (hc.card.Secret) return 20;
+                }
+            }
 
             //no penality, but a bonus, if he has weapon on hand!
             if (target == 200 && p.ownWeaponName == CardDB.cardName.gorehowl && p.ownWeaponAttack >= 3)
@@ -149,7 +163,7 @@ namespace HREngine.Bots
             retval += getCardDiscardPenality( name,  p);
             retval += getDestroyOwnPenality(name, target, p, lethal);
             
-            retval += getDestroyPenality( name,  target,  p);
+            retval += getDestroyPenality( name,  target,  p, lethal);
             retval += getSpecialCardComboPenalitys( card,  target,  p, lethal, choice);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
@@ -425,7 +439,7 @@ namespace HREngine.Bots
                 }
                 if (p.enemyMinions.Count <= 2)
                 {
-                    return 20 * p.enemyMinions.Count;
+                    return 20 * (3 - p.enemyMinions.Count);
                 }
             }
 
@@ -795,11 +809,18 @@ namespace HREngine.Bots
             return pen;
         }
 
-        private int getDestroyPenality(CardDB.cardName name, int target, Playfield p)
+        private int getDestroyPenality(CardDB.cardName name, int target, Playfield p, bool lethal)
         {
-            if (!this.destroyDatabase.ContainsKey(name)) return 0;
+            if (!this.destroyDatabase.ContainsKey(name) || lethal) return 0;
             int pen = 0;
-
+            if (target >= 0 && target <= 9)
+            {
+                Minion m = p.ownMinions[target];
+                if (!m.handcard.card.deathrattle)
+                {
+                    pen = 500;
+                }
+            }
             if (target >= 10 && target <= 19)
             {
                 // dont destroy owns ;_; (except mins with deathrattle effects)
@@ -812,7 +833,12 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    pen = 25;
+                    pen = 30;
+                }
+
+                if (name == CardDB.cardName.mindcontrol && (m.name == CardDB.cardName.direwolfalpha || m.name == CardDB.cardName.raidleader || m.name == CardDB.cardName.flametonguetotem) && p.enemyMinions.Count == 1)
+                {
+                    pen = 50;
                 }
 
             }

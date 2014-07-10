@@ -1512,6 +1512,10 @@ namespace HREngine.Bots
             foreach (Minion m in this.enemyMinions)
             {
                 if (m.frozen) continue;
+                if (m.name == CardDB.cardName.ancientwatcher && !m.silenced)
+                {
+                    continue;
+                }
                 ghd += m.Angr;
                 if (m.windfury) ghd += m.Angr;
             }
@@ -1581,7 +1585,7 @@ namespace HREngine.Bots
                 {
                     // first damage to your hero is nulled -> lower guessingHeroDamage
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
-                    temp.Sort((a, b) => a.Angr.CompareTo(b.Angr));//take the weakest
+                    temp.Sort((a, b) => -a.Angr.CompareTo(b.Angr));//take the strongest
                     if (temp.Count == 0) continue;
                     Minion m = temp[0];
                     m.Angr = 0;
@@ -3794,17 +3798,28 @@ namespace HREngine.Bots
 
             //draw a card if the minion has enchantment from: Segen der weisheit 
             int segenderweisheitAnz = 0;
+            int segenderweisheitAnzEnemy = 0;
             foreach (Enchantment e in ownMinion.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2 && e.controllerOfCreator == this.ownController)
+                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2 )
                 {
-                    segenderweisheitAnz++;
+                    if (e.controllerOfCreator == this.ownController)
+                    {
+                        segenderweisheitAnz++;
+                    }
+                    else 
+                    {
+                        segenderweisheitAnzEnemy++;
+                    }
                 }
             }
-            this.owncarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
             {
                 this.drawACard(CardDB.cardName.unknown, true);
+            }
+            for (int i = 0; i < segenderweisheitAnzEnemy; i++)
+            {
+                this.drawACard(CardDB.cardName.unknown, false);
             }
         }
 
@@ -3815,15 +3830,26 @@ namespace HREngine.Bots
             attack(ownMinion.id+10, target, false);
             //draw a card if the minion has enchantment from: Segen der weisheit 
             int segenderweisheitAnz = 0;
+            int segenderweisheitAnzEnemy = 0;
             foreach (Enchantment e in ownMinion.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2 && e.controllerOfCreator != this.ownController)
+                if (e.CARDID == CardDB.cardIDEnum.EX1_363e2)
                 {
-                    segenderweisheitAnz++;
+                    if (e.controllerOfCreator == this.ownController)
+                    {
+                        segenderweisheitAnz++;
+                    }
+                    else
+                    {
+                        segenderweisheitAnzEnemy++;
+                    }
                 }
             }
-            this.enemycarddraw += segenderweisheitAnz;
             for (int i = 0; i < segenderweisheitAnz; i++)
+            {
+                this.drawACard(CardDB.cardName.unknown, true);
+            }
+            for (int i = 0; i < segenderweisheitAnzEnemy; i++)
             {
                 this.drawACard(CardDB.cardName.unknown, false);
             }
@@ -5444,7 +5470,8 @@ namespace HREngine.Bots
             if (c.name == CardDB.cardName.siphonsoul)
             {
                 destroy = true;
-                attackOrHealHero(3, true);
+                int h = getSpellHeal(3);
+                attackOrHealHero(-h, true);
 
             }
 
