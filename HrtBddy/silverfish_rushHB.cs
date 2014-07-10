@@ -12589,7 +12589,7 @@ namespace Silverfish
 
         public void ErrorLog(string s)
         {
-            HREngine.API.Utilities.HRLog.Write(s);
+            Logging.Write(s);
         }
 
     }
