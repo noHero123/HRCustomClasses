@@ -165,8 +165,10 @@ namespace HREngine.Bots
                    totallose = int.Parse(temp2);
                }
            }
-           Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
-           
+           if ((totalwin + totallose - KeepConcede) != 0)
+           {
+               Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+           }
            
            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
