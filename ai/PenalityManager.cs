@@ -105,6 +105,11 @@ namespace HREngine.Bots
         {
             int retval = 0;
 
+            if (!leathal && p.ownWeaponName == CardDB.cardName.swordofjustice)
+            {
+                return 28;
+            }
+
             if (p.ownWeaponDurability == 1 && p.ownWeaponName == CardDB.cardName.eaglehornbow)
             {
                 foreach (Handmanager.Handcard hc in p.owncards)

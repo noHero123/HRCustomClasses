@@ -12,6 +12,7 @@ namespace HREngine.Bots
        private int dirtytarget = -1;
        private int dirtychoice = -1;
        private string choiceCardId = "";
+       DateTime starttime = DateTime.Now;
        Silverfish sf;
 
        Behavior behave;
@@ -19,9 +20,9 @@ namespace HREngine.Bots
        public Bot()
        {
            behave = this.getBotBehave();
-
            OnBattleStateUpdate = HandleOnBattleStateUpdate;
            OnMulliganStateUpdate = HandleBattleMulliganPhase;
+           starttime = DateTime.Now;
            bool concede = false;
            bool writeToSingleFile = false;
            try
@@ -134,6 +135,7 @@ namespace HREngine.Bots
            {
                Ai.Instance.autoTester(behave, printstuff);
            }
+           writeSettings();
        }
 
 
@@ -173,83 +175,185 @@ namespace HREngine.Bots
            {
                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
            }
-           
+
            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
            if (curlvl < this.concedeLvl)
            {
                Helpfunctions.Instance.ErrorLog("not today!");
                KeepConcede++;
+               writeSettings();
                HRGame.ConcedeGame();
            }
        }
 
-      private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
-      {
-          Helpfunctions.Instance.ErrorLog("handle mulligan");
+       private void writeSettings()
+       {
+           int version = sf.versionnumber;
+           int totalwin = 0;
+           int totallose = 0;
+           string[] lines = new string[0] { };
+           try
+           {
+               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+               lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+           }
+           catch
+           {
+               Helpfunctions.Instance.logg("cant find Settings.ini");
+           }
+           List<string> newlines = new List<string>();
+           for (int i = 0; i < lines.Length; i++)
+           {
+               string s = lines[i];
 
-          if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
-          {
-              Helpfunctions.Instance.ErrorLog("but we have to wait :D");
-              return null;
-          }
+               if (s.Contains("bot.stats.victory"))
+               {
+                   int val1 = s.Length;
+                   string temp1 = s.Substring(18, (val1 - 18));
+                   //HRLog.Write(temp1);
+                   totalwin = int.Parse(temp1);
+               }
 
-          if (HRMulligan.IsMulliganActive())
-         {
-            var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-            if (Mulligan.Instance.hasmulliganrules())
-            {
-                HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
-                string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
-                List<Mulligan.CardIDEntity> celist= new List<Mulligan.CardIDEntity>();
-                foreach (var item in list)
-                {
-                    if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
-                    {
-                        celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
-                    }
-                }
-                List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
-                foreach (var item in list)
-                {
-                    if(mullientitys.Contains(item.GetEntity().GetEntityId()))
-                    {
-                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
-                        HRMulligan.ToggleCard(item);
-                    }
-                }
+               if (s.Contains("bot.stats.defeat"))
+               {
+                   int val2 = s.Length;
+                   string temp2 = s.Substring(17, (val2 - 17));
+                   //HRLog.Write(temp2);
+                   totallose = int.Parse(temp2);
+               }
+
+               if (s.Contains("uai.version"))
+               {
+                   s = "uai.version=V" + version;
+                   Helpfunctions.Instance.ErrorLog("v");
+               }
+
+               if (s.Contains("uai.concedes"))
+               {
+                   s = "uai.concedes=" + KeepConcede;
+               }
+
+               if (s.Contains("uai.wins"))
+               {
+                   Helpfunctions.Instance.ErrorLog("totalwin is " + totalwin);
+                   s = "uai.wins=" + totalwin;
+               }
+               if (s.Contains("uai.loses"))
+               {
+                   s = "uai.loses=" + totallose;
+               }
+               if (s.Contains("uai.winrate"))
+               {
+                   s = "uai.winrate=" + 0;
+                   double winr = 0;
+                   if ((totalwin + totallose - KeepConcede) != 0)
+                   {
+                       winr = ((double)(totalwin * 100) / (double)(totalwin + totallose - KeepConcede));
+                       s = "uai.winrate=" + Math.Round(winr, 2);
+                   }
+
+               }
+               if (s.Contains("uai.winph"))
+               {
+                   s = "uai.winph=" + 0;
+                   double winh = 0;
+                   if ((DateTime.Now - starttime).TotalHours >= 0.001)
+                   {
+
+                       winh = (double)totalwin / (DateTime.Now - starttime).TotalHours;
+                       s = "uai.winph=" + Math.Round(winh, 2);
+                   }
+
+               }
+               Helpfunctions.Instance.ErrorLog("add " + s);
+               newlines.Add(s);
+
+           }
 
 
-            }
-            else
-            {
-                foreach (var item in list)
-                {
-                    if (item.GetEntity().GetCost() >= 4)
-                    {
-                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
-                        HRMulligan.ToggleCard(item);
-                    }
-                    if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
-                    {
-                        Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
-                        HRMulligan.ToggleCard(item);
-                    }
-                }
-            }
+           try
+           {
+               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+               System.IO.File.WriteAllLines(path + "Settings.ini", newlines.ToArray());
+           }
+           catch
+           {
+               Helpfunctions.Instance.logg("cant write Settings.ini");
+           }
+       }
 
-            
-            sf.setnewLoggFile();
+       private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
+       {
+           Helpfunctions.Instance.ErrorLog("handle mulligan");
 
-            if (Mulligan.Instance.loserLoserLoser)
-            {
-                concede();
-            }
-            return null;
-            //HRMulligan.EndMulligan();
-         }
-         return null;
-      }
+           if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
+           {
+               Helpfunctions.Instance.ErrorLog("but we have to wait :D");
+               return null;
+           }
+
+           if (HRMulligan.IsMulliganActive())
+           {
+               var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
+               if (Mulligan.Instance.hasmulliganrules())
+               {
+                   HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
+                   HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
+                   string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
+                   string ownName = Hrtprozis.Instance.heroIDtoName(ownPlayer.GetHeroCard().GetEntity().GetCardId());
+                   List<Mulligan.CardIDEntity> celist = new List<Mulligan.CardIDEntity>();
+                   foreach (var item in list)
+                   {
+                       if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
+                       {
+                           celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
+                       }
+                   }
+                   List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, ownName, enemName);
+                   foreach (var item in list)
+                   {
+                       if (mullientitys.Contains(item.GetEntity().GetEntityId()))
+                       {
+                           Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                           HRMulligan.ToggleCard(item);
+                       }
+                   }
+
+
+               }
+               else
+               {
+                   foreach (var item in list)
+                   {
+                       if (item.GetEntity().GetCost() >= 4)
+                       {
+                           Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                           HRMulligan.ToggleCard(item);
+                       }
+                       if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                       {
+                           Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                           HRMulligan.ToggleCard(item);
+                       }
+                   }
+               }
+
+
+               sf.setnewLoggFile();
+
+               writeSettings();
+
+               if (Mulligan.Instance.loserLoserLoser)
+               {
+                   concede();
+               }
+
+               return null;
+               //HRMulligan.EndMulligan();
+           }
+           return null;
+       }
 
       /// <summary>
       /// [EN]

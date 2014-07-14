@@ -22,13 +22,15 @@ namespace HREngine.Bots
         {
             public string cardid = "";
             public string enemyclass = "";
+            public string ownclass = "";
             public int howmuch = 2;
             public string[] requiresCard = null;
             public int manarule = -1;
 
-            public mulliitem(string id, string enemy, int number, string[] req = null, int mrule = -1)
+            public mulliitem(string id, string own, string enemy, int number, string[] req = null, int mrule = -1)
             {
                 this.cardid = id;
+                this.ownclass = own;
                 this.enemyclass = enemy;
                 this.howmuch = number;
                 this.requiresCard = req;
@@ -89,32 +91,33 @@ namespace HREngine.Bots
                 {
                     try
                     {
-                        string enemyclass = line.Split(';')[1];
-                        string cardlist = line.Split(';')[2];
+                        string ownclass = line.Split(';')[1];
+                        string enemyclass = line.Split(';')[2];
+                        string cardlist = line.Split(';')[3];
                         foreach (string crd in cardlist.Split(','))
                         {
                             if (crd.Contains(":"))
                             {
                                 if ((crd.Split(':')).Length == 3)
                                 {
-                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1]), crd.Split(':')[2].Split('/')));
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0],ownclass, enemyclass, Convert.ToInt32(crd.Split(':')[1]), crd.Split(':')[2].Split('/')));
                                 }
                                 else
                                 {
-                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1])));
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0],ownclass, enemyclass, Convert.ToInt32(crd.Split(':')[1])));
                                 }
 
                             }
                             else
                             {
-                                this.holdlist.Add(new mulliitem(crd, enemyclass, 2));
+                                this.holdlist.Add(new mulliitem(crd,ownclass, enemyclass, 2));
                             }
                         }
 
-                        if (line.Split(';').Length == 4)
+                        if (line.Split(';').Length == 5)
                         {
-                            int manarule = Convert.ToInt32(line.Split(';')[3]);
-                            this.holdlist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
+                            int manarule = Convert.ToInt32(line.Split(';')[4]);
+                            this.holdlist.Add(new mulliitem("#MANARULE",ownclass, enemyclass, 2, null, manarule));
                         }
 
                     }
@@ -130,18 +133,19 @@ namespace HREngine.Bots
                     {
                         try
                         {
-                            string enemyclass = line.Split(';')[1];
-                            string cardlist = line.Split(';')[2];
+                            string ownclass = line.Split(';')[1];
+                            string enemyclass = line.Split(';')[2];
+                            string cardlist = line.Split(';')[3];
                             foreach (string crd in cardlist.Split(','))
                             {
                                 if (crd == null || crd == "") continue;
-                                this.deletelist.Add(new mulliitem(crd, enemyclass, 2));
+                                this.deletelist.Add(new mulliitem(crd, ownclass, enemyclass, 2));
                             }
 
-                            if (line.Split(';').Length == 4)
+                            if (line.Split(';').Length == 5)
                             {
-                                int manarule = Convert.ToInt32(line.Split(';')[3]);
-                                this.deletelist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
+                                int manarule = Convert.ToInt32(line.Split(';')[4]);
+                                this.deletelist.Add(new mulliitem("#MANARULE", ownclass, enemyclass, 2, null, manarule));
                             }
 
                         }
@@ -167,7 +171,7 @@ namespace HREngine.Bots
             return true;
         }
 
-        public List<int> whatShouldIMulligan(List<CardIDEntity> cards, string enemclass)
+        public List<int> whatShouldIMulligan(List<CardIDEntity> cards, string ownclass, string enemclass)
         {
             List<int> discarditems = new List<int>();
 
@@ -175,7 +179,7 @@ namespace HREngine.Bots
             {
                 foreach (CardIDEntity c in cards)
                 {
-                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
                     {
                         if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost >= mi.manarule)
                         {
@@ -185,7 +189,7 @@ namespace HREngine.Bots
                         continue;
                     }
 
-                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
                     {
                         if (discarditems.Contains(c.entitiy)) continue;
                         discarditems.Add(c.entitiy);
@@ -202,7 +206,7 @@ namespace HREngine.Bots
                 foreach (mulliitem mi in this.holdlist)
                 {
 
-                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
                     {
                         if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost <= mi.manarule)
                         {
@@ -211,7 +215,7 @@ namespace HREngine.Bots
                         continue;
                     }
 
-                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
                     {
 
                         if (mi.requiresCard == null)

@@ -392,7 +392,7 @@ namespace SilverfishControl
 
     public class Silverfish
     {
-        private int versionnumber = 74;
+        private int versionnumber = 76;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -922,6 +922,7 @@ namespace SilverfishControl
             {
                 if (a.heroattack && p.enemyHeroHp <= p.attackFaceHP) retval++;
                 if (a.useability) useAbili = true;
+                if (p.ownHeroName == HeroEnum.warrior && a.heroattack && useAbili) retval -= 1;
                 if (a.useability && a.handcard.card.name == CardDB.cardName.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
                 if (!a.cardplay) continue;
                 if ((a.handcard.card.name == CardDB.cardName.thecoin || a.handcard.card.name == CardDB.cardName.innervate)) usecoin = true;
@@ -1047,6 +1048,7 @@ namespace SilverfishControl
             {
                 if (a.heroattack && p.enemyHeroHp <= p.attackFaceHP) retval++;
                 if (a.useability) useAbili = true;
+                if (p.ownHeroName == HeroEnum.warrior && a.heroattack && useAbili) retval -= 1;
                 if (a.useability && a.handcard.card.name == CardDB.cardName.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
                 if (!a.cardplay) continue;
                 if ((a.handcard.card.name == CardDB.cardName.thecoin || a.handcard.card.name == CardDB.cardName.innervate)) usecoin = true;
@@ -5774,21 +5776,21 @@ namespace SilverfishControl
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_506a);//murlocscout
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.razorfenhunter)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_boar);//boar
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.dragonlingmechanic)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_025t);//mechanicaldragonling
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.leeroyjenkins)
@@ -5808,22 +5810,22 @@ namespace SilverfishControl
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_573t); //special treant
                 int pos = this.ownMinions.Count - 1;
                 if (!own) pos = this.enemyMinions.Count - 1;
-                callKid(kid, pos, own);
-                callKid(kid, pos, own);
+                callKid(kid, pos, own, true);
+                callKid(kid, pos, own, true);
 
             }
             if (c.name == CardDB.cardName.silverhandknight)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_152);//squire
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.gelbinmekkatorque)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka1);//homingchicken
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
 
@@ -5831,7 +5833,7 @@ namespace SilverfishControl
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_131t);//defiasbandit
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.onyxia)
@@ -5840,16 +5842,24 @@ namespace SilverfishControl
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_116t);//whelp
                 for (int i = 0; i < kids; i++)
                 {
-                    callKid(kid, position, own);
+                    callKid(kid, position, own, true);
                 }
 
             }
             return kids;
         }
 
-        private void callKid(CardDB.Card c, int placeoffather, bool own)
+        private void callKid(CardDB.Card c, int placeoffather, bool own, bool spawnKid = false)
         {
-            if (own && this.ownMinions.Count >= 7) return;
+            if (own)
+            {
+                if (!spawnKid && this.ownMinions.Count >= 7) return;
+                if (spawnKid && this.ownMinions.Count >= 6)
+                {
+                    this.evaluatePenality += 20;
+                    return;
+                }
+            }
             if (!own && this.enemyMinions.Count >= 7) return;
             int mobplace = placeoffather + 1;
             /*if (own && this.ownMinions.Count >= 1)
@@ -10795,6 +10805,11 @@ namespace SilverfishControl
         public int getAttackWithHeroPenality(int target, Playfield p, bool leathal)
         {
             int retval = 0;
+
+            if (!leathal && p.ownWeaponName == CardDB.cardName.swordofjustice)
+            {
+                return 28;
+            }
 
             if (p.ownWeaponDurability == 1 && p.ownWeaponName == CardDB.cardName.eaglehornbow)
             {

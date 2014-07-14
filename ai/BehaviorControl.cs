@@ -102,6 +102,7 @@ namespace HREngine.Bots
             {
                 if (a.heroattack && p.enemyHeroHp <= p.attackFaceHP) retval++;
                 if (a.useability) useAbili = true;
+                if (p.ownHeroName == HeroEnum.warrior && a.heroattack && useAbili) retval -= 1; 
                 if (a.useability && a.handcard.card.name == CardDB.cardName.lesserheal && ((a.enemytarget >= 10 && a.enemytarget <= 20) || a.enemytarget == 200)) retval -= 5;
                 if (!a.cardplay) continue;
                 if ((a.handcard.card.name == CardDB.cardName.thecoin || a.handcard.card.name == CardDB.cardName.innervate)) usecoin = true;

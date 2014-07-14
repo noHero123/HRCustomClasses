@@ -4674,21 +4674,21 @@ namespace HREngine.Bots
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_506a);//murlocscout
-                callKid(kid, position, own);
+                callKid(kid, position, own,true);
 
             }
             if (c.name == CardDB.cardName.razorfenhunter)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_boar);//boar
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.dragonlingmechanic)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_025t);//mechanicaldragonling
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.leeroyjenkins)
@@ -4708,22 +4708,22 @@ namespace HREngine.Bots
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_573t); //special treant
                 int pos = this.ownMinions.Count - 1;
                 if (!own) pos = this.enemyMinions.Count - 1;
-                callKid(kid, pos, own);
-                callKid(kid, pos, own);
+                callKid(kid, pos, own, true);
+                callKid(kid, pos, own, true);
 
             }
             if (c.name == CardDB.cardName.silverhandknight)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.CS2_152);//squire
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.gelbinmekkatorque)
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.Mekka1);//homingchicken
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
 
@@ -4731,7 +4731,7 @@ namespace HREngine.Bots
             {
                 kids = 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_131t);//defiasbandit
-                callKid(kid, position, own);
+                callKid(kid, position, own, true);
 
             }
             if (c.name == CardDB.cardName.onyxia)
@@ -4740,16 +4740,24 @@ namespace HREngine.Bots
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_116t);//whelp
                 for (int i = 0; i < kids; i++)
                 {
-                    callKid(kid, position, own);
+                        callKid(kid, position, own, true);
                 }
 
             }
             return kids;
         }
 
-        private void callKid(CardDB.Card c, int placeoffather, bool own)
+        private void callKid(CardDB.Card c, int placeoffather, bool own, bool spawnKid = false)
         {
-            if (own && this.ownMinions.Count >= 7) return;
+            if (own)
+            {
+                if(!spawnKid && this.ownMinions.Count >= 7) return;
+                if (spawnKid && this.ownMinions.Count >= 6)
+                {
+                    this.evaluatePenality += 20;
+                    return;
+                }
+            }
             if (!own && this.enemyMinions.Count >= 7) return;
             int mobplace = placeoffather + 1;
             /*if (own && this.ownMinions.Count >= 1)
