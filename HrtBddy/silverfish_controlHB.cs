@@ -4240,6 +4240,7 @@ namespace SilverfishControl
             else
             {
                 removeMinionFromListNoDeath(m, this.enemyMinions, false);
+                this.enemycarddraw++;
             }
 
         }

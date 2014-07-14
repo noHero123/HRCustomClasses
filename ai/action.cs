@@ -3138,6 +3138,7 @@ namespace HREngine.Bots
             else
             {
                 removeMinionFromListNoDeath(m, this.enemyMinions, false);
+                this.enemycarddraw++;
             }
 
         }
