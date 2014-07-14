@@ -650,7 +650,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 77;
+        public int versionnumber = 78;
         private bool singleLog = false;
 
 
@@ -2906,7 +2906,7 @@ namespace HREngine.Bots
 
             //penalty for destroying combo
 
-            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName);
+            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName, this.ownHeroName);
 
             if (this.complete) return;
             endTurnEffect(true);//own turn ends
@@ -10558,6 +10558,7 @@ namespace HREngine.Bots
 
     public enum HeroEnum
     {
+        None,
         druid,
         hogger,
         hunter,
@@ -10773,54 +10774,53 @@ namespace HREngine.Bots
 
         public HeroEnum heroNametoEnum(string s)
         {
-            HeroEnum retval = HeroEnum.druid;
 
             if (s == "hogger")
             {
-                retval = HeroEnum.hogger;
+                return HeroEnum.hogger;
             }
             if (s == "hunter")
             {
-                retval = HeroEnum.hunter;
+                return HeroEnum.hunter;
             }
             if (s == "priest")
             {
-                retval = HeroEnum.priest;
+                return HeroEnum.priest;
             }
             if (s == "druid")
             {
-                retval = HeroEnum.druid;
+                return HeroEnum.druid;
             }
             if (s == "warlock")
             {
-                retval = HeroEnum.warlock;
+                return HeroEnum.warlock;
             }
             if (s == "thief")
             {
-                retval = HeroEnum.thief;
+                return HeroEnum.thief;
             }
             if (s == "pala")
             {
-                retval = HeroEnum.pala;
+                return HeroEnum.pala;
             }
             if (s == "warrior")
             {
-                retval = HeroEnum.warrior;
+                return HeroEnum.warrior;
             }
             if (s == "shaman")
             {
-                retval = HeroEnum.shaman;
+                return HeroEnum.shaman;
             }
             if (s == "mage")
             {
-                retval = HeroEnum.mage;
+                return HeroEnum.mage;
             }
             if (s == "lordjaraxxus")
             {
-                retval = HeroEnum.lordjaraxxus;
+                return HeroEnum.lordjaraxxus;
             }
 
-            return retval;
+            return HeroEnum.None;
         }
 
 
@@ -11132,6 +11132,11 @@ namespace HREngine.Bots
         {
             int retval = 0;
 
+            if (!leathal && p.ownWeaponName == CardDB.cardName.swordofjustice)
+            {
+                return 28;
+            }
+
             if (p.ownWeaponDurability == 1 && p.ownWeaponName == CardDB.cardName.eaglehornbow)
             {
                 foreach (Handmanager.Handcard hc in p.owncards)
@@ -11194,7 +11199,11 @@ namespace HREngine.Bots
             retval += getSpecialCardComboPenalitys(card, target, p, lethal, choice);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
-            if (!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
+            if (!lethal)
+            {
+                retval += cb.getPenalityForDestroyingCombo(card, p);
+                retval += cb.getPlayValue(card.cardIDenum);
+            }
 
             return retval;
         }
@@ -13140,6 +13149,7 @@ namespace HREngine.Bots
             weaponuse
         }
 
+        private Dictionary<CardDB.cardIDEnum, int> playByValue = new Dictionary<CardDB.cardIDEnum, int>();
 
         private List<combo> combos = new List<combo>();
         private static ComboBreaker instance;
@@ -13148,6 +13158,7 @@ namespace HREngine.Bots
         Hrtprozis hp = Hrtprozis.Instance;
 
         public int attackFaceHP = -1;
+
 
         class combo
         {
@@ -13168,6 +13179,7 @@ namespace HREngine.Bots
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
             public CardDB.cardName requiredWeapon = CardDB.cardName.unknown;
+            public HeroEnum oHero = HeroEnum.None;
 
             public combo(string s)
             {
@@ -13179,6 +13191,7 @@ namespace HREngine.Bots
                 bool fixmana = false;
                 if (s.Contains("nxttrn")) this.twoTurnCombo = true;
                 if (s.Contains("mana:")) fixmana = true;
+
                 /*foreach (string ding in s.Split(':'))
                 {
                     if (i == 0)
@@ -13216,6 +13229,11 @@ namespace HREngine.Bots
                         if (crdl.StartsWith("mana:"))
                         {
                             this.neededMana = Convert.ToInt32(crdl.Replace("mana:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("hero:"))
+                        {
+                            this.oHero = Hrtprozis.Instance.heroNametoEnum(crdl.Replace("hero:", ""));
                             continue;
                         }
                         if (crdl.StartsWith("bonus:"))
@@ -13528,15 +13546,35 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    try
+                    if (line.Contains("cardvalue:"))
                     {
-                        combo c = new combo(line);
-                        this.combos.Add(c);
+                        try
+                        {
+                            string cardvalue = line.Replace("cardvalue:", "");
+                            CardDB.cardIDEnum ce = CardDB.Instance.cardIdstringToEnum(cardvalue.Split(',')[0]);
+                            int val = Convert.ToInt32(cardvalue.Split(',')[1]);
+                            if (this.playByValue.ContainsKey(ce)) continue;
+                            this.playByValue.Add(ce, val);
+                            //Helpfunctions.Instance.ErrorLog("adding: " + line);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
-                    catch
+                    else
                     {
-                        Helpfunctions.Instance.logg("combomaker cant read: " + line);
-                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        try
+                        {
+                            combo c = new combo(line);
+                            this.combos.Add(c);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
                 }
 
@@ -13552,7 +13590,7 @@ namespace HREngine.Bots
             int mana = Math.Max(hp.ownMaxMana, hp.currentMana);
             foreach (combo c in this.combos)
             {
-                if (c.isCardInCombo(crd))
+                if ((c.oHero == HeroEnum.None || c.oHero == p.ownHeroName) && c.isCardInCombo(crd))
                 {
                     int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
                     int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
@@ -13573,7 +13611,7 @@ namespace HREngine.Bots
 
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon)
+        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon, HeroEnum heroname)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely
@@ -13588,7 +13626,7 @@ namespace HREngine.Bots
                 //playedcards.Add(a.handcard);
                 foreach (combo c in this.combos)
                 {
-                    if (c.isCardInCombo(crd))
+                    if ((c.oHero == HeroEnum.None || c.oHero == heroname) && c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);
                         int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions, weapon);
@@ -13629,6 +13667,16 @@ namespace HREngine.Bots
 
         }
 
+        public int getPlayValue(CardDB.cardIDEnum ce)
+        {
+            if (this.playByValue.Count == 0) return 0;
+            if (this.playByValue.ContainsKey(ce))
+            {
+                return this.playByValue[ce];
+            }
+            return 0;
+
+        }
 
     }
 

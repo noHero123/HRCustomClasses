@@ -12,6 +12,7 @@ namespace HREngine.Bots
 
     public enum HeroEnum
     {
+        None,
         druid,
         hogger,
         hunter,
@@ -227,54 +228,53 @@ namespace HREngine.Bots
 
         public HeroEnum heroNametoEnum(string s)
         {
-            HeroEnum retval = HeroEnum.druid;
 
             if (s == "hogger")
             {
-                retval = HeroEnum.hogger;
+                return HeroEnum.hogger;
             }
             if (s == "hunter")
             {
-                retval = HeroEnum.hunter;
+                return HeroEnum.hunter;
             }
             if (s == "priest")
             {
-                retval = HeroEnum.priest;
+                return HeroEnum.priest;
             }
             if (s == "druid")
             {
-                retval = HeroEnum.druid;
+                return HeroEnum.druid;
             }
             if (s == "warlock")
             {
-                retval = HeroEnum.warlock;
+                return HeroEnum.warlock;
             }
             if (s == "thief")
             {
-                retval = HeroEnum.thief;
+                return HeroEnum.thief;
             }
             if (s == "pala")
             {
-                retval = HeroEnum.pala;
+                return HeroEnum.pala;
             }
             if (s == "warrior")
             {
-                retval = HeroEnum.warrior;
+                return HeroEnum.warrior;
             }
             if (s == "shaman")
             {
-                retval = HeroEnum.shaman;
+                return HeroEnum.shaman;
             }
             if (s == "mage")
             {
-                retval = HeroEnum.mage;
+                return HeroEnum.mage;
             }
             if (s == "lordjaraxxus")
             {
-                retval = HeroEnum.lordjaraxxus;
+                return HeroEnum.lordjaraxxus;
             }
 
-            return retval;
+            return HeroEnum.None;
         }
 
 

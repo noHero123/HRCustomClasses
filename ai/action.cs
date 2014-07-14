@@ -1479,7 +1479,7 @@ namespace HREngine.Bots
 
             //penalty for destroying combo
 
-            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName);
+            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName, this.ownHeroName);
 
             if (this.complete) return;
             endTurnEffect(true);//own turn ends

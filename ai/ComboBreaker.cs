@@ -11,12 +11,13 @@ namespace HREngine.Bots
 
         enum combotype
         {
-            combo, 
+            combo,
             target,
             weaponuse
         }
 
-        
+        private Dictionary<CardDB.cardIDEnum, int> playByValue = new Dictionary<CardDB.cardIDEnum, int>();
+
         private List<combo> combos = new List<combo>();
         private static ComboBreaker instance;
 
@@ -24,6 +25,7 @@ namespace HREngine.Bots
         Hrtprozis hp = Hrtprozis.Instance;
 
         public int attackFaceHP = -1;
+
 
         class combo
         {
@@ -44,6 +46,7 @@ namespace HREngine.Bots
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
             public CardDB.cardName requiredWeapon = CardDB.cardName.unknown;
+            public HeroEnum oHero = HeroEnum.None;
 
             public combo(string s)
             {
@@ -55,6 +58,7 @@ namespace HREngine.Bots
                 bool fixmana = false;
                 if (s.Contains("nxttrn")) this.twoTurnCombo = true;
                 if (s.Contains("mana:")) fixmana = true;
+
                 /*foreach (string ding in s.Split(':'))
                 {
                     if (i == 0)
@@ -72,127 +76,132 @@ namespace HREngine.Bots
                         if (m >= 1) neededMana = m;
                     }
                 */
-                    if ( type == combotype.combo)
+                if (type == combotype.combo)
+                {
+                    this.combolength = 0;
+                    this.combot0len = 0;
+                    this.combot1len = 0;
+                    this.combot0lenAll = 0;
+                    int manat0 = 0;
+                    int manat1 = -1;
+                    bool t1 = false;
+                    foreach (string crdl in s.Split(';')) //ding.Split
                     {
-                        this.combolength = 0;
-                        this.combot0len = 0;
-                        this.combot1len = 0;
-                        this.combot0lenAll = 0;
-                        int manat0=0;
-                        int manat1=-1;
-                        bool t1=false;
-                        foreach (string crdl in s.Split(';')) //ding.Split
+                        if (crdl == "" || crdl == string.Empty) continue;
+                        if (crdl == "nxttrn")
                         {
-                            if (crdl == "" || crdl == string.Empty) continue;
-                            if(crdl=="nxttrn")
-                            {
-                                t1=true;
-                                continue;
-                            }
-                            if (crdl.StartsWith("mana:"))
-                            {
-                                this.neededMana = Convert.ToInt32(crdl.Replace("mana:", ""));
-                                continue;
-                            }
-                            if (crdl.StartsWith("bonus:"))
-                            {
-                                this.bonusForPlaying = Convert.ToInt32(crdl.Replace("bonus:", ""));
-                                continue;
-                            }
-                            if (crdl.StartsWith("bonusfirst:"))
-                            {
-                                this.bonusForPlayingT0 = Convert.ToInt32(crdl.Replace("bonusfirst:", ""));
-                                continue;
-                            }
-                            if (crdl.StartsWith("bonussecond:"))
-                            {
-                                this.bonusForPlayingT1 = Convert.ToInt32(crdl.Replace("bonussecond:", ""));
-                                continue;
-                            }
-                            string crd = crdl.Split(',')[0];
+                            t1 = true;
+                            continue;
+                        }
+                        if (crdl.StartsWith("mana:"))
+                        {
+                            this.neededMana = Convert.ToInt32(crdl.Replace("mana:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("hero:"))
+                        {
+                            this.oHero = Hrtprozis.Instance.heroNametoEnum(crdl.Replace("hero:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("bonus:"))
+                        {
+                            this.bonusForPlaying = Convert.ToInt32(crdl.Replace("bonus:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("bonusfirst:"))
+                        {
+                            this.bonusForPlayingT0 = Convert.ToInt32(crdl.Replace("bonusfirst:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("bonussecond:"))
+                        {
+                            this.bonusForPlayingT1 = Convert.ToInt32(crdl.Replace("bonussecond:", ""));
+                            continue;
+                        }
+                        string crd = crdl.Split(',')[0];
+                        if (t1)
+                        {
+                            manat1 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
+                        }
+                        else
+                        {
+                            manat0 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
+                        }
+                        this.combolength++;
+
+                        if (combocards.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
+                        {
+                            combocards[CardDB.Instance.cardIdstringToEnum(crd)]++;
+                        }
+                        else
+                        {
+                            combocards.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
+                            cardspen.Add(CardDB.Instance.cardIdstringToEnum(crd), Convert.ToInt32(crdl.Split(',')[1]));
+                        }
+
+                        if (this.twoTurnCombo)
+                        {
+
                             if (t1)
                             {
-                                manat1 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
+                                if (this.combocardsTurn1.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
+                                {
+                                    combocardsTurn1[CardDB.Instance.cardIdstringToEnum(crd)]++;
+                                }
+                                else
+                                {
+                                    combocardsTurn1.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
+                                }
+                                this.combot1len++;
                             }
                             else
                             {
-                                manat0 += CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd)).cost;
-                            }
-                            this.combolength++;
-
-                            if (combocards.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
-                            {
-                                combocards[CardDB.Instance.cardIdstringToEnum(crd)]++;
-                            }
-                            else
-                            {
-                                combocards.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
-                                cardspen.Add(CardDB.Instance.cardIdstringToEnum(crd), Convert.ToInt32(crdl.Split(',')[1]));
-                            }
-
-                            if (this.twoTurnCombo)
-                            {
-
-                                if (t1)
+                                CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd));
+                                if (lolcrd.type == CardDB.cardtype.MOB)
                                 {
-                                    if (this.combocardsTurn1.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
+                                    if (this.combocardsTurn0Mobs.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
                                     {
-                                        combocardsTurn1[CardDB.Instance.cardIdstringToEnum(crd)]++;
+                                        combocardsTurn0Mobs[CardDB.Instance.cardIdstringToEnum(crd)]++;
                                     }
                                     else
                                     {
-                                        combocardsTurn1.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
+                                        combocardsTurn0Mobs.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
                                     }
-                                    this.combot1len++;
+                                    this.combot0len++;
                                 }
-                                else 
+                                if (lolcrd.type == CardDB.cardtype.WEAPON)
                                 {
-                                    CardDB.Card lolcrd = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(crd));
-                                    if (lolcrd.type == CardDB.cardtype.MOB)
-                                    {
-                                        if (this.combocardsTurn0Mobs.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
-                                        {
-                                            combocardsTurn0Mobs[CardDB.Instance.cardIdstringToEnum(crd)]++;
-                                        }
-                                        else
-                                        {
-                                            combocardsTurn0Mobs.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
-                                        }
-                                        this.combot0len++;
-                                    }
-                                    if (lolcrd.type == CardDB.cardtype.WEAPON)
-                                    {
-                                        this.requiredWeapon = lolcrd.name;
-                                    }
-                                    if (this.combocardsTurn0All.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
-                                    {
-                                        combocardsTurn0All[CardDB.Instance.cardIdstringToEnum(crd)]++;
-                                    }
-                                    else
-                                    {
-                                        combocardsTurn0All.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
-                                    }
-                                    this.combot0lenAll++;
+                                    this.requiredWeapon = lolcrd.name;
                                 }
+                                if (this.combocardsTurn0All.ContainsKey(CardDB.Instance.cardIdstringToEnum(crd)))
+                                {
+                                    combocardsTurn0All[CardDB.Instance.cardIdstringToEnum(crd)]++;
+                                }
+                                else
+                                {
+                                    combocardsTurn0All.Add(CardDB.Instance.cardIdstringToEnum(crd), 1);
+                                }
+                                this.combot0lenAll++;
                             }
-                            
+                        }
 
-                        }
-                        if (!fixmana)
-                        {
-                            this.neededMana = Math.Max(manat1, manat0);
-                        }
+
                     }
-
-                    /*if (i == 2 && type == combotype.combo)
+                    if (!fixmana)
                     {
-                        int m = Convert.ToInt32(ding);
-                        penality = 0;
-                        if (m >= 1) penality = m;
+                        this.neededMana = Math.Max(manat1, manat0);
                     }
+                }
 
-                    i++;
-                }*/
+                /*if (i == 2 && type == combotype.combo)
+                {
+                    int m = Convert.ToInt32(ding);
+                    penality = 0;
+                    if (m >= 1) penality = m;
+                }
+
+                i++;
+            }*/
             }
 
             public int isInCombo(List<Handmanager.Handcard> hand, int omm)
@@ -249,7 +258,7 @@ namespace HREngine.Bots
                     if (turn0requires >= combot0len) return 2;
 
                     return 1;
-                } 
+                }
                 if (cardsincombo >= 1) return 1;
                 return 0;
             }
@@ -364,7 +373,7 @@ namespace HREngine.Bots
         private ComboBreaker()
         {
             readCombos();
-            if(attackFaceHP!=-1)
+            if (attackFaceHP != -1)
             {
                 hp.setAttackFaceHP(attackFaceHP);
             }
@@ -404,15 +413,35 @@ namespace HREngine.Bots
                 }
                 else
                 {
-                    try
+                    if (line.Contains("cardvalue:"))
                     {
-                        combo c = new combo(line);
-                        this.combos.Add(c);
+                        try
+                        {
+                            string cardvalue = line.Replace("cardvalue:", "");
+                            CardDB.cardIDEnum ce = CardDB.Instance.cardIdstringToEnum(cardvalue.Split(',')[0]);
+                            int val = Convert.ToInt32(cardvalue.Split(',')[1]);
+                            if (this.playByValue.ContainsKey(ce)) continue;
+                            this.playByValue.Add(ce, val);
+                            //Helpfunctions.Instance.ErrorLog("adding: " + line);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
-                    catch
+                    else
                     {
-                        Helpfunctions.Instance.logg("combomaker cant read: " + line);
-                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        try
+                        {
+                            combo c = new combo(line);
+                            this.combos.Add(c);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
                 }
 
@@ -423,37 +452,37 @@ namespace HREngine.Bots
         public int getPenalityForDestroyingCombo(CardDB.Card crd, Playfield p)
         {
             if (this.combos.Count == 0) return 0;
-            int pen=int.MaxValue;
+            int pen = int.MaxValue;
             bool found = false;
             int mana = Math.Max(hp.ownMaxMana, hp.currentMana);
             foreach (combo c in this.combos)
+            {
+                if ((c.oHero == HeroEnum.None || c.oHero == p.ownHeroName) && c.isCardInCombo(crd))
                 {
-                    if (c.isCardInCombo(crd))
+                    int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
+                    int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
+
+                    int iic = Math.Max(iia, iib);
+                    if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))// it is a card of the combo, is a turn 1 card, but turn 1 is not possible -> we have to play turn 0 cards first
                     {
-                        int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
-                        int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
-                        
-                        int iic = Math.Max(iia, iib);
-                        if (iia == 2 && iib != 2 && c.isMultiTurn1Card(crd))// it is a card of the combo, is a turn 1 card, but turn 1 is not possible -> we have to play turn 0 cards first
-                        {
-                            iic = 1;
-                        }
-                        if (iic == 1) found = true;
-                        if (iic == 1 && pen > c.cardspen[crd.cardIDenum]) pen = c.cardspen[crd.cardIDenum];//iic==1 will destroy combo
-                        if (iic == 2) pen = 0;//card is ok to play
+                        iic = 1;
                     }
- 
+                    if (iic == 1) found = true;
+                    if (iic == 1 && pen > c.cardspen[crd.cardIDenum]) pen = c.cardspen[crd.cardIDenum];//iic==1 will destroy combo
+                    if (iic == 2) pen = 0;//card is ok to play
                 }
+
+            }
             if (found) { return pen; }
             return 0;
-            
+
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon)
+        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon, HeroEnum heroname)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely
-            List<Handmanager.Handcard> playedcards= new List<Handmanager.Handcard>();
+            List<Handmanager.Handcard> playedcards = new List<Handmanager.Handcard>();
             List<combo> searchingCombo = new List<combo>();
             // only check the cards, that are in a combo that can be played:
             int mana = Math.Max(hp.ownMaxMana, hp.currentMana);
@@ -464,7 +493,7 @@ namespace HREngine.Bots
                 //playedcards.Add(a.handcard);
                 foreach (combo c in this.combos)
                 {
-                    if (c.isCardInCombo(crd))
+                    if ((c.oHero == HeroEnum.None || c.oHero == heroname) && c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);
                         int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions, weapon);
@@ -505,6 +534,16 @@ namespace HREngine.Bots
 
         }
 
+        public int getPlayValue(CardDB.cardIDEnum ce)
+        {
+            if (this.playByValue.Count == 0) return 0;
+            if (this.playByValue.ContainsKey(ce))
+            {
+                return this.playByValue[ce];
+            }
+            return 0;
+
+        }
 
     }
 

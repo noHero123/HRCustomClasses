@@ -10,7 +10,7 @@ using Triton.Game;
 
 namespace SilverfishRush
 {
-    public class SilverControl : ICustomDeck
+    public class SilverRush : ICustomDeck
     {
         private readonly PenalityManager penman = PenalityManager.Instance;
         private readonly Silverfish sf;
@@ -22,7 +22,7 @@ namespace SilverfishRush
 
         Behavior behave = new BehaviorRush();
 
-        public SilverControl()
+        public SilverRush()
         {
             bool concede = false;
             bool writeToSingleFile = false;
@@ -392,7 +392,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        private int versionnumber = 76;
+        private int versionnumber = 78;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -2581,7 +2581,7 @@ namespace SilverfishRush
 
             //penalty for destroying combo
 
-            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName);
+            this.evaluatePenality += ComboBreaker.Instance.checkIfComboWasPlayed(this.playactions, this.ownWeaponName, this.ownHeroName);
 
             if (this.complete) return;
             endTurnEffect(true);//own turn ends
@@ -10233,6 +10233,7 @@ namespace SilverfishRush
 
     public enum HeroEnum
     {
+        None,
         druid,
         hogger,
         hunter,
@@ -10448,54 +10449,53 @@ namespace SilverfishRush
 
         public HeroEnum heroNametoEnum(string s)
         {
-            HeroEnum retval = HeroEnum.druid;
 
             if (s == "hogger")
             {
-                retval = HeroEnum.hogger;
+                return HeroEnum.hogger;
             }
             if (s == "hunter")
             {
-                retval = HeroEnum.hunter;
+                return HeroEnum.hunter;
             }
             if (s == "priest")
             {
-                retval = HeroEnum.priest;
+                return HeroEnum.priest;
             }
             if (s == "druid")
             {
-                retval = HeroEnum.druid;
+                return HeroEnum.druid;
             }
             if (s == "warlock")
             {
-                retval = HeroEnum.warlock;
+                return HeroEnum.warlock;
             }
             if (s == "thief")
             {
-                retval = HeroEnum.thief;
+                return HeroEnum.thief;
             }
             if (s == "pala")
             {
-                retval = HeroEnum.pala;
+                return HeroEnum.pala;
             }
             if (s == "warrior")
             {
-                retval = HeroEnum.warrior;
+                return HeroEnum.warrior;
             }
             if (s == "shaman")
             {
-                retval = HeroEnum.shaman;
+                return HeroEnum.shaman;
             }
             if (s == "mage")
             {
-                retval = HeroEnum.mage;
+                return HeroEnum.mage;
             }
             if (s == "lordjaraxxus")
             {
-                retval = HeroEnum.lordjaraxxus;
+                return HeroEnum.lordjaraxxus;
             }
 
-            return retval;
+            return HeroEnum.None;
         }
 
 
@@ -10874,7 +10874,11 @@ namespace SilverfishRush
             retval += getSpecialCardComboPenalitys(card, target, p, lethal, choice);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
-            if (!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
+            if (!lethal)
+            {
+                retval += cb.getPenalityForDestroyingCombo(card, p);
+                retval += cb.getPlayValue(card.cardIDenum);
+            }
 
             return retval;
         }
@@ -12820,6 +12824,7 @@ namespace SilverfishRush
             weaponuse
         }
 
+        private Dictionary<CardDB.cardIDEnum, int> playByValue = new Dictionary<CardDB.cardIDEnum, int>();
 
         private List<combo> combos = new List<combo>();
         private static ComboBreaker instance;
@@ -12828,6 +12833,7 @@ namespace SilverfishRush
         Hrtprozis hp = Hrtprozis.Instance;
 
         public int attackFaceHP = -1;
+
 
         class combo
         {
@@ -12848,6 +12854,7 @@ namespace SilverfishRush
             public int bonusForPlayingT0 = 0;
             public int bonusForPlayingT1 = 0;
             public CardDB.cardName requiredWeapon = CardDB.cardName.unknown;
+            public HeroEnum oHero = HeroEnum.None;
 
             public combo(string s)
             {
@@ -12859,6 +12866,7 @@ namespace SilverfishRush
                 bool fixmana = false;
                 if (s.Contains("nxttrn")) this.twoTurnCombo = true;
                 if (s.Contains("mana:")) fixmana = true;
+
                 /*foreach (string ding in s.Split(':'))
                 {
                     if (i == 0)
@@ -12896,6 +12904,11 @@ namespace SilverfishRush
                         if (crdl.StartsWith("mana:"))
                         {
                             this.neededMana = Convert.ToInt32(crdl.Replace("mana:", ""));
+                            continue;
+                        }
+                        if (crdl.StartsWith("hero:"))
+                        {
+                            this.oHero = Hrtprozis.Instance.heroNametoEnum(crdl.Replace("hero:", ""));
                             continue;
                         }
                         if (crdl.StartsWith("bonus:"))
@@ -13208,15 +13221,35 @@ namespace SilverfishRush
                 }
                 else
                 {
-                    try
+                    if (line.Contains("cardvalue:"))
                     {
-                        combo c = new combo(line);
-                        this.combos.Add(c);
+                        try
+                        {
+                            string cardvalue = line.Replace("cardvalue:", "");
+                            CardDB.cardIDEnum ce = CardDB.Instance.cardIdstringToEnum(cardvalue.Split(',')[0]);
+                            int val = Convert.ToInt32(cardvalue.Split(',')[1]);
+                            if (this.playByValue.ContainsKey(ce)) continue;
+                            this.playByValue.Add(ce, val);
+                            //Helpfunctions.Instance.ErrorLog("adding: " + line);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
-                    catch
+                    else
                     {
-                        Helpfunctions.Instance.logg("combomaker cant read: " + line);
-                        Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        try
+                        {
+                            combo c = new combo(line);
+                            this.combos.Add(c);
+                        }
+                        catch
+                        {
+                            Helpfunctions.Instance.logg("combomaker cant read: " + line);
+                            Helpfunctions.Instance.ErrorLog("combomaker cant read: " + line);
+                        }
                     }
                 }
 
@@ -13232,7 +13265,7 @@ namespace SilverfishRush
             int mana = Math.Max(hp.ownMaxMana, hp.currentMana);
             foreach (combo c in this.combos)
             {
-                if (c.isCardInCombo(crd))
+                if ((c.oHero == HeroEnum.None || c.oHero == p.ownHeroName) && c.isCardInCombo(crd))
                 {
                     int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);//check if we have all cards for a combo, and if the choosen card is one
                     int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, p.ownMinions, p.ownWeaponName);
@@ -13253,7 +13286,7 @@ namespace SilverfishRush
 
         }
 
-        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon)
+        public int checkIfComboWasPlayed(List<Action> alist, CardDB.cardName weapon, HeroEnum heroname)
         {
             if (this.combos.Count == 0) return 0;
             //returns a penalty only if the combo could be played, but is not played completely
@@ -13268,7 +13301,7 @@ namespace SilverfishRush
                 //playedcards.Add(a.handcard);
                 foreach (combo c in this.combos)
                 {
-                    if (c.isCardInCombo(crd))
+                    if ((c.oHero == HeroEnum.None || c.oHero == heroname) && c.isCardInCombo(crd))
                     {
                         int iia = c.isInCombo(hm.handCards, hp.ownMaxMana);
                         int iib = c.isMultiTurnComboTurn1(hm.handCards, mana, hp.ownMinions, weapon);
@@ -13309,6 +13342,16 @@ namespace SilverfishRush
 
         }
 
+        public int getPlayValue(CardDB.cardIDEnum ce)
+        {
+            if (this.playByValue.Count == 0) return 0;
+            if (this.playByValue.ContainsKey(ce))
+            {
+                return this.playByValue[ce];
+            }
+            return 0;
+
+        }
 
     }
 

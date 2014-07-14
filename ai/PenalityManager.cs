@@ -172,7 +172,11 @@ namespace HREngine.Bots
             retval += getSpecialCardComboPenalitys( card,  target,  p, lethal, choice);
             retval += playSecretPenality( card,  p);
             retval += getPlayCardSecretPenality(card, p);
-            if(!lethal) retval += cb.getPenalityForDestroyingCombo(card, p);
+            if (!lethal)
+            {
+                retval += cb.getPenalityForDestroyingCombo(card, p);
+                retval += cb.getPlayValue(card.cardIDenum);
+            }
 
             return retval;
         }
