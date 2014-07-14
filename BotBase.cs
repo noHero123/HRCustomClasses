@@ -226,7 +226,6 @@ namespace HREngine.Bots
                if (s.Contains("uai.version"))
                {
                    s = "uai.version=V" + version;
-                   Helpfunctions.Instance.ErrorLog("v");
                }
 
                if (s.Contains("uai.concedes"))
@@ -236,7 +235,6 @@ namespace HREngine.Bots
 
                if (s.Contains("uai.wins"))
                {
-                   Helpfunctions.Instance.ErrorLog("totalwin is " + totalwin);
                    s = "uai.wins=" + totalwin;
                }
                if (s.Contains("uai.loses"))
@@ -266,7 +264,7 @@ namespace HREngine.Bots
                    }
 
                }
-               Helpfunctions.Instance.ErrorLog("add " + s);
+               //Helpfunctions.Instance.ErrorLog("add " + s);
                newlines.Add(s);
 
            }
