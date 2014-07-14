@@ -8,7 +8,7 @@ using Triton.Game;
 
 //using System.Linq;
 
-namespace SilverfishControl
+namespace SilverfishRush
 {
     public class SilverControl : ICustomDeck
     {
