@@ -1,722 +1,479 @@
-﻿using HREngine.API;
-using HREngine.API.Actions;
-using HREngine.API.Utilities;
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using Triton.Bot;
+using Triton.Common;
+using Triton.Game;
+
 //using System.Linq;
 
-
-
-namespace HREngine.Bots
+namespace SilverfishControlfix
 {
-
-
-    public class Bot : IBot
+    public class SilverControlfix : ICustomDeck
     {
-        private int concedeLvl = 5; // the rank, till you want to concede
-        private int dirtytarget = -1;
-        private int dirtychoice = -1;
+        private readonly PenalityManager penman = PenalityManager.Instance;
+        private readonly Silverfish sf;
         private string choiceCardId = "";
-        PenalityManager penman = PenalityManager.Instance;
-        DateTime starttime = DateTime.Now;
-        Silverfish sf;
-        Behavior behave = new BehaviorRush();
+        private int concedeLvl = 20; // the rank, till you want to concede
+        private int dirtyTargetSource = -1;
+        private int dirtychoice = -1;
+        private int dirtytarget = -1;
+        private bool waited = false;
+        Behavior behave = new BehaviorControl();
 
-        public Bot()
+        public SilverControlfix()
         {
-            OnBattleStateUpdate = HandleOnBattleStateUpdate;
-            OnMulliganStateUpdate = HandleBattleMulliganPhase;
-            starttime = DateTime.Now;
             bool concede = false;
             bool writeToSingleFile = false;
-            try
-            {
-                concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
-                writeToSingleFile = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.singleLog") == "true") ? true : false;
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("a wild error occurrs! cant read the settings...");
-            }
-            try
-            {
-                this.concedeLvl = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.concedelvl")));
-                if (this.concedeLvl >= 20) this.concedeLvl = 20;
-                if (concede)
-                {
-                    Helpfunctions.Instance.ErrorLog("concede till rank " + concedeLvl);
-                }
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("cant read your concede-Lvl");
-            }
 
-            this.sf = new Silverfish(writeToSingleFile);
-
-
-
-
-
+            sf = new Silverfish(writeToSingleFile);
             Mulligan.Instance.setAutoConcede(concede);
 
             sf.setnewLoggFile();
 
-            try
-            {
-                int enfacehp = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyfacehp")));
-                Helpfunctions.Instance.ErrorLog("set enemy-face-hp to: " + enfacehp);
-                ComboBreaker.Instance.attackFaceHP = enfacehp;
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("error in reading enemy-face-hp");
-            }
+            int enfacehp = 15;
+            Helpfunctions.Instance.ErrorLog("set enemy-face-hp to: " + enfacehp);
+            ComboBreaker.Instance.attackFaceHP = enfacehp;
 
-            try
+            int mxwde = 3000;
+            Ai.Instance.setMaxWide(mxwde);
+            Helpfunctions.Instance.ErrorLog("set maxwide to: " + mxwde);
+
+            bool twots = false;
+            if (twots)
             {
-                int mxwde = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.maxwide")));
-                if (mxwde != 3000)
-                {
-                    Ai.Instance.setMaxWide(mxwde);
-                    Helpfunctions.Instance.ErrorLog("set maxwide to: " + mxwde);
-                }
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("error in reading Maxwide from settings, please recheck the entry");
+                Ai.Instance.setTwoTurnSimulation(twots);
+                Helpfunctions.Instance.ErrorLog("activated two turn simulation");
             }
 
-            try
+            bool playaround = false;
+            if (playaround)
             {
-                bool twots = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.simulateTwoTurns") == "true") ? true : false;
-                if (twots)
-                {
-                    Ai.Instance.setTwoTurnSimulation(twots);
-                    Helpfunctions.Instance.ErrorLog("activated two turn simulation");
-                }
-
-
-
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
-            }
-
-            try
-            {
-                bool playaround = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAround") == "true") ? true : false;
-
-                if (playaround)
-                {
-                    Ai.Instance.setPlayAround(playaround);
-                    Helpfunctions.Instance.ErrorLog("activated playaround");
-                }
-
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
+                Ai.Instance.setPlayAround(playaround);
+                Helpfunctions.Instance.ErrorLog("activated playaround");
             }
 
             Helpfunctions.Instance.ErrorLog("write to single log file is: " + writeToSingleFile);
 
+
             bool teststuff = false;
-            bool printstuff = false;
-            try
-            {
-
-                printstuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.longteststuff") == "true") ? true : false;
-                teststuff = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.teststuff") == "true") ? true : false;
-            }
-            catch
-            {
-                Helpfunctions.Instance.ErrorLog("something went wrong with simulating stuff!");
-            }
-
+                // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
+            bool printstuff = false; // if true, the best board of the tested file is printet stepp by stepp
             if (teststuff)
             {
                 Ai.Instance.autoTester(behave, printstuff);
             }
-            Helpfunctions.Instance.ErrorLog("writesettings");
-            this.writeSettings();
         }
 
+        // you may have to out-comment the code in this function (its for conceding)
+        /*
+     private void concede()
+      {
+          int curlvl = HRPlayer.GetLocalPlayer().GetRank();
+          if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
+          if (curlvl < this.concedeLvl)
+          {
+              Helpfunctions.Instance.ErrorLog("not today!");
+              HRGame.ConcedeGame();
+          }
+      }
 
-        int KeepConcede = 0;
-        private void concede()
+
+        // HC mulligan
+      private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
+      {
+          Helpfunctions.Instance.ErrorLog("handle mulligan");
+
+          if (HRMulligan.IsMulliganActive())
+          {
+              var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
+              if (Mulligan.Instance.hasmulliganrules())
+              {
+                  HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
+                  string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
+                  List<Mulligan.CardIDEntity> celist = new List<Mulligan.CardIDEntity>();
+                  foreach (var item in list)
+                  {
+                      if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
+                      {
+                          celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
+                      }
+                  }
+                  List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, enemName);
+                  foreach (var item in list)
+                  {
+                      if (mullientitys.Contains(item.GetEntity().GetEntityId()))
+                      {
+                          Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
+                          HRMulligan.ToggleCard(item);
+                      }
+                  }
+
+
+              }
+              else
+              {
+                  foreach (var item in list)
+                  {
+                      if (item.GetEntity().GetCost() >= 4)
+                      {
+                          Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
+                          HRMulligan.ToggleCard(item);
+                      }
+                      if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
+                      {
+                          Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
+                          HRMulligan.ToggleCard(item);
+                      }
+                  }
+              }
+
+
+              sf.setnewLoggFile();
+
+              if (Mulligan.Instance.loserLoserLoser)
+              {
+                  concede();
+              }
+              return null;
+              //HRMulligan.EndMulligan();
+          }
+          return null;
+      }
+
+        */
+
+        /// <summary>
+        ///     [EN]
+        ///     This handler is executed when the local player turn is active.
+        /// </summary>
+        public IEnumerator SelectCard()
         {
-            int totalwin = 0;
-            int totallose = 0;
-            string[] lines = new string[0] { };
-            try
+            if (waited)
             {
-                string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-                lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+                Helpfunctions.Instance.ErrorLog("waiting...");
+                yield return Coroutine.Sleep(500);
+                waited = false;
+                yield break;
             }
-            catch
+            else
             {
-                Helpfunctions.Instance.logg("cant find Settings.ini");
+                waited = true;
             }
-            foreach (string s in lines)
+            if (TritonHS.IsInTargetMode())
             {
-                if (s.Contains("bot.stats.victory"))
+                if (dirtytarget >= 0)
                 {
-                    int val1 = s.Length;
-                    string temp1 = s.Substring(18, (val1 - 18));
-                    //HRLog.Write(temp1);
-                    totalwin = int.Parse(temp1);
-                }
-                else if (s.Contains("bot.stats.defeat"))
-                {
-                    int val2 = s.Length;
-                    string temp2 = s.Substring(17, (val2 - 17));
-                    //HRLog.Write(temp2);
-                    totallose = int.Parse(temp2);
-                }
-            }
-            if ((totalwin + totallose - KeepConcede) != 0)
-            {
-                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
-            }
-
-            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
-            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
-            if (curlvl < this.concedeLvl)
-            {
-                Helpfunctions.Instance.ErrorLog("not today!");
-                KeepConcede++;
-                writeSettings();
-                HRGame.ConcedeGame();
-            }
-        }
-
-        private void writeSettings()
-        {
-            int version = sf.versionnumber;
-            int totalwin = 0;
-            int totallose = 0;
-            string[] lines = new string[0] { };
-            try
-            {
-                string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-                lines = System.IO.File.ReadAllLines(path + "Settings.ini");
-            }
-            catch
-            {
-                Helpfunctions.Instance.logg("cant find Settings.ini");
-            }
-            List<string> newlines = new List<string>();
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string s = lines[i];
-
-                if (s.Contains("bot.stats.victory"))
-                {
-                    int val1 = s.Length;
-                    string temp1 = s.Substring(18, (val1 - 18));
-                    //HRLog.Write(temp1);
-                    totalwin = int.Parse(temp1);
-                }
-
-                if (s.Contains("bot.stats.defeat"))
-                {
-                    int val2 = s.Length;
-                    string temp2 = s.Substring(17, (val2 - 17));
-                    //HRLog.Write(temp2);
-                    totallose = int.Parse(temp2);
-                }
-
-                if (s.Contains("uai.version"))
-                {
-                    s = "uai.version=V" + version;
-                }
-
-                if (s.Contains("uai.concedes"))
-                {
-                    s = "uai.concedes=" + KeepConcede;
-                }
-
-                if (s.Contains("uai.wins"))
-                {
-                    s = "uai.wins=" + totalwin;
-                }
-                if (s.Contains("uai.loses"))
-                {
-                    s = "uai.loses=" + totallose;
-                }
-                if (s.Contains("uai.winrate"))
-                {
-                    s = "uai.winrate=" + 0;
-                    double winr = 0;
-                    if ((totalwin + totallose - KeepConcede) != 0)
+                    Logging.Write("targeting...");
+                    HSCard source = null;
+                    if (dirtyTargetSource == 9000) // 9000 = ability
                     {
-                        winr = ((double)(totalwin * 100) / (double)(totalwin + totallose - KeepConcede));
-                        s = "uai.winrate=" + Math.Round(winr, 2);
+                        source = TritonHS.OurHeroPowerCard;
+                    }
+                    else
+                    {
+                        source = getEntityWithNumber(dirtyTargetSource);
+                    }
+                    HSCard target = getEntityWithNumber(dirtytarget);
+
+                    if(target == null) Logging.Write("error: target is null...");
+                    
+                    dirtytarget = -1;
+                    dirtyTargetSource = -1;
+
+                    if(source == null) TritonHS.DoTarget(target);
+                    else source.DoTarget(target);
+
+                    yield break;
+                }
+                Logging.Write("target failure...");
+                TritonHS.CancelTargetingMode();
+            }
+
+            if (TritonHS.IsInChoiceMode())
+            {
+                if (dirtychoice >= 1)
+                {
+                    //dirtychoice == 1 -> choose left card, 
+                    // dirty choice == 2 -> right card
+
+                    Helpfunctions.Instance.logg("chooses the card: " + dirtychoice);
+                    if (dirtychoice == 1)
+                    {
+                        TritonHS.ChooseOneClickLeft();
+                    }
+                    else
+                    {
+                        TritonHS.ChooseOneClickRight();
+                    }
+                    dirtychoice = -1;
+                    yield break;
+                }
+                //Todo: ultimate tracking-simulation!
+                var r = new Random();
+                int choice = r.Next(0, 2);
+                Helpfunctions.Instance.logg("chooses a random card");
+                TritonHS.ChooseOneClickLeft();
+                yield break;
+            }
+
+            sf.updateEverything(behave);
+            Action moveTodo = Ai.Instance.bestmove;
+            if (moveTodo == null)
+            {
+                Helpfunctions.Instance.ErrorLog("end turn");
+                TritonHS.EndTurn();
+                yield break;
+            }
+            Helpfunctions.Instance.ErrorLog("play action");
+            moveTodo.print();
+
+            //play the move#########################################################################
+
+            //play a card form hand
+            if (moveTodo.cardplay)
+            {
+                HSCard cardtoplay = getCardWithNumber(moveTodo.cardEntitiy);
+                if (moveTodo.enemytarget >= 0)
+                {
+                    HSCard target = getEntityWithNumber(moveTodo.enemyEntitiy);
+                    Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.Name + " target: " + target.Name);
+                    Helpfunctions.Instance.logg("play: " + cardtoplay.Name + " target: " + target.Name + " choice: " +
+                                                moveTodo.druidchoice);
+
+                    if (moveTodo.druidchoice >= 1)
+                    {
+                        if (moveTodo.enemyEntitiy >= 0) dirtytarget = moveTodo.enemyEntitiy;
+                        dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                        choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
                     }
 
-                }
-                if (s.Contains("uai.winph"))
+                    //safe targeting stuff for hsbuddy
+                    dirtyTargetSource = moveTodo.cardEntitiy;
+                    dirtytarget = moveTodo.enemyEntitiy;
+
+
+                    //we can place mobs (if api supports it)
+                    /*
+                if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                 {
-                    s = "uai.winph=" + 0;
-                    double winh = 0;
-                    if ((DateTime.Now - starttime).TotalHours >= 0.001)
-                    {
-
-                        winh = (double)totalwin / (DateTime.Now - starttime).TotalHours;
-                        s = "uai.winph=" + Math.Round(winh, 2);
-                    }
-
+                    //moveTodo.owntarget (maybe +1 (depends on api)) is the place, where the mob should be placed
+                    //return;
                 }
-                //Helpfunctions.Instance.ErrorLog("add " + s);
-                newlines.Add(s);
+                */
 
-            }
-
-
-            try
-            {
-                string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-                System.IO.File.WriteAllLines(path + "Settings.ini", newlines.ToArray());
-            }
-            catch
-            {
-                Helpfunctions.Instance.logg("cant write Settings.ini");
-            }
-        }
-
-        private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
-        {
-            Helpfunctions.Instance.ErrorLog("handle mulligan");
-
-            if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
-            {
-                Helpfunctions.Instance.ErrorLog("but we have to wait :D");
-                return null;
-            }
-
-            if (HRMulligan.IsMulliganActive())
-            {
-                var list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-                if (Mulligan.Instance.hasmulliganrules())
+                    cardtoplay.DoGrab();
+                    yield return Coroutine.Sleep(500);
+                    cardtoplay.DoDrop();
+                    yield break;
+                }
+                Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.Name + " target nothing");
+                Helpfunctions.Instance.logg("play: " + cardtoplay.Name + " choice: " + moveTodo.druidchoice);
+                if (moveTodo.druidchoice >= 1)
                 {
-                    HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
-                    HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
-                    string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
-                    string ownName = Hrtprozis.Instance.heroIDtoName(ownPlayer.GetHeroCard().GetEntity().GetCardId());
-                    List<Mulligan.CardIDEntity> celist = new List<Mulligan.CardIDEntity>();
-                    foreach (var item in list)
-                    {
-                        if (item.GetEntity().GetCardId() != "GAME_005")// dont mulligan coin
-                        {
-                            celist.Add(new Mulligan.CardIDEntity(item.GetEntity().GetCardId(), item.GetEntity().GetEntityId()));
-                        }
-                    }
-                    List<int> mullientitys = Mulligan.Instance.whatShouldIMulligan(celist, ownName, enemName);
-                    foreach (var item in list)
-                    {
-                        if (mullientitys.Contains(item.GetEntity().GetEntityId()))
-                        {
-                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because of your rules");
-                            HRMulligan.ToggleCard(item);
-                        }
-                    }
+                    dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
+                    choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
+                }
 
+                dirtyTargetSource = -1;
+                dirtytarget = -1;
 
+                //mob placement...
+                /*
+                if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
+                {
+                    //moveTodo.owntarget (maybe +1 (depends on api)) is the place, where the mob should be placed
+                    //return;
+                }*/
+
+                cardtoplay.DoGrab();
+                yield return Coroutine.Sleep(500);
+                cardtoplay.DoDrop();
+                yield break;
+            }
+
+            //attack with minion
+            if (moveTodo.minionplay)
+            {
+                HSCard attacker = getEntityWithNumber(moveTodo.ownEntitiy);
+                HSCard target = getEntityWithNumber(moveTodo.enemyEntitiy);
+                Helpfunctions.Instance.ErrorLog("minion attack: " + attacker.Name + " target: " + target.Name);
+                Helpfunctions.Instance.logg("minion attack: " + attacker.Name + " target: " + target.Name);
+                attacker.DoAttack(target);
+                yield break;
+            }
+            //attack with hero
+            if (moveTodo.heroattack)
+            {
+                HSCard attacker = getEntityWithNumber(moveTodo.ownEntitiy);
+                HSCard target = getEntityWithNumber(moveTodo.enemyEntitiy);
+                dirtytarget = moveTodo.enemyEntitiy;
+                Helpfunctions.Instance.ErrorLog("heroattack: " + attacker.Name + " target: " + target.Name);
+                Helpfunctions.Instance.logg("heroattack: " + attacker.Name + " target: " + target.Name);
+
+                //safe targeting stuff for hsbuddy
+                dirtyTargetSource = moveTodo.ownEntitiy;
+                dirtytarget = moveTodo.enemyEntitiy;
+                attacker.DoAttack(target);
+                yield break;
+            }
+
+            //use ability
+            if (moveTodo.useability)
+            {
+                HSCard cardtoplay = TritonHS.OurHeroPowerCard;
+
+                if (moveTodo.enemytarget >= 0)
+                {
+                    HSCard target = getEntityWithNumber(moveTodo.enemyEntitiy);
+                    dirtyTargetSource = 9000;
+                    dirtytarget = moveTodo.enemyEntitiy;
+
+                    Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.Name + " target " + target.Name);
+                    Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.Name + " target " + target.Name);
                 }
                 else
                 {
-                    foreach (var item in list)
-                    {
-                        if (item.GetEntity().GetCost() >= 4)
-                        {
-                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it cost is >= 4.");
-                            HRMulligan.ToggleCard(item);
-                        }
-                        if (item.GetEntity().GetCardId() == "EX1_308" || item.GetEntity().GetCardId() == "EX1_622" || item.GetEntity().GetCardId() == "EX1_005")
-                        {
-                            Helpfunctions.Instance.ErrorLog("Rejecting Mulligan Card " + item.GetEntity().GetName() + " because it is soulfire or shadow word: death");
-                            HRMulligan.ToggleCard(item);
-                        }
-                    }
+                    Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.Name +
+                                                    " target nothing");
+                    Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.Name + " target nothing");
                 }
+                cardtoplay.DoGrab();
+                yield return Coroutine.Sleep(500);
+                cardtoplay.DoDrop();
+                yield break;
+            }
 
+            TritonHS.EndTurn();
+        }
 
-                sf.setnewLoggFile();
-
-                writeSettings();
-
-                if (Mulligan.Instance.loserLoserLoser)
-                {
-                    concede();
-                }
-
-                return null;
-                //HRMulligan.EndMulligan();
+        private HSCard getEntityWithNumber(int number)
+        {
+            foreach (HSCard e in getallEntitys())
+            {
+                if (number == e.EntityId) return e;
             }
             return null;
         }
 
-        /// <summary>
-        /// [EN]
-        /// This handler is executed when the local player turn is active.
-        ///
-        /// [DE]
-        /// Dieses Event wird ausgelöst wenn der Spieler am Zug ist.
-        /// </summary>
-        private HREngine.API.Actions.ActionBase HandleOnBattleStateUpdate()
+        private HSCard getCardWithNumber(int number)
         {
-
-            try
+            foreach (HSCard e in getallHandCards())
             {
-                if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
-                {
-                    Helpfunctions.Instance.ErrorLog("dirty targeting...");
-                    HREntity target = getEntityWithNumber(dirtytarget);
-
-                    dirtytarget = -1;
-
-                    return new HREngine.API.Actions.TargetAction(target);
-                }
-                if (HRChoice.IsChoiceActive())
-                {
-                    if (this.dirtychoice >= 1)
-                    {
-                        List<HREntity> choices = HRChoice.GetChoiceCards();
-                        int choice = this.dirtychoice;
-                        this.dirtychoice = -1;
-                        string ccId = this.choiceCardId;
-                        this.choiceCardId = "";
-                        HREntity target = choices[choice - 1];
-                        if (ccId == "EX1_160")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_160b") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_160a") target = hre;
-                            }
-                        }
-                        if (ccId == "NEW1_008")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "NEW1_008a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "NEW1_008b") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_178")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_178a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_178b") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_573")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_573a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_573b") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_165")//druid of the claw
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_165t1") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_165t2") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_166")//keeper of the grove
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_166a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_166b") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_155")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_155a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_155b") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_164")
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_164a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_164b") target = hre;
-                            }
-                        }
-                        if (ccId == "New1_007")//starfall
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "New1_007b") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "New1_007a") target = hre;
-                            }
-                        }
-                        if (ccId == "EX1_154")//warth
-                        {
-                            foreach (HREntity hre in choices)
-                            {
-                                if (choice == 1 && hre.GetCardId() == "EX1_154a") target = hre;
-                                if (choice == 2 && hre.GetCardId() == "EX1_154b") target = hre;
-                            }
-                        }
-                        Helpfunctions.Instance.logg("chooses the card: " + target.GetCardId());
-                        return new HREngine.API.Actions.ChoiceAction(target);
-                    }
-                    else
-                    {
-                        //Todo: ultimate tracking-simulation!
-                        List<HREntity> choices = HRChoice.GetChoiceCards();
-                        Random r = new Random();
-                        int choice = r.Next(0, choices.Count);
-                        Helpfunctions.Instance.logg("chooses a random card");
-                        return new HREngine.API.Actions.ChoiceAction(choices[choice]);
-                    }
-                }
-
-                sf.updateEverything(behave);
-                Action moveTodo = Ai.Instance.bestmove;
-                if (moveTodo == null)
-                {
-                    Helpfunctions.Instance.ErrorLog("end turn");
-                    return null;
-                }
-                Helpfunctions.Instance.ErrorLog("play action");
-                moveTodo.print();
-                if (moveTodo.cardplay)
-                {
-                    HRCard cardtoplay = getCardWithNumber(moveTodo.cardEntitiy);
-                    if (moveTodo.enemytarget >= 0)
-                    {
-                        HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                        Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName());
-                        Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " target: " + target.GetName() + " choice: " + moveTodo.druidchoice);
-                        if (moveTodo.druidchoice >= 1)
-                        {
-                            if (moveTodo.enemyEntitiy >= 0) this.dirtytarget = moveTodo.enemyEntitiy;
-                            this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                            this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
-
-                        }
-                        if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
-                        {
-                            return new HREngine.API.Actions.PlayCardAction(cardtoplay, target, moveTodo.owntarget + 1);
-                        }
-
-                        return new HREngine.API.Actions.PlayCardAction(cardtoplay, target);
-
-                    }
-                    else
-                    {
-                        Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.GetEntity().GetName() + " target nothing");
-                        Helpfunctions.Instance.logg("play: " + cardtoplay.GetEntity().GetName() + " choice: " + moveTodo.druidchoice);
-                        if (moveTodo.druidchoice >= 1)
-                        {
-                            this.dirtychoice = moveTodo.druidchoice; //1=leftcard, 2= rightcard
-                            this.choiceCardId = moveTodo.handcard.card.cardIDenum.ToString();
-
-                        }
-                        if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
-                        {
-                            return new HREngine.API.Actions.PlayCardAction(cardtoplay, null, moveTodo.owntarget + 1);
-                        }
-                        return new HREngine.API.Actions.PlayCardAction(cardtoplay);
-                    }
-
-                }
-
-                if (moveTodo.minionplay)
-                {
-                    HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
-                    HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                    Helpfunctions.Instance.ErrorLog("minion attack: " + attacker.GetName() + " target: " + target.GetName());
-                    Helpfunctions.Instance.logg("minion attack: " + attacker.GetName() + " target: " + target.GetName());
-                    return new HREngine.API.Actions.AttackAction(attacker, target);
-
-                }
-
-                if (moveTodo.heroattack)
-                {
-                    HREntity attacker = getEntityWithNumber(moveTodo.ownEntitiy);
-                    HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                    this.dirtytarget = moveTodo.enemyEntitiy;
-                    Helpfunctions.Instance.ErrorLog("heroattack: " + attacker.GetName() + " target: " + target.GetName());
-                    Helpfunctions.Instance.logg("heroattack: " + attacker.GetName() + " target: " + target.GetName());
-                    if (HRPlayer.GetLocalPlayer().HasWeapon())
-                    {
-                        Helpfunctions.Instance.ErrorLog("hero attack with weapon");
-                        return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetWeaponCard().GetEntity(), target);
-                    }
-                    Helpfunctions.Instance.ErrorLog("hero attack without weapon");
-                    //Helpfunctions.Instance.ErrorLog("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
-                    return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
-
-                }
-
-                if (moveTodo.useability)
-                {
-                    HRCard cardtoplay = HRPlayer.GetLocalPlayer().GetHeroPower().GetCard();
-
-                    if (moveTodo.enemytarget >= 0)
-                    {
-                        HREntity target = getEntityWithNumber(moveTodo.enemyEntitiy);
-                        Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
-                        Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target " + target.GetName());
-                        return new HREngine.API.Actions.PlayCardAction(cardtoplay, target);
-
-                    }
-                    else
-                    {
-                        Helpfunctions.Instance.ErrorLog("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
-                        Helpfunctions.Instance.logg("use ablitiy: " + cardtoplay.GetEntity().GetName() + " target nothing");
-                        return new HREngine.API.Actions.PlayCardAction(cardtoplay);
-                    }
-                }
-
-            }
-            catch (Exception Exception)
-            {
-                Helpfunctions.Instance.ErrorLog(Exception.Message);
-                Helpfunctions.Instance.ErrorLog(Environment.StackTrace);
-            }
-            return null;
-            //HRBattle.FinishRound();
-        }
-
-        private HREntity getEntityWithNumber(int number)
-        {
-            foreach (HREntity e in this.getallEntitys())
-            {
-                if (number == e.GetEntityId()) return e;
+                if (number == e.EntityId) return e;
             }
             return null;
         }
 
-        private HRCard getCardWithNumber(int number)
+        private List<HSCard> getallEntitys()
         {
-            foreach (HRCard e in this.getallHandCards())
-            {
-                if (number == e.GetEntity().GetEntityId()) return e;
-            }
-            return null;
-        }
-
-        private List<HREntity> getallEntitys()
-        {
-            List<HREntity> result = new List<HREntity>();
-            HREntity ownhero = HRPlayer.GetLocalPlayer().GetHero();
-            HREntity enemyhero = HRPlayer.GetEnemyPlayer().GetHero();
-            HREntity ownHeroAbility = HRPlayer.GetLocalPlayer().GetHeroPower();
-            List<HRCard> list2 = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.PLAY);
-            List<HRCard> list3 = HRCard.GetCards(HRPlayer.GetEnemyPlayer(), HRCardZone.PLAY);
+            var result = new List<HSCard>();
+            HSCard ownhero = TritonHS.OurHero;
+            HSCard enemyhero = TritonHS.EnemyHero;
+            HSCard ownHeroAbility = TritonHS.OurHeroPowerCard;
+            List<HSCard> list2 = TritonHS.GetCards(CardZone.Battlefield, true);
+            List<HSCard> list3 = TritonHS.GetCards(CardZone.Battlefield, false);
 
             result.Add(ownhero);
             result.Add(enemyhero);
             result.Add(ownHeroAbility);
 
-            foreach (HRCard item in list2)
-            {
-                result.Add(item.GetEntity());
-            }
-            foreach (HRCard item in list3)
-            {
-                result.Add(item.GetEntity());
-            }
-
-
-
+            result.AddRange(list2);
+            result.AddRange(list3);
 
             return result;
         }
 
-        private List<HRCard> getallHandCards()
+        private List<HSCard> getallHandCards()
         {
-            List<HRCard> list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
+            List<HSCard> list = TritonHS.GetCards(CardZone.Hand, true);
             return list;
         }
 
+        protected virtual void SafeHandleBattleLocalPlayerTurnHandler()
+        {
+        }
+
+        protected virtual HSCard GetMinionByPriority(HSCard lastMinion = null)
+        {
+            return null;
+        }
     }
 
     public class Silverfish
     {
-        public int versionnumber = 79;
-        private bool singleLog = false;
+        private int versionnumber = 79;
+
+        private readonly List<Minion> enemyMinions = new List<Minion>();
+        private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
+        private readonly List<Minion> ownMinions = new List<Minion>();
+        private readonly bool singleLog;
 
 
-        Settings sttngs = Settings.Instance;
+        private readonly Settings sttngs = Settings.Instance;
+        private int anzcards;
+        private int cardsPlayedThisTurn;
+        private int currentMana;
+        private CardDB.Card enemyAbility = new CardDB.Card();
+        private int enemyAnzCards;
+        private int enemyAtk;
+        private int enemyDecksize = 0;
+        private int enemyDefence;
+        private int enemyHeroFatigue;
+        private bool enemyHeroImmune;
 
-        List<Minion> ownMinions = new List<Minion>();
-        List<Minion> enemyMinions = new List<Minion>();
-        List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
-        int ownPlayerController = 0;
-        List<string> ownSecretList = new List<string>();
-        int enemySecretCount = 0;
+        private string enemyHeroWeapon = "";
+        private string enemyHeroname = "";
+        private int enemyHp = 30;
+        private int enemyMaxMana;
+        private int enemySecretCount;
+        private int enemyWeaponAttack;
+        private int enemyWeaponDurability;
+        private bool enemyfrozen;
 
-        int currentMana = 0;
-        int ownMaxMana = 0;
-        int numMinionsPlayedThisTurn = 0;
-        int cardsPlayedThisTurn = 0;
-        int ueberladung = 0;
+        private CardDB.Card heroAbility = new CardDB.Card();
 
-        int enemyMaxMana = 0;
+        private int heroAtk;
+        private int heroDefence;
+        private bool heroHasWindfury;
+        private int heroHp = 30;
+        private bool heroImmune;
+        private bool heroImmuneToDamageWhileAttacking;
+        private int heroNumAttacksThisTurn;
+        private int heroWeaponAttack;
+        private int heroWeaponDurability;
+        private bool herofrozen;
+        private string heroname = "";
+        private int numMinionsPlayedThisTurn;
 
-
-        string ownHeroWeapon = "";
-        int heroWeaponAttack = 0;
-        int heroWeaponDurability = 0;
-        bool heroImmuneToDamageWhileAttacking = false;
-        bool heroImmune = false;
-        bool enemyHeroImmune = false;
-
-        string enemyHeroWeapon = "";
-        int enemyWeaponAttack = 0;
-        int enemyWeaponDurability = 0;
-
-        int heroAtk = 0;
-        int heroHp = 30;
-        int heroDefence = 0;
-        string heroname = "";
-        bool ownheroisread = false;
-        int heroNumAttacksThisTurn = 0;
-        bool heroHasWindfury = false;
-        bool herofrozen = false;
-
-        int enemyAtk = 0;
-        int enemyHp = 30;
-        string enemyHeroname = "";
-        int enemyDefence = 0;
-        bool enemyfrozen = false;
-
-        CardDB.Card heroAbility = new CardDB.Card();
-        bool ownAbilityisReady = false;
-        CardDB.Card enemyAbility = new CardDB.Card();
-
-        int anzcards = 0;
-        int enemyAnzCards = 0;
-
-        int ownHeroFatigue = 0;
-        int enemyHeroFatigue = 0;
-        int ownDecksize = 0;
-        int enemyDecksize = 0;
+        private bool ownAbilityisReady;
+        private int ownDecksize = 0;
+        private int ownHeroFatigue;
+        private string ownHeroWeapon = "";
+        private int ownMaxMana;
+        private int ownPlayerController;
+        private int ourSecretsCount;
+        private List<string> ownSecretList = new List<string>();
+        private bool ownheroisread;
+        private int ueberladung;
+        
 
         public Silverfish(bool snglLg)
         {
-            this.singleLog = snglLg;
+            singleLog = snglLg;
             Helpfunctions.Instance.ErrorLog("init Silverfish");
-            string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "UltimateLogs" + System.IO.Path.DirectorySeparatorChar;
-            System.IO.Directory.CreateDirectory(path);
-            sttngs.setFilePath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Bots" + System.IO.Path.DirectorySeparatorChar + "silver" + System.IO.Path.DirectorySeparatorChar);
+
+            string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
+                               Environment.OSVersion.Platform == PlatformID.MacOSX)
+                ? Environment.GetEnvironmentVariable("HOME")
+                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
+            string p = "./CustomDecks/Silverfish/";//homePath + Path.DirectorySeparatorChar + "uaiFiles" + Path.DirectorySeparatorChar;
+
+            // change this two paths!!!!! (the (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13))
+            string path = p + "UltimateLogs" + Path.DirectorySeparatorChar;
+            Directory.CreateDirectory(path);
+            sttngs.setFilePath(p + "Data" + Path.DirectorySeparatorChar);
 
             if (!singleLog)
             {
@@ -724,7 +481,7 @@ namespace HREngine.Bots
             }
             else
             {
-                sttngs.setLoggPath((HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13));
+                sttngs.setLoggPath(p);
                 sttngs.setLoggFile("UILogg.txt");
                 Helpfunctions.Instance.createNewLoggfile();
             }
@@ -750,14 +507,13 @@ namespace HREngine.Bots
 
         public void updateEverything(Behavior botbase)
         {
-
-            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
-            HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
-            ownPlayerController = ownPlayer.GetHero().GetControllerId();//ownPlayer.GetHero().GetControllerId()
-
-
+            ownPlayerController = TritonHS.OurHero.ControllerId;
             // create hero + minion data
             getHerostuff();
+
+            //small fix for not knowing when to mulligan:
+            if (ownMaxMana == 1 && numMinionsPlayedThisTurn == 0 && cardsPlayedThisTurn == 0) setnewLoggFile();
+
             getMinions();
             getHandcards();
 
@@ -768,16 +524,20 @@ namespace HREngine.Bots
             Hrtprozis.Instance.setOwnPlayer(ownPlayerController);
             Handmanager.Instance.setOwnPlayer(ownPlayerController);
 
-            Hrtprozis.Instance.updatePlayer(this.ownMaxMana, this.currentMana, this.cardsPlayedThisTurn, this.numMinionsPlayedThisTurn, this.ueberladung, ownPlayer.GetHero().GetEntityId(), enemyPlayer.GetHero().GetEntityId());
-            Hrtprozis.Instance.updateSecretStuff(this.ownSecretList, this.enemySecretCount);
+            Hrtprozis.Instance.updatePlayer(ownMaxMana, currentMana, cardsPlayedThisTurn, numMinionsPlayedThisTurn,
+                ueberladung, TritonHS.OurHero.EntityId, TritonHS.EnemyHero.EntityId);
+            Hrtprozis.Instance.updateSecretStuff(ownSecretList, enemySecretCount);
 
-            Hrtprozis.Instance.updateOwnHero(this.ownHeroWeapon, this.heroWeaponAttack, this.heroWeaponDurability, this.heroImmuneToDamageWhileAttacking, this.heroAtk, this.heroHp, this.heroDefence, this.heroname, this.ownheroisread, this.herofrozen, this.heroAbility, this.ownAbilityisReady, this.heroNumAttacksThisTurn, this.heroHasWindfury, this.heroImmune);
-            Hrtprozis.Instance.updateEnemyHero(this.enemyHeroWeapon, this.enemyWeaponAttack, this.enemyWeaponDurability, this.enemyAtk, this.enemyHp, this.enemyDefence, this.enemyHeroname, this.enemyfrozen, this.enemyAbility, this.enemyHeroImmune, this.enemyMaxMana);
+            Hrtprozis.Instance.updateOwnHero(ownHeroWeapon, heroWeaponAttack, heroWeaponDurability,
+                heroImmuneToDamageWhileAttacking, heroAtk, heroHp, heroDefence, heroname, ownheroisread, herofrozen,
+                heroAbility, ownAbilityisReady, heroNumAttacksThisTurn, heroHasWindfury, heroImmune);
+            Hrtprozis.Instance.updateEnemyHero(enemyHeroWeapon, enemyWeaponAttack, enemyWeaponDurability, enemyAtk,
+                enemyHp, enemyDefence, enemyHeroname, enemyfrozen, enemyAbility, enemyHeroImmune, enemyMaxMana);
 
-            Hrtprozis.Instance.updateMinions(this.ownMinions, this.enemyMinions);
-            Handmanager.Instance.setHandcards(this.handCards, this.anzcards, this.enemyAnzCards);
+            Hrtprozis.Instance.updateMinions(ownMinions, enemyMinions);
+            Handmanager.Instance.setHandcards(handCards, anzcards, enemyAnzCards);
 
-            Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);
+            Hrtprozis.Instance.updateFatigueStats(ownDecksize, ownHeroFatigue, enemyDecksize, enemyHeroFatigue);
 
             // print data
             Hrtprozis.Instance.printHero();
@@ -789,201 +549,191 @@ namespace HREngine.Bots
             Helpfunctions.Instance.ErrorLog("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
             Helpfunctions.Instance.ErrorLog("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
-
         }
 
         private void getHerostuff()
         {
-
-
-            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
-            HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
-
-            HREntity ownhero = ownPlayer.GetHero();
-            HREntity enemyhero = enemyPlayer.GetHero();
-            HREntity ownHeroAbility = ownPlayer.GetHeroPower();
-
             //player stuff#########################
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
-            this.currentMana = ownPlayer.GetNumAvailableResources();
-            this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);
-            this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
+            currentMana = TritonHS.CurrentMana;
+            ownMaxMana = TritonHS.Resources;
+            enemyMaxMana = ownMaxMana;
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber);
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" +
+                                        versionnumber);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("emana " + enemyMaxMana);
-            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
-            enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
+
+            //count own secrets
+            ownSecretList = new List<string>(); // the CARDIDS of the secrets
+            ourSecretsCount = 0;
+            Helpfunctions.Instance.logg("own secretsCount: " + ourSecretsCount);
+            //count enemy secrets
             enemySecretCount = 0;
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
-            this.ownSecretList = ownPlayer.GetSecretDefinitions();
-            this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
-            this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
-            //if (ownPlayer.HasCombo()) this.cardsPlayedThisTurn = 1;
-            this.ueberladung = ownPlayer.GetTag(HRGameTag.RECALL_OWED);
+
+
+            numMinionsPlayedThisTurn = TritonHS.NumMinionsPlayedThisTurn;
+            cardsPlayedThisTurn = TritonHS.NumCardsPlayedThisTurn;
+            ueberladung = TritonHS.RecallOwed;
 
             //get weapon stuff
-            this.ownHeroWeapon = "";
-            this.heroWeaponAttack = 0;
-            this.heroWeaponDurability = 0;
+            ownHeroWeapon = "";
+            heroWeaponAttack = 0;
+            heroWeaponDurability = 0;
 
-            this.ownHeroFatigue = ownhero.GetFatigue();
-            this.enemyHeroFatigue = enemyhero.GetFatigue();
-            //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
-            //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
+            ownHeroFatigue = TritonHS.Fatigue;
+            enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
 
-            this.heroImmune = ownhero.IsImmune();
-            this.enemyHeroImmune = enemyhero.IsImmune();
+            //this.ownDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, true).Count;// or something like this :D
+            //this.enemyDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, false).Count;// or something like this :D
 
-            this.enemyHeroWeapon = "";
-            this.enemyWeaponAttack = 0;
-            this.enemyWeaponDurability = 0;
-            if (enemyPlayer.HasWeapon())
+            heroImmune = TritonHS.OurHero.IsImmune;
+            enemyHeroImmune = TritonHS.EnemyHero.IsImmune;
+
+            enemyHeroWeapon = "";
+            enemyWeaponAttack = 0;
+            enemyWeaponDurability = 0;
+
+            if (TritonHS.DoesEnemyHasWeapon)
             {
-                HREntity weapon = enemyPlayer.GetWeaponCard().GetEntity();
-                this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
-                this.enemyWeaponAttack = weapon.GetATK();
-                this.enemyWeaponDurability = weapon.GetDurability();
-
+                HSCard weapon = TritonHS.EnemyWeaponCard;
+                enemyHeroWeapon =
+                    CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
+                enemyWeaponAttack = weapon.Attack;
+                enemyWeaponDurability = weapon.Durability;
             }
 
 
             //own hero stuff###########################
-            this.heroAtk = ownhero.GetATK();
-            this.heroHp = ownhero.GetHealth() - ownhero.GetDamage();
-            this.heroDefence = ownhero.GetArmor();
-            this.heroname = Hrtprozis.Instance.heroIDtoName(ownhero.GetCardId());
+            heroAtk = TritonHS.OurHeroAttack;
+            heroHp = TritonHS.OurHeroHealthAndArmor - TritonHS.OurHeroArmor;
+            heroDefence = TritonHS.OurHeroArmor;
+            heroname = Hrtprozis.Instance.heroIDtoName(TritonHS.OurHero.Id);
             bool exausted = false;
-            exausted = ownhero.IsExhausted();
-            this.ownheroisread = true;
+            exausted = TritonHS.OurHero.IsExhausted;
+            ownheroisread = true;
 
-            this.heroImmuneToDamageWhileAttacking = (ownhero.IsImmune()) ? true : false;
-            this.herofrozen = ownhero.IsFrozen();
-            this.heroNumAttacksThisTurn = ownhero.GetNumAttacksThisTurn();
-            this.heroHasWindfury = ownhero.HasWindfury();
-            //int numberofattacks = ownhero.GetNumAttacksThisTurn();
+            heroImmuneToDamageWhileAttacking = (TritonHS.OurHero.IsImmune) ? true : false;
+            herofrozen = TritonHS.OurHero.IsFrozen;
+            heroNumAttacksThisTurn = TritonHS.OurHero.NumAttackThisTurn;
+            heroHasWindfury = TritonHS.OurHero.HasWindfury;
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
-            if (exausted == true)
+            if (exausted)
             {
-                this.ownheroisread = false;
+                ownheroisread = false;
             }
-            if (exausted == false && this.heroAtk == 0)
+            if (exausted == false && heroAtk == 0)
             {
-                this.ownheroisread = false;
+                ownheroisread = false;
             }
             if (herofrozen) ownheroisread = false;
 
 
-            if (ownPlayer.HasWeapon())
+            if (TritonHS.DoWeHaveWeapon)
             {
-                HREntity weapon = ownPlayer.GetWeaponCard().GetEntity();
-                this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.GetCardId())).name.ToString();
-                this.heroWeaponAttack = weapon.GetATK();
-                this.heroWeaponDurability = weapon.GetTag(HRGameTag.DURABILITY) - weapon.GetTag(HRGameTag.DAMAGE);//weapon.GetDurability();
-                this.heroImmuneToDamageWhileAttacking = false;
-                if (this.ownHeroWeapon == "gladiatorslongbow")
+                HSCard weapon = TritonHS.OurWeaponCard;
+                ownHeroWeapon =
+                    CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
+                heroWeaponAttack = weapon.Attack;
+                heroWeaponDurability = weapon.Durability; //weapon.GetDurability();
+                heroImmuneToDamageWhileAttacking = false;
+                if (ownHeroWeapon == "gladiatorslongbow")
                 {
-                    this.heroImmuneToDamageWhileAttacking = true;
+                    heroImmuneToDamageWhileAttacking = true;
                 }
 
                 //Helpfunctions.Instance.ErrorLog("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
-
             }
 
             //enemy hero stuff###############################################################
-            this.enemyAtk = enemyhero.GetATK();
+            enemyAtk = TritonHS.EnemyHeroAttack; //lol should be zero :D
 
-            this.enemyHp = enemyhero.GetHealth() - enemyhero.GetDamage();
+            enemyHp = TritonHS.EnemyHeroHealthAndArmor - TritonHS.EnemyHeroArmor;
 
-            this.enemyHeroname = Hrtprozis.Instance.heroIDtoName(enemyhero.GetCardId());
+            enemyHeroname = Hrtprozis.Instance.heroIDtoName(TritonHS.EnemyHero.Id);
 
-            this.enemyDefence = enemyhero.GetArmor();
+            enemyDefence = TritonHS.EnemyHeroArmor;
 
-            this.enemyfrozen = enemyhero.IsFrozen();
-
-
-
-
+            enemyfrozen = TritonHS.EnemyHero.IsFrozen;
 
 
             //own hero ablity stuff###########################################################
 
-            this.heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ownHeroAbility.GetCardId()));
-            this.ownAbilityisReady = (ownHeroAbility.IsExhausted()) ? false : true; // if exhausted, ability is NOT ready
+            heroAbility =
+                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            ownAbilityisReady = (TritonHS.OurHeroPowerCard.IsExhausted) ? false : true;
+                // if exhausted, ability is NOT ready
 
-            this.enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(enemyhero.GetHeroPower().GetCardId()));
-
-
-
+            enemyAbility =
+                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+                // not correct :D
         }
 
         private void getMinions()
         {
             ownMinions.Clear();
             enemyMinions.Clear();
-            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
-            HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
 
             // ALL minions on Playfield:
-            List<HRCard> list = HRCard.GetCards(ownPlayer, HRCardZone.PLAY);
-            list.AddRange(HRCard.GetCards(enemyPlayer, HRCardZone.PLAY));
+            List<HSCard> list = TritonHS.GetCards(CardZone.Battlefield, true);
+            list.AddRange(TritonHS.GetCards(CardZone.Battlefield, false));
 
-            List<HREntity> enchantments = new List<HREntity>();
+            var enchantments = new List<HSCard>();
 
 
-            foreach (HRCard item in list)
+            foreach (HSCard entitiy in list)
             {
-                HREntity entitiy = item.GetEntity();
-                int zp = entitiy.GetZonePosition();
+                int zp = entitiy.ZonePosition;
 
-                if (entitiy.GetCardType() == HRCardType.MINION && zp >= 1)
+                if (entitiy.IsMinion && zp >= 1)
                 {
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
-                    Minion m = new Minion();
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
+                    var m = new Minion();
                     m.name = c.name;
                     m.handcard.card = c;
-                    m.Angr = entitiy.GetATK();
-                    m.maxHp = entitiy.GetHealth();
-                    m.Hp = m.maxHp - entitiy.GetDamage();
+
+                    m.Angr = entitiy.Attack;
+                    m.maxHp = entitiy.MaxHp;
+                    m.Hp = entitiy.Health;
+
                     m.wounded = false;
                     if (m.maxHp > m.Hp) m.wounded = true;
 
+                    m.exhausted = entitiy.IsExhausted;
 
-                    m.exhausted = entitiy.IsExhausted();
+                    m.taunt = (entitiy.HasTaunt) ? true : false;
 
-                    m.taunt = (entitiy.HasTaunt()) ? true : false;
+                    m.charge = (entitiy.HasCharge) ? true : false;
 
-                    m.charge = (entitiy.HasCharge()) ? true : false;
+                    m.numAttacksThisTurn = entitiy.NumAttackThisTurn;
 
-                    m.numAttacksThisTurn = entitiy.GetNumAttacksThisTurn();
+                    m.playedThisTurn = (entitiy.IsRecentlyArrived) ? true : false;
 
-                    int temp = entitiy.GetNumTurnsInPlay();
-                    m.playedThisTurn = (temp == 0) ? true : false;
+                    m.windfury = (entitiy.HasWindfury) ? true : false;
 
-                    m.windfury = (entitiy.HasWindfury()) ? true : false;
+                    m.frozen = (entitiy.IsFrozen) ? true : false;
 
-                    m.frozen = (entitiy.IsFrozen()) ? true : false;
+                    m.divineshild = (entitiy.HasDivineShield) ? true : false;
 
-                    m.divineshild = (entitiy.HasDivineShield()) ? true : false;
+                    m.stealth = (entitiy.IsStealthed) ? true : false;
 
-                    m.stealth = (entitiy.IsStealthed()) ? true : false;
+                    m.poisonous = (entitiy.IsPoisonous) ? true : false;
 
-                    m.poisonous = (entitiy.IsPoisonous()) ? true : false;
+                    m.immune = (entitiy.IsImmune) ? true : false;
 
-                    m.immune = (entitiy.IsImmune()) ? true : false;
-
-                    m.silenced = (entitiy.GetTag(HRGameTag.SILENCED) >= 1) ? true : false;
+                    m.silenced = (entitiy.IsSilenced) ? true : false;
 
 
                     m.zonepos = zp;
                     m.id = m.zonepos - 1;
 
-                    m.entitiyID = entitiy.GetEntityId();
+                    m.entitiyID = entitiy.EntityId;
 
                     m.enchantments.Clear();
 
@@ -991,150 +741,86 @@ namespace HREngine.Bots
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (!m.playedThisTurn && !m.exhausted && !m.frozen &&
+                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         m.Ready = true;
                     }
 
-                    if (m.playedThisTurn && m.charge && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (m.playedThisTurn && m.charge &&
+                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         //m.exhausted = false;
                         m.Ready = true;
                     }
 
-                    if (!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
+                    if (!m.silenced &&
+                        (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
                     {
                         m.Ready = false;
                     }
 
+                    //adding the enchantments
 
-                    if (entitiy.GetControllerId() == this.ownPlayerController) // OWN minion
+                    foreach (HSCard enchi in entitiy.AttachedCards)
                     {
+                      if(!enchi.IsNull())
+                      {
+                        Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(enchi.Id));
+                        ench.creator = enchi.CreatorId;
+                        ench.controllerOfCreator = enchi.ControllerId;
+                        ench.cantBeDispelled = false;
+                        m.enchantments.Add(ench);
+                      }
+                      else
+                      {
+                        Logging.Write("Attachedcard is null...");
+                      }
+                    }
 
-                        this.ownMinions.Add(m);
+
+                    if (entitiy.ControllerId == ownPlayerController) // OWN minion
+                    {
+                        ownMinions.Add(m);
                     }
                     else
                     {
-                        this.enemyMinions.Add(m);
+                        enemyMinions.Add(m);
                     }
-
                 }
                 // minions added
-
-                if (entitiy.GetCardType() == HRCardType.WEAPON)
-                {
-                    //Helpfunctions.Instance.ErrorLog("found weapon!");
-                    if (entitiy.GetControllerId() == this.ownPlayerController) // OWN weapon
-                    {
-                        this.ownHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
-                        this.heroWeaponAttack = entitiy.GetATK();
-                        this.heroWeaponDurability = entitiy.GetDurability();
-                        //this.heroImmuneToDamageWhileAttacking = false;
-
-
-                    }
-                    else
-                    {
-                        this.enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId())).name.ToString();
-                        this.enemyWeaponAttack = entitiy.GetATK();
-                        this.enemyWeaponDurability = entitiy.GetDurability();
-                    }
-                }
-
-                if (entitiy.GetCardType() == HRCardType.ENCHANTMENT)
-                {
-
-                    enchantments.Add(entitiy);
-                }
-
-
             }
-
-            foreach (HRCard item in list)
-            {
-                foreach (HREntity e in item.GetEntity().GetEnchantments())
-                {
-                    enchantments.Add(e);
-                }
-            }
-
-
-            // add enchantments to minions
-            setEnchantments(enchantments);
-        }
-
-        private void setEnchantments(List<HREntity> enchantments)
-        {
-            foreach (HREntity bhu in enchantments)
-            {
-                //create enchantment
-                Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(bhu.GetCardId()));
-                ench.creator = bhu.GetCreatorId();
-                ench.controllerOfCreator = bhu.GetControllerId();
-                ench.cantBeDispelled = false;
-                //if (bhu.c) ench.cantBeDispelled = true;
-
-                foreach (Minion m in this.ownMinions)
-                {
-                    if (m.entitiyID == bhu.GetAttached())
-                    {
-                        m.enchantments.Add(ench);
-                        //Helpfunctions.Instance.ErrorLog("add enchantment " +bhu.GetCardId()+" to: " + m.entitiyID);
-                    }
-
-                }
-
-                foreach (Minion m in this.enemyMinions)
-                {
-                    if (m.entitiyID == bhu.GetAttached())
-                    {
-                        m.enchantments.Add(ench);
-                    }
-
-                }
-
-            }
-
         }
 
         private void getHandcards()
         {
             handCards.Clear();
-            this.anzcards = 0;
-            this.enemyAnzCards = 0;
-            List<HRCard> list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-            list.AddRange(HRCard.GetCards(HRPlayer.GetEnemyPlayer(), HRCardZone.HAND));
+            anzcards = 0;
+            enemyAnzCards = 0;
+            List<HSCard> list = TritonHS.GetCards(CardZone.Hand);
+            //List<HRCard> list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
 
-            foreach (HRCard item in list)
+            foreach (HSCard entitiy in list)
             {
-
-                HREntity entitiy = item.GetEntity();
-
-                if (entitiy.GetControllerId() == this.ownPlayerController && entitiy.GetZonePosition() >= 1) // own handcard
+                if (entitiy.ZonePosition >= 1) // own handcard 
                 {
-                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.GetCardId()));
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
                     //c.cost = entitiy.GetCost();
                     //c.entityID = entitiy.GetEntityId();
 
-                    Handmanager.Handcard hc = new Handmanager.Handcard();
+                    var hc = new Handmanager.Handcard();
                     hc.card = c;
-                    hc.position = entitiy.GetZonePosition();
-                    hc.entity = entitiy.GetEntityId();
-                    hc.manacost = entitiy.GetCost();
+                    hc.position = entitiy.ZonePosition;
+                    hc.entity = entitiy.EntityId;
+                    hc.manacost = entitiy.Cost;
                     handCards.Add(hc);
-                    this.anzcards++;
-                }
-
-                if (entitiy.GetControllerId() != this.ownPlayerController && entitiy.GetZonePosition() >= 1) // enemy handcard
-                {
-                    this.enemyAnzCards++;
+                    anzcards++;
                 }
             }
 
+            enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
+                // dont know if you can count the enemys-handcars in this way :D
         }
-
-
-
     }
 
     public abstract class Behavior
@@ -13154,7 +12840,7 @@ namespace HREngine.Bots
 
         public void ErrorLog(string s)
         {
-            HREngine.API.Utilities.HRLog.Write(s);
+            Logging.Write(s);
         }
 
     }
@@ -13717,15 +13403,13 @@ namespace HREngine.Bots
         {
             public string cardid = "";
             public string enemyclass = "";
-            public string ownclass = "";
             public int howmuch = 2;
             public string[] requiresCard = null;
             public int manarule = -1;
 
-            public mulliitem(string id, string own, string enemy, int number, string[] req = null, int mrule = -1)
+            public mulliitem(string id, string enemy, int number, string[] req = null, int mrule = -1)
             {
                 this.cardid = id;
-                this.ownclass = own;
                 this.enemyclass = enemy;
                 this.howmuch = number;
                 this.requiresCard = req;
@@ -13786,33 +13470,32 @@ namespace HREngine.Bots
                 {
                     try
                     {
-                        string ownclass = line.Split(';')[1];
-                        string enemyclass = line.Split(';')[2];
-                        string cardlist = line.Split(';')[3];
+                        string enemyclass = line.Split(';')[1];
+                        string cardlist = line.Split(';')[2];
                         foreach (string crd in cardlist.Split(','))
                         {
                             if (crd.Contains(":"))
                             {
                                 if ((crd.Split(':')).Length == 3)
                                 {
-                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], ownclass, enemyclass, Convert.ToInt32(crd.Split(':')[1]), crd.Split(':')[2].Split('/')));
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1]), crd.Split(':')[2].Split('/')));
                                 }
                                 else
                                 {
-                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], ownclass, enemyclass, Convert.ToInt32(crd.Split(':')[1])));
+                                    this.holdlist.Add(new mulliitem(crd.Split(':')[0], enemyclass, Convert.ToInt32(crd.Split(':')[1])));
                                 }
 
                             }
                             else
                             {
-                                this.holdlist.Add(new mulliitem(crd, ownclass, enemyclass, 2));
+                                this.holdlist.Add(new mulliitem(crd, enemyclass, 2));
                             }
                         }
 
-                        if (line.Split(';').Length == 5)
+                        if (line.Split(';').Length == 4)
                         {
-                            int manarule = Convert.ToInt32(line.Split(';')[4]);
-                            this.holdlist.Add(new mulliitem("#MANARULE", ownclass, enemyclass, 2, null, manarule));
+                            int manarule = Convert.ToInt32(line.Split(';')[3]);
+                            this.holdlist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
                         }
 
                     }
@@ -13828,19 +13511,18 @@ namespace HREngine.Bots
                     {
                         try
                         {
-                            string ownclass = line.Split(';')[1];
-                            string enemyclass = line.Split(';')[2];
-                            string cardlist = line.Split(';')[3];
+                            string enemyclass = line.Split(';')[1];
+                            string cardlist = line.Split(';')[2];
                             foreach (string crd in cardlist.Split(','))
                             {
                                 if (crd == null || crd == "") continue;
-                                this.deletelist.Add(new mulliitem(crd, ownclass, enemyclass, 2));
+                                this.deletelist.Add(new mulliitem(crd, enemyclass, 2));
                             }
 
-                            if (line.Split(';').Length == 5)
+                            if (line.Split(';').Length == 4)
                             {
-                                int manarule = Convert.ToInt32(line.Split(';')[4]);
-                                this.deletelist.Add(new mulliitem("#MANARULE", ownclass, enemyclass, 2, null, manarule));
+                                int manarule = Convert.ToInt32(line.Split(';')[3]);
+                                this.deletelist.Add(new mulliitem("#MANARULE", enemyclass, 2, null, manarule));
                             }
 
                         }
@@ -13866,7 +13548,7 @@ namespace HREngine.Bots
             return true;
         }
 
-        public List<int> whatShouldIMulligan(List<CardIDEntity> cards, string ownclass, string enemclass)
+        public List<int> whatShouldIMulligan(List<CardIDEntity> cards, string enemclass)
         {
             List<int> discarditems = new List<int>();
 
@@ -13874,7 +13556,7 @@ namespace HREngine.Bots
             {
                 foreach (CardIDEntity c in cards)
                 {
-                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
                         if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost >= mi.manarule)
                         {
@@ -13884,7 +13566,7 @@ namespace HREngine.Bots
                         continue;
                     }
 
-                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
                         if (discarditems.Contains(c.entitiy)) continue;
                         discarditems.Add(c.entitiy);
@@ -13901,7 +13583,7 @@ namespace HREngine.Bots
                 foreach (mulliitem mi in this.holdlist)
                 {
 
-                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
+                    if (mi.cardid == "#MANARULE" && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
                         if (CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(c.id)).cost <= mi.manarule)
                         {
@@ -13910,7 +13592,7 @@ namespace HREngine.Bots
                         continue;
                     }
 
-                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass) && (mi.ownclass == "all" || mi.ownclass == ownclass))
+                    if (c.id == mi.cardid && (mi.enemyclass == "all" || mi.enemyclass == enemclass))
                     {
 
                         if (mi.requiresCard == null)
@@ -19245,6 +18927,4 @@ namespace HREngine.Bots
         }
     }
 
-
 }
-

@@ -40,7 +40,7 @@ namespace HREngine.Bots
             }
 
             retval += p.owncarddraw * 5;
-            retval -= p.enemycarddraw * 5;
+            retval -= p.enemycarddraw * 15;
 
             bool useAbili = false;
             bool usecoin = false;

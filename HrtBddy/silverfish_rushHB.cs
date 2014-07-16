@@ -392,7 +392,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        private int versionnumber = 78;
+        private int versionnumber = 79;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -885,7 +885,7 @@ namespace SilverfishRush
             }
 
             retval += p.owncarddraw * 5;
-            retval -= p.enemycarddraw * 5;
+            retval -= p.enemycarddraw * 15;
 
             int owntaunt = 0;
             int ownMinionsCount = 0;
@@ -1040,7 +1040,7 @@ namespace SilverfishRush
             }
 
             retval += p.owncarddraw * 5;
-            retval -= p.enemycarddraw * 5;
+            retval -= p.enemycarddraw * 15;
 
             bool useAbili = false;
             bool usecoin = false;
@@ -1142,6 +1142,7 @@ namespace SilverfishRush
         public int druidchoice = 0; // 1 left card, 2 right card
         public int numEnemysBeforePlayed = 0;
         public bool comboBeforePlayed = false;
+        public int penalty = 0;
 
         public void print()
         {
@@ -1159,6 +1160,10 @@ namespace SilverfishRush
                 if (this.enemytarget >= 0)
                 {
                     help.logg("and target to " + this.enemytarget + " " + this.enemyEntitiy);
+                }
+                if (this.penalty > 0)
+                {
+                    help.logg("penality for playing " + this.penalty);
                 }
             }
             if (this.minionplay)
@@ -2832,6 +2837,12 @@ namespace SilverfishRush
                 List<Enchantment> tempench = new List<Enchantment>(m.enchantments);
                 foreach (Enchantment e in tempench)
                 {
+
+                    if (e.CARDID == CardDB.cardIDEnum.NEW1_036e || e.CARDID == CardDB.cardIDEnum.NEW1_036e2)//commanding shout
+                    {
+                        debuff(m, e, own);
+                    }
+
                     if (e.CARDID == CardDB.cardIDEnum.EX1_316e)//ueberwaeltigende macht
                     {
                         minionGetDestroyed(m, own);
@@ -2868,8 +2879,9 @@ namespace SilverfishRush
                         //"uncontrol minion"
                         minionGetControlled(m, !own, true);
                     }
-
                 }
+
+
             }
 
             temp.Clear();
@@ -3570,6 +3582,11 @@ namespace SilverfishRush
             if (m.handcard.card.name == CardDB.cardName.raidleader) // if he dies, lower attack of all minions of his side
             {
                 deleteEffectOf(CardDB.cardIDEnum.CS2_122e, m.entitiyID);
+            }
+
+            if (m.handcard.card.name == CardDB.cardName.flametonguetotem)
+            {
+                deleteEffectOf(CardDB.cardIDEnum.EX1_565o, m.entitiyID);
             }
 
             if (m.handcard.card.name == CardDB.cardName.grimscaleoracle)
@@ -8027,6 +8044,7 @@ namespace SilverfishRush
                 b.owntarget = placepos;
                 b.enemyEntitiy = targetEntity;
                 b.cardEntitiy = cardEntity;
+                b.penalty = penality;
                 this.playactions.Add(b);
                 this.mobsplayedThisTurn++;
                 if (c.name == CardDB.cardName.kirintormage) this.playedmagierinderkirintor = true;
@@ -8041,6 +8059,7 @@ namespace SilverfishRush
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
                 a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
                 a.owntarget = 0;
+                a.penalty = penality;
                 if (target >= 0)
                 {
                     a.owntarget = -1;
@@ -8658,6 +8677,10 @@ namespace SilverfishRush
                     if (a.enemytarget >= 0)
                     {
                         Helpfunctions.Instance.logg("and target to " + a.enemytarget + " " + a.enemyEntitiy);
+                    }
+                    if (a.penalty != 0)
+                    {
+                        Helpfunctions.Instance.logg("penality for playing " + a.penalty);
                     }
                 }
                 if (a.minionplay)
@@ -10914,9 +10937,8 @@ namespace SilverfishRush
                     if (hc.card.name == CardDB.cardName.biggamehunter) return pen;
                     if (hc.card.name == CardDB.cardName.shadowworddeath) return pen;
                 }
-                if (card.name == CardDB.cardName.crueltaskmaster)
+                if (card.name == CardDB.cardName.crueltaskmaster || card.name == CardDB.cardName.innerrage)
                 {
-                    int maxhp = 0;
                     Minion m = p.enemyMinions[target - 10];
 
                     if (m.Hp == 1)
@@ -10924,11 +10946,7 @@ namespace SilverfishRush
                         return 0;
                     }
 
-                    if (m.Angr >= 4 || m.Hp >= 5)
-                    {
-                        maxhp++;
-                    }
-                    if (maxhp >= 1)
+                    if (!m.wounded && (m.Angr >= 4 || m.Hp >= 5))
                     {
                         foreach (Handmanager.Handcard hc in p.owncards)
                         {
@@ -10947,7 +10965,7 @@ namespace SilverfishRush
                 Minion m = p.ownMinions[target];
                 if (!m.Ready)
                 {
-                    return 20;
+                    return 50;
                 }
                 if (m.Hp == 1 && !m.divineshild && !this.buffing1TurnDatabase.ContainsKey(name))
                 {
@@ -11095,19 +11113,15 @@ namespace SilverfishRush
 
             if (this.DamageAllDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealAllDatabase.ContainsKey(name))) // aoe penality
             {
-                int maxhp = 0;
+
                 foreach (Minion m in p.enemyMinions)
                 {
-                    if (m.Angr >= 4 || m.Hp >= 5)
+                    if ((m.Angr >= 4 || m.Hp >= 5) && !m.wounded)
                     {
-                        maxhp++;
-                    }
-                }
-                if (maxhp >= 1)
-                {
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        if (hc.card.name == CardDB.cardName.execute) return 0;
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == CardDB.cardName.execute) return 0;
+                        }
                     }
                 }
 
@@ -11119,19 +11133,14 @@ namespace SilverfishRush
 
             if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
             {
-                int maxhp = 0;
                 foreach (Minion m in p.enemyMinions)
                 {
-                    if (m.Angr >= 4 || m.Hp >= 5)
+                    if ((m.Angr >= 4 || m.Hp >= 5) && !m.wounded)
                     {
-                        maxhp++;
-                    }
-                }
-                if (maxhp >= 4)
-                {
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        if (hc.card.name == CardDB.cardName.execute) return 0;
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == CardDB.cardName.execute) return 0;
+                        }
                     }
                 }
 
@@ -11178,7 +11187,7 @@ namespace SilverfishRush
                     Minion m = p.ownMinions[target];
 
                     //standard ones :D (mostly carddraw
-                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded && m.Ready)
                     {
                         return pen;
                     }
@@ -11213,7 +11222,7 @@ namespace SilverfishRush
                 {
                     int dmg = DamageTargetSpecialDatabase[name];
                     Minion m = p.ownMinions[target];
-                    if (name == CardDB.cardName.crueltaskmaster && m.Hp >= 2) return 0;
+                    if ((name == CardDB.cardName.crueltaskmaster || name == CardDB.cardName.innerrage) && m.Hp >= 2) return 0;
                     if (name == CardDB.cardName.demonfire && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == CardDB.cardName.earthshock && m.Hp >= 2)
                     {
@@ -11280,6 +11289,18 @@ namespace SilverfishRush
                 if (target == 200) pen = 500; // dont heal enemy
                 if ((target == 100 || target == -1) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
             }*/
+
+            if (name == CardDB.cardName.circleofhealing)
+            {
+                int mheal = 0;
+                int wounded = 0;
+                foreach (Minion mi in p.ownMinions)
+                {
+                    mheal += Math.Min((mi.maxHp - mi.Hp), 4);
+                    if (mi.wounded) wounded++;
+                }
+                if (mheal <= 7 && wounded <= 2) return 20;
+            }
 
             if (HealTargetDatabase.ContainsKey(name))
             {
@@ -12419,7 +12440,6 @@ namespace SilverfishRush
             heroAttackBuffDatabase.Add(CardDB.cardName.heroicstrike, 2);
 
             this.attackBuffDatabase.Add(CardDB.cardName.abusivesergeant, 2);
-            this.attackBuffDatabase.Add(CardDB.cardName.ancientofwar, 5); //choice1
             this.attackBuffDatabase.Add(CardDB.cardName.bananas, 1);
             this.attackBuffDatabase.Add(CardDB.cardName.bestialwrath, 2); // NEVER ON enemy MINION
             this.attackBuffDatabase.Add(CardDB.cardName.blessingofkings, 4);

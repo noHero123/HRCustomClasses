@@ -212,9 +212,8 @@ namespace HREngine.Bots
                     if (hc.card.name == CardDB.cardName.biggamehunter) return pen;
                     if (hc.card.name == CardDB.cardName.shadowworddeath) return pen;
                 }
-                if (card.name == CardDB.cardName.crueltaskmaster)
+                if (card.name == CardDB.cardName.crueltaskmaster || card.name == CardDB.cardName.innerrage)
                 {
-                    int maxhp = 0;
                     Minion m = p.enemyMinions[target - 10];
 
                     if (m.Hp == 1)
@@ -222,11 +221,7 @@ namespace HREngine.Bots
                         return 0;
                     }
 
-                    if (m.Angr >= 4 || m.Hp >= 5)
-                    {
-                        maxhp++;
-                    }
-                    if (maxhp >= 1)
+                    if (!m.wounded && (m.Angr >= 4 || m.Hp >= 5))
                     {
                         foreach (Handmanager.Handcard hc in p.owncards)
                         {
@@ -245,7 +240,7 @@ namespace HREngine.Bots
                 Minion m = p.ownMinions[target];
                 if (!m.Ready)
                 {
-                    return 20;
+                    return 50;
                 }
                 if (m.Hp == 1 && !m.divineshild && !this.buffing1TurnDatabase.ContainsKey(name))
                 {
@@ -393,22 +388,18 @@ namespace HREngine.Bots
 
             if (this.DamageAllDatabase.ContainsKey(name) || (p.auchenaiseelenpriesterin && HealAllDatabase.ContainsKey(name))) // aoe penality
             {
-                int maxhp = 0;
+                
                 foreach (Minion m in p.enemyMinions)
                 {
-                    if (m.Angr >= 4 || m.Hp >= 5)
+                    if ((m.Angr >= 4 || m.Hp >= 5)&& !m.wounded)
                     {
-                        maxhp++;
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == CardDB.cardName.execute) return 0;
+                        }
                     }
                 }
-                if (maxhp >= 1)
-                {
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        if (hc.card.name == CardDB.cardName.execute) return 0;
-                    }
-                }
-
+                
                 if( p.enemyMinions.Count <=1 || p.enemyMinions.Count +1 <= p.ownMinions.Count || p.ownMinions.Count >=3)
                 {
                     return 30;
@@ -417,19 +408,14 @@ namespace HREngine.Bots
 
             if (this.DamageAllEnemysDatabase.ContainsKey(name)) // aoe penality
             {
-                int maxhp = 0;
                 foreach (Minion m in p.enemyMinions)
                 {
-                    if (m.Angr >= 4 || m.Hp >= 5)
+                    if ((m.Angr >= 4 || m.Hp >= 5)&&!m.wounded)
                     {
-                        maxhp++;
-                    }
-                }
-                if (maxhp >= 4)
-                {
-                    foreach (Handmanager.Handcard hc in p.owncards)
-                    {
-                        if (hc.card.name == CardDB.cardName.execute) return 0;
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (hc.card.name == CardDB.cardName.execute) return 0;
+                        }
                     }
                 }
 
@@ -476,7 +462,7 @@ namespace HREngine.Bots
                     Minion m = p.ownMinions[target];
 
                     //standard ones :D (mostly carddraw
-                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded && m.Ready)
                     {
                         return pen;
                     }
@@ -511,7 +497,7 @@ namespace HREngine.Bots
                 {
                     int dmg  = DamageTargetSpecialDatabase[name];
                     Minion m = p.ownMinions[target];
-                    if (name == CardDB.cardName.crueltaskmaster && m.Hp>=2) return 0;
+                    if ((name == CardDB.cardName.crueltaskmaster || name == CardDB.cardName.innerrage) && m.Hp>=2) return 0;
                     if (name == CardDB.cardName.demonfire && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == CardDB.cardName.earthshock && m.Hp >= 2 )
                     {
@@ -578,6 +564,18 @@ namespace HREngine.Bots
                 if (target == 200) pen = 500; // dont heal enemy
                 if ((target == 100 || target == -1) && p.ownHeroHp + heal > 30) pen = p.ownHeroHp + heal - 30;
             }*/
+
+            if (name == CardDB.cardName.circleofhealing)
+            {
+                int mheal = 0;
+                int wounded = 0;
+                foreach (Minion mi in p.ownMinions)
+                {
+                    mheal += Math.Min((mi.maxHp - mi.Hp), 4);
+                    if (mi.wounded) wounded++;
+                }
+                if (mheal <= 7 && wounded <=2) return 20;
+            }
 
             if (HealTargetDatabase.ContainsKey(name))
             {
@@ -1717,7 +1715,6 @@ namespace HREngine.Bots
             heroAttackBuffDatabase.Add(CardDB.cardName.heroicstrike, 2);
 
             this.attackBuffDatabase.Add(CardDB.cardName.abusivesergeant, 2);
-            this.attackBuffDatabase.Add(CardDB.cardName.ancientofwar, 5); //choice1
             this.attackBuffDatabase.Add(CardDB.cardName.bananas, 1);
             this.attackBuffDatabase.Add(CardDB.cardName.bestialwrath, 2); // NEVER ON enemy MINION
             this.attackBuffDatabase.Add(CardDB.cardName.blessingofkings, 4);

@@ -65,7 +65,7 @@ namespace HREngine.Bots
             }
 
             retval += p.owncarddraw * 5;
-            retval -= p.enemycarddraw * 5;
+            retval -= p.enemycarddraw * 15;
 
             int owntaunt = 0;
             int ownMinionsCount = 0;

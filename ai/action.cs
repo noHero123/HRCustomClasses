@@ -40,6 +40,7 @@ namespace HREngine.Bots
         public int druidchoice = 0; // 1 left card, 2 right card
         public int numEnemysBeforePlayed = 0;
         public bool comboBeforePlayed = false;
+        public int penalty = 0;
 
         public void print()
         {
@@ -57,6 +58,10 @@ namespace HREngine.Bots
                     if (this.enemytarget >= 0)
                     {
                         help.logg("and target to " + this.enemytarget + " " + this.enemyEntitiy);
+                    }
+                    if (this.penalty > 0)
+                    {
+                        help.logg("penality for playing " + this.penalty);
                     }
                 }
                 if (this.minionplay)
@@ -1730,6 +1735,12 @@ namespace HREngine.Bots
                 List<Enchantment> tempench = new List<Enchantment>(m.enchantments);
                 foreach (Enchantment e in tempench)
                 {
+
+                    if (e.CARDID == CardDB.cardIDEnum.NEW1_036e || e.CARDID == CardDB.cardIDEnum.NEW1_036e2)//commanding shout
+                    {
+                        debuff(m, e, own);
+                    }
+
                     if (e.CARDID == CardDB.cardIDEnum.EX1_316e)//ueberwaeltigende macht
                     {
                         minionGetDestroyed(m, own);
@@ -1766,8 +1777,9 @@ namespace HREngine.Bots
                         //"uncontrol minion"
                         minionGetControlled(m, !own, true);
                     }
-
                 }
+
+
             }
 
             temp.Clear();
@@ -2468,6 +2480,11 @@ namespace HREngine.Bots
             if (m.handcard.card.name == CardDB.cardName.raidleader) // if he dies, lower attack of all minions of his side
             {
                 deleteEffectOf(CardDB.cardIDEnum.CS2_122e, m.entitiyID);
+            }
+
+            if (m.handcard.card.name == CardDB.cardName.flametonguetotem)
+            {
+                deleteEffectOf(CardDB.cardIDEnum.EX1_565o, m.entitiyID);
             }
 
             if (m.handcard.card.name == CardDB.cardName.grimscaleoracle)
@@ -6925,6 +6942,7 @@ namespace HREngine.Bots
                 b.owntarget = placepos;
                 b.enemyEntitiy = targetEntity;
                 b.cardEntitiy = cardEntity;
+                b.penalty = penality;
                 this.playactions.Add(b);
                 this.mobsplayedThisTurn++;
                 if (c.name == CardDB.cardName.kirintormage) this.playedmagierinderkirintor = true;
@@ -6939,6 +6957,7 @@ namespace HREngine.Bots
                 a.numEnemysBeforePlayed = this.enemyMinions.Count;
                 a.comboBeforePlayed = (this.cardsPlayedThisTurn >= 1) ? true : false;
                 a.owntarget = 0;
+                a.penalty = penality;
                 if (target >= 0)
                 {
                     a.owntarget = -1;
@@ -7556,6 +7575,10 @@ namespace HREngine.Bots
                     if (a.enemytarget >= 0)
                     {
                         Helpfunctions.Instance.logg("and target to " + a.enemytarget + " " + a.enemyEntitiy);
+                    }
+                    if (a.penalty != 0)
+                    {
+                        Helpfunctions.Instance.logg("penality for playing " + a.penalty);
                     }
                 }
                 if (a.minionplay)
