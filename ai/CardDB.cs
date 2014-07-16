@@ -2934,6 +2934,162 @@ namespace HREngine.Bots
 
             }
 
+
+            public List<targett> getTargetsForCardEnemy(Playfield p)
+            {
+                List<targett> retval = new List<targett>();
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO) && p.cardsPlayedThisTurn == 0) return retval;
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO))
+                {
+                    retval.Add(new targett(100, p.ownHeroEntity));//ownhero
+                    retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        retval.Add(new targett(m.id, m.entitiyID));
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) ) continue;
+                        retval.Add(new targett(m.id + 10, m.entitiyID));
+                    }
+
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_HERO_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target <= 30));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MINION_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_FRIENDLY_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target <= 9 || (x.target == 100)));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_ENEMY_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target >= 10 && x.target <= 20) || (x.target == 200));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_DAMAGED_TARGET))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_UNDAMAGED_TARGET))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_MAX_ATTACK))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.Angr > this.needWithMaxAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.Angr > this.needWithMaxAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_MIN_ATTACK))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.Angr < this.needWithMinAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.Angr < this.needWithMinAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_WITH_RACE))
+                {
+                    retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MUST_TARGET_TAUNTER))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!m.taunt)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!m.taunt)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+                return retval;
+
+            }
+
             public int calculateManaCost(Playfield p)//calculates the mana from orginal mana, needed for back-to hand effects
             {
                 int retval = this.cost;

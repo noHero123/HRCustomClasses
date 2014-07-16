@@ -146,8 +146,9 @@ namespace HREngine.Bots
         }
 
 
+        int lossedtodo = 0;
         int KeepConcede = 0;
-        private void concede()
+        private void autoconcede()
         {
             int totalwin = 0;
             int totallose = 0;
@@ -178,20 +179,51 @@ namespace HREngine.Bots
                     totallose = int.Parse(temp2);
                 }
             }
+
+
+
             if ((totalwin + totallose - KeepConcede) != 0)
             {
                 Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+            }
+            if (this.lossedtodo > 0)
+            {
+                this.lossedtodo--;
+                Helpfunctions.Instance.ErrorLog("not today!");
+                KeepConcede++;
+                writeSettings();
+                HRGame.ConcedeGame();
+                return;
             }
 
             int curlvl = HRPlayer.GetLocalPlayer().GetRank();
             if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
             if (curlvl < this.concedeLvl)
             {
+                this.lossedtodo = 3;
                 Helpfunctions.Instance.ErrorLog("not today!");
                 KeepConcede++;
                 writeSettings();
                 HRGame.ConcedeGame();
             }
+        }
+
+        private bool concedeVSenemy(string ownh, string enemyh)
+        {
+            if (!(HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.RANKED_PLAY || HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.UNRANKED_PLAY)) return false;
+            if (Mulligan.Instance.shouldConcede(Hrtprozis.Instance.heroNametoEnum(ownh), Hrtprozis.Instance.heroNametoEnum(enemyh)))
+            {
+                if (this.lossedtodo > 0)
+                {
+                    this.lossedtodo--;
+                }
+                Helpfunctions.Instance.ErrorLog("not today!!");
+                KeepConcede++;
+                writeSettings();
+                HRGame.ConcedeGame();
+                return true;
+            }
+            return false;
         }
 
         private void writeSettings()
@@ -351,7 +383,14 @@ namespace HREngine.Bots
 
                 if (Mulligan.Instance.loserLoserLoser)
                 {
-                    concede();
+                    HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
+                    HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
+                    string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
+                    string ownName = Hrtprozis.Instance.heroIDtoName(ownPlayer.GetHeroCard().GetEntity().GetCardId());
+                    if (!concedeVSenemy(ownName, enemName))
+                    {
+                        autoconcede();
+                    }
                 }
 
                 return null;
@@ -650,7 +689,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 79;
+        public int versionnumber = 80;
         private bool singleLog = false;
 
 
@@ -1283,8 +1322,8 @@ namespace HREngine.Bots
             retval -= p.enemySecretCount;
             retval -= p.lostDamage;//damage which was to high (like killing a 2/1 with an 3/3 -> => lostdamage =2
             retval -= p.lostWeaponDamage;
-            if (p.ownMinions.Count == 0) retval -= 20;
-            if (p.enemyMinions.Count == 0) retval += 20;
+            //if (p.ownMinions.Count == 0) retval -= 20;
+            //if (p.enemyMinions.Count == 0) retval += 20;
             if (p.enemyHeroHp <= 0) retval = 10000;
             //soulfire etc
             int deletecardsAtLast = 0;
@@ -2096,6 +2135,38 @@ namespace HREngine.Bots
                 m.numAttacksThisTurn = 0;
             }
 
+            //play ability!
+            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0))
+            {
+                int abilityPenality = 0;
+
+                havedonesomething = true;
+                // if we have mage or priest, we have to target something####################################################
+                if (posmoves[0].enemyHeroName == HeroEnum.mage || posmoves[0].enemyHeroName == HeroEnum.priest)
+                {
+
+                    List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
+                    foreach (targett trgt in trgts)
+                    {
+                        Playfield pf = new Playfield(posmoves[0]);
+                        //havedonesomething = true;
+                        //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
+                        posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
+                        posmoves.Add(pf);
+                    }
+                }
+                else
+                {
+                    // the other classes dont have to target####################################################
+                    Playfield pf = new Playfield(posmoves[0]);
+
+                    //havedonesomething = true;
+                    posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, -1, -1);
+                    posmoves.Add(pf);
+                }
+
+            }
+
             while (havedonesomething)
             {
 
@@ -2211,36 +2282,6 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-
-                    if (p.enemyAbilityReady && enemMana >= 2 && p.enemyHeroAblility.canplayCard(p, 0))
-                    {
-                        int abilityPenality = 0;
-
-                        havedonesomething = true;
-                        // if we have mage or priest, we have to target something####################################################
-                        if (p.enemyHeroName == HeroEnum.mage || p.enemyHeroName == HeroEnum.priest)
-                        {
-
-                            List<targett> trgts = p.enemyHeroAblility.getTargetsForCard(p);
-                            foreach (targett trgt in trgts)
-                            {
-                                Playfield pf = new Playfield(p);
-                                havedonesomething = true;
-                                pf.ENEMYactivateAbility(p.enemyHeroAblility, trgt.target, trgt.targetEntity);
-                                posmoves.Add(pf);
-                            }
-                        }
-                        else
-                        {
-                            // the other classes dont have to target####################################################
-                            Playfield pf = new Playfield(p);
-
-                            havedonesomething = true;
-                            pf.ENEMYactivateAbility(p.enemyHeroAblility, -1, -1);
-                            posmoves.Add(pf);
-                        }
-
-                    }
 
                     p.endEnemyTurn();
                     p.guessingHeroHP = this.guessingHeroHP;
@@ -5158,6 +5199,7 @@ namespace HREngine.Bots
             if (!dontcount)
             {
                 m.numAttacksThisTurn++;
+                m.stealth = false;
                 if (m.windfury && m.numAttacksThisTurn == 2)
                 {
                     m.Ready = false;
@@ -13733,8 +13775,15 @@ namespace HREngine.Bots
             }
         }
 
+        class concedeItem
+        {
+            public HeroEnum urhero = HeroEnum.None;
+            public List<HeroEnum> enemhero = new List<HeroEnum>();
+        }
+
         List<mulliitem> holdlist = new List<mulliitem>();
         List<mulliitem> deletelist = new List<mulliitem>();
+        List<concedeItem> concedelist = new List<concedeItem>();
         public bool loserLoserLoser = false;
 
         private static Mulligan instance;
@@ -13779,6 +13828,27 @@ namespace HREngine.Bots
                 if (line.StartsWith("loser"))
                 {
                     this.loserLoserLoser = true;
+                    continue;
+                }
+
+                if (line.StartsWith("concede:"))
+                {
+                    try
+                    {
+                        string ownh = line.Split(':')[1];
+                        concedeItem ci = new concedeItem();
+                        ci.urhero = Hrtprozis.Instance.heroNametoEnum(ownh);
+                        string enemlist = line.Split(':')[2];
+                        foreach (string s in enemlist.Split(','))
+                        {
+                            ci.enemhero.Add(Hrtprozis.Instance.heroNametoEnum(s));
+                        }
+                    }
+                    catch
+                    {
+                        Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
+                    }
                     continue;
                 }
 
@@ -13989,6 +14059,17 @@ namespace HREngine.Bots
         public void setAutoConcede(bool mode)
         {
             this.loserLoserLoser = mode;
+        }
+
+        public bool shouldConcede(HeroEnum ownhero, HeroEnum enemHero)
+        {
+
+            foreach (concedeItem ci in concedelist)
+            {
+                if (ci.urhero == ownhero && ci.enemhero.Contains(enemHero)) return true;
+            }
+
+            return false;
         }
 
     }
@@ -16795,6 +16876,162 @@ namespace HREngine.Bots
                 if (isRequirementInList(CardDB.ErrorType2.REQ_ENEMY_TARGET))
                 {
                     retval.RemoveAll(x => (x.target <= 9 || (x.target == 100)));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_DAMAGED_TARGET))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_UNDAMAGED_TARGET))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.wounded)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_MAX_ATTACK))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.Angr > this.needWithMaxAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.Angr > this.needWithMaxAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_MIN_ATTACK))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (m.Angr < this.needWithMinAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (m.Angr < this.needWithMinAttackValueOf)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_WITH_RACE))
+                {
+                    retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!(m.handcard.card.race == this.needRaceForPlaying))
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MUST_TARGET_TAUNTER))
+                {
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (!m.taunt)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (!m.taunt)
+                        {
+                            retval.RemoveAll(x => x.targetEntity == m.entitiyID);
+                        }
+                    }
+                }
+                return retval;
+
+            }
+
+
+            public List<targett> getTargetsForCardEnemy(Playfield p)
+            {
+                List<targett> retval = new List<targett>();
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO) && p.cardsPlayedThisTurn == 0) return retval;
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_TO_PLAY) || isRequirementInList(CardDB.ErrorType2.REQ_NONSELF_TARGET) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) || isRequirementInList(CardDB.ErrorType2.REQ_TARGET_FOR_COMBO))
+                {
+                    retval.Add(new targett(100, p.ownHeroEntity));//ownhero
+                    retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        retval.Add(new targett(m.id, m.entitiyID));
+                    }
+                    foreach (Minion m in p.enemyMinions)
+                    {
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister))) continue;
+                        retval.Add(new targett(m.id + 10, m.entitiyID));
+                    }
+
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_HERO_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target <= 30));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_MINION_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_FRIENDLY_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target <= 9 || (x.target == 100)));
+                }
+
+                if (isRequirementInList(CardDB.ErrorType2.REQ_ENEMY_TARGET))
+                {
+                    retval.RemoveAll(x => (x.target >= 10 && x.target <= 20) || (x.target == 200));
                 }
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_DAMAGED_TARGET))

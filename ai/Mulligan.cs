@@ -38,8 +38,15 @@ namespace HREngine.Bots
             }
         }
 
+        class concedeItem
+        {
+            public HeroEnum urhero = HeroEnum.None;
+            public List<HeroEnum> enemhero = new List<HeroEnum>();
+        }
+
         List<mulliitem> holdlist = new List<mulliitem>();
         List<mulliitem> deletelist = new List<mulliitem>();
+        List<concedeItem> concedelist = new List<concedeItem>();
         public bool loserLoserLoser = false;
 
         private static Mulligan instance;
@@ -84,6 +91,27 @@ namespace HREngine.Bots
                 if (line.StartsWith("loser"))
                 {
                     this.loserLoserLoser = true;
+                    continue;
+                }
+
+                if (line.StartsWith("concede:"))
+                {
+                    try
+                    {
+                        string ownh = line.Split(':')[1];
+                        concedeItem ci = new concedeItem();
+                        ci.urhero = Hrtprozis.Instance.heroNametoEnum(ownh);
+                        string enemlist = line.Split(':')[2];
+                        foreach (string s in enemlist.Split(','))
+                        {
+                            ci.enemhero.Add(Hrtprozis.Instance.heroNametoEnum(s));
+                        }
+                    }
+                    catch
+                    {
+                        Helpfunctions.Instance.logg("mullimaker cant read: " + line);
+                        Helpfunctions.Instance.ErrorLog("mullimaker cant read: " + line);
+                    }
                     continue;
                 }
 
@@ -294,6 +322,17 @@ namespace HREngine.Bots
         public void setAutoConcede(bool mode)
         {
             this.loserLoserLoser = mode;
+        }
+
+        public bool shouldConcede(HeroEnum ownhero, HeroEnum enemHero)
+        {
+
+            foreach (concedeItem ci in concedelist)
+            {
+                if (ci.urhero == ownhero && ci.enemhero.Contains(enemHero)) return true;
+            }
+
+            return false;
         }
 
     }

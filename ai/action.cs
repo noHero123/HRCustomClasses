@@ -669,6 +669,38 @@ namespace HREngine.Bots
                 m.numAttacksThisTurn = 0;
             }
 
+            //play ability!
+            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0))
+            {
+                int abilityPenality = 0;
+
+                havedonesomething = true;
+                // if we have mage or priest, we have to target something####################################################
+                if (posmoves[0].enemyHeroName == HeroEnum.mage || posmoves[0].enemyHeroName == HeroEnum.priest)
+                {
+
+                    List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
+                    foreach (targett trgt in trgts)
+                    {
+                        Playfield pf = new Playfield(posmoves[0]);
+                        //havedonesomething = true;
+                        //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
+                        posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
+                        posmoves.Add(pf);
+                    }
+                }
+                else
+                {
+                    // the other classes dont have to target####################################################
+                    Playfield pf = new Playfield(posmoves[0]);
+
+                    //havedonesomething = true;
+                    posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, -1, -1);
+                    posmoves.Add(pf);
+                }
+
+            }
+
             while (havedonesomething)
             {
 
@@ -784,36 +816,6 @@ namespace HREngine.Bots
 
                     // use ability
                     /// TODO check if ready after manaup
-
-                    if (p.enemyAbilityReady && enemMana>=2 && p.enemyHeroAblility.canplayCard(p, 0))
-                    {
-                        int abilityPenality = 0;
-
-                        havedonesomething = true;
-                        // if we have mage or priest, we have to target something####################################################
-                        if (p.enemyHeroName == HeroEnum.mage || p.enemyHeroName == HeroEnum.priest)
-                        {
-
-                            List<targett> trgts = p.enemyHeroAblility.getTargetsForCard(p);
-                            foreach (targett trgt in trgts)
-                            {
-                                    Playfield pf = new Playfield(p);
-                                    havedonesomething = true;
-                                    pf.ENEMYactivateAbility(p.enemyHeroAblility, trgt.target, trgt.targetEntity);
-                                    posmoves.Add(pf);
-                            }
-                        }
-                        else
-                        {
-                            // the other classes dont have to target####################################################
-                            Playfield pf = new Playfield(p);
-
-                                havedonesomething = true;
-                                pf.ENEMYactivateAbility(p.enemyHeroAblility, -1, -1);
-                                posmoves.Add(pf);
-                        }
-
-                    }
 
                     p.endEnemyTurn();
                     p.guessingHeroHP = this.guessingHeroHP;
@@ -3731,6 +3733,7 @@ namespace HREngine.Bots
             if (!dontcount)
             {
                 m.numAttacksThisTurn++;
+                m.stealth = false;
                 if (m.windfury && m.numAttacksThisTurn == 2)
                 {
                     m.Ready = false;
