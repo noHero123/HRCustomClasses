@@ -682,10 +682,11 @@ namespace HREngine.Bots
                     List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
                     foreach (targett trgt in trgts)
                     {
+                        if (trgt.target >= 100) continue;
                         Playfield pf = new Playfield(posmoves[0]);
                         //havedonesomething = true;
                         //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
-                        posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
+                        pf.ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
                         posmoves.Add(pf);
                     }
                 }

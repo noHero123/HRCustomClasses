@@ -106,6 +106,7 @@ namespace HREngine.Bots
                         {
                             ci.enemhero.Add(Hrtprozis.Instance.heroNametoEnum(s));
                         }
+                        concedelist.Add(ci);
                     }
                     catch
                     {

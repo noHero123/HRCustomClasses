@@ -403,7 +403,7 @@ namespace SilverfishControlfix
 
     public class Silverfish
     {
-        private int versionnumber = 80;
+        private int versionnumber = 81;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -980,7 +980,11 @@ namespace SilverfishControlfix
                 if (a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus) deletecardsAtLast = 1;
                 if (deletecardsAtLast == 1 && !(a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus)) retval -= 20;
             }
-            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
+            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0)
+            {
+                retval += p.owncarddraw * 500;
+                retval -= 1000;
+            }
             if (p.ownHeroHp <= 0) retval = -10000;
 
             p.value = retval;
@@ -1099,7 +1103,11 @@ namespace SilverfishControlfix
                 if (a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus) deletecardsAtLast = 1;
                 if (deletecardsAtLast == 1 && !(a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus)) retval -= 20;
             }
-            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
+            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0)
+            {
+                retval += p.owncarddraw * 500;
+                retval -= 1000;
+            }
             if (p.ownHeroHp <= 0) retval = -10000;
 
             p.value = retval;
@@ -1795,10 +1803,11 @@ namespace SilverfishControlfix
                     List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
                     foreach (targett trgt in trgts)
                     {
+                        if (trgt.target >= 100) continue;
                         Playfield pf = new Playfield(posmoves[0]);
                         //havedonesomething = true;
                         //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
-                        posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
+                        pf.ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
                         posmoves.Add(pf);
                     }
                 }
@@ -13490,6 +13499,7 @@ namespace SilverfishControlfix
                         {
                             ci.enemhero.Add(Hrtprozis.Instance.heroNametoEnum(s));
                         }
+                        concedelist.Add(ci);
                     }
                     catch
                     {

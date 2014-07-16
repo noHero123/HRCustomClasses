@@ -149,7 +149,11 @@ namespace HREngine.Bots
                 if (a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus) deletecardsAtLast = 1;
                 if (deletecardsAtLast == 1 && !(a.handcard.card.name == CardDB.cardName.soulfire || a.handcard.card.name == CardDB.cardName.doomguard || a.handcard.card.name == CardDB.cardName.succubus)) retval -= 20;
             }
-            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0) retval -= 1000;
+            if (p.enemyHeroHp >= 1 && p.guessingHeroHP <= 0)
+            {
+                retval += p.owncarddraw * 500;
+                retval -= 1000;
+            }
             if (p.ownHeroHp <= 0) retval = -10000;
 
             p.value = retval;
