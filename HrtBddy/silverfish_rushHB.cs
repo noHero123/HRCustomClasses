@@ -392,7 +392,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        private int versionnumber = 81;
+        private int versionnumber = 82;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -3068,6 +3068,7 @@ namespace SilverfishRush
 
                     CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_598);//imp
                     callKid(kid, posi, own);
+                    m.stealth = false;
                 }
 
                 if (m.name == CardDB.cardName.natpagle) // draw card
@@ -3099,6 +3100,7 @@ namespace SilverfishRush
                     {
                         attackOrHealHero(8, !own);
                     }
+                    m.stealth = false;
                 }
 
 
@@ -4859,7 +4861,12 @@ namespace SilverfishRush
 
             if (target == 200)//target is hero
             {
+                int oldhp = this.ownHeroHp;
                 attackOrHealHero(m.Angr, false);
+                if (oldhp > this.ownHeroHp)
+                {
+                    if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.ownHeroFrozen = true;
+                }
                 return;
             }
 
@@ -7874,7 +7881,7 @@ namespace SilverfishRush
                                 }
                                 if (!dmgdone) this.attackOrHealHero(1, false);
                             }
-
+                            m.stealth = false;
 
                         }
                         else
@@ -8177,10 +8184,14 @@ namespace SilverfishRush
 
                 if (!this.heroImmuneWhileAttacking)
                 {
+                    int oldhp = this.ownHeroHp;
                     attackOrHealHero(enem_attack, true);
-                    if (!enemy.silenced && enemy.handcard.card.name == CardDB.cardName.waterelemental)
+                    if (oldhp > this.ownHeroHp)
                     {
-                        this.ownHeroFrozen = true;
+                        if (!enemy.silenced && enemy.handcard.card.name == CardDB.cardName.waterelemental)
+                        {
+                            this.ownHeroFrozen = true;
+                        }
                     }
                 }
             }
@@ -10778,6 +10789,8 @@ namespace SilverfishRush
         Dictionary<CardDB.cardName, int> buffing1TurnDatabase = new Dictionary<CardDB.cardName, int>();
         Dictionary<CardDB.cardName, int> heroDamagingAoeDatabase = new Dictionary<CardDB.cardName, int>();
 
+        Dictionary<CardDB.cardName, int> randomEffects = new Dictionary<CardDB.cardName, int>();
+
         Dictionary<CardDB.cardName, int> returnHandDatabase = new Dictionary<CardDB.cardName, int>();
         public Dictionary<CardDB.cardName, int> priorityTargets = new Dictionary<CardDB.cardName, int>();
 
@@ -10814,6 +10827,7 @@ namespace SilverfishRush
             setupEnemyTargetPriority();
             setupHeroDamagingAOE();
             setupBuffingMinions();
+            setupRandomCards();
         }
 
         public void setCombos()
@@ -10902,13 +10916,14 @@ namespace SilverfishRush
             retval += getHealPenality(name, target, p, choice, lethal);
             retval += getCardDrawPenality(name, target, p, choice);
             retval += getCardDrawofEffectMinions(card, p);
-            retval += getCardDiscardPenality(name, p);
+            //retval += getCardDiscardPenality( name,  p);
             retval += getDestroyOwnPenality(name, target, p, lethal);
 
             retval += getDestroyPenality(name, target, p, lethal);
             retval += getSpecialCardComboPenalitys(card, target, p, lethal, choice);
             retval += playSecretPenality(card, p);
             retval += getPlayCardSecretPenality(card, p);
+            retval += getRandomPenaltiy(card, p, target);
             if (!lethal)
             {
                 retval += cb.getPenalityForDestroyingCombo(card, p);
@@ -11478,6 +11493,62 @@ namespace SilverfishRush
             return pen;
         }
 
+        private int getRandomPenaltiy(CardDB.Card card, Playfield p, int target)
+        {
+            if (!this.randomEffects.ContainsKey(card.name)) return 0;
+            if (card.name == CardDB.cardName.brawl && p.playactions.Count >= 1 && p.enemyHeroName != HeroEnum.mage) return 100;
+            if ((card.name == CardDB.cardName.cleave || card.name == CardDB.cardName.multishot) && p.enemyMinions.Count == 2) return 0;
+            if ((card.name == CardDB.cardName.deadlyshot) && p.enemyMinions.Count == 1) return 0;
+            if ((card.name == CardDB.cardName.arcanemissiles || card.name == CardDB.cardName.avengingwrath) && p.enemyMinions.Count == 0) return 0;
+            int cards = randomEffects[card.name];
+            bool first = true;
+            bool hasgadget = false;
+            bool hasstarving = false;
+            bool hasknife = false;
+            foreach (Minion mnn in p.ownMinions)
+            {
+                if (mnn.name == CardDB.cardName.gadgetzanauctioneer) hasgadget = true;
+                if (mnn.name == CardDB.cardName.starvingbuzzard) hasstarving = true;
+                if (mnn.name == CardDB.cardName.knifejuggler) hasknife = true;
+            }
+            foreach (Action a in p.playactions)
+            {
+                if (a.heroattack)
+                {
+                    first = false;
+                    continue;
+                }
+                if (a.useability && p.ownHeroName != HeroEnum.shaman)
+                {
+                    first = false;
+                    continue;
+                }
+                if (a.minionplay)
+                {
+                    first = false;
+                    continue;
+                }
+                if (a.cardplay)
+                {
+                    if (card.name == CardDB.cardName.knifejuggler && card.type == CardDB.cardtype.MOB)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    if (cardDrawBattleCryDatabase.ContainsKey(a.handcard.card.name)) continue;
+                    if (hasgadget && card.type == CardDB.cardtype.SPELL) continue;
+                    if (hasstarving && (TAG_RACE)card.race == TAG_RACE.PET) continue;
+                    if (hasknife && card.type == CardDB.cardtype.MOB) continue;
+
+                    first = false;
+                    continue;
+                }
+            }
+            if (first == false) return cards;
+
+            return 0;
+        }
+
         private int getCardDiscardPenality(CardDB.cardName name, Playfield p)
         {
             if (p.owncards.Count <= 1) return 0;
@@ -11494,7 +11565,7 @@ namespace SilverfishRush
                         canplayanothercard = true;
                     }
                 }
-                if (canplayanothercard) pen += 10;
+                if (canplayanothercard) pen += 20;
 
             }
 
@@ -11676,6 +11747,16 @@ namespace SilverfishRush
             if (card.name == CardDB.cardName.flametonguetotem && p.ownMinions.Count == 0)
             {
                 return 100;
+            }
+
+            if (card.name == CardDB.cardName.stampedingkodo)
+            {
+                bool found = false;
+                foreach (Minion mi in p.enemyMinions)
+                {
+                    if (mi.Angr <= 2) found = true;
+                }
+                if (!found) return 20;
             }
 
             if (name == CardDB.cardName.windfury && !m.Ready) return 500;
@@ -12686,6 +12767,7 @@ namespace SilverfishRush
             buffing1TurnDatabase.Add(CardDB.cardName.darkirondwarf, 0);
 
         }
+
         private void setupEnemyTargetPriority()
         {
             priorityTargets.Add(CardDB.cardName.angrychicken, 10);
@@ -12761,6 +12843,31 @@ namespace SilverfishRush
             priorityTargets.Add(CardDB.cardName.tundrarhino, 10);
         }
 
+        private void setupRandomCards()
+        {
+            this.randomEffects.Add(CardDB.cardName.deadlyshot, 1);
+            this.randomEffects.Add(CardDB.cardName.multishot, 1);
+
+            this.randomEffects.Add(CardDB.cardName.animalcompanion, 1);
+            this.randomEffects.Add(CardDB.cardName.arcanemissiles, 3);
+            this.randomEffects.Add(CardDB.cardName.avengingwrath, 8);
+            //this.randomEffects.Add(CardDB.cardName.baneofdoom, 1);
+            this.randomEffects.Add(CardDB.cardName.brawl, 1);
+            this.randomEffects.Add(CardDB.cardName.captainsparrot, 1);
+            this.randomEffects.Add(CardDB.cardName.cleave, 1);
+            this.randomEffects.Add(CardDB.cardName.forkedlightning, 1);
+            this.randomEffects.Add(CardDB.cardName.gelbinmekkatorque, 1);
+            this.randomEffects.Add(CardDB.cardName.iammurloc, 3);
+            this.randomEffects.Add(CardDB.cardName.lightningstorm, 1);
+            this.randomEffects.Add(CardDB.cardName.madbomber, 3);
+            this.randomEffects.Add(CardDB.cardName.mindgames, 1);
+            this.randomEffects.Add(CardDB.cardName.mindcontroltech, 1);
+            this.randomEffects.Add(CardDB.cardName.mindvision, 1);
+            this.randomEffects.Add(CardDB.cardName.powerofthehorde, 1);
+            this.randomEffects.Add(CardDB.cardName.sensedemons, 2);
+            this.randomEffects.Add(CardDB.cardName.tinkmasteroverspark, 1);
+            this.randomEffects.Add(CardDB.cardName.totemiccall, 1);
+        }
 
     }
 

@@ -1958,6 +1958,7 @@ namespace HREngine.Bots
 
                     CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_598);//imp
                     callKid(kid, posi, own);
+                    m.stealth = false;
                 }
 
                 if (m.name == CardDB.cardName.natpagle) // draw card
@@ -1989,6 +1990,7 @@ namespace HREngine.Bots
                     {
                         attackOrHealHero(8, !own);
                     }
+                    m.stealth = false;
                 }
 
 
@@ -3749,7 +3751,12 @@ namespace HREngine.Bots
             
             if (target == 200)//target is hero
             {
+                int oldhp = this.ownHeroHp;
                 attackOrHealHero(m.Angr, false);
+                if (oldhp > this.ownHeroHp)
+                {
+                    if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.ownHeroFrozen = true;
+                }
                 return;
             }
 
@@ -6764,7 +6771,7 @@ namespace HREngine.Bots
                                 }
                                 if (!dmgdone) this.attackOrHealHero(1, false);
                             }
-
+                            m.stealth = false;
 
                         }
                         else
@@ -7067,10 +7074,14 @@ namespace HREngine.Bots
 
                 if (!this.heroImmuneWhileAttacking)
                 {
+                    int oldhp = this.ownHeroHp;
                     attackOrHealHero(enem_attack, true);
-                    if (!enemy.silenced && enemy.handcard.card.name ==  CardDB.cardName.waterelemental)
+                    if (oldhp > this.ownHeroHp)
                     {
-                        this.ownHeroFrozen = true;
+                        if (!enemy.silenced && enemy.handcard.card.name == CardDB.cardName.waterelemental)
+                        {
+                            this.ownHeroFrozen = true;
+                        }
                     }
                 }
             }
