@@ -1677,6 +1677,7 @@ namespace HREngine.Bots
             DamageAllEnemysDatabase.Add(CardDB.cardName.stomp, 1);
             DamageAllEnemysDatabase.Add(CardDB.cardName.madbomber, 1);
             DamageAllEnemysDatabase.Add(CardDB.cardName.swipe, 4);//1 to others
+            DamageAllEnemysDatabase.Add(CardDB.cardName.bladeflurry, 1);
             
             DamageRandomDatabase.Add(CardDB.cardName.arcanemissiles,1);
             DamageRandomDatabase.Add(CardDB.cardName.avengingwrath, 1);

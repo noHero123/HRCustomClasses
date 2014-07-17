@@ -6227,19 +6227,24 @@ namespace HREngine.Bots
             {
                 this.playedPreparation = true;
             }
+
             if (c.name == CardDB.cardName.bladeflurry)
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = this.getSpellDamageDamage(this.ownWeaponAttack);
+                int maxhp = 0;
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    minionGetDamagedOrHealed(enemy, damage, 0, true);
+                    if(maxhp < enemy.Hp) maxhp = Math.Min(enemy.Hp, damage);
                 }
+                this.lostDamage += (damage - maxhp) * (damage - maxhp);
                 attackOrHealHero(damage, false);
 
                 //destroy own weapon
                 this.lowerWeaponDurability(1000, true);
             }
+
             if (c.name == CardDB.cardName.headcrack)
             {
                 int damage = getSpellDamageDamage(2);

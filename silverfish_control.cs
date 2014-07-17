@@ -7701,19 +7701,24 @@ namespace HREngine.Bots
             {
                 this.playedPreparation = true;
             }
+
             if (c.name == CardDB.cardName.bladeflurry)
             {
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = this.getSpellDamageDamage(this.ownWeaponAttack);
+                int maxhp = 0;
                 foreach (Minion enemy in temp)
                 {
-                    minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    minionGetDamagedOrHealed(enemy, damage, 0, true);
+                    if (maxhp < enemy.Hp) maxhp = Math.Min(enemy.Hp, damage);
                 }
+                this.lostDamage += (damage - maxhp) * (damage - maxhp);
                 attackOrHealHero(damage, false);
 
                 //destroy own weapon
                 this.lowerWeaponDurability(1000, true);
             }
+
             if (c.name == CardDB.cardName.headcrack)
             {
                 int damage = getSpellDamageDamage(2);
@@ -10020,7 +10025,7 @@ namespace HREngine.Bots
 
 
                             }
-                            if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            if ((!m.stealth || isLethalCheck) && p.enemySecretCount == 0 && trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
                             {
                                 break;
                             }
@@ -12789,6 +12794,7 @@ namespace HREngine.Bots
             DamageAllEnemysDatabase.Add(CardDB.cardName.stomp, 1);
             DamageAllEnemysDatabase.Add(CardDB.cardName.madbomber, 1);
             DamageAllEnemysDatabase.Add(CardDB.cardName.swipe, 4);//1 to others
+            DamageAllEnemysDatabase.Add(CardDB.cardName.bladeflurry, 1);
 
             DamageRandomDatabase.Add(CardDB.cardName.arcanemissiles, 1);
             DamageRandomDatabase.Add(CardDB.cardName.avengingwrath, 1);

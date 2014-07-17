@@ -522,7 +522,7 @@ namespace HREngine.Bots
 
 
                             }
-                            if (trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            if ( ( !m.stealth || isLethalCheck) && p.enemySecretCount == 0 && trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
                             {
                                 break;
                             }
