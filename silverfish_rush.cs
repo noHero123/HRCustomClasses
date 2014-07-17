@@ -145,10 +145,10 @@ namespace HREngine.Bots
             this.writeSettings();
         }
 
-
         int lossedtodo = 0;
         int KeepConcede = 0;
-        private void autoconcede()
+        int oldwin = 0;
+        private bool autoconcede()
         {
             int totalwin = 0;
             int totallose = 0;
@@ -186,6 +186,21 @@ namespace HREngine.Bots
             {
                 Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
             }
+
+
+            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return false;
+            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
+
+            if (this.oldwin != totalwin)
+            {
+                this.oldwin = totalwin;
+                Helpfunctions.Instance.ErrorLog("not today!! (you won a game)");
+                KeepConcede++;
+                writeSettings();
+                HRGame.ConcedeGame();
+                return true;
+            }
+
             if (this.lossedtodo > 0)
             {
                 this.lossedtodo--;
@@ -193,19 +208,19 @@ namespace HREngine.Bots
                 KeepConcede++;
                 writeSettings();
                 HRGame.ConcedeGame();
-                return;
+                return true;
             }
 
-            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
-            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return;
             if (curlvl < this.concedeLvl)
             {
                 this.lossedtodo = 3;
-                Helpfunctions.Instance.ErrorLog("not today!");
+                Helpfunctions.Instance.ErrorLog("not today!!!");
                 KeepConcede++;
                 writeSettings();
                 HRGame.ConcedeGame();
+                return true;
             }
+            return false;
         }
 
         private bool concedeVSenemy(string ownh, string enemyh)
@@ -213,11 +228,7 @@ namespace HREngine.Bots
             if (!(HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.RANKED_PLAY || HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.UNRANKED_PLAY)) return false;
             if (Mulligan.Instance.shouldConcede(Hrtprozis.Instance.heroNametoEnum(ownh), Hrtprozis.Instance.heroNametoEnum(enemyh)))
             {
-                if (this.lossedtodo > 0)
-                {
-                    this.lossedtodo--;
-                }
-                Helpfunctions.Instance.ErrorLog("not today!!");
+                Helpfunctions.Instance.ErrorLog("not today!!!!");
                 KeepConcede++;
                 writeSettings();
                 HRGame.ConcedeGame();
@@ -387,9 +398,9 @@ namespace HREngine.Bots
                     HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
                     string enemName = Hrtprozis.Instance.heroIDtoName(enemyPlayer.GetHeroCard().GetEntity().GetCardId());
                     string ownName = Hrtprozis.Instance.heroIDtoName(ownPlayer.GetHeroCard().GetEntity().GetCardId());
-                    if (!concedeVSenemy(ownName, enemName))
+                    if (!autoconcede())
                     {
-                        autoconcede();
+                        concedeVSenemy(ownName, enemName);
                     }
                 }
 
@@ -689,7 +700,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 83;
+        public int versionnumber = 84;
         private bool singleLog = false;
 
 

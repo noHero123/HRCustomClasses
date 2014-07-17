@@ -392,7 +392,7 @@ namespace SilverfishControl
 
     public class Silverfish
     {
-        private int versionnumber = 83;
+        private int versionnumber = 84;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
