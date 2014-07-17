@@ -392,7 +392,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        private int versionnumber = 82;
+        private int versionnumber = 83;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
