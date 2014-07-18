@@ -403,7 +403,7 @@ namespace SilverfishControlfix
 
     public class Silverfish
     {
-        private int versionnumber = 84;
+        private int versionnumber = 85;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -2997,9 +2997,11 @@ namespace SilverfishControlfix
                 {
                     List<Minion> temp2 = new List<Minion>(ownmins);
                     temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//buff the weakest
-                    foreach (Minion mins in Helpfunctions.TakeList(temp2, 1))
+                    foreach (Minion mins in temp2)
                     {
+                        if (m.id == mins.id) continue;
                         minionGetBuffed(mins, 0, 1, own);
+                        break;
                     }
                 }
 
@@ -3007,19 +3009,27 @@ namespace SilverfishControlfix
                 {
                     List<Minion> temp2 = new List<Minion>(ownmins);
                     temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));//buff the weakest
-                    foreach (Minion mins in Helpfunctions.TakeList(temp2, 1))
+                    foreach (Minion mins in temp2)
                     {
+                        if (m.id == mins.id) continue;
                         minionGetBuffed(mins, 1, 0, own);
+                        break;
                     }
                 }
 
                 if (m.name == CardDB.cardName.emboldener3000) // buff a minion
                 {
+                    bool buffown = false;
                     List<Minion> temp2 = new List<Minion>(this.enemyMinions);
+                    if (temp2.Count == 0)
+                    {
+                        temp2.AddRange(this.ownMinions);
+                        buffown = true;
+                    }
                     temp2.Sort((a, b) => -a.Angr.CompareTo(b.Angr));//buff the strongest enemy
                     foreach (Minion mins in Helpfunctions.TakeList(temp2, 1))
                     {
-                        minionGetBuffed(mins, 1, 0, false);//buff alyways enemy :D
+                        minionGetBuffed(mins, 1, 0, buffown);//buff alyways enemy :D
                     }
                 }
 
@@ -5494,6 +5504,7 @@ namespace SilverfishControlfix
             {
                 attackOrHealHero(3, own);
             }
+
             if (c.name == CardDB.cardName.pitlord)
             {
                 attackOrHealHero(5, own);
@@ -5695,6 +5706,60 @@ namespace SilverfishControlfix
                 }
                 attackOrHealHero(1, false);
                 attackOrHealHero(1, true);
+            }
+
+            if (c.name == CardDB.cardName.madbomber)
+            {
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (this.ownHeroHp <= 3)
+                    {
+                        attackOrHealHero(1, true);
+                        continue;
+                    }
+                    List<Minion> temp = new List<Minion>(this.ownMinions);
+                    temp.AddRange(this.enemyMinions);
+                    temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));//destroys the weakest
+
+                    foreach (Minion m in temp)
+                    {
+                        bool target = true;
+                        if (m.id >= 10) target = false;
+                        minionGetDamagedOrHealed(m, 1, 0, target);
+                        break;
+                    }
+                    attackOrHealHero(1, false);
+                }
+            }
+
+            if (c.name == CardDB.cardName.tinkmasteroverspark)
+            {
+                int oc = this.ownMinions.Count;
+                int ec = this.enemyMinions.Count;
+                if (oc == 0 && ec == 0) return;
+                if (oc > ec)
+                {
+                    List<Minion> temp = new List<Minion>(this.ownMinions);
+                    temp.AddRange(this.enemyMinions);
+                    temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));//transform the weakest
+                    foreach (Minion m in temp)
+                    {
+                        minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk29), true);
+                        break;
+                    }
+                }
+                else
+                {
+                    List<Minion> temp = new List<Minion>(this.ownMinions);
+                    temp.AddRange(this.enemyMinions);
+                    temp.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//transform the strongest
+                    foreach (Minion m in temp)
+                    {
+                        minionTransform(m, CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_tk28), true);
+                        break;
+                    }
+                }
             }
 
             if (c.name == CardDB.cardName.tundrarhino)
@@ -11596,6 +11661,7 @@ namespace SilverfishControlfix
 
             if (name == CardDB.cardName.brawl || name == CardDB.cardName.twistingnether)
             {
+                if (name == CardDB.cardName.brawl && p.ownMinions.Count + p.enemyMinions.Count <= 1) return 500;
                 int highminion = 0;
                 int veryhighminion = 0;
                 foreach (Minion m in p.enemyMinions)
