@@ -8,9 +8,9 @@ using Triton.Game;
 
 //using System.Linq;
 
-namespace SilverfishControlfix
+namespace SilverfishControl
 {
-    public class SilverControlfix : ICustomDeck
+    public class SilverControlFix : ICustomDeck
     {
         private readonly PenalityManager penman = PenalityManager.Instance;
         private readonly Silverfish sf;
@@ -19,10 +19,10 @@ namespace SilverfishControlfix
         private int dirtyTargetSource = -1;
         private int dirtychoice = -1;
         private int dirtytarget = -1;
-        private bool waited = false;
+
         Behavior behave = new BehaviorControl();
 
-        public SilverControlfix()
+        public SilverControlFix()
         {
             bool concede = false;
             bool writeToSingleFile = false;
@@ -58,7 +58,7 @@ namespace SilverfishControlfix
 
 
             bool teststuff = false;
-                // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
+            // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
             bool printstuff = false; // if true, the best board of the tested file is printet stepp by stepp
             if (teststuff)
             {
@@ -150,17 +150,6 @@ namespace SilverfishControlfix
         /// </summary>
         public IEnumerator SelectCard()
         {
-            if (waited)
-            {
-                Helpfunctions.Instance.ErrorLog("waiting...");
-                yield return Coroutine.Sleep(500);
-                waited = false;
-                yield break;
-            }
-            else
-            {
-                waited = true;
-            }
             if (TritonHS.IsInTargetMode())
             {
                 if (dirtytarget >= 0)
@@ -177,12 +166,12 @@ namespace SilverfishControlfix
                     }
                     HSCard target = getEntityWithNumber(dirtytarget);
 
-                    if(target == null) Logging.Write("error: target is null...");
-                    
+                    if (target == null) Logging.Write("error: target is null...");
+
                     dirtytarget = -1;
                     dirtyTargetSource = -1;
 
-                    if(source == null) TritonHS.DoTarget(target);
+                    if (source == null) TritonHS.DoTarget(target);
                     else source.DoTarget(target);
 
                     yield break;
@@ -457,7 +446,7 @@ namespace SilverfishControlfix
         private List<string> ownSecretList = new List<string>();
         private bool ownheroisread;
         private int ueberladung;
-        
+
 
         public Silverfish(bool snglLg)
         {
@@ -667,11 +656,12 @@ namespace SilverfishControlfix
             heroAbility =
                 CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
             ownAbilityisReady = (TritonHS.OurHeroPowerCard.IsExhausted) ? false : true;
-                // if exhausted, ability is NOT ready
-
+            // if exhausted, ability is NOT ready
+            //fix:
+            ownAbilityisReady = TritonHS.OurHeroPowerCard.CanAttack;
             enemyAbility =
                 CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
-                // not correct :D
+            // not correct :D
         }
 
         private void getMinions()
@@ -760,22 +750,23 @@ namespace SilverfishControlfix
                         m.Ready = false;
                     }
 
+                    m.Ready = entitiy.CanAttack;
                     //adding the enchantments
 
                     foreach (HSCard enchi in entitiy.AttachedCards)
                     {
-                      if(!enchi.IsNull())
-                      {
-                        Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(enchi.Id));
-                        ench.creator = enchi.CreatorId;
-                        ench.controllerOfCreator = enchi.ControllerId;
-                        ench.cantBeDispelled = false;
-                        m.enchantments.Add(ench);
-                      }
-                      else
-                      {
-                        Logging.Write("Attachedcard is null...");
-                      }
+                        if (!enchi.IsNull())
+                        {
+                            Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(enchi.Id));
+                            ench.creator = enchi.CreatorId;
+                            ench.controllerOfCreator = enchi.ControllerId;
+                            ench.cantBeDispelled = false;
+                            m.enchantments.Add(ench);
+                        }
+                        else
+                        {
+                            Logging.Write("Attachedcard is null...");
+                        }
                     }
 
 
@@ -819,7 +810,7 @@ namespace SilverfishControlfix
             }
 
             enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
-                // dont know if you can count the enemys-handcars in this way :D
+            // dont know if you can count the enemys-handcars in this way :D
         }
     }
 

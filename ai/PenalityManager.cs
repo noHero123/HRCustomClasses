@@ -832,6 +832,7 @@ namespace HREngine.Bots
 
             if (name == CardDB.cardName.brawl || name == CardDB.cardName.twistingnether)
             {
+                if (name == CardDB.cardName.brawl && p.ownMinions.Count + p.enemyMinions.Count <= 1) return 500;
                 int highminion = 0;
                 int veryhighminion = 0;
                 foreach (Minion m in p.enemyMinions)
