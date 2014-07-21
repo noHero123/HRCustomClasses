@@ -3175,6 +3175,22 @@ namespace HREngine.Bots
         {
             Handmanager.Handcard hc = new Handmanager.Handcard(c);
             hc.entity = m.entitiyID;
+            bool ancestral = false;
+            if (m.enchantments.Count >= 1)
+            {
+                foreach (Enchantment e in m.enchantments)
+                {
+                    if (e.CARDID == CardDB.cardIDEnum.CS2_038e)
+                    {
+                        ancestral = true;
+                        break;
+                    }
+                }
+            }
+            if (m.handcard.card.name == CardDB.cardName.cairnebloodhoof || m.handcard.card.name == CardDB.cardName.harvestgolem || ancestral)
+            {
+                this.evaluatePenality -= Ai.Instance.botBase.getEnemyMinionValue(m, this) - 1;
+            }
             Minion tranform = createNewMinion(hc, m.id, own);
             Minion temp = new Minion();
             temp.setMinionTominion(m);
