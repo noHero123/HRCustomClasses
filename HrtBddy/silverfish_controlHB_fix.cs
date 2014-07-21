@@ -392,7 +392,7 @@ namespace SilverfishControlFix
 
     public class Silverfish
     {
-        private int versionnumber = 85;
+        private int versionnumber = 86;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -11537,7 +11537,7 @@ namespace SilverfishControlFix
                 }
                 carddraw = 0;
                 if (m.Hp == 1) carddraw = 1;
-                if (carddraw == 0) return 3;
+                if (carddraw == 0) return 15;
             }
 
             if (name == CardDB.cardName.lifetap)

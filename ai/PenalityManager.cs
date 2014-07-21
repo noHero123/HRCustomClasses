@@ -701,7 +701,7 @@ namespace HREngine.Bots
                 }
                 carddraw = 0;
                 if (m.Hp == 1) carddraw = 1;
-                if (carddraw == 0) return 3;
+                if (carddraw == 0) return 15;
             }
 
             if (name == CardDB.cardName.lifetap )
