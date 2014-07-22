@@ -14,6 +14,8 @@ using System.Text;
 //faehrtenlesen (tracking)
 // lehrensucher cho
 //scharmuetzel kills all :D
+//todo deathlord-guessing
+//todo kelthuzad dont know which minion died this turn in rl
 
 
 
@@ -131,6 +133,11 @@ namespace HREngine.Bots
         public int enemyWeaponDurability = 0;
         public List<Minion> ownMinions = new List<Minion>();
         public List<Minion> enemyMinions = new List<Minion>();
+
+        public List<Minion> diedMinions = null;
+        public bool ownhasorcanplayKelThuzad = false;
+        public bool enemyhasorcanplayKelThuzad = false;
+
         public List<Handmanager.Handcard> owncards = new List<Handmanager.Handcard>();
         public List<Action> playactions = new List<Action>();
         public bool complete = false;
@@ -154,6 +161,7 @@ namespace HREngine.Bots
         public bool playedmagierinderkirintor = false;
         public bool playedPreparation = false;
 
+        public bool loatheb = false;
         public int winzigebeschwoererin = 0;
         public int startedWithWinzigebeschwoererin = 0;
         public int zauberlehrling = 0;
@@ -164,6 +172,8 @@ namespace HREngine.Bots
         public int startedWithsoeldnerDerVenture = 0;
         public int beschwoerungsportal = 0;
         public int startedWithbeschwoerungsportal = 0;
+        public int nerubarweblord = 0;
+        public int startedWithnerubarweblord = 0;
 
         public int ownWeaponAttackStarted = 0;
         public int ownMobsCountStarted = 0;
@@ -291,7 +301,9 @@ namespace HREngine.Bots
             this.managespenst = 0;
             this.soeldnerDerVenture = 0;
             this.beschwoerungsportal = 0;
+            this.nerubarweblord = 0;
 
+            this.startedWithnerubarweblord = 0;
             this.startedWithbeschwoerungsportal = 0;
             this.startedWithManagespenst = 0;
             this.startedWithWinzigebeschwoererin = 0;
@@ -301,8 +313,14 @@ namespace HREngine.Bots
             this.ownBaronRivendare = false;
             this.enemyBaronRivendare = false;
 
+            ownhasorcanplayKelThuzad = false;
+            enemyhasorcanplayKelThuzad = false;
+            this.loatheb = false;
+
             foreach (Minion m in this.ownMinions)
             {
+                if (m.playedThisTurn && m.name == CardDB.cardName.loatheb) this.loatheb = true;
+
                 if (m.silenced) continue;
 
                 if (m.name == CardDB.cardName.prophetvelen) this.doublepriest++;
@@ -324,6 +342,11 @@ namespace HREngine.Bots
                     this.managespenst++;
                     this.startedWithManagespenst++;
                 }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                    this.startedWithnerubarweblord++;
+                }
                 if (m.name == CardDB.cardName.venturecomercenary)
                 {
                     this.soeldnerDerVenture++;
@@ -339,10 +362,22 @@ namespace HREngine.Bots
                 {
                     this.ownBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
 
                 foreach (Enchantment e in m.enchantments)// only at first init needed, after that its copied
                 {
                     if (e.CARDID == CardDB.cardIDEnum.NEW1_036e || e.CARDID == CardDB.cardIDEnum.NEW1_036e2) m.cantLowerHPbelowONE = true;
+                }
+                
+            }
+            foreach (Handmanager.Handcard hc in this.owncards)
+            {
+                if (hc.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
                 }
             }
 
@@ -356,12 +391,21 @@ namespace HREngine.Bots
                     this.managespenst++;
                     this.startedWithManagespenst++;
                 }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                    this.startedWithnerubarweblord++;
+                }
                 if (m.handcard.card.name == CardDB.cardName.baronrivendare)
                 {
                     this.enemyBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.enemyhasorcanplayKelThuzad = true;
+                }
             }
-
+            if (this.ownhasorcanplayKelThuzad || this.enemyhasorcanplayKelThuzad) this.diedMinions = new List<Minion>();
 
         }
 
@@ -453,16 +497,24 @@ namespace HREngine.Bots
             this.startedWithManagespenst = p.startedWithManagespenst;
             this.startedWithsoeldnerDerVenture = p.startedWithsoeldnerDerVenture;
             this.startedWithbeschwoerungsportal = p.startedWithbeschwoerungsportal;
+            this.startedWithnerubarweblord = p.startedWithnerubarweblord;
 
             this.ownBaronRivendare = false;
             this.enemyBaronRivendare = false;
 
+            this.nerubarweblord = 0;
             this.zauberlehrling = 0;
             this.winzigebeschwoererin = 0;
             this.managespenst = 0;
             this.soeldnerDerVenture = 0;
+            this.enemyhasorcanplayKelThuzad = false;
+            this.ownhasorcanplayKelThuzad = false;
+            this.loatheb = false;
+
             foreach (Minion m in this.ownMinions)
             {
+                if (m.playedThisTurn && m.name == CardDB.cardName.loatheb) this.loatheb = true;
+
                 if (m.silenced) continue;
 
                 if (m.handcard.card.name == CardDB.cardName.prophetvelen) this.doublepriest++;
@@ -477,8 +529,21 @@ namespace HREngine.Bots
                 {
                     this.ownBaronRivendare = true;
                 }
-
-
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                }
+            }
+            foreach (Handmanager.Handcard hc in this.owncards)
+            {
+                if (hc.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
             }
 
             foreach (Minion m in this.enemyMinions)
@@ -487,12 +552,20 @@ namespace HREngine.Bots
                 this.enemyspellpower = this.enemyspellpower + m.handcard.card.spellpowervalue;
                 if (m.handcard.card.name == CardDB.cardName.prophetvelen) this.enemydoublepriest++;
                 if (m.handcard.card.name == CardDB.cardName.manawraith) this.managespenst++;
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                }
                 if (m.handcard.card.name == CardDB.cardName.baronrivendare)
                 {
                     this.enemyBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.enemyhasorcanplayKelThuzad = true;
+                }
             }
-
+            if (this.ownhasorcanplayKelThuzad || this.enemyhasorcanplayKelThuzad) this.diedMinions = new List<Minion>();
         }
 
         public bool isEqual(Playfield p, bool logg)
@@ -641,7 +714,7 @@ namespace HREngine.Bots
             int deep = 0;
             int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
 
-            if (playaround)
+            if (playaround && !this.loatheb)
             {
                 int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
@@ -666,7 +739,7 @@ namespace HREngine.Bots
             }
 
             //play ability!
-            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0))
+            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0) && !loatheb)
             {
                 int abilityPenality = 0;
 
@@ -1838,7 +1911,7 @@ namespace HREngine.Bots
                 enemymins.AddRange(this.ownMinions);
             }
 
-     
+            
 
             foreach (Minion m in temp)
             {
@@ -2023,6 +2096,34 @@ namespace HREngine.Bots
                         this.drawACard(CardDB.cardName.yseraawakens, own);
                     }
                 }
+                if (m.name == CardDB.cardName.echoingooze) // draw card
+                {
+                    this.callKid(m.handcard.card, m.id, own);
+                    foreach (Minion mnn in temp)
+                    {
+                        if (mnn.name == CardDB.cardName.echoingooze && m.entitiyID != mnn.entitiyID)
+                        {
+                            mnn.setMinionTominion(m);
+                            break;
+                        }
+                    }
+
+                }
+                if (m.name == CardDB.cardName.kelthuzad) // summon death minion
+                {
+                    foreach (Minion mnn in this.diedMinions)
+                    {
+                        if (own)
+                        {
+                            if (m.id >= 0 && m.id <= 9) callKid(m.handcard.card, m.id, true);
+                        }
+                        else
+                        {
+                            if (m.id >= 10 && m.id <= 19) callKid(m.handcard.card, m.id, false);
+                        }
+                    }
+                }
+
             }
 
             foreach (Minion m in enemymins)
@@ -2030,6 +2131,21 @@ namespace HREngine.Bots
                 if (m.name == CardDB.cardName.gruul) // gain +1/+1
                 {
                     minionGetBuffed(m, 1, 1, !own);
+                }
+
+                if (m.name == CardDB.cardName.kelthuzad) // summon death minion
+                {
+                    foreach (Minion mnn in this.diedMinions)
+                    {
+                        if (own)
+                        {
+                            if (m.id >= 0 && m.id <= 9) callKid(m.handcard.card, m.id, true);
+                        }
+                        else
+                        {
+                            if (m.id >= 10 && m.id <= 19) callKid(m.handcard.card, m.id, false);
+                        }
+                    }
                 }
             }
 
@@ -2190,6 +2306,13 @@ namespace HREngine.Bots
                         m.Hp = m.maxHp;
                     }
                     
+                }
+
+                if (m.name == CardDB.cardName.stoneskingargoyle) // 
+                {
+                     m.Hp = m.maxHp;
+                        m.wounded = false;
+
                 }
                 
 
@@ -3032,6 +3155,72 @@ namespace HREngine.Bots
                     }
                 }
 
+                if (m.handcard.card.name == CardDB.cardName.deathlord)
+                {
+                    int place = this.enemyMinions.Count - 1;
+                    if (!own) place = this.ownMinions.Count - 1;
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.panther);//nerubian
+                    callKid(c, place, !own);
+                        
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.hauntedcreeper)
+                {
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.spectralspider);
+                    callKid(c, m.id - 1, own);
+                    callKid(c, m.id - 1, own);
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.madscientist)
+                {
+                    if (own)
+                    {
+                        if (ownHeroName == HeroEnum.mage)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_289);
+                        }
+                        if (ownHeroName == HeroEnum.hunter)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_554);
+                        }
+                        if (ownHeroName == HeroEnum.pala)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_130);
+                        }
+                    }
+                    else
+                    {
+                        if (enemyHeroName == HeroEnum.mage || enemyHeroName == HeroEnum.hunter || enemyHeroName == HeroEnum.pala)
+                        {
+                            this.enemySecretCount++;
+                        }
+                    }
+                }
+                if (m.handcard.card.name == CardDB.cardName.sludgebelcher)
+                {
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.slime);
+                    callKid(c, m.id - 1, own);
+                }
+                if (m.handcard.card.name == CardDB.cardName.unstableghoul)
+                { 
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    foreach (Minion mnn in temp)
+                    {
+                        minionGetDamagedOrHealed(mnn, 1, 0, false, true);
+                    }
+                    temp.Clear();
+                    temp.AddRange(this.ownMinions);
+                   foreach (Minion mnn in temp)
+                    {
+                        minionGetDamagedOrHealed(mnn, 1, 0, true, true);
+                    }
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.zombiechow)
+                {
+                    this.attackOrHealHero(-5, !own);
+                }
+
 
 
             }
@@ -3071,11 +3260,20 @@ namespace HREngine.Bots
             {
                 temp.AddRange(this.ownMinions);
                 temp2.AddRange(this.enemyMinions);
+                if (this.ownhasorcanplayKelThuzad)
+                {
+                    this.diedMinions.Add(m);
+                }
             }
             else
             {
                 temp.AddRange(this.enemyMinions);
                 temp2.AddRange(this.ownMinions);
+
+                if (this.enemyhasorcanplayKelThuzad)
+                {
+                    this.diedMinions.Add(m);
+                }
 
                 bool ancestral = false;
                 if (m.enchantments.Count >= 1)
@@ -3729,11 +3927,11 @@ namespace HREngine.Bots
             this.deathrattle(m, own);
             if (own)
             {
-                if (this.ownBaronRivendare) this.deathrattle(m, own);
+                if (this.ownBaronRivendare && m.name != CardDB.cardName.baronrivendare) this.deathrattle(m, own);
             }
             else 
-            { 
-                if(this.enemyBaronRivendare) this.deathrattle(m, own);
+            {
+                if (this.enemyBaronRivendare && m.name != CardDB.cardName.baronrivendare) this.deathrattle(m, own);
             }
             this.triggerAMinionDied(m, own);
             adjacentBuffUpdate(own);
@@ -4766,6 +4964,16 @@ namespace HREngine.Bots
             {
                 //this.owncarddraw++;
                 drawACard(CardDB.cardName.unknown, true);
+
+            }
+            if (c.name == CardDB.cardName.wailingsoul)
+            {
+                //this.owncarddraw++;
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion m in temp)
+                {
+                    minionGetSilenced(m,true);
+                }
 
             }
 

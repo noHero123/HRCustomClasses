@@ -392,7 +392,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        private int versionnumber = 86;
+        private int versionnumber = 87;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -1005,6 +1005,7 @@ namespace SilverfishRush
             if (m.poisonous) retval += 4;
 
             if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
+            if (m.name == CardDB.cardName.nerubianegg && m.Angr == 0 && !m.taunt) retval = 0;
             return retval;
         }
 
@@ -1125,6 +1126,7 @@ namespace SilverfishRush
             if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
             if (m.Angr >= 4) retval += 20;
             if (m.Angr >= 7) retval += 50;
+            if (m.name == CardDB.cardName.nerubianegg && m.Angr == 0 && !m.taunt) retval = 0;
             return retval;
         }
 
@@ -1245,6 +1247,11 @@ namespace SilverfishRush
         public int enemyWeaponDurability = 0;
         public List<Minion> ownMinions = new List<Minion>();
         public List<Minion> enemyMinions = new List<Minion>();
+
+        public List<Minion> diedMinions = null;
+        public bool ownhasorcanplayKelThuzad = false;
+        public bool enemyhasorcanplayKelThuzad = false;
+
         public List<Handmanager.Handcard> owncards = new List<Handmanager.Handcard>();
         public List<Action> playactions = new List<Action>();
         public bool complete = false;
@@ -1268,6 +1275,7 @@ namespace SilverfishRush
         public bool playedmagierinderkirintor = false;
         public bool playedPreparation = false;
 
+        public bool loatheb = false;
         public int winzigebeschwoererin = 0;
         public int startedWithWinzigebeschwoererin = 0;
         public int zauberlehrling = 0;
@@ -1278,6 +1286,8 @@ namespace SilverfishRush
         public int startedWithsoeldnerDerVenture = 0;
         public int beschwoerungsportal = 0;
         public int startedWithbeschwoerungsportal = 0;
+        public int nerubarweblord = 0;
+        public int startedWithnerubarweblord = 0;
 
         public int ownWeaponAttackStarted = 0;
         public int ownMobsCountStarted = 0;
@@ -1405,7 +1415,9 @@ namespace SilverfishRush
             this.managespenst = 0;
             this.soeldnerDerVenture = 0;
             this.beschwoerungsportal = 0;
+            this.nerubarweblord = 0;
 
+            this.startedWithnerubarweblord = 0;
             this.startedWithbeschwoerungsportal = 0;
             this.startedWithManagespenst = 0;
             this.startedWithWinzigebeschwoererin = 0;
@@ -1415,8 +1427,14 @@ namespace SilverfishRush
             this.ownBaronRivendare = false;
             this.enemyBaronRivendare = false;
 
+            ownhasorcanplayKelThuzad = false;
+            enemyhasorcanplayKelThuzad = false;
+            this.loatheb = false;
+
             foreach (Minion m in this.ownMinions)
             {
+                if (m.playedThisTurn && m.name == CardDB.cardName.loatheb) this.loatheb = true;
+
                 if (m.silenced) continue;
 
                 if (m.name == CardDB.cardName.prophetvelen) this.doublepriest++;
@@ -1438,6 +1456,11 @@ namespace SilverfishRush
                     this.managespenst++;
                     this.startedWithManagespenst++;
                 }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                    this.startedWithnerubarweblord++;
+                }
                 if (m.name == CardDB.cardName.venturecomercenary)
                 {
                     this.soeldnerDerVenture++;
@@ -1453,10 +1476,22 @@ namespace SilverfishRush
                 {
                     this.ownBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
 
                 foreach (Enchantment e in m.enchantments)// only at first init needed, after that its copied
                 {
                     if (e.CARDID == CardDB.cardIDEnum.NEW1_036e || e.CARDID == CardDB.cardIDEnum.NEW1_036e2) m.cantLowerHPbelowONE = true;
+                }
+
+            }
+            foreach (Handmanager.Handcard hc in this.owncards)
+            {
+                if (hc.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
                 }
             }
 
@@ -1470,12 +1505,21 @@ namespace SilverfishRush
                     this.managespenst++;
                     this.startedWithManagespenst++;
                 }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                    this.startedWithnerubarweblord++;
+                }
                 if (m.handcard.card.name == CardDB.cardName.baronrivendare)
                 {
                     this.enemyBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.enemyhasorcanplayKelThuzad = true;
+                }
             }
-
+            if (this.ownhasorcanplayKelThuzad || this.enemyhasorcanplayKelThuzad) this.diedMinions = new List<Minion>();
 
         }
 
@@ -1567,16 +1611,24 @@ namespace SilverfishRush
             this.startedWithManagespenst = p.startedWithManagespenst;
             this.startedWithsoeldnerDerVenture = p.startedWithsoeldnerDerVenture;
             this.startedWithbeschwoerungsportal = p.startedWithbeschwoerungsportal;
+            this.startedWithnerubarweblord = p.startedWithnerubarweblord;
 
             this.ownBaronRivendare = false;
             this.enemyBaronRivendare = false;
 
+            this.nerubarweblord = 0;
             this.zauberlehrling = 0;
             this.winzigebeschwoererin = 0;
             this.managespenst = 0;
             this.soeldnerDerVenture = 0;
+            this.enemyhasorcanplayKelThuzad = false;
+            this.ownhasorcanplayKelThuzad = false;
+            this.loatheb = false;
+
             foreach (Minion m in this.ownMinions)
             {
+                if (m.playedThisTurn && m.name == CardDB.cardName.loatheb) this.loatheb = true;
+
                 if (m.silenced) continue;
 
                 if (m.handcard.card.name == CardDB.cardName.prophetvelen) this.doublepriest++;
@@ -1591,8 +1643,21 @@ namespace SilverfishRush
                 {
                     this.ownBaronRivendare = true;
                 }
-
-
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                }
+            }
+            foreach (Handmanager.Handcard hc in this.owncards)
+            {
+                if (hc.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.ownhasorcanplayKelThuzad = true;
+                }
             }
 
             foreach (Minion m in this.enemyMinions)
@@ -1601,12 +1666,20 @@ namespace SilverfishRush
                 this.enemyspellpower = this.enemyspellpower + m.handcard.card.spellpowervalue;
                 if (m.handcard.card.name == CardDB.cardName.prophetvelen) this.enemydoublepriest++;
                 if (m.handcard.card.name == CardDB.cardName.manawraith) this.managespenst++;
+                if (m.name == CardDB.cardName.nerubarweblord)
+                {
+                    this.nerubarweblord++;
+                }
                 if (m.handcard.card.name == CardDB.cardName.baronrivendare)
                 {
                     this.enemyBaronRivendare = true;
                 }
+                if (m.handcard.card.name == CardDB.cardName.kelthuzad)
+                {
+                    this.enemyhasorcanplayKelThuzad = true;
+                }
             }
-
+            if (this.ownhasorcanplayKelThuzad || this.enemyhasorcanplayKelThuzad) this.diedMinions = new List<Minion>();
         }
 
         public bool isEqual(Playfield p, bool logg)
@@ -1755,7 +1828,7 @@ namespace SilverfishRush
             int deep = 0;
             int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
 
-            if (playaround)
+            if (playaround && !this.loatheb)
             {
                 int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
@@ -1780,7 +1853,7 @@ namespace SilverfishRush
             }
 
             //play ability!
-            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0))
+            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0) && !loatheb)
             {
                 int abilityPenality = 0;
 
@@ -3137,6 +3210,34 @@ namespace SilverfishRush
                         this.drawACard(CardDB.cardName.yseraawakens, own);
                     }
                 }
+                if (m.name == CardDB.cardName.echoingooze) // draw card
+                {
+                    this.callKid(m.handcard.card, m.id, own);
+                    foreach (Minion mnn in temp)
+                    {
+                        if (mnn.name == CardDB.cardName.echoingooze && m.entitiyID != mnn.entitiyID)
+                        {
+                            mnn.setMinionTominion(m);
+                            break;
+                        }
+                    }
+
+                }
+                if (m.name == CardDB.cardName.kelthuzad) // summon death minion
+                {
+                    foreach (Minion mnn in this.diedMinions)
+                    {
+                        if (own)
+                        {
+                            if (m.id >= 0 && m.id <= 9) callKid(m.handcard.card, m.id, true);
+                        }
+                        else
+                        {
+                            if (m.id >= 10 && m.id <= 19) callKid(m.handcard.card, m.id, false);
+                        }
+                    }
+                }
+
             }
 
             foreach (Minion m in enemymins)
@@ -3144,6 +3245,21 @@ namespace SilverfishRush
                 if (m.name == CardDB.cardName.gruul) // gain +1/+1
                 {
                     minionGetBuffed(m, 1, 1, !own);
+                }
+
+                if (m.name == CardDB.cardName.kelthuzad) // summon death minion
+                {
+                    foreach (Minion mnn in this.diedMinions)
+                    {
+                        if (own)
+                        {
+                            if (m.id >= 0 && m.id <= 9) callKid(m.handcard.card, m.id, true);
+                        }
+                        else
+                        {
+                            if (m.id >= 10 && m.id <= 19) callKid(m.handcard.card, m.id, false);
+                        }
+                    }
                 }
             }
 
@@ -3303,6 +3419,13 @@ namespace SilverfishRush
                         minionGetBuffed(m, 4, 4, false);
                         m.Hp = m.maxHp;
                     }
+
+                }
+
+                if (m.name == CardDB.cardName.stoneskingargoyle) // 
+                {
+                    m.Hp = m.maxHp;
+                    m.wounded = false;
 
                 }
 
@@ -4146,6 +4269,72 @@ namespace SilverfishRush
                     }
                 }
 
+                if (m.handcard.card.name == CardDB.cardName.deathlord)
+                {
+                    int place = this.enemyMinions.Count - 1;
+                    if (!own) place = this.ownMinions.Count - 1;
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.panther);//nerubian
+                    callKid(c, place, !own);
+
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.hauntedcreeper)
+                {
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.spectralspider);
+                    callKid(c, m.id - 1, own);
+                    callKid(c, m.id - 1, own);
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.madscientist)
+                {
+                    if (own)
+                    {
+                        if (ownHeroName == HeroEnum.mage)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_289);
+                        }
+                        if (ownHeroName == HeroEnum.hunter)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_554);
+                        }
+                        if (ownHeroName == HeroEnum.pala)
+                        {
+                            this.ownSecretsIDList.Add(CardDB.cardIDEnum.EX1_130);
+                        }
+                    }
+                    else
+                    {
+                        if (enemyHeroName == HeroEnum.mage || enemyHeroName == HeroEnum.hunter || enemyHeroName == HeroEnum.pala)
+                        {
+                            this.enemySecretCount++;
+                        }
+                    }
+                }
+                if (m.handcard.card.name == CardDB.cardName.sludgebelcher)
+                {
+                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.slime);
+                    callKid(c, m.id - 1, own);
+                }
+                if (m.handcard.card.name == CardDB.cardName.unstableghoul)
+                {
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    foreach (Minion mnn in temp)
+                    {
+                        minionGetDamagedOrHealed(mnn, 1, 0, false, true);
+                    }
+                    temp.Clear();
+                    temp.AddRange(this.ownMinions);
+                    foreach (Minion mnn in temp)
+                    {
+                        minionGetDamagedOrHealed(mnn, 1, 0, true, true);
+                    }
+                }
+
+                if (m.handcard.card.name == CardDB.cardName.zombiechow)
+                {
+                    this.attackOrHealHero(-5, !own);
+                }
+
 
 
             }
@@ -4185,11 +4374,20 @@ namespace SilverfishRush
             {
                 temp.AddRange(this.ownMinions);
                 temp2.AddRange(this.enemyMinions);
+                if (this.ownhasorcanplayKelThuzad)
+                {
+                    this.diedMinions.Add(m);
+                }
             }
             else
             {
                 temp.AddRange(this.enemyMinions);
                 temp2.AddRange(this.ownMinions);
+
+                if (this.enemyhasorcanplayKelThuzad)
+                {
+                    this.diedMinions.Add(m);
+                }
 
                 bool ancestral = false;
                 if (m.enchantments.Count >= 1)
@@ -4843,11 +5041,11 @@ namespace SilverfishRush
             this.deathrattle(m, own);
             if (own)
             {
-                if (this.ownBaronRivendare) this.deathrattle(m, own);
+                if (this.ownBaronRivendare && m.name != CardDB.cardName.baronrivendare) this.deathrattle(m, own);
             }
             else
             {
-                if (this.enemyBaronRivendare) this.deathrattle(m, own);
+                if (this.enemyBaronRivendare && m.name != CardDB.cardName.baronrivendare) this.deathrattle(m, own);
             }
             this.triggerAMinionDied(m, own);
             adjacentBuffUpdate(own);
@@ -5880,6 +6078,16 @@ namespace SilverfishRush
             {
                 //this.owncarddraw++;
                 drawACard(CardDB.cardName.unknown, true);
+
+            }
+            if (c.name == CardDB.cardName.wailingsoul)
+            {
+                //this.owncarddraw++;
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion m in temp)
+                {
+                    minionGetSilenced(m, true);
+                }
 
             }
 
@@ -12710,7 +12918,6 @@ namespace SilverfishRush
             this.destroyOwnDatabase.Add(CardDB.cardName.hungrycrab, 0);//not own mins
             this.destroyOwnDatabase.Add(CardDB.cardName.sacrificialpact, 0);//not own mins
 
-
             this.destroyDatabase.Add(CardDB.cardName.assassinate, 0);//not own mins
             this.destroyDatabase.Add(CardDB.cardName.corruption, 0);//not own mins
             this.destroyDatabase.Add(CardDB.cardName.execute, 0);//not own mins
@@ -12817,14 +13024,23 @@ namespace SilverfishRush
             this.specialMinions.Add(CardDB.cardName.waterelemental, 0);
 
             // naxx cards
-            //this.specialMinions.Add(CardDB.cardName.baronrivendare, 0);
-            //this.specialMinions.Add(CardDB.cardName.nerubianegg, 0);
-            //this.specialMinions.Add(CardDB.cardName.undertaker, 0);
-            //this.specialMinions.Add(CardDB.cardName.dancingswords, 0);
-            //this.specialMinions.Add(CardDB.cardName.voidcaller, 0);
-            //this.specialMinions.Add(CardDB.cardName.anubarambusher, 0);
-            //this.specialMinions.Add(CardDB.cardName.darkcultist, 0);
-            //this.specialMinions.Add(CardDB.cardName.webspinner, 0);
+            this.specialMinions.Add(CardDB.cardName.baronrivendare, 0);
+            this.specialMinions.Add(CardDB.cardName.undertaker, 0);
+            this.specialMinions.Add(CardDB.cardName.dancingswords, 0);
+            this.specialMinions.Add(CardDB.cardName.darkcultist, 0);
+            this.specialMinions.Add(CardDB.cardName.deathlord, 0);
+            this.specialMinions.Add(CardDB.cardName.feugen, 0);
+            this.specialMinions.Add(CardDB.cardName.stalagg, 0);
+            this.specialMinions.Add(CardDB.cardName.hauntedcreeper, 0);
+            this.specialMinions.Add(CardDB.cardName.kelthuzad, 0);
+            this.specialMinions.Add(CardDB.cardName.madscientist, 0);
+            this.specialMinions.Add(CardDB.cardName.maexxna, 0);
+            this.specialMinions.Add(CardDB.cardName.nerubarweblord, 0);
+            this.specialMinions.Add(CardDB.cardName.shadeofnaxxramas, 0);
+            this.specialMinions.Add(CardDB.cardName.unstableghoul, 0);
+            this.specialMinions.Add(CardDB.cardName.voidcaller, 0);
+            this.specialMinions.Add(CardDB.cardName.anubarambusher, 0);
+            this.specialMinions.Add(CardDB.cardName.webspinner, 0);
 
         }
 
@@ -12929,6 +13145,14 @@ namespace SilverfishRush
             priorityTargets.Add(CardDB.cardName.starvingbuzzard, 10);
             priorityTargets.Add(CardDB.cardName.leokk, 10);
             priorityTargets.Add(CardDB.cardName.tundrarhino, 10);
+
+            //naxx cards
+            priorityTargets.Add(CardDB.cardName.baronrivendare, 10);
+            priorityTargets.Add(CardDB.cardName.kelthuzad, 10);
+            priorityTargets.Add(CardDB.cardName.nerubarweblord, 10);
+            priorityTargets.Add(CardDB.cardName.shadeofnaxxramas, 10);
+            priorityTargets.Add(CardDB.cardName.undertaker, 10);
+
         }
 
         private void setupRandomCards()
@@ -15371,19 +15595,43 @@ namespace SilverfishRush
         public enum cardName
         {
             unknown,
-            shadeofnaxxramas,//naxx
-            deathsbite,//naxx
             nerubian,//naxx
+            slime,//naxx
+
+            avenge,//naxx
+            baronrivendare,//naxx
+            dancingswords,//naxx
+            darkcultist,//naxx
+            deathsbite,//naxx
+            deathlord,//naxx
+            echoingooze,//naxx
+
+            feugen,//naxx
+            stalagg,//naxx
+
+            hauntedcreeper,//naxx
+            spectralspider,//naxx
+            kelthuzad,//naxx
+            madscientist,//naxx
+            maexxna,//nax
+            nerubarweblord,//nax
+            nerubianegg,//naxx
+            shadeofnaxxramas,//naxx
             reincarnation,//naxx
             poisonseeds,//naxx
-            baronrivendare,//naxx
-            nerubianegg,//naxx
-            dancingswords,//naxx
+
             anubarambusher,//naxx
             voidcaller,//naxx
-            darkcultist,//naxx
             webspinner,//naxx
             undertaker,//naxx
+            sludgebelcher,//naxx
+            spectralknight,//naxx
+            stoneskingargoyle,//naxx
+            unstableghoul,//naxx
+            wailingsoul,//naxx
+            zombiechow,//naxx
+            loatheb,//naxx
+
             hogger,
             starfall,
             barrel,
@@ -16688,12 +16936,12 @@ namespace SilverfishRush
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -16844,12 +17092,12 @@ namespace SilverfishRush
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister))) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight))) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -16998,6 +17246,11 @@ namespace SilverfishRush
 
                     offset += (p.managespenst);
 
+                    if (this.battlecry)
+                    {
+                        offset += p.nerubarweblord * 2;
+                    }
+
                     int temp = -(p.startedWithbeschwoerungsportal) * 2;
                     if (retval + temp <= 0) temp = -retval + 1;
                     offset = offset + temp;
@@ -17066,6 +17319,12 @@ namespace SilverfishRush
                 if (p.managespenst != p.startedWithManagespenst && this.type == cardtype.MOB)
                 {
                     offset += (p.managespenst - p.startedWithManagespenst);
+                }
+
+                //Manacosts changes with nerubarweblord
+                if (this.battlecry && p.nerubarweblord != p.startedWithnerubarweblord && this.type == cardtype.MOB)
+                {
+                    offset += (p.nerubarweblord - p.startedWithnerubarweblord);
                 }
 
 

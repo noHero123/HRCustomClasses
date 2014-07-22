@@ -1474,19 +1474,43 @@ namespace HREngine.Bots
         public enum cardName
         {
             unknown,
-            shadeofnaxxramas,//naxx
-            deathsbite,//naxx
             nerubian,//naxx
+            slime,//naxx
+
+            avenge,//naxx
+            baronrivendare,//naxx
+            dancingswords,//naxx
+            darkcultist,//naxx
+            deathsbite,//naxx
+            deathlord,//naxx
+            echoingooze,//naxx
+            
+            feugen,//naxx
+            stalagg,//naxx
+
+            hauntedcreeper,//naxx
+            spectralspider,//naxx
+            kelthuzad,//naxx
+            madscientist,//naxx
+            maexxna,//nax
+            nerubarweblord,//nax
+            nerubianegg,//naxx
+            shadeofnaxxramas,//naxx
             reincarnation,//naxx
             poisonseeds,//naxx
-            baronrivendare,//naxx
-            nerubianegg,//naxx
-            dancingswords,//naxx
+            
             anubarambusher,//naxx
             voidcaller,//naxx
-            darkcultist,//naxx
             webspinner,//naxx
             undertaker,//naxx
+            sludgebelcher,//naxx
+            spectralknight,//naxx
+            stoneskingargoyle,//naxx
+            unstableghoul,//naxx
+            wailingsoul,//naxx
+            zombiechow,//naxx
+            loatheb,//naxx
+
             hogger,
             starfall,
             barrel,
@@ -2791,12 +2815,12 @@ namespace HREngine.Bots
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -2947,12 +2971,12 @@ namespace HREngine.Bots
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) ) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight))) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -3101,6 +3125,11 @@ namespace HREngine.Bots
 
                     offset += (p.managespenst);
 
+                    if (this.battlecry)
+                    {
+                        offset += p.nerubarweblord * 2;
+                    }
+
                     int temp = -(p.startedWithbeschwoerungsportal) * 2;
                     if (retval + temp <= 0) temp = -retval + 1;
                     offset = offset + temp;
@@ -3169,6 +3198,12 @@ namespace HREngine.Bots
                 if (p.managespenst != p.startedWithManagespenst && this.type == cardtype.MOB)
                 {
                     offset += (p.managespenst - p.startedWithManagespenst);
+                }
+
+                //Manacosts changes with nerubarweblord
+                if (this.battlecry && p.nerubarweblord != p.startedWithnerubarweblord && this.type == cardtype.MOB)
+                {
+                    offset += (p.nerubarweblord - p.startedWithnerubarweblord);
                 }
 
 

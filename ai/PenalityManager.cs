@@ -1876,7 +1876,6 @@ namespace HREngine.Bots
             this.destroyOwnDatabase.Add(CardDB.cardName.hungrycrab, 0);//not own mins
             this.destroyOwnDatabase.Add(CardDB.cardName.sacrificialpact, 0);//not own mins
 
-
             this.destroyDatabase.Add(CardDB.cardName.assassinate, 0);//not own mins
             this.destroyDatabase.Add(CardDB.cardName.corruption, 0);//not own mins
             this.destroyDatabase.Add(CardDB.cardName.execute, 0);//not own mins
@@ -1983,14 +1982,23 @@ namespace HREngine.Bots
             this.specialMinions.Add(CardDB.cardName.waterelemental, 0);
 
             // naxx cards
-            //this.specialMinions.Add(CardDB.cardName.baronrivendare, 0);
-            //this.specialMinions.Add(CardDB.cardName.nerubianegg, 0);
-            //this.specialMinions.Add(CardDB.cardName.undertaker, 0);
-            //this.specialMinions.Add(CardDB.cardName.dancingswords, 0);
-            //this.specialMinions.Add(CardDB.cardName.voidcaller, 0);
-            //this.specialMinions.Add(CardDB.cardName.anubarambusher, 0);
-            //this.specialMinions.Add(CardDB.cardName.darkcultist, 0);
-            //this.specialMinions.Add(CardDB.cardName.webspinner, 0);
+            this.specialMinions.Add(CardDB.cardName.baronrivendare, 0);
+            this.specialMinions.Add(CardDB.cardName.undertaker, 0);
+            this.specialMinions.Add(CardDB.cardName.dancingswords, 0);
+            this.specialMinions.Add(CardDB.cardName.darkcultist, 0);
+            this.specialMinions.Add(CardDB.cardName.deathlord, 0);
+            this.specialMinions.Add(CardDB.cardName.feugen, 0);
+            this.specialMinions.Add(CardDB.cardName.stalagg, 0);
+            this.specialMinions.Add(CardDB.cardName.hauntedcreeper, 0);
+            this.specialMinions.Add(CardDB.cardName.kelthuzad, 0);
+            this.specialMinions.Add(CardDB.cardName.madscientist, 0);
+            this.specialMinions.Add(CardDB.cardName.maexxna, 0);
+            this.specialMinions.Add(CardDB.cardName.nerubarweblord, 0);
+            this.specialMinions.Add(CardDB.cardName.shadeofnaxxramas, 0);
+            this.specialMinions.Add(CardDB.cardName.unstableghoul, 0);
+            this.specialMinions.Add(CardDB.cardName.voidcaller, 0);
+            this.specialMinions.Add(CardDB.cardName.anubarambusher, 0);
+            this.specialMinions.Add(CardDB.cardName.webspinner, 0);
 
         }
 
@@ -2095,6 +2103,14 @@ namespace HREngine.Bots
             priorityTargets.Add(CardDB.cardName.starvingbuzzard, 10);
             priorityTargets.Add(CardDB.cardName.leokk, 10);
             priorityTargets.Add(CardDB.cardName.tundrarhino, 10);
+
+            //naxx cards
+            priorityTargets.Add(CardDB.cardName.baronrivendare, 10);
+            priorityTargets.Add(CardDB.cardName.kelthuzad, 10);
+            priorityTargets.Add(CardDB.cardName.nerubarweblord, 10);
+            priorityTargets.Add(CardDB.cardName.shadeofnaxxramas, 10);
+            priorityTargets.Add(CardDB.cardName.undertaker, 10);
+
         }
 
         private void setupRandomCards()
