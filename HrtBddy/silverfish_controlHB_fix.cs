@@ -60,6 +60,9 @@ namespace SilverfishControlFix
             bool teststuff = false;
             // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
             bool printstuff = false; // if true, the best board of the tested file is printet stepp by stepp
+            Helpfunctions.Instance.ErrorLog("----------------------------");
+            Helpfunctions.Instance.ErrorLog("you are running uai V" + sf.versionnumber);
+            Helpfunctions.Instance.ErrorLog("----------------------------");
             if (teststuff)
             {
                 Ai.Instance.autoTester(behave, printstuff);

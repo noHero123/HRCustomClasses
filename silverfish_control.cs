@@ -136,7 +136,9 @@ namespace HREngine.Bots
            {
                Helpfunctions.Instance.ErrorLog("something went wrong with simulating stuff!");
            }
-
+           Helpfunctions.Instance.ErrorLog("----------------------------");
+           Helpfunctions.Instance.ErrorLog("you are running uai V" + sf.versionnumber);
+           Helpfunctions.Instance.ErrorLog("----------------------------");
            if (teststuff)
            {
                Ai.Instance.autoTester(behave, printstuff);
