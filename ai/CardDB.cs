@@ -37,15 +37,20 @@ namespace HREngine.Bots
         {
             None,
             XXX_040,
+            NAX5_01H,
             CS2_188o,
+            NAX6_02H,
             NEW1_007b,
+            NAX6_02e,
             TU4c_003,
             XXX_024,
             EX1_613,
+            NAX8_01,
             EX1_295o,
             CS2_059o,
             EX1_133,
             NEW1_018,
+            NAX15_03t,
             EX1_012,
             EX1_178a,
             CS2_231,
@@ -56,27 +61,36 @@ namespace HREngine.Bots
             EX1_244,
             EX1_178b,
             XXX_030,
+            NAX8_05,
             EX1_573b,
             TU4d_001,
             NEW1_007a,
+            NAX12_02H,
             EX1_345t,
+            FP1_007t,
             EX1_025,
             EX1_396,
+            NAX9_03,
             NEW1_017,
             NEW1_008a,
             EX1_587e,
             EX1_533,
             EX1_522,
+            NAX11_04,
             NEW1_026,
             EX1_398,
+            NAX4_04,
             EX1_007,
             CS1_112,
             CRED_17,
             NEW1_036,
+            NAX3_03,
             EX1_355e,
             EX1_258,
             HERO_01,
             XXX_009,
+            NAX6_01H,
+            NAX12_04e,
             CS2_087,
             DREAM_05,
             NEW1_036e,
@@ -87,15 +101,21 @@ namespace HREngine.Bots
             PRO_001b,
             XXX_022,
             PRO_001a,
+            NAX6_04,
+            NAX7_05,
             CS2_103,
             NEW1_041,
             EX1_360,
+            FP1_023,
             NEW1_038,
             CS2_009,
+            NAX10_01H,
             EX1_010,
             CS2_024,
+            NAX9_05,
             EX1_565,
             CS2_076,
+            FP1_004,
             CS2_046e,
             CS2_162,
             EX1_110t,
@@ -103,9 +123,13 @@ namespace HREngine.Bots
             CS2_181,
             EX1_309,
             EX1_354,
+            NAX10_02H,
+            NAX7_04H,
             TU4f_001,
             XXX_018,
             EX1_023,
+            XXX_048,
+            XXX_049,
             NEW1_034,
             CS2_003,
             HERO_06,
@@ -116,7 +140,9 @@ namespace HREngine.Bots
             DREAM_05e,
             CRED_09,
             EX1_103,
+            FP1_021,
             EX1_411,
+            NAX1_04,
             CS2_053,
             CS2_182,
             CS2_008,
@@ -129,22 +155,29 @@ namespace HREngine.Bots
             EX1_158t,
             EX1_006,
             NEW1_031,
+            NAX10_03,
             DREAM_04,
+            NAX1h_01,
             CS2_022e,
             EX1_611e,
             EX1_004,
             EX1_014te,
+            FP1_005e,
+            NAX12_03e,
             EX1_095,
             NEW1_007,
             EX1_275,
             EX1_245,
             EX1_383,
+            FP1_016,
             EX1_016t,
             CS2_125,
             EX1_137,
             EX1_178ae,
             DS1_185,
+            FP1_010,
             EX1_598,
+            NAX9_07,
             EX1_304,
             EX1_302,
             XXX_017,
@@ -165,9 +198,13 @@ namespace HREngine.Bots
             CS2_072,
             EX1_tk28,
             EX1_604o,
+            FP1_014,
             EX1_084e,
+            NAX3_01H,
+            NAX2_01,
             EX1_409t,
             CRED_07,
+            NAX3_02H,
             TU4e_002,
             EX1_507,
             EX1_144,
@@ -178,6 +215,8 @@ namespace HREngine.Bots
             XXX_013,
             EX1_005,
             EX1_382,
+            NAX13_02e,
+            FP1_020e,
             EX1_603e,
             CS2_028,
             TU4f_002,
@@ -185,6 +224,7 @@ namespace HREngine.Bots
             GAME_003e,
             DREAM_02,
             EX1_581,
+            NAX15_01H,
             EX1_131t,
             CS2_147,
             CS1_113,
@@ -202,21 +242,29 @@ namespace HREngine.Bots
             EX1_164a,
             CS2_188,
             EX1_016,
+            NAX6_03t,
             EX1_tk31,
             EX1_603,
             EX1_238,
             EX1_166,
             DS1h_292,
             DS1_183,
+            NAX15_03n,
+            NAX8_02H,
+            NAX7_01H,
+            NAX9_02H,
             CRED_11,
             XXX_019,
             EX1_076,
             EX1_048,
             CS2_038e,
+            FP1_026,
             CS2_074,
+            FP1_027,
             EX1_323w,
             EX1_129,
             NEW1_024o,
+            NAX11_02,
             EX1_405,
             EX1_317,
             EX1_606,
@@ -224,6 +272,7 @@ namespace HREngine.Bots
             XXX_044,
             CS2_074e,
             TU4a_005,
+            FP1_006,
             EX1_258e,
             TU4f_004o,
             NEW1_008,
@@ -237,11 +286,15 @@ namespace HREngine.Bots
             NEW1_020,
             CS2_196,
             EX1_312,
+            NAX1_01,
+            FP1_022,
             EX1_160b,
             EX1_563,
             XXX_039,
+            FP1_031,
             CS2_087e,
             EX1_613e,
+            NAX9_02,
             NEW1_029,
             CS1_129,
             HERO_03,
@@ -249,42 +302,57 @@ namespace HREngine.Bots
             EX1_158,
             XXX_010,
             NEW1_025,
+            FP1_012t,
             EX1_083,
             EX1_295,
             EX1_407,
             NEW1_004,
+            FP1_019,
             PRO_001at,
+            NAX13_03e,
             EX1_625t,
             EX1_014,
             CRED_04,
+            NAX12_01H,
             CS2_097,
             EX1_558,
+            XXX_047,
             EX1_tk29,
             CS2_186,
             EX1_084,
             NEW1_012,
+            FP1_014t,
+            NAX1_03,
             EX1_623e,
             EX1_578,
             CS2_073e2,
             CS2_221,
             EX1_019,
+            NAX15_04a,
+            FP1_019t,
             EX1_132,
             EX1_284,
             EX1_105,
             NEW1_011,
+            NAX9_07e,
             EX1_017,
             EX1_249,
             EX1_162o,
+            FP1_002t,
+            NAX3_02,
             EX1_313,
             EX1_549o,
             EX1_091o,
             CS2_084e,
             EX1_155b,
+            NAX11_01,
             NEW1_033,
             CS2_106,
             XXX_002,
+            FP1_018,
             NEW1_036e2,
             XXX_004,
+            NAX11_02H,
             CS2_122e,
             DS1_233,
             DS1_175,
@@ -294,6 +362,7 @@ namespace HREngine.Bots
             NEW1_037,
             EX1_414,
             EX1_538t,
+            FP1_030e,
             EX1_586,
             EX1_310,
             NEW1_010,
@@ -302,6 +371,7 @@ namespace HREngine.Bots
             CS2_005o,
             EX1_363e2,
             EX1_534t,
+            FP1_028,
             EX1_604,
             EX1_160,
             EX1_165t1,
@@ -310,12 +380,20 @@ namespace HREngine.Bots
             CS2_213,
             TU4f_007,
             GAME_004,
+            NAX5_01,
             XXX_020,
+            NAX15_02H,
             CS2_004,
+            NAX2_03H,
             EX1_561e,
             CS2_023,
             EX1_164,
             EX1_009,
+            NAX6_01,
+            FP1_007,
+            NAX1h_04,
+            NAX2_05H,
+            NAX10_02,
             EX1_345,
             EX1_116,
             EX1_399,
@@ -323,10 +401,13 @@ namespace HREngine.Bots
             XXX_026,
             EX1_571,
             EX1_335,
+            XXX_050,
             TU4e_004,
             HERO_08,
             EX1_166a,
+            NAX2_03,
             EX1_finkle,
+            NAX4_03H,
             EX1_164b,
             EX1_283,
             EX1_339,
@@ -340,14 +421,19 @@ namespace HREngine.Bots
             skele21,
             CS2_222o,
             XXX_015,
+            FP1_013,
             NEW1_006,
             EX1_399e,
             EX1_509,
             EX1_612,
+            NAX8_05t,
+            NAX9_05H,
             EX1_021,
             CS2_041e,
             CS2_226,
             EX1_608,
+            NAX13_05H,
+            NAX13_04H,
             TU4c_008,
             EX1_624,
             EX1_616,
@@ -368,7 +454,9 @@ namespace HREngine.Bots
             XXX_009e,
             EX1_562,
             EX1_055,
+            NAX9_06,
             TU4e_007,
+            FP1_012,
             EX1_317t,
             EX1_004e,
             EX1_278,
@@ -379,11 +467,14 @@ namespace HREngine.Bots
             EX1_365,
             CS2_141,
             PRO_001,
+            NAX8_04t,
             CS2_173,
             CS2_017,
             CRED_16,
             EX1_392,
             EX1_593,
+            FP1_023e,
+            NAX1_05,
             TU4d_002,
             CRED_15,
             EX1_049,
@@ -397,6 +488,7 @@ namespace HREngine.Bots
             EX1_323,
             CS2_073,
             EX1_246e,
+            NAX12_01,
             EX1_244e,
             EX1_001,
             EX1_607e,
@@ -407,14 +499,19 @@ namespace HREngine.Bots
             Mekka4,
             CS2_142,
             TU4f_004,
+            NAX5_02H,
             EX1_411e2,
             EX1_573,
+            FP1_009,
             CS2_050,
+            NAX4_03,
             CS2_063e,
+            NAX2_05,
             EX1_390,
             EX1_610,
             hexfrog,
             CS2_181e,
+            NAX6_02,
             XXX_027,
             CS2_082,
             NEW1_040,
@@ -427,6 +524,7 @@ namespace HREngine.Bots
             GAME_002,
             EX1_165,
             CS2_013t,
+            NAX4_04H,
             EX1_tk11,
             EX1_591,
             EX1_549,
@@ -434,18 +532,22 @@ namespace HREngine.Bots
             CS2_237,
             CS2_027,
             EX1_508o,
+            NAX14_03,
             CS2_101t,
             CS2_063,
             EX1_145,
+            NAX1h_03,
             EX1_110,
             EX1_408,
             EX1_544,
             TU4c_006,
+            NAXM_001,
             CS2_151,
             CS2_073e,
             XXX_006,
             CS2_088,
             EX1_057,
+            FP1_020,
             CS2_169,
             EX1_573t,
             EX1_323h,
@@ -455,6 +557,8 @@ namespace HREngine.Bots
             CS2_007,
             EX1_059e2,
             CS2_227,
+            NAX7_03H,
+            NAX9_01H,
             EX1_570e,
             NEW1_003,
             GAME_006,
@@ -467,6 +571,7 @@ namespace HREngine.Bots
             EX1_596e,
             XXX_014,
             EX1_158e,
+            NAX14_01,
             CRED_01,
             CRED_08,
             EX1_126,
@@ -482,28 +587,35 @@ namespace HREngine.Bots
             CS1_069,
             XXX_003,
             XXX_042,
+            NAX8_02,
             EX1_173,
             CS1_042,
+            NAX8_03,
             EX1_506a,
             EX1_298,
             CS2_104,
+            FP1_001,
             HERO_02,
             EX1_316e,
+            NAX7_01,
             EX1_044e,
             CS2_051,
             NEW1_016,
             EX1_304e,
             EX1_033,
+            NAX8_04,
             EX1_028,
             XXX_011,
             EX1_621,
             EX1_554,
             EX1_091,
+            FP1_017,
             EX1_409,
             EX1_363e,
             EX1_410,
             TU4e_005,
             CS2_039,
+            NAX12_04,
             EX1_557,
             CS2_105e,
             EX1_128e,
@@ -515,6 +627,7 @@ namespace HREngine.Bots
             EX1_559,
             XXX_023,
             NEW1_033o,
+            NAX15_04H,
             CS2_004e,
             CS2_052,
             EX1_539,
@@ -527,6 +640,7 @@ namespace HREngine.Bots
             EX1_382e,
             CS2_092e,
             CS2_026,
+            NAX14_04,
             NEW1_012o,
             EX1_619e,
             EX1_294,
@@ -536,23 +650,31 @@ namespace HREngine.Bots
             CS2_118,
             CS2_124,
             Mekka3,
+            NAX13_02,
             EX1_112,
+            FP1_011,
             CS2_009e,
             HERO_04,
             EX1_607,
             DREAM_03,
+            NAX11_04e,
             EX1_103e,
+            XXX_046,
+            FP1_003,
             CS2_105,
+            FP1_002,
             TU4c_002,
             CRED_14,
             EX1_567,
             TU4c_004,
+            NAX10_03H,
+            FP1_008,
             DS1_184,
             CS2_029,
-            TU4e_006,
             GAME_005,
             CS2_187,
             EX1_020,
+            NAX15_01He,
             EX1_011,
             CS2_057,
             EX1_274,
@@ -562,14 +684,20 @@ namespace HREngine.Bots
             EX1_617,
             CS1_113e,
             CS2_101,
+            FP1_015,
+            NAX13_03,
             CS2_005,
             EX1_537,
             EX1_384,
             TU4a_002,
+            NAX9_04,
             EX1_362,
+            NAX12_02,
+            FP1_028e,
             TU4c_005,
             EX1_301,
             CS2_235,
+            NAX4_05,
             EX1_029,
             CS2_042,
             EX1_155a,
@@ -578,11 +706,13 @@ namespace HREngine.Bots
             NEW1_027,
             CS2_236e,
             CS2_083e,
+            NAX6_03te,
             EX1_165a,
             EX1_570,
             EX1_131,
             EX1_556,
             EX1_543,
+            XXX_096,
             TU4c_008e,
             EX1_379e,
             NEW1_009,
@@ -595,27 +725,39 @@ namespace HREngine.Bots
             EX1_043,
             EX1_050,
             TU4b_001,
+            FP1_005,
             EX1_620,
+            NAX15_01,
+            NAX6_03,
             EX1_303,
             HERO_09,
             EX1_067,
             XXX_028,
             EX1_277,
             Mekka2,
+            NAX14_01H,
+            NAX15_04,
+            FP1_024,
+            FP1_030,
             CS2_221e,
             EX1_178,
             CS2_222,
             EX1_409e,
             tt_004o,
             EX1_155ae,
+            NAX11_01H,
             EX1_160a,
+            NAX15_02,
+            NAX15_05,
             NEW1_025e,
             CS2_012,
+            XXX_099,
             EX1_246,
             EX1_572,
             EX1_089,
             CS2_059,
             EX1_279,
+            NAX12_02e,
             CS2_168,
             tt_010,
             NEW1_023,
@@ -625,32 +767,42 @@ namespace HREngine.Bots
             CS2_234,
             XXX_043,
             GAME_001,
+            NAX5_02,
             EX1_130,
             EX1_584e,
             CS2_064,
             EX1_161,
             CS2_049,
+            NAX13_01,
             EX1_154,
             EX1_080,
             NEW1_022,
+            NAX2_01H,
             EX1_160be,
+            NAX12_03,
             EX1_251,
+            FP1_025,
             EX1_371,
             CS2_mirror,
+            NAX4_01H,
             EX1_594,
+            NAX14_02,
             TU4c_006e,
             EX1_560,
             CS2_236,
             TU4f_006,
             EX1_402,
+            NAX3_01,
             EX1_506,
             NEW1_027e,
             DS1_070o,
             XXX_045,
             XXX_029,
             DS1_178,
+            XXX_098,
             EX1_315,
             CS2_094,
+            NAX13_01H,
             TU4e_002t,
             EX1_046e,
             NEW1_040t,
@@ -662,16 +814,20 @@ namespace HREngine.Bots
             XXX_022e,
             DS1_178e,
             CS2_226o,
+            NAX9_04H,
             Mekka4e,
             EX1_082,
             CS2_093,
             EX1_411e,
+            NAX8_03t,
             EX1_145o,
+            NAX7_04,
             CS2_boar,
             NEW1_019,
             EX1_289,
             EX1_025t,
             EX1_398t,
+            NAX12_03H,
             EX1_055o,
             CS2_091,
             EX1_241,
@@ -685,11 +841,15 @@ namespace HREngine.Bots
             CS2_203,
             EX1_124,
             EX1_379,
+            NAX7_02,
             CS2_053e,
             EX1_032,
+            NAX9_01,
             TU4e_003,
             CS2_146o,
+            NAX8_01H,
             XXX_041,
+            NAXM_002,
             EX1_391,
             EX1_366,
             EX1_059e,
@@ -716,21 +876,29 @@ namespace HREngine.Bots
             NEW1_026t,
             EX1_623,
             EX1_383t,
+            NAX7_03,
             EX1_597,
             TU4f_006o,
             EX1_130a,
             CS2_011,
             EX1_169,
             EX1_tk33,
+            NAX11_03,
+            NAX4_01,
+            NAX10_01,
             EX1_250,
             EX1_564,
+            NAX5_03,
             EX1_043e,
             EX1_349,
+            XXX_097,
             EX1_102,
             EX1_058,
             EX1_243,
             PRO_001c,
             EX1_116t,
+            NAX15_01e,
+            FP1_029,
             CS2_089,
             TU4c_001,
             EX1_248,
@@ -744,27 +912,31 @@ namespace HREngine.Bots
             EX1_093e,
             CS2_150,
             CS2_152,
+            NAX9_03H,
             EX1_160t,
             CS2_127,
             CRED_03,
             DS1_188,
             XXX_001,
-            EX1_Avenge,//fake
-            EX1_duplicate, //fake
         }
-        
+
         public cardIDEnum cardIdstringToEnum(string s)
         {
             if (s == "XXX_040") return CardDB.cardIDEnum.XXX_040;
+            if (s == "NAX5_01H") return CardDB.cardIDEnum.NAX5_01H;
             if (s == "CS2_188o") return CardDB.cardIDEnum.CS2_188o;
+            if (s == "NAX6_02H") return CardDB.cardIDEnum.NAX6_02H;
             if (s == "NEW1_007b") return CardDB.cardIDEnum.NEW1_007b;
+            if (s == "NAX6_02e") return CardDB.cardIDEnum.NAX6_02e;
             if (s == "TU4c_003") return CardDB.cardIDEnum.TU4c_003;
             if (s == "XXX_024") return CardDB.cardIDEnum.XXX_024;
             if (s == "EX1_613") return CardDB.cardIDEnum.EX1_613;
+            if (s == "NAX8_01") return CardDB.cardIDEnum.NAX8_01;
             if (s == "EX1_295o") return CardDB.cardIDEnum.EX1_295o;
             if (s == "CS2_059o") return CardDB.cardIDEnum.CS2_059o;
             if (s == "EX1_133") return CardDB.cardIDEnum.EX1_133;
             if (s == "NEW1_018") return CardDB.cardIDEnum.NEW1_018;
+            if (s == "NAX15_03t") return CardDB.cardIDEnum.NAX15_03t;
             if (s == "EX1_012") return CardDB.cardIDEnum.EX1_012;
             if (s == "EX1_178a") return CardDB.cardIDEnum.EX1_178a;
             if (s == "CS2_231") return CardDB.cardIDEnum.CS2_231;
@@ -775,27 +947,36 @@ namespace HREngine.Bots
             if (s == "EX1_244") return CardDB.cardIDEnum.EX1_244;
             if (s == "EX1_178b") return CardDB.cardIDEnum.EX1_178b;
             if (s == "XXX_030") return CardDB.cardIDEnum.XXX_030;
+            if (s == "NAX8_05") return CardDB.cardIDEnum.NAX8_05;
             if (s == "EX1_573b") return CardDB.cardIDEnum.EX1_573b;
             if (s == "TU4d_001") return CardDB.cardIDEnum.TU4d_001;
             if (s == "NEW1_007a") return CardDB.cardIDEnum.NEW1_007a;
+            if (s == "NAX12_02H") return CardDB.cardIDEnum.NAX12_02H;
             if (s == "EX1_345t") return CardDB.cardIDEnum.EX1_345t;
+            if (s == "FP1_007t") return CardDB.cardIDEnum.FP1_007t;
             if (s == "EX1_025") return CardDB.cardIDEnum.EX1_025;
             if (s == "EX1_396") return CardDB.cardIDEnum.EX1_396;
+            if (s == "NAX9_03") return CardDB.cardIDEnum.NAX9_03;
             if (s == "NEW1_017") return CardDB.cardIDEnum.NEW1_017;
             if (s == "NEW1_008a") return CardDB.cardIDEnum.NEW1_008a;
             if (s == "EX1_587e") return CardDB.cardIDEnum.EX1_587e;
             if (s == "EX1_533") return CardDB.cardIDEnum.EX1_533;
             if (s == "EX1_522") return CardDB.cardIDEnum.EX1_522;
+            if (s == "NAX11_04") return CardDB.cardIDEnum.NAX11_04;
             if (s == "NEW1_026") return CardDB.cardIDEnum.NEW1_026;
             if (s == "EX1_398") return CardDB.cardIDEnum.EX1_398;
+            if (s == "NAX4_04") return CardDB.cardIDEnum.NAX4_04;
             if (s == "EX1_007") return CardDB.cardIDEnum.EX1_007;
             if (s == "CS1_112") return CardDB.cardIDEnum.CS1_112;
             if (s == "CRED_17") return CardDB.cardIDEnum.CRED_17;
             if (s == "NEW1_036") return CardDB.cardIDEnum.NEW1_036;
+            if (s == "NAX3_03") return CardDB.cardIDEnum.NAX3_03;
             if (s == "EX1_355e") return CardDB.cardIDEnum.EX1_355e;
             if (s == "EX1_258") return CardDB.cardIDEnum.EX1_258;
             if (s == "HERO_01") return CardDB.cardIDEnum.HERO_01;
             if (s == "XXX_009") return CardDB.cardIDEnum.XXX_009;
+            if (s == "NAX6_01H") return CardDB.cardIDEnum.NAX6_01H;
+            if (s == "NAX12_04e") return CardDB.cardIDEnum.NAX12_04e;
             if (s == "CS2_087") return CardDB.cardIDEnum.CS2_087;
             if (s == "DREAM_05") return CardDB.cardIDEnum.DREAM_05;
             if (s == "NEW1_036e") return CardDB.cardIDEnum.NEW1_036e;
@@ -806,15 +987,21 @@ namespace HREngine.Bots
             if (s == "PRO_001b") return CardDB.cardIDEnum.PRO_001b;
             if (s == "XXX_022") return CardDB.cardIDEnum.XXX_022;
             if (s == "PRO_001a") return CardDB.cardIDEnum.PRO_001a;
+            if (s == "NAX6_04") return CardDB.cardIDEnum.NAX6_04;
+            if (s == "NAX7_05") return CardDB.cardIDEnum.NAX7_05;
             if (s == "CS2_103") return CardDB.cardIDEnum.CS2_103;
             if (s == "NEW1_041") return CardDB.cardIDEnum.NEW1_041;
             if (s == "EX1_360") return CardDB.cardIDEnum.EX1_360;
+            if (s == "FP1_023") return CardDB.cardIDEnum.FP1_023;
             if (s == "NEW1_038") return CardDB.cardIDEnum.NEW1_038;
             if (s == "CS2_009") return CardDB.cardIDEnum.CS2_009;
+            if (s == "NAX10_01H") return CardDB.cardIDEnum.NAX10_01H;
             if (s == "EX1_010") return CardDB.cardIDEnum.EX1_010;
             if (s == "CS2_024") return CardDB.cardIDEnum.CS2_024;
+            if (s == "NAX9_05") return CardDB.cardIDEnum.NAX9_05;
             if (s == "EX1_565") return CardDB.cardIDEnum.EX1_565;
             if (s == "CS2_076") return CardDB.cardIDEnum.CS2_076;
+            if (s == "FP1_004") return CardDB.cardIDEnum.FP1_004;
             if (s == "CS2_046e") return CardDB.cardIDEnum.CS2_046e;
             if (s == "CS2_162") return CardDB.cardIDEnum.CS2_162;
             if (s == "EX1_110t") return CardDB.cardIDEnum.EX1_110t;
@@ -822,9 +1009,13 @@ namespace HREngine.Bots
             if (s == "CS2_181") return CardDB.cardIDEnum.CS2_181;
             if (s == "EX1_309") return CardDB.cardIDEnum.EX1_309;
             if (s == "EX1_354") return CardDB.cardIDEnum.EX1_354;
+            if (s == "NAX10_02H") return CardDB.cardIDEnum.NAX10_02H;
+            if (s == "NAX7_04H") return CardDB.cardIDEnum.NAX7_04H;
             if (s == "TU4f_001") return CardDB.cardIDEnum.TU4f_001;
             if (s == "XXX_018") return CardDB.cardIDEnum.XXX_018;
             if (s == "EX1_023") return CardDB.cardIDEnum.EX1_023;
+            if (s == "XXX_048") return CardDB.cardIDEnum.XXX_048;
+            if (s == "XXX_049") return CardDB.cardIDEnum.XXX_049;
             if (s == "NEW1_034") return CardDB.cardIDEnum.NEW1_034;
             if (s == "CS2_003") return CardDB.cardIDEnum.CS2_003;
             if (s == "HERO_06") return CardDB.cardIDEnum.HERO_06;
@@ -835,7 +1026,9 @@ namespace HREngine.Bots
             if (s == "DREAM_05e") return CardDB.cardIDEnum.DREAM_05e;
             if (s == "CRED_09") return CardDB.cardIDEnum.CRED_09;
             if (s == "EX1_103") return CardDB.cardIDEnum.EX1_103;
+            if (s == "FP1_021") return CardDB.cardIDEnum.FP1_021;
             if (s == "EX1_411") return CardDB.cardIDEnum.EX1_411;
+            if (s == "NAX1_04") return CardDB.cardIDEnum.NAX1_04;
             if (s == "CS2_053") return CardDB.cardIDEnum.CS2_053;
             if (s == "CS2_182") return CardDB.cardIDEnum.CS2_182;
             if (s == "CS2_008") return CardDB.cardIDEnum.CS2_008;
@@ -848,22 +1041,29 @@ namespace HREngine.Bots
             if (s == "EX1_158t") return CardDB.cardIDEnum.EX1_158t;
             if (s == "EX1_006") return CardDB.cardIDEnum.EX1_006;
             if (s == "NEW1_031") return CardDB.cardIDEnum.NEW1_031;
+            if (s == "NAX10_03") return CardDB.cardIDEnum.NAX10_03;
             if (s == "DREAM_04") return CardDB.cardIDEnum.DREAM_04;
+            if (s == "NAX1h_01") return CardDB.cardIDEnum.NAX1h_01;
             if (s == "CS2_022e") return CardDB.cardIDEnum.CS2_022e;
             if (s == "EX1_611e") return CardDB.cardIDEnum.EX1_611e;
             if (s == "EX1_004") return CardDB.cardIDEnum.EX1_004;
             if (s == "EX1_014te") return CardDB.cardIDEnum.EX1_014te;
+            if (s == "FP1_005e") return CardDB.cardIDEnum.FP1_005e;
+            if (s == "NAX12_03e") return CardDB.cardIDEnum.NAX12_03e;
             if (s == "EX1_095") return CardDB.cardIDEnum.EX1_095;
             if (s == "NEW1_007") return CardDB.cardIDEnum.NEW1_007;
             if (s == "EX1_275") return CardDB.cardIDEnum.EX1_275;
             if (s == "EX1_245") return CardDB.cardIDEnum.EX1_245;
             if (s == "EX1_383") return CardDB.cardIDEnum.EX1_383;
+            if (s == "FP1_016") return CardDB.cardIDEnum.FP1_016;
             if (s == "EX1_016t") return CardDB.cardIDEnum.EX1_016t;
             if (s == "CS2_125") return CardDB.cardIDEnum.CS2_125;
             if (s == "EX1_137") return CardDB.cardIDEnum.EX1_137;
             if (s == "EX1_178ae") return CardDB.cardIDEnum.EX1_178ae;
             if (s == "DS1_185") return CardDB.cardIDEnum.DS1_185;
+            if (s == "FP1_010") return CardDB.cardIDEnum.FP1_010;
             if (s == "EX1_598") return CardDB.cardIDEnum.EX1_598;
+            if (s == "NAX9_07") return CardDB.cardIDEnum.NAX9_07;
             if (s == "EX1_304") return CardDB.cardIDEnum.EX1_304;
             if (s == "EX1_302") return CardDB.cardIDEnum.EX1_302;
             if (s == "XXX_017") return CardDB.cardIDEnum.XXX_017;
@@ -884,9 +1084,13 @@ namespace HREngine.Bots
             if (s == "CS2_072") return CardDB.cardIDEnum.CS2_072;
             if (s == "EX1_tk28") return CardDB.cardIDEnum.EX1_tk28;
             if (s == "EX1_604o") return CardDB.cardIDEnum.EX1_604o;
+            if (s == "FP1_014") return CardDB.cardIDEnum.FP1_014;
             if (s == "EX1_084e") return CardDB.cardIDEnum.EX1_084e;
+            if (s == "NAX3_01H") return CardDB.cardIDEnum.NAX3_01H;
+            if (s == "NAX2_01") return CardDB.cardIDEnum.NAX2_01;
             if (s == "EX1_409t") return CardDB.cardIDEnum.EX1_409t;
             if (s == "CRED_07") return CardDB.cardIDEnum.CRED_07;
+            if (s == "NAX3_02H") return CardDB.cardIDEnum.NAX3_02H;
             if (s == "TU4e_002") return CardDB.cardIDEnum.TU4e_002;
             if (s == "EX1_507") return CardDB.cardIDEnum.EX1_507;
             if (s == "EX1_144") return CardDB.cardIDEnum.EX1_144;
@@ -897,6 +1101,8 @@ namespace HREngine.Bots
             if (s == "XXX_013") return CardDB.cardIDEnum.XXX_013;
             if (s == "EX1_005") return CardDB.cardIDEnum.EX1_005;
             if (s == "EX1_382") return CardDB.cardIDEnum.EX1_382;
+            if (s == "NAX13_02e") return CardDB.cardIDEnum.NAX13_02e;
+            if (s == "FP1_020e") return CardDB.cardIDEnum.FP1_020e;
             if (s == "EX1_603e") return CardDB.cardIDEnum.EX1_603e;
             if (s == "CS2_028") return CardDB.cardIDEnum.CS2_028;
             if (s == "TU4f_002") return CardDB.cardIDEnum.TU4f_002;
@@ -904,6 +1110,7 @@ namespace HREngine.Bots
             if (s == "GAME_003e") return CardDB.cardIDEnum.GAME_003e;
             if (s == "DREAM_02") return CardDB.cardIDEnum.DREAM_02;
             if (s == "EX1_581") return CardDB.cardIDEnum.EX1_581;
+            if (s == "NAX15_01H") return CardDB.cardIDEnum.NAX15_01H;
             if (s == "EX1_131t") return CardDB.cardIDEnum.EX1_131t;
             if (s == "CS2_147") return CardDB.cardIDEnum.CS2_147;
             if (s == "CS1_113") return CardDB.cardIDEnum.CS1_113;
@@ -921,21 +1128,29 @@ namespace HREngine.Bots
             if (s == "EX1_164a") return CardDB.cardIDEnum.EX1_164a;
             if (s == "CS2_188") return CardDB.cardIDEnum.CS2_188;
             if (s == "EX1_016") return CardDB.cardIDEnum.EX1_016;
+            if (s == "NAX6_03t") return CardDB.cardIDEnum.NAX6_03t;
             if (s == "EX1_tk31") return CardDB.cardIDEnum.EX1_tk31;
             if (s == "EX1_603") return CardDB.cardIDEnum.EX1_603;
             if (s == "EX1_238") return CardDB.cardIDEnum.EX1_238;
             if (s == "EX1_166") return CardDB.cardIDEnum.EX1_166;
             if (s == "DS1h_292") return CardDB.cardIDEnum.DS1h_292;
             if (s == "DS1_183") return CardDB.cardIDEnum.DS1_183;
+            if (s == "NAX15_03n") return CardDB.cardIDEnum.NAX15_03n;
+            if (s == "NAX8_02H") return CardDB.cardIDEnum.NAX8_02H;
+            if (s == "NAX7_01H") return CardDB.cardIDEnum.NAX7_01H;
+            if (s == "NAX9_02H") return CardDB.cardIDEnum.NAX9_02H;
             if (s == "CRED_11") return CardDB.cardIDEnum.CRED_11;
             if (s == "XXX_019") return CardDB.cardIDEnum.XXX_019;
             if (s == "EX1_076") return CardDB.cardIDEnum.EX1_076;
             if (s == "EX1_048") return CardDB.cardIDEnum.EX1_048;
             if (s == "CS2_038e") return CardDB.cardIDEnum.CS2_038e;
+            if (s == "FP1_026") return CardDB.cardIDEnum.FP1_026;
             if (s == "CS2_074") return CardDB.cardIDEnum.CS2_074;
+            if (s == "FP1_027") return CardDB.cardIDEnum.FP1_027;
             if (s == "EX1_323w") return CardDB.cardIDEnum.EX1_323w;
             if (s == "EX1_129") return CardDB.cardIDEnum.EX1_129;
             if (s == "NEW1_024o") return CardDB.cardIDEnum.NEW1_024o;
+            if (s == "NAX11_02") return CardDB.cardIDEnum.NAX11_02;
             if (s == "EX1_405") return CardDB.cardIDEnum.EX1_405;
             if (s == "EX1_317") return CardDB.cardIDEnum.EX1_317;
             if (s == "EX1_606") return CardDB.cardIDEnum.EX1_606;
@@ -943,6 +1158,7 @@ namespace HREngine.Bots
             if (s == "XXX_044") return CardDB.cardIDEnum.XXX_044;
             if (s == "CS2_074e") return CardDB.cardIDEnum.CS2_074e;
             if (s == "TU4a_005") return CardDB.cardIDEnum.TU4a_005;
+            if (s == "FP1_006") return CardDB.cardIDEnum.FP1_006;
             if (s == "EX1_258e") return CardDB.cardIDEnum.EX1_258e;
             if (s == "TU4f_004o") return CardDB.cardIDEnum.TU4f_004o;
             if (s == "NEW1_008") return CardDB.cardIDEnum.NEW1_008;
@@ -956,11 +1172,15 @@ namespace HREngine.Bots
             if (s == "NEW1_020") return CardDB.cardIDEnum.NEW1_020;
             if (s == "CS2_196") return CardDB.cardIDEnum.CS2_196;
             if (s == "EX1_312") return CardDB.cardIDEnum.EX1_312;
+            if (s == "NAX1_01") return CardDB.cardIDEnum.NAX1_01;
+            if (s == "FP1_022") return CardDB.cardIDEnum.FP1_022;
             if (s == "EX1_160b") return CardDB.cardIDEnum.EX1_160b;
             if (s == "EX1_563") return CardDB.cardIDEnum.EX1_563;
             if (s == "XXX_039") return CardDB.cardIDEnum.XXX_039;
+            if (s == "FP1_031") return CardDB.cardIDEnum.FP1_031;
             if (s == "CS2_087e") return CardDB.cardIDEnum.CS2_087e;
             if (s == "EX1_613e") return CardDB.cardIDEnum.EX1_613e;
+            if (s == "NAX9_02") return CardDB.cardIDEnum.NAX9_02;
             if (s == "NEW1_029") return CardDB.cardIDEnum.NEW1_029;
             if (s == "CS1_129") return CardDB.cardIDEnum.CS1_129;
             if (s == "HERO_03") return CardDB.cardIDEnum.HERO_03;
@@ -968,42 +1188,57 @@ namespace HREngine.Bots
             if (s == "EX1_158") return CardDB.cardIDEnum.EX1_158;
             if (s == "XXX_010") return CardDB.cardIDEnum.XXX_010;
             if (s == "NEW1_025") return CardDB.cardIDEnum.NEW1_025;
+            if (s == "FP1_012t") return CardDB.cardIDEnum.FP1_012t;
             if (s == "EX1_083") return CardDB.cardIDEnum.EX1_083;
             if (s == "EX1_295") return CardDB.cardIDEnum.EX1_295;
             if (s == "EX1_407") return CardDB.cardIDEnum.EX1_407;
             if (s == "NEW1_004") return CardDB.cardIDEnum.NEW1_004;
+            if (s == "FP1_019") return CardDB.cardIDEnum.FP1_019;
             if (s == "PRO_001at") return CardDB.cardIDEnum.PRO_001at;
+            if (s == "NAX13_03e") return CardDB.cardIDEnum.NAX13_03e;
             if (s == "EX1_625t") return CardDB.cardIDEnum.EX1_625t;
             if (s == "EX1_014") return CardDB.cardIDEnum.EX1_014;
             if (s == "CRED_04") return CardDB.cardIDEnum.CRED_04;
+            if (s == "NAX12_01H") return CardDB.cardIDEnum.NAX12_01H;
             if (s == "CS2_097") return CardDB.cardIDEnum.CS2_097;
             if (s == "EX1_558") return CardDB.cardIDEnum.EX1_558;
+            if (s == "XXX_047") return CardDB.cardIDEnum.XXX_047;
             if (s == "EX1_tk29") return CardDB.cardIDEnum.EX1_tk29;
             if (s == "CS2_186") return CardDB.cardIDEnum.CS2_186;
             if (s == "EX1_084") return CardDB.cardIDEnum.EX1_084;
             if (s == "NEW1_012") return CardDB.cardIDEnum.NEW1_012;
+            if (s == "FP1_014t") return CardDB.cardIDEnum.FP1_014t;
+            if (s == "NAX1_03") return CardDB.cardIDEnum.NAX1_03;
             if (s == "EX1_623e") return CardDB.cardIDEnum.EX1_623e;
             if (s == "EX1_578") return CardDB.cardIDEnum.EX1_578;
             if (s == "CS2_073e2") return CardDB.cardIDEnum.CS2_073e2;
             if (s == "CS2_221") return CardDB.cardIDEnum.CS2_221;
             if (s == "EX1_019") return CardDB.cardIDEnum.EX1_019;
+            if (s == "NAX15_04a") return CardDB.cardIDEnum.NAX15_04a;
+            if (s == "FP1_019t") return CardDB.cardIDEnum.FP1_019t;
             if (s == "EX1_132") return CardDB.cardIDEnum.EX1_132;
             if (s == "EX1_284") return CardDB.cardIDEnum.EX1_284;
             if (s == "EX1_105") return CardDB.cardIDEnum.EX1_105;
             if (s == "NEW1_011") return CardDB.cardIDEnum.NEW1_011;
+            if (s == "NAX9_07e") return CardDB.cardIDEnum.NAX9_07e;
             if (s == "EX1_017") return CardDB.cardIDEnum.EX1_017;
             if (s == "EX1_249") return CardDB.cardIDEnum.EX1_249;
             if (s == "EX1_162o") return CardDB.cardIDEnum.EX1_162o;
+            if (s == "FP1_002t") return CardDB.cardIDEnum.FP1_002t;
+            if (s == "NAX3_02") return CardDB.cardIDEnum.NAX3_02;
             if (s == "EX1_313") return CardDB.cardIDEnum.EX1_313;
             if (s == "EX1_549o") return CardDB.cardIDEnum.EX1_549o;
             if (s == "EX1_091o") return CardDB.cardIDEnum.EX1_091o;
             if (s == "CS2_084e") return CardDB.cardIDEnum.CS2_084e;
             if (s == "EX1_155b") return CardDB.cardIDEnum.EX1_155b;
+            if (s == "NAX11_01") return CardDB.cardIDEnum.NAX11_01;
             if (s == "NEW1_033") return CardDB.cardIDEnum.NEW1_033;
             if (s == "CS2_106") return CardDB.cardIDEnum.CS2_106;
             if (s == "XXX_002") return CardDB.cardIDEnum.XXX_002;
+            if (s == "FP1_018") return CardDB.cardIDEnum.FP1_018;
             if (s == "NEW1_036e2") return CardDB.cardIDEnum.NEW1_036e2;
             if (s == "XXX_004") return CardDB.cardIDEnum.XXX_004;
+            if (s == "NAX11_02H") return CardDB.cardIDEnum.NAX11_02H;
             if (s == "CS2_122e") return CardDB.cardIDEnum.CS2_122e;
             if (s == "DS1_233") return CardDB.cardIDEnum.DS1_233;
             if (s == "DS1_175") return CardDB.cardIDEnum.DS1_175;
@@ -1013,6 +1248,7 @@ namespace HREngine.Bots
             if (s == "NEW1_037") return CardDB.cardIDEnum.NEW1_037;
             if (s == "EX1_414") return CardDB.cardIDEnum.EX1_414;
             if (s == "EX1_538t") return CardDB.cardIDEnum.EX1_538t;
+            if (s == "FP1_030e") return CardDB.cardIDEnum.FP1_030e;
             if (s == "EX1_586") return CardDB.cardIDEnum.EX1_586;
             if (s == "EX1_310") return CardDB.cardIDEnum.EX1_310;
             if (s == "NEW1_010") return CardDB.cardIDEnum.NEW1_010;
@@ -1021,6 +1257,7 @@ namespace HREngine.Bots
             if (s == "CS2_005o") return CardDB.cardIDEnum.CS2_005o;
             if (s == "EX1_363e2") return CardDB.cardIDEnum.EX1_363e2;
             if (s == "EX1_534t") return CardDB.cardIDEnum.EX1_534t;
+            if (s == "FP1_028") return CardDB.cardIDEnum.FP1_028;
             if (s == "EX1_604") return CardDB.cardIDEnum.EX1_604;
             if (s == "EX1_160") return CardDB.cardIDEnum.EX1_160;
             if (s == "EX1_165t1") return CardDB.cardIDEnum.EX1_165t1;
@@ -1029,12 +1266,20 @@ namespace HREngine.Bots
             if (s == "CS2_213") return CardDB.cardIDEnum.CS2_213;
             if (s == "TU4f_007") return CardDB.cardIDEnum.TU4f_007;
             if (s == "GAME_004") return CardDB.cardIDEnum.GAME_004;
+            if (s == "NAX5_01") return CardDB.cardIDEnum.NAX5_01;
             if (s == "XXX_020") return CardDB.cardIDEnum.XXX_020;
+            if (s == "NAX15_02H") return CardDB.cardIDEnum.NAX15_02H;
             if (s == "CS2_004") return CardDB.cardIDEnum.CS2_004;
+            if (s == "NAX2_03H") return CardDB.cardIDEnum.NAX2_03H;
             if (s == "EX1_561e") return CardDB.cardIDEnum.EX1_561e;
             if (s == "CS2_023") return CardDB.cardIDEnum.CS2_023;
             if (s == "EX1_164") return CardDB.cardIDEnum.EX1_164;
             if (s == "EX1_009") return CardDB.cardIDEnum.EX1_009;
+            if (s == "NAX6_01") return CardDB.cardIDEnum.NAX6_01;
+            if (s == "FP1_007") return CardDB.cardIDEnum.FP1_007;
+            if (s == "NAX1h_04") return CardDB.cardIDEnum.NAX1h_04;
+            if (s == "NAX2_05H") return CardDB.cardIDEnum.NAX2_05H;
+            if (s == "NAX10_02") return CardDB.cardIDEnum.NAX10_02;
             if (s == "EX1_345") return CardDB.cardIDEnum.EX1_345;
             if (s == "EX1_116") return CardDB.cardIDEnum.EX1_116;
             if (s == "EX1_399") return CardDB.cardIDEnum.EX1_399;
@@ -1042,10 +1287,13 @@ namespace HREngine.Bots
             if (s == "XXX_026") return CardDB.cardIDEnum.XXX_026;
             if (s == "EX1_571") return CardDB.cardIDEnum.EX1_571;
             if (s == "EX1_335") return CardDB.cardIDEnum.EX1_335;
+            if (s == "XXX_050") return CardDB.cardIDEnum.XXX_050;
             if (s == "TU4e_004") return CardDB.cardIDEnum.TU4e_004;
             if (s == "HERO_08") return CardDB.cardIDEnum.HERO_08;
             if (s == "EX1_166a") return CardDB.cardIDEnum.EX1_166a;
+            if (s == "NAX2_03") return CardDB.cardIDEnum.NAX2_03;
             if (s == "EX1_finkle") return CardDB.cardIDEnum.EX1_finkle;
+            if (s == "NAX4_03H") return CardDB.cardIDEnum.NAX4_03H;
             if (s == "EX1_164b") return CardDB.cardIDEnum.EX1_164b;
             if (s == "EX1_283") return CardDB.cardIDEnum.EX1_283;
             if (s == "EX1_339") return CardDB.cardIDEnum.EX1_339;
@@ -1059,14 +1307,19 @@ namespace HREngine.Bots
             if (s == "skele21") return CardDB.cardIDEnum.skele21;
             if (s == "CS2_222o") return CardDB.cardIDEnum.CS2_222o;
             if (s == "XXX_015") return CardDB.cardIDEnum.XXX_015;
+            if (s == "FP1_013") return CardDB.cardIDEnum.FP1_013;
             if (s == "NEW1_006") return CardDB.cardIDEnum.NEW1_006;
             if (s == "EX1_399e") return CardDB.cardIDEnum.EX1_399e;
             if (s == "EX1_509") return CardDB.cardIDEnum.EX1_509;
             if (s == "EX1_612") return CardDB.cardIDEnum.EX1_612;
+            if (s == "NAX8_05t") return CardDB.cardIDEnum.NAX8_05t;
+            if (s == "NAX9_05H") return CardDB.cardIDEnum.NAX9_05H;
             if (s == "EX1_021") return CardDB.cardIDEnum.EX1_021;
             if (s == "CS2_041e") return CardDB.cardIDEnum.CS2_041e;
             if (s == "CS2_226") return CardDB.cardIDEnum.CS2_226;
             if (s == "EX1_608") return CardDB.cardIDEnum.EX1_608;
+            if (s == "NAX13_05H") return CardDB.cardIDEnum.NAX13_05H;
+            if (s == "NAX13_04H") return CardDB.cardIDEnum.NAX13_04H;
             if (s == "TU4c_008") return CardDB.cardIDEnum.TU4c_008;
             if (s == "EX1_624") return CardDB.cardIDEnum.EX1_624;
             if (s == "EX1_616") return CardDB.cardIDEnum.EX1_616;
@@ -1087,7 +1340,9 @@ namespace HREngine.Bots
             if (s == "XXX_009e") return CardDB.cardIDEnum.XXX_009e;
             if (s == "EX1_562") return CardDB.cardIDEnum.EX1_562;
             if (s == "EX1_055") return CardDB.cardIDEnum.EX1_055;
+            if (s == "NAX9_06") return CardDB.cardIDEnum.NAX9_06;
             if (s == "TU4e_007") return CardDB.cardIDEnum.TU4e_007;
+            if (s == "FP1_012") return CardDB.cardIDEnum.FP1_012;
             if (s == "EX1_317t") return CardDB.cardIDEnum.EX1_317t;
             if (s == "EX1_004e") return CardDB.cardIDEnum.EX1_004e;
             if (s == "EX1_278") return CardDB.cardIDEnum.EX1_278;
@@ -1098,11 +1353,14 @@ namespace HREngine.Bots
             if (s == "EX1_365") return CardDB.cardIDEnum.EX1_365;
             if (s == "CS2_141") return CardDB.cardIDEnum.CS2_141;
             if (s == "PRO_001") return CardDB.cardIDEnum.PRO_001;
+            if (s == "NAX8_04t") return CardDB.cardIDEnum.NAX8_04t;
             if (s == "CS2_173") return CardDB.cardIDEnum.CS2_173;
             if (s == "CS2_017") return CardDB.cardIDEnum.CS2_017;
             if (s == "CRED_16") return CardDB.cardIDEnum.CRED_16;
             if (s == "EX1_392") return CardDB.cardIDEnum.EX1_392;
             if (s == "EX1_593") return CardDB.cardIDEnum.EX1_593;
+            if (s == "FP1_023e") return CardDB.cardIDEnum.FP1_023e;
+            if (s == "NAX1_05") return CardDB.cardIDEnum.NAX1_05;
             if (s == "TU4d_002") return CardDB.cardIDEnum.TU4d_002;
             if (s == "CRED_15") return CardDB.cardIDEnum.CRED_15;
             if (s == "EX1_049") return CardDB.cardIDEnum.EX1_049;
@@ -1116,6 +1374,7 @@ namespace HREngine.Bots
             if (s == "EX1_323") return CardDB.cardIDEnum.EX1_323;
             if (s == "CS2_073") return CardDB.cardIDEnum.CS2_073;
             if (s == "EX1_246e") return CardDB.cardIDEnum.EX1_246e;
+            if (s == "NAX12_01") return CardDB.cardIDEnum.NAX12_01;
             if (s == "EX1_244e") return CardDB.cardIDEnum.EX1_244e;
             if (s == "EX1_001") return CardDB.cardIDEnum.EX1_001;
             if (s == "EX1_607e") return CardDB.cardIDEnum.EX1_607e;
@@ -1126,14 +1385,19 @@ namespace HREngine.Bots
             if (s == "Mekka4") return CardDB.cardIDEnum.Mekka4;
             if (s == "CS2_142") return CardDB.cardIDEnum.CS2_142;
             if (s == "TU4f_004") return CardDB.cardIDEnum.TU4f_004;
+            if (s == "NAX5_02H") return CardDB.cardIDEnum.NAX5_02H;
             if (s == "EX1_411e2") return CardDB.cardIDEnum.EX1_411e2;
             if (s == "EX1_573") return CardDB.cardIDEnum.EX1_573;
+            if (s == "FP1_009") return CardDB.cardIDEnum.FP1_009;
             if (s == "CS2_050") return CardDB.cardIDEnum.CS2_050;
+            if (s == "NAX4_03") return CardDB.cardIDEnum.NAX4_03;
             if (s == "CS2_063e") return CardDB.cardIDEnum.CS2_063e;
+            if (s == "NAX2_05") return CardDB.cardIDEnum.NAX2_05;
             if (s == "EX1_390") return CardDB.cardIDEnum.EX1_390;
             if (s == "EX1_610") return CardDB.cardIDEnum.EX1_610;
             if (s == "hexfrog") return CardDB.cardIDEnum.hexfrog;
             if (s == "CS2_181e") return CardDB.cardIDEnum.CS2_181e;
+            if (s == "NAX6_02") return CardDB.cardIDEnum.NAX6_02;
             if (s == "XXX_027") return CardDB.cardIDEnum.XXX_027;
             if (s == "CS2_082") return CardDB.cardIDEnum.CS2_082;
             if (s == "NEW1_040") return CardDB.cardIDEnum.NEW1_040;
@@ -1146,6 +1410,7 @@ namespace HREngine.Bots
             if (s == "GAME_002") return CardDB.cardIDEnum.GAME_002;
             if (s == "EX1_165") return CardDB.cardIDEnum.EX1_165;
             if (s == "CS2_013t") return CardDB.cardIDEnum.CS2_013t;
+            if (s == "NAX4_04H") return CardDB.cardIDEnum.NAX4_04H;
             if (s == "EX1_tk11") return CardDB.cardIDEnum.EX1_tk11;
             if (s == "EX1_591") return CardDB.cardIDEnum.EX1_591;
             if (s == "EX1_549") return CardDB.cardIDEnum.EX1_549;
@@ -1153,18 +1418,22 @@ namespace HREngine.Bots
             if (s == "CS2_237") return CardDB.cardIDEnum.CS2_237;
             if (s == "CS2_027") return CardDB.cardIDEnum.CS2_027;
             if (s == "EX1_508o") return CardDB.cardIDEnum.EX1_508o;
+            if (s == "NAX14_03") return CardDB.cardIDEnum.NAX14_03;
             if (s == "CS2_101t") return CardDB.cardIDEnum.CS2_101t;
             if (s == "CS2_063") return CardDB.cardIDEnum.CS2_063;
             if (s == "EX1_145") return CardDB.cardIDEnum.EX1_145;
+            if (s == "NAX1h_03") return CardDB.cardIDEnum.NAX1h_03;
             if (s == "EX1_110") return CardDB.cardIDEnum.EX1_110;
             if (s == "EX1_408") return CardDB.cardIDEnum.EX1_408;
             if (s == "EX1_544") return CardDB.cardIDEnum.EX1_544;
             if (s == "TU4c_006") return CardDB.cardIDEnum.TU4c_006;
+            if (s == "NAXM_001") return CardDB.cardIDEnum.NAXM_001;
             if (s == "CS2_151") return CardDB.cardIDEnum.CS2_151;
             if (s == "CS2_073e") return CardDB.cardIDEnum.CS2_073e;
             if (s == "XXX_006") return CardDB.cardIDEnum.XXX_006;
             if (s == "CS2_088") return CardDB.cardIDEnum.CS2_088;
             if (s == "EX1_057") return CardDB.cardIDEnum.EX1_057;
+            if (s == "FP1_020") return CardDB.cardIDEnum.FP1_020;
             if (s == "CS2_169") return CardDB.cardIDEnum.CS2_169;
             if (s == "EX1_573t") return CardDB.cardIDEnum.EX1_573t;
             if (s == "EX1_323h") return CardDB.cardIDEnum.EX1_323h;
@@ -1174,6 +1443,8 @@ namespace HREngine.Bots
             if (s == "CS2_007") return CardDB.cardIDEnum.CS2_007;
             if (s == "EX1_059e2") return CardDB.cardIDEnum.EX1_059e2;
             if (s == "CS2_227") return CardDB.cardIDEnum.CS2_227;
+            if (s == "NAX7_03H") return CardDB.cardIDEnum.NAX7_03H;
+            if (s == "NAX9_01H") return CardDB.cardIDEnum.NAX9_01H;
             if (s == "EX1_570e") return CardDB.cardIDEnum.EX1_570e;
             if (s == "NEW1_003") return CardDB.cardIDEnum.NEW1_003;
             if (s == "GAME_006") return CardDB.cardIDEnum.GAME_006;
@@ -1186,6 +1457,7 @@ namespace HREngine.Bots
             if (s == "EX1_596e") return CardDB.cardIDEnum.EX1_596e;
             if (s == "XXX_014") return CardDB.cardIDEnum.XXX_014;
             if (s == "EX1_158e") return CardDB.cardIDEnum.EX1_158e;
+            if (s == "NAX14_01") return CardDB.cardIDEnum.NAX14_01;
             if (s == "CRED_01") return CardDB.cardIDEnum.CRED_01;
             if (s == "CRED_08") return CardDB.cardIDEnum.CRED_08;
             if (s == "EX1_126") return CardDB.cardIDEnum.EX1_126;
@@ -1201,28 +1473,35 @@ namespace HREngine.Bots
             if (s == "CS1_069") return CardDB.cardIDEnum.CS1_069;
             if (s == "XXX_003") return CardDB.cardIDEnum.XXX_003;
             if (s == "XXX_042") return CardDB.cardIDEnum.XXX_042;
+            if (s == "NAX8_02") return CardDB.cardIDEnum.NAX8_02;
             if (s == "EX1_173") return CardDB.cardIDEnum.EX1_173;
             if (s == "CS1_042") return CardDB.cardIDEnum.CS1_042;
+            if (s == "NAX8_03") return CardDB.cardIDEnum.NAX8_03;
             if (s == "EX1_506a") return CardDB.cardIDEnum.EX1_506a;
             if (s == "EX1_298") return CardDB.cardIDEnum.EX1_298;
             if (s == "CS2_104") return CardDB.cardIDEnum.CS2_104;
+            if (s == "FP1_001") return CardDB.cardIDEnum.FP1_001;
             if (s == "HERO_02") return CardDB.cardIDEnum.HERO_02;
             if (s == "EX1_316e") return CardDB.cardIDEnum.EX1_316e;
+            if (s == "NAX7_01") return CardDB.cardIDEnum.NAX7_01;
             if (s == "EX1_044e") return CardDB.cardIDEnum.EX1_044e;
             if (s == "CS2_051") return CardDB.cardIDEnum.CS2_051;
             if (s == "NEW1_016") return CardDB.cardIDEnum.NEW1_016;
             if (s == "EX1_304e") return CardDB.cardIDEnum.EX1_304e;
             if (s == "EX1_033") return CardDB.cardIDEnum.EX1_033;
+            if (s == "NAX8_04") return CardDB.cardIDEnum.NAX8_04;
             if (s == "EX1_028") return CardDB.cardIDEnum.EX1_028;
             if (s == "XXX_011") return CardDB.cardIDEnum.XXX_011;
             if (s == "EX1_621") return CardDB.cardIDEnum.EX1_621;
             if (s == "EX1_554") return CardDB.cardIDEnum.EX1_554;
             if (s == "EX1_091") return CardDB.cardIDEnum.EX1_091;
+            if (s == "FP1_017") return CardDB.cardIDEnum.FP1_017;
             if (s == "EX1_409") return CardDB.cardIDEnum.EX1_409;
             if (s == "EX1_363e") return CardDB.cardIDEnum.EX1_363e;
             if (s == "EX1_410") return CardDB.cardIDEnum.EX1_410;
             if (s == "TU4e_005") return CardDB.cardIDEnum.TU4e_005;
             if (s == "CS2_039") return CardDB.cardIDEnum.CS2_039;
+            if (s == "NAX12_04") return CardDB.cardIDEnum.NAX12_04;
             if (s == "EX1_557") return CardDB.cardIDEnum.EX1_557;
             if (s == "CS2_105e") return CardDB.cardIDEnum.CS2_105e;
             if (s == "EX1_128e") return CardDB.cardIDEnum.EX1_128e;
@@ -1234,6 +1513,7 @@ namespace HREngine.Bots
             if (s == "EX1_559") return CardDB.cardIDEnum.EX1_559;
             if (s == "XXX_023") return CardDB.cardIDEnum.XXX_023;
             if (s == "NEW1_033o") return CardDB.cardIDEnum.NEW1_033o;
+            if (s == "NAX15_04H") return CardDB.cardIDEnum.NAX15_04H;
             if (s == "CS2_004e") return CardDB.cardIDEnum.CS2_004e;
             if (s == "CS2_052") return CardDB.cardIDEnum.CS2_052;
             if (s == "EX1_539") return CardDB.cardIDEnum.EX1_539;
@@ -1246,6 +1526,7 @@ namespace HREngine.Bots
             if (s == "EX1_382e") return CardDB.cardIDEnum.EX1_382e;
             if (s == "CS2_092e") return CardDB.cardIDEnum.CS2_092e;
             if (s == "CS2_026") return CardDB.cardIDEnum.CS2_026;
+            if (s == "NAX14_04") return CardDB.cardIDEnum.NAX14_04;
             if (s == "NEW1_012o") return CardDB.cardIDEnum.NEW1_012o;
             if (s == "EX1_619e") return CardDB.cardIDEnum.EX1_619e;
             if (s == "EX1_294") return CardDB.cardIDEnum.EX1_294;
@@ -1255,23 +1536,31 @@ namespace HREngine.Bots
             if (s == "CS2_118") return CardDB.cardIDEnum.CS2_118;
             if (s == "CS2_124") return CardDB.cardIDEnum.CS2_124;
             if (s == "Mekka3") return CardDB.cardIDEnum.Mekka3;
+            if (s == "NAX13_02") return CardDB.cardIDEnum.NAX13_02;
             if (s == "EX1_112") return CardDB.cardIDEnum.EX1_112;
+            if (s == "FP1_011") return CardDB.cardIDEnum.FP1_011;
             if (s == "CS2_009e") return CardDB.cardIDEnum.CS2_009e;
             if (s == "HERO_04") return CardDB.cardIDEnum.HERO_04;
             if (s == "EX1_607") return CardDB.cardIDEnum.EX1_607;
             if (s == "DREAM_03") return CardDB.cardIDEnum.DREAM_03;
+            if (s == "NAX11_04e") return CardDB.cardIDEnum.NAX11_04e;
             if (s == "EX1_103e") return CardDB.cardIDEnum.EX1_103e;
+            if (s == "XXX_046") return CardDB.cardIDEnum.XXX_046;
+            if (s == "FP1_003") return CardDB.cardIDEnum.FP1_003;
             if (s == "CS2_105") return CardDB.cardIDEnum.CS2_105;
+            if (s == "FP1_002") return CardDB.cardIDEnum.FP1_002;
             if (s == "TU4c_002") return CardDB.cardIDEnum.TU4c_002;
             if (s == "CRED_14") return CardDB.cardIDEnum.CRED_14;
             if (s == "EX1_567") return CardDB.cardIDEnum.EX1_567;
             if (s == "TU4c_004") return CardDB.cardIDEnum.TU4c_004;
+            if (s == "NAX10_03H") return CardDB.cardIDEnum.NAX10_03H;
+            if (s == "FP1_008") return CardDB.cardIDEnum.FP1_008;
             if (s == "DS1_184") return CardDB.cardIDEnum.DS1_184;
             if (s == "CS2_029") return CardDB.cardIDEnum.CS2_029;
-            if (s == "TU4e_006") return CardDB.cardIDEnum.TU4e_006;
             if (s == "GAME_005") return CardDB.cardIDEnum.GAME_005;
             if (s == "CS2_187") return CardDB.cardIDEnum.CS2_187;
             if (s == "EX1_020") return CardDB.cardIDEnum.EX1_020;
+            if (s == "NAX15_01He") return CardDB.cardIDEnum.NAX15_01He;
             if (s == "EX1_011") return CardDB.cardIDEnum.EX1_011;
             if (s == "CS2_057") return CardDB.cardIDEnum.CS2_057;
             if (s == "EX1_274") return CardDB.cardIDEnum.EX1_274;
@@ -1281,14 +1570,20 @@ namespace HREngine.Bots
             if (s == "EX1_617") return CardDB.cardIDEnum.EX1_617;
             if (s == "CS1_113e") return CardDB.cardIDEnum.CS1_113e;
             if (s == "CS2_101") return CardDB.cardIDEnum.CS2_101;
+            if (s == "FP1_015") return CardDB.cardIDEnum.FP1_015;
+            if (s == "NAX13_03") return CardDB.cardIDEnum.NAX13_03;
             if (s == "CS2_005") return CardDB.cardIDEnum.CS2_005;
             if (s == "EX1_537") return CardDB.cardIDEnum.EX1_537;
             if (s == "EX1_384") return CardDB.cardIDEnum.EX1_384;
             if (s == "TU4a_002") return CardDB.cardIDEnum.TU4a_002;
+            if (s == "NAX9_04") return CardDB.cardIDEnum.NAX9_04;
             if (s == "EX1_362") return CardDB.cardIDEnum.EX1_362;
+            if (s == "NAX12_02") return CardDB.cardIDEnum.NAX12_02;
+            if (s == "FP1_028e") return CardDB.cardIDEnum.FP1_028e;
             if (s == "TU4c_005") return CardDB.cardIDEnum.TU4c_005;
             if (s == "EX1_301") return CardDB.cardIDEnum.EX1_301;
             if (s == "CS2_235") return CardDB.cardIDEnum.CS2_235;
+            if (s == "NAX4_05") return CardDB.cardIDEnum.NAX4_05;
             if (s == "EX1_029") return CardDB.cardIDEnum.EX1_029;
             if (s == "CS2_042") return CardDB.cardIDEnum.CS2_042;
             if (s == "EX1_155a") return CardDB.cardIDEnum.EX1_155a;
@@ -1297,11 +1592,13 @@ namespace HREngine.Bots
             if (s == "NEW1_027") return CardDB.cardIDEnum.NEW1_027;
             if (s == "CS2_236e") return CardDB.cardIDEnum.CS2_236e;
             if (s == "CS2_083e") return CardDB.cardIDEnum.CS2_083e;
+            if (s == "NAX6_03te") return CardDB.cardIDEnum.NAX6_03te;
             if (s == "EX1_165a") return CardDB.cardIDEnum.EX1_165a;
             if (s == "EX1_570") return CardDB.cardIDEnum.EX1_570;
             if (s == "EX1_131") return CardDB.cardIDEnum.EX1_131;
             if (s == "EX1_556") return CardDB.cardIDEnum.EX1_556;
             if (s == "EX1_543") return CardDB.cardIDEnum.EX1_543;
+            if (s == "XXX_096") return CardDB.cardIDEnum.XXX_096;
             if (s == "TU4c_008e") return CardDB.cardIDEnum.TU4c_008e;
             if (s == "EX1_379e") return CardDB.cardIDEnum.EX1_379e;
             if (s == "NEW1_009") return CardDB.cardIDEnum.NEW1_009;
@@ -1314,27 +1611,39 @@ namespace HREngine.Bots
             if (s == "EX1_043") return CardDB.cardIDEnum.EX1_043;
             if (s == "EX1_050") return CardDB.cardIDEnum.EX1_050;
             if (s == "TU4b_001") return CardDB.cardIDEnum.TU4b_001;
+            if (s == "FP1_005") return CardDB.cardIDEnum.FP1_005;
             if (s == "EX1_620") return CardDB.cardIDEnum.EX1_620;
+            if (s == "NAX15_01") return CardDB.cardIDEnum.NAX15_01;
+            if (s == "NAX6_03") return CardDB.cardIDEnum.NAX6_03;
             if (s == "EX1_303") return CardDB.cardIDEnum.EX1_303;
             if (s == "HERO_09") return CardDB.cardIDEnum.HERO_09;
             if (s == "EX1_067") return CardDB.cardIDEnum.EX1_067;
             if (s == "XXX_028") return CardDB.cardIDEnum.XXX_028;
             if (s == "EX1_277") return CardDB.cardIDEnum.EX1_277;
             if (s == "Mekka2") return CardDB.cardIDEnum.Mekka2;
+            if (s == "NAX14_01H") return CardDB.cardIDEnum.NAX14_01H;
+            if (s == "NAX15_04") return CardDB.cardIDEnum.NAX15_04;
+            if (s == "FP1_024") return CardDB.cardIDEnum.FP1_024;
+            if (s == "FP1_030") return CardDB.cardIDEnum.FP1_030;
             if (s == "CS2_221e") return CardDB.cardIDEnum.CS2_221e;
             if (s == "EX1_178") return CardDB.cardIDEnum.EX1_178;
             if (s == "CS2_222") return CardDB.cardIDEnum.CS2_222;
             if (s == "EX1_409e") return CardDB.cardIDEnum.EX1_409e;
             if (s == "tt_004o") return CardDB.cardIDEnum.tt_004o;
             if (s == "EX1_155ae") return CardDB.cardIDEnum.EX1_155ae;
+            if (s == "NAX11_01H") return CardDB.cardIDEnum.NAX11_01H;
             if (s == "EX1_160a") return CardDB.cardIDEnum.EX1_160a;
+            if (s == "NAX15_02") return CardDB.cardIDEnum.NAX15_02;
+            if (s == "NAX15_05") return CardDB.cardIDEnum.NAX15_05;
             if (s == "NEW1_025e") return CardDB.cardIDEnum.NEW1_025e;
             if (s == "CS2_012") return CardDB.cardIDEnum.CS2_012;
+            if (s == "XXX_099") return CardDB.cardIDEnum.XXX_099;
             if (s == "EX1_246") return CardDB.cardIDEnum.EX1_246;
             if (s == "EX1_572") return CardDB.cardIDEnum.EX1_572;
             if (s == "EX1_089") return CardDB.cardIDEnum.EX1_089;
             if (s == "CS2_059") return CardDB.cardIDEnum.CS2_059;
             if (s == "EX1_279") return CardDB.cardIDEnum.EX1_279;
+            if (s == "NAX12_02e") return CardDB.cardIDEnum.NAX12_02e;
             if (s == "CS2_168") return CardDB.cardIDEnum.CS2_168;
             if (s == "tt_010") return CardDB.cardIDEnum.tt_010;
             if (s == "NEW1_023") return CardDB.cardIDEnum.NEW1_023;
@@ -1344,32 +1653,42 @@ namespace HREngine.Bots
             if (s == "CS2_234") return CardDB.cardIDEnum.CS2_234;
             if (s == "XXX_043") return CardDB.cardIDEnum.XXX_043;
             if (s == "GAME_001") return CardDB.cardIDEnum.GAME_001;
+            if (s == "NAX5_02") return CardDB.cardIDEnum.NAX5_02;
             if (s == "EX1_130") return CardDB.cardIDEnum.EX1_130;
             if (s == "EX1_584e") return CardDB.cardIDEnum.EX1_584e;
             if (s == "CS2_064") return CardDB.cardIDEnum.CS2_064;
             if (s == "EX1_161") return CardDB.cardIDEnum.EX1_161;
             if (s == "CS2_049") return CardDB.cardIDEnum.CS2_049;
+            if (s == "NAX13_01") return CardDB.cardIDEnum.NAX13_01;
             if (s == "EX1_154") return CardDB.cardIDEnum.EX1_154;
             if (s == "EX1_080") return CardDB.cardIDEnum.EX1_080;
             if (s == "NEW1_022") return CardDB.cardIDEnum.NEW1_022;
+            if (s == "NAX2_01H") return CardDB.cardIDEnum.NAX2_01H;
             if (s == "EX1_160be") return CardDB.cardIDEnum.EX1_160be;
+            if (s == "NAX12_03") return CardDB.cardIDEnum.NAX12_03;
             if (s == "EX1_251") return CardDB.cardIDEnum.EX1_251;
+            if (s == "FP1_025") return CardDB.cardIDEnum.FP1_025;
             if (s == "EX1_371") return CardDB.cardIDEnum.EX1_371;
             if (s == "CS2_mirror") return CardDB.cardIDEnum.CS2_mirror;
+            if (s == "NAX4_01H") return CardDB.cardIDEnum.NAX4_01H;
             if (s == "EX1_594") return CardDB.cardIDEnum.EX1_594;
+            if (s == "NAX14_02") return CardDB.cardIDEnum.NAX14_02;
             if (s == "TU4c_006e") return CardDB.cardIDEnum.TU4c_006e;
             if (s == "EX1_560") return CardDB.cardIDEnum.EX1_560;
             if (s == "CS2_236") return CardDB.cardIDEnum.CS2_236;
             if (s == "TU4f_006") return CardDB.cardIDEnum.TU4f_006;
             if (s == "EX1_402") return CardDB.cardIDEnum.EX1_402;
+            if (s == "NAX3_01") return CardDB.cardIDEnum.NAX3_01;
             if (s == "EX1_506") return CardDB.cardIDEnum.EX1_506;
             if (s == "NEW1_027e") return CardDB.cardIDEnum.NEW1_027e;
             if (s == "DS1_070o") return CardDB.cardIDEnum.DS1_070o;
             if (s == "XXX_045") return CardDB.cardIDEnum.XXX_045;
             if (s == "XXX_029") return CardDB.cardIDEnum.XXX_029;
             if (s == "DS1_178") return CardDB.cardIDEnum.DS1_178;
+            if (s == "XXX_098") return CardDB.cardIDEnum.XXX_098;
             if (s == "EX1_315") return CardDB.cardIDEnum.EX1_315;
             if (s == "CS2_094") return CardDB.cardIDEnum.CS2_094;
+            if (s == "NAX13_01H") return CardDB.cardIDEnum.NAX13_01H;
             if (s == "TU4e_002t") return CardDB.cardIDEnum.TU4e_002t;
             if (s == "EX1_046e") return CardDB.cardIDEnum.EX1_046e;
             if (s == "NEW1_040t") return CardDB.cardIDEnum.NEW1_040t;
@@ -1381,16 +1700,20 @@ namespace HREngine.Bots
             if (s == "XXX_022e") return CardDB.cardIDEnum.XXX_022e;
             if (s == "DS1_178e") return CardDB.cardIDEnum.DS1_178e;
             if (s == "CS2_226o") return CardDB.cardIDEnum.CS2_226o;
+            if (s == "NAX9_04H") return CardDB.cardIDEnum.NAX9_04H;
             if (s == "Mekka4e") return CardDB.cardIDEnum.Mekka4e;
             if (s == "EX1_082") return CardDB.cardIDEnum.EX1_082;
             if (s == "CS2_093") return CardDB.cardIDEnum.CS2_093;
             if (s == "EX1_411e") return CardDB.cardIDEnum.EX1_411e;
+            if (s == "NAX8_03t") return CardDB.cardIDEnum.NAX8_03t;
             if (s == "EX1_145o") return CardDB.cardIDEnum.EX1_145o;
+            if (s == "NAX7_04") return CardDB.cardIDEnum.NAX7_04;
             if (s == "CS2_boar") return CardDB.cardIDEnum.CS2_boar;
             if (s == "NEW1_019") return CardDB.cardIDEnum.NEW1_019;
             if (s == "EX1_289") return CardDB.cardIDEnum.EX1_289;
             if (s == "EX1_025t") return CardDB.cardIDEnum.EX1_025t;
             if (s == "EX1_398t") return CardDB.cardIDEnum.EX1_398t;
+            if (s == "NAX12_03H") return CardDB.cardIDEnum.NAX12_03H;
             if (s == "EX1_055o") return CardDB.cardIDEnum.EX1_055o;
             if (s == "CS2_091") return CardDB.cardIDEnum.CS2_091;
             if (s == "EX1_241") return CardDB.cardIDEnum.EX1_241;
@@ -1404,11 +1727,15 @@ namespace HREngine.Bots
             if (s == "CS2_203") return CardDB.cardIDEnum.CS2_203;
             if (s == "EX1_124") return CardDB.cardIDEnum.EX1_124;
             if (s == "EX1_379") return CardDB.cardIDEnum.EX1_379;
+            if (s == "NAX7_02") return CardDB.cardIDEnum.NAX7_02;
             if (s == "CS2_053e") return CardDB.cardIDEnum.CS2_053e;
             if (s == "EX1_032") return CardDB.cardIDEnum.EX1_032;
+            if (s == "NAX9_01") return CardDB.cardIDEnum.NAX9_01;
             if (s == "TU4e_003") return CardDB.cardIDEnum.TU4e_003;
             if (s == "CS2_146o") return CardDB.cardIDEnum.CS2_146o;
+            if (s == "NAX8_01H") return CardDB.cardIDEnum.NAX8_01H;
             if (s == "XXX_041") return CardDB.cardIDEnum.XXX_041;
+            if (s == "NAXM_002") return CardDB.cardIDEnum.NAXM_002;
             if (s == "EX1_391") return CardDB.cardIDEnum.EX1_391;
             if (s == "EX1_366") return CardDB.cardIDEnum.EX1_366;
             if (s == "EX1_059e") return CardDB.cardIDEnum.EX1_059e;
@@ -1435,21 +1762,29 @@ namespace HREngine.Bots
             if (s == "NEW1_026t") return CardDB.cardIDEnum.NEW1_026t;
             if (s == "EX1_623") return CardDB.cardIDEnum.EX1_623;
             if (s == "EX1_383t") return CardDB.cardIDEnum.EX1_383t;
+            if (s == "NAX7_03") return CardDB.cardIDEnum.NAX7_03;
             if (s == "EX1_597") return CardDB.cardIDEnum.EX1_597;
             if (s == "TU4f_006o") return CardDB.cardIDEnum.TU4f_006o;
             if (s == "EX1_130a") return CardDB.cardIDEnum.EX1_130a;
             if (s == "CS2_011") return CardDB.cardIDEnum.CS2_011;
             if (s == "EX1_169") return CardDB.cardIDEnum.EX1_169;
             if (s == "EX1_tk33") return CardDB.cardIDEnum.EX1_tk33;
+            if (s == "NAX11_03") return CardDB.cardIDEnum.NAX11_03;
+            if (s == "NAX4_01") return CardDB.cardIDEnum.NAX4_01;
+            if (s == "NAX10_01") return CardDB.cardIDEnum.NAX10_01;
             if (s == "EX1_250") return CardDB.cardIDEnum.EX1_250;
             if (s == "EX1_564") return CardDB.cardIDEnum.EX1_564;
+            if (s == "NAX5_03") return CardDB.cardIDEnum.NAX5_03;
             if (s == "EX1_043e") return CardDB.cardIDEnum.EX1_043e;
             if (s == "EX1_349") return CardDB.cardIDEnum.EX1_349;
+            if (s == "XXX_097") return CardDB.cardIDEnum.XXX_097;
             if (s == "EX1_102") return CardDB.cardIDEnum.EX1_102;
             if (s == "EX1_058") return CardDB.cardIDEnum.EX1_058;
             if (s == "EX1_243") return CardDB.cardIDEnum.EX1_243;
             if (s == "PRO_001c") return CardDB.cardIDEnum.PRO_001c;
             if (s == "EX1_116t") return CardDB.cardIDEnum.EX1_116t;
+            if (s == "NAX15_01e") return CardDB.cardIDEnum.NAX15_01e;
+            if (s == "FP1_029") return CardDB.cardIDEnum.FP1_029;
             if (s == "CS2_089") return CardDB.cardIDEnum.CS2_089;
             if (s == "TU4c_001") return CardDB.cardIDEnum.TU4c_001;
             if (s == "EX1_248") return CardDB.cardIDEnum.EX1_248;
@@ -1463,6 +1798,7 @@ namespace HREngine.Bots
             if (s == "EX1_093e") return CardDB.cardIDEnum.EX1_093e;
             if (s == "CS2_150") return CardDB.cardIDEnum.CS2_150;
             if (s == "CS2_152") return CardDB.cardIDEnum.CS2_152;
+            if (s == "NAX9_03H") return CardDB.cardIDEnum.NAX9_03H;
             if (s == "EX1_160t") return CardDB.cardIDEnum.EX1_160t;
             if (s == "CS2_127") return CardDB.cardIDEnum.CS2_127;
             if (s == "CRED_03") return CardDB.cardIDEnum.CRED_03;
@@ -1474,50 +1810,17 @@ namespace HREngine.Bots
         public enum cardName
         {
             unknown,
-            nerubian,//naxx
-            slime,//naxx
-
-            avenge,//naxx
-            baronrivendare,//naxx
-            dancingswords,//naxx
-            darkcultist,//naxx
-            deathsbite,//naxx
-            deathlord,//naxx
-            echoingooze,//naxx
-            
-            feugen,//naxx
-            stalagg,//naxx
-
-            hauntedcreeper,//naxx
-            spectralspider,//naxx
-            kelthuzad,//naxx
-            madscientist,//naxx
-            maexxna,//nax
-            nerubarweblord,//nax
-            nerubianegg,//naxx
-            shadeofnaxxramas,//naxx
-            reincarnation,//naxx
-            poisonseeds,//naxx
-            
-            anubarambusher,//naxx
-            voidcaller,//naxx
-            webspinner,//naxx
-            undertaker,//naxx
-            sludgebelcher,//naxx
-            spectralknight,//naxx
-            stoneskingargoyle,//naxx
-            unstableghoul,//naxx
-            wailingsoul,//naxx
-            zombiechow,//naxx
-            loatheb,//naxx
-
             hogger,
+            heigantheunclean,
+            necroticaura,
             starfall,
             barrel,
             damagereflector,
             edwinvancleef,
+            gothiktheharvester,
             perditionsblade,
             bloodsailraider,
+            guardianoficecrown,
             bloodmagethalnos,
             rooted,
             wisp,
@@ -1526,24 +1829,32 @@ namespace HREngine.Bots
             totemicmight,
             uproot,
             opponentdisconnect,
+            unrelentingrider,
             shandoslesson,
             hemetnesingwary,
-            mindgameswhiffedyouropponenthadnominions,
+            decimate,
+            shadowofnothing,
+            nerubian,
             dragonlingmechanic,
             mogushanwarden,
+            thanekorthazz,
             hungrycrab,
             ancientteachings,
             misdirection,
             patientassassin,
+            mutatinginjection,
             violetteacher,
             arathiweaponsmith,
+            raisedead,
             acolyteofpain,
             holynova,
             robpardo,
             commandingshout,
+            necroticpoison,
             unboundelemental,
             garroshhellscream,
             enchant,
+            loatheb,
             blessingofmight,
             nightmare,
             blessingofkings,
@@ -1553,23 +1864,32 @@ namespace HREngine.Bots
             roguesdoit,
             freecards,
             iammurloc,
+            sporeburst,
+            mindcontrolcrystal,
             charge,
             stampedingkodo,
             humility,
+            darkcultist,
             gruul,
             markofthewild,
+            patchwerk,
             worgeninfiltrator,
             frostbolt,
+            runeblade,
             flametonguetotem,
             assassinate,
+            madscientist,
             lordofthearena,
             bainebloodhoof,
             injuredblademaster,
             siphonsoul,
             layonhands,
+            hook,
+            massiveruneblade,
             lorewalkercho,
             destroyallminions,
             silvermoonguardian,
+            destroyallmana,
             huffer,
             mindvision,
             malfurionstormrage,
@@ -1579,7 +1899,9 @@ namespace HREngine.Bots
             lightwell,
             benthompson,
             coldlightseer,
+            deathsbite,
             gorehowl,
+            skitter,
             farsight,
             chillwindyeti,
             moonfire,
@@ -1592,17 +1914,22 @@ namespace HREngine.Bots
             treant,
             alarmobot,
             animalcompanion,
+            hatefulstrike,
             dream,
+            anubrekhan,
             youngpriestess,
             gadgetzanauctioneer,
             coneofcold,
             earthshock,
             tirionfordring,
+            wailingsoul,
             skeleton,
             ironfurgrizzly,
             headcrack,
             arcaneshot,
+            maexxna,
             imp,
+            markofthehorsemen,
             voidterror,
             mortalcoil,
             draw3cards,
@@ -1618,8 +1945,11 @@ namespace HREngine.Bots
             spellbender,
             backstab,
             squirrel,
+            stalagg,
+            grandwidowfaerlina,
             heavyaxe,
             zwick,
+            webwrap,
             flamesofazzinoth,
             murlocwarleader,
             shadowstep,
@@ -1634,6 +1964,7 @@ namespace HREngine.Bots
             unleashthehounds,
             yseraawakens,
             sap,
+            kelthuzad,
             defiasbandit,
             gnomishinventor,
             mindcontrol,
@@ -1650,23 +1981,31 @@ namespace HREngine.Bots
             nourish,
             abusivesergeant,
             sylvanaswindrunner,
+            spore,
             crueltaskmaster,
             lightningbolt,
             keeperofthegrove,
             steadyshot,
             multishot,
+            harvest,
+            instructorrazuvious,
+            ladyblaumeux,
             jaybaxter,
             molasses,
             pintsizedsummoner,
             spellbreaker,
+            anubarambusher,
             deadlypoison,
+            stoneskingargoyle,
             bloodfury,
             fanofknives,
+            poisoncloud,
             shieldbearer,
             sensedemons,
             shieldblock,
             handswapperminion,
             massivegnoll,
+            deathcharger,
             ancientoflore,
             oasissnapjaw,
             illidanstormrage,
@@ -1676,9 +2015,11 @@ namespace HREngine.Bots
             wildpyromancer,
             razorfenhunter,
             twistingnether,
+            voidcaller,
             leaderofthepack,
             malygos,
             becomehogger,
+            baronrivendare,
             millhousemanastorm,
             innerfire,
             valeerasanguinar,
@@ -1686,20 +2027,25 @@ namespace HREngine.Bots
             souloftheforest,
             silencedebug,
             bloodsailcorsair,
+            slime,
             tinkmasteroverspark,
             iceblock,
             brawl,
             vanish,
+            poisonseeds,
             murloc,
             mindspike,
             kingmukla,
             stevengabriel,
+            gluth,
             truesilverchampion,
             harrisonjones,
+            destroydeck,
             devilsaur,
             wargolem,
             warsongcommander,
             manawyrm,
+            thaddius,
             savagery,
             spitefulsmith,
             shatteredsuncleric,
@@ -1709,11 +2055,14 @@ namespace HREngine.Bots
             korkronelite,
             junglepanther,
             barongeddon,
+            spectralspider,
             pitlord,
             markofnature,
+            grobbulus,
             leokk,
             fierywaraxe,
             damage5,
+            duplicate,
             restore5,
             mindblast,
             timberwolf,
@@ -1727,6 +2076,7 @@ namespace HREngine.Bots
             doomguard,
             alakirthewindlord,
             hyena,
+            undertaker,
             frothingberserker,
             powerofthewild,
             druidoftheclaw,
@@ -1735,9 +2085,13 @@ namespace HREngine.Bots
             recklessrocketeer,
             crazymonkey,
             damageallbut1,
+            frostblast,
             powerwordshield,
+            rainoffire,
             arcaneintellect,
             angrychicken,
+            nerubianegg,
+            worshipper,
             mindgames,
             leeroyjenkins,
             gurubashiberserker,
@@ -1745,6 +2099,7 @@ namespace HREngine.Bots
             enableemotes,
             forceofnature,
             lightspawn,
+            destroyamanacrystal,
             warglaiveofazzinoth,
             finkleeinhorn,
             frostelemental,
@@ -1760,9 +2115,11 @@ namespace HREngine.Bots
             adrenalinerush,
             murloctidecaller,
             kirintormage,
+            spectralrider,
             thrallmarfarseer,
             frostwolfwarlord,
             sorcerersapprentice,
+            feugen,
             willofmukla,
             holyfire,
             manawraith,
@@ -1780,7 +2137,9 @@ namespace HREngine.Bots
             earthenringfarseer,
             onyxia,
             manaaddict,
+            unholyshadow,
             dualwarglaives,
+            sludgebelcher,
             worthlessimp,
             shiv,
             sheep,
@@ -1790,11 +2149,13 @@ namespace HREngine.Bots
             holywrath,
             ironforgerifleman,
             elitetaurenchieftain,
+            spectralwarrior,
             bluegillwarrior,
             shapeshift,
             hamiltonchu,
             battlerage,
             nightblade,
+            locustswarm,
             crazedhunter,
             andybrock,
             youthfulbrewmaster,
@@ -1812,7 +2173,9 @@ namespace HREngine.Bots
             poultryizer,
             koboldgeomancer,
             legacyoftheemperor,
+            eruption,
             cenarius,
+            deathlord,
             searingtotem,
             taurenwarrior,
             explosivetrap,
@@ -1833,20 +2196,24 @@ namespace HREngine.Bots
             rockbiterweapon,
             starvingbuzzard,
             mirrorimage,
+            frozenchampion,
             silverhandrecruit,
             corruption,
             preparation,
             cairnebloodhoof,
             mortalstrike,
             flare,
+            necroknight,
             silverhandknight,
             breakweapon,
             guardianofkings,
             ancientbrewmaster,
+            avenge,
             youngdragonhawk,
             frostshock,
             healingtouch,
             venturecomercenary,
+            unbalancingstrike,
             sacrificialpact,
             noooooooooooo,
             baneofdoom,
@@ -1854,6 +2221,7 @@ namespace HREngine.Bots
             flesheatingghoul,
             loothoarder,
             mill10,
+            sapphiron,
             jasonchayes,
             benbrode,
             betrayal,
@@ -1869,22 +2237,27 @@ namespace HREngine.Bots
             handtodeck,
             starfire,
             goldshirefootman,
+            unrelentingtrainee,
             murlocscout,
             ragnarosthefirelord,
             rampage,
+            zombiechow,
             thrall,
             stoneclawtotem,
             captainsparrot,
             windfuryharpy,
+            unrelentingwarrior,
             stranglethorntiger,
             summonarandomsecret,
             circleofhealing,
             snaketrap,
             cabalshadowpriest,
+            nerubarweblord,
             upgrade,
             shieldslam,
             flameburst,
             windfury,
+            enrage,
             natpagle,
             restoreallhealth,
             houndmaster,
@@ -1893,6 +2266,7 @@ namespace HREngine.Bots
             gnoll,
             archmageantonidas,
             destroyallheroes,
+            chains,
             wrathofairtotem,
             killcommand,
             manatidetotem,
@@ -1902,24 +2276,30 @@ namespace HREngine.Bots
             darkscalehealer,
             shadowform,
             frostnova,
+            purecold,
             mirrorentity,
             counterspell,
             mindshatter,
             magmarager,
             wolfrider,
             emboldener3000,
+            polarityshift,
             gelbinmekkatorque,
+            webspinner,
             utherlightbringer,
             innerrage,
             emeralddrake,
+            forceaitouseheropower,
+            echoingooze,
             heroicstrike,
+            hauntedcreeper,
             barreltoss,
             yongwoo,
             doomhammer,
             stomp,
+            spectralknight,
             tracking,
             fireball,
-            metamorphosis,
             thecoin,
             bootybaybodyguard,
             scarletcrusader,
@@ -1930,14 +2310,17 @@ namespace HREngine.Bots
             emperorcobra,
             deadlyshot,
             reinforce,
+            supercharge,
             claw,
             explosiveshot,
             avengingwrath,
             riverpawgnoll,
+            sirzeliek,
             argentprotector,
             hiddengnome,
             felguard,
             northshirecleric,
+            plague,
             lepergnome,
             fireelemental,
             armorup,
@@ -1948,6 +2331,7 @@ namespace HREngine.Bots
             defiasringleader,
             harvestgolem,
             kingkrush,
+            aibuddydamageownhero5,
             healingtotem,
             ericdodds,
             demigodsfavor,
@@ -1955,17 +2339,22 @@ namespace HREngine.Bots
             dalaranmage,
             twilightdrake,
             coldlightoracle,
+            shadeofnaxxramas,
             moltengiant,
+            deathbloom,
             shadowflame,
             anduinwrynn,
             argentcommander,
             revealhand,
             arcanemissiles,
             repairbot,
+            unstableghoul,
             ancientofwar,
             stormwindchampion,
             summonapanther,
+            mrbigglesworth,
             swipe,
+            aihelperbuddy,
             hex,
             ysera,
             arcanegolem,
@@ -1984,9 +2373,13 @@ namespace HREngine.Bots
             totemiccall,
             secretkeeper,
             dreadcorsair,
+            jaws,
             forkedlightning,
+            reincarnate,
             handofprotection,
+            noththeplaguebringer,
             vaporize,
+            frostbreath,
             nozdormu,
             divinespirit,
             transcendence,
@@ -2001,6 +2394,7 @@ namespace HREngine.Bots
             freeze,
             madbomber,
             consecration,
+            spectraltrainee,
             boar,
             knifejuggler,
             icebarrier,
@@ -2017,9 +2411,11 @@ namespace HREngine.Bots
             ironbeakowl,
             eviscerate,
             repentance,
+            understudy,
             sunwalker,
             nagamyrmidon,
-            destoryheropower,
+            destroyheropower,
+            skeletalsmith,
             slam,
             swordofjustice,
             bounce,
@@ -2043,13 +2439,17 @@ namespace HREngine.Bots
             savageroar,
             innervate,
             inferno,
+            falloutslime,
             earthelemental,
             facelessmanipulator,
+            mindpocalypse,
             divinefavor,
+            aibuddydestroyminions,
             demolisher,
             sunfuryprotector,
             dustdevil,
             powerofthehorde,
+            dancingswords,
             holylight,
             feralspirit,
             raidleader,
@@ -2065,17 +2465,21 @@ namespace HREngine.Bots
             gladiatorslongbow,
             damage1,
         }
-        
+
         public cardName cardNamestringToEnum(string s)
         {
             if (s == "unknown") return CardDB.cardName.unknown;
             if (s == "hogger") return CardDB.cardName.hogger;
+            if (s == "heigantheunclean") return CardDB.cardName.heigantheunclean;
+            if (s == "necroticaura") return CardDB.cardName.necroticaura;
             if (s == "starfall") return CardDB.cardName.starfall;
             if (s == "barrel") return CardDB.cardName.barrel;
             if (s == "damagereflector") return CardDB.cardName.damagereflector;
             if (s == "edwinvancleef") return CardDB.cardName.edwinvancleef;
+            if (s == "gothiktheharvester") return CardDB.cardName.gothiktheharvester;
             if (s == "perditionsblade") return CardDB.cardName.perditionsblade;
             if (s == "bloodsailraider") return CardDB.cardName.bloodsailraider;
+            if (s == "guardianoficecrown") return CardDB.cardName.guardianoficecrown;
             if (s == "bloodmagethalnos") return CardDB.cardName.bloodmagethalnos;
             if (s == "rooted") return CardDB.cardName.rooted;
             if (s == "wisp") return CardDB.cardName.wisp;
@@ -2084,24 +2488,32 @@ namespace HREngine.Bots
             if (s == "totemicmight") return CardDB.cardName.totemicmight;
             if (s == "uproot") return CardDB.cardName.uproot;
             if (s == "opponentdisconnect") return CardDB.cardName.opponentdisconnect;
+            if (s == "unrelentingrider") return CardDB.cardName.unrelentingrider;
             if (s == "shandoslesson") return CardDB.cardName.shandoslesson;
             if (s == "hemetnesingwary") return CardDB.cardName.hemetnesingwary;
-            if (s == "mindgameswhiffedyouropponenthadnominions") return CardDB.cardName.mindgameswhiffedyouropponenthadnominions;
+            if (s == "decimate") return CardDB.cardName.decimate;
+            if (s == "shadowofnothing") return CardDB.cardName.shadowofnothing;
+            if (s == "nerubian") return CardDB.cardName.nerubian;
             if (s == "dragonlingmechanic") return CardDB.cardName.dragonlingmechanic;
             if (s == "mogushanwarden") return CardDB.cardName.mogushanwarden;
+            if (s == "thanekorthazz") return CardDB.cardName.thanekorthazz;
             if (s == "hungrycrab") return CardDB.cardName.hungrycrab;
             if (s == "ancientteachings") return CardDB.cardName.ancientteachings;
             if (s == "misdirection") return CardDB.cardName.misdirection;
             if (s == "patientassassin") return CardDB.cardName.patientassassin;
+            if (s == "mutatinginjection") return CardDB.cardName.mutatinginjection;
             if (s == "violetteacher") return CardDB.cardName.violetteacher;
             if (s == "arathiweaponsmith") return CardDB.cardName.arathiweaponsmith;
+            if (s == "raisedead") return CardDB.cardName.raisedead;
             if (s == "acolyteofpain") return CardDB.cardName.acolyteofpain;
             if (s == "holynova") return CardDB.cardName.holynova;
             if (s == "robpardo") return CardDB.cardName.robpardo;
             if (s == "commandingshout") return CardDB.cardName.commandingshout;
+            if (s == "necroticpoison") return CardDB.cardName.necroticpoison;
             if (s == "unboundelemental") return CardDB.cardName.unboundelemental;
             if (s == "garroshhellscream") return CardDB.cardName.garroshhellscream;
             if (s == "enchant") return CardDB.cardName.enchant;
+            if (s == "loatheb") return CardDB.cardName.loatheb;
             if (s == "blessingofmight") return CardDB.cardName.blessingofmight;
             if (s == "nightmare") return CardDB.cardName.nightmare;
             if (s == "blessingofkings") return CardDB.cardName.blessingofkings;
@@ -2111,23 +2523,32 @@ namespace HREngine.Bots
             if (s == "roguesdoit") return CardDB.cardName.roguesdoit;
             if (s == "freecards") return CardDB.cardName.freecards;
             if (s == "iammurloc") return CardDB.cardName.iammurloc;
+            if (s == "sporeburst") return CardDB.cardName.sporeburst;
+            if (s == "mindcontrolcrystal") return CardDB.cardName.mindcontrolcrystal;
             if (s == "charge") return CardDB.cardName.charge;
             if (s == "stampedingkodo") return CardDB.cardName.stampedingkodo;
             if (s == "humility") return CardDB.cardName.humility;
+            if (s == "darkcultist") return CardDB.cardName.darkcultist;
             if (s == "gruul") return CardDB.cardName.gruul;
             if (s == "markofthewild") return CardDB.cardName.markofthewild;
+            if (s == "patchwerk") return CardDB.cardName.patchwerk;
             if (s == "worgeninfiltrator") return CardDB.cardName.worgeninfiltrator;
             if (s == "frostbolt") return CardDB.cardName.frostbolt;
+            if (s == "runeblade") return CardDB.cardName.runeblade;
             if (s == "flametonguetotem") return CardDB.cardName.flametonguetotem;
             if (s == "assassinate") return CardDB.cardName.assassinate;
+            if (s == "madscientist") return CardDB.cardName.madscientist;
             if (s == "lordofthearena") return CardDB.cardName.lordofthearena;
             if (s == "bainebloodhoof") return CardDB.cardName.bainebloodhoof;
             if (s == "injuredblademaster") return CardDB.cardName.injuredblademaster;
             if (s == "siphonsoul") return CardDB.cardName.siphonsoul;
             if (s == "layonhands") return CardDB.cardName.layonhands;
+            if (s == "hook") return CardDB.cardName.hook;
+            if (s == "massiveruneblade") return CardDB.cardName.massiveruneblade;
             if (s == "lorewalkercho") return CardDB.cardName.lorewalkercho;
             if (s == "destroyallminions") return CardDB.cardName.destroyallminions;
             if (s == "silvermoonguardian") return CardDB.cardName.silvermoonguardian;
+            if (s == "destroyallmana") return CardDB.cardName.destroyallmana;
             if (s == "huffer") return CardDB.cardName.huffer;
             if (s == "mindvision") return CardDB.cardName.mindvision;
             if (s == "malfurionstormrage") return CardDB.cardName.malfurionstormrage;
@@ -2137,7 +2558,9 @@ namespace HREngine.Bots
             if (s == "lightwell") return CardDB.cardName.lightwell;
             if (s == "benthompson") return CardDB.cardName.benthompson;
             if (s == "coldlightseer") return CardDB.cardName.coldlightseer;
+            if (s == "deathsbite") return CardDB.cardName.deathsbite;
             if (s == "gorehowl") return CardDB.cardName.gorehowl;
+            if (s == "skitter") return CardDB.cardName.skitter;
             if (s == "farsight") return CardDB.cardName.farsight;
             if (s == "chillwindyeti") return CardDB.cardName.chillwindyeti;
             if (s == "moonfire") return CardDB.cardName.moonfire;
@@ -2150,17 +2573,22 @@ namespace HREngine.Bots
             if (s == "treant") return CardDB.cardName.treant;
             if (s == "alarmobot") return CardDB.cardName.alarmobot;
             if (s == "animalcompanion") return CardDB.cardName.animalcompanion;
+            if (s == "hatefulstrike") return CardDB.cardName.hatefulstrike;
             if (s == "dream") return CardDB.cardName.dream;
+            if (s == "anubrekhan") return CardDB.cardName.anubrekhan;
             if (s == "youngpriestess") return CardDB.cardName.youngpriestess;
             if (s == "gadgetzanauctioneer") return CardDB.cardName.gadgetzanauctioneer;
             if (s == "coneofcold") return CardDB.cardName.coneofcold;
             if (s == "earthshock") return CardDB.cardName.earthshock;
             if (s == "tirionfordring") return CardDB.cardName.tirionfordring;
+            if (s == "wailingsoul") return CardDB.cardName.wailingsoul;
             if (s == "skeleton") return CardDB.cardName.skeleton;
             if (s == "ironfurgrizzly") return CardDB.cardName.ironfurgrizzly;
             if (s == "headcrack") return CardDB.cardName.headcrack;
             if (s == "arcaneshot") return CardDB.cardName.arcaneshot;
+            if (s == "maexxna") return CardDB.cardName.maexxna;
             if (s == "imp") return CardDB.cardName.imp;
+            if (s == "markofthehorsemen") return CardDB.cardName.markofthehorsemen;
             if (s == "voidterror") return CardDB.cardName.voidterror;
             if (s == "mortalcoil") return CardDB.cardName.mortalcoil;
             if (s == "draw3cards") return CardDB.cardName.draw3cards;
@@ -2176,8 +2604,11 @@ namespace HREngine.Bots
             if (s == "spellbender") return CardDB.cardName.spellbender;
             if (s == "backstab") return CardDB.cardName.backstab;
             if (s == "squirrel") return CardDB.cardName.squirrel;
+            if (s == "stalagg") return CardDB.cardName.stalagg;
+            if (s == "grandwidowfaerlina") return CardDB.cardName.grandwidowfaerlina;
             if (s == "heavyaxe") return CardDB.cardName.heavyaxe;
             if (s == "zwick") return CardDB.cardName.zwick;
+            if (s == "webwrap") return CardDB.cardName.webwrap;
             if (s == "flamesofazzinoth") return CardDB.cardName.flamesofazzinoth;
             if (s == "murlocwarleader") return CardDB.cardName.murlocwarleader;
             if (s == "shadowstep") return CardDB.cardName.shadowstep;
@@ -2192,6 +2623,7 @@ namespace HREngine.Bots
             if (s == "unleashthehounds") return CardDB.cardName.unleashthehounds;
             if (s == "yseraawakens") return CardDB.cardName.yseraawakens;
             if (s == "sap") return CardDB.cardName.sap;
+            if (s == "kelthuzad") return CardDB.cardName.kelthuzad;
             if (s == "defiasbandit") return CardDB.cardName.defiasbandit;
             if (s == "gnomishinventor") return CardDB.cardName.gnomishinventor;
             if (s == "mindcontrol") return CardDB.cardName.mindcontrol;
@@ -2208,23 +2640,31 @@ namespace HREngine.Bots
             if (s == "nourish") return CardDB.cardName.nourish;
             if (s == "abusivesergeant") return CardDB.cardName.abusivesergeant;
             if (s == "sylvanaswindrunner") return CardDB.cardName.sylvanaswindrunner;
+            if (s == "spore") return CardDB.cardName.spore;
             if (s == "crueltaskmaster") return CardDB.cardName.crueltaskmaster;
             if (s == "lightningbolt") return CardDB.cardName.lightningbolt;
             if (s == "keeperofthegrove") return CardDB.cardName.keeperofthegrove;
             if (s == "steadyshot") return CardDB.cardName.steadyshot;
             if (s == "multishot") return CardDB.cardName.multishot;
+            if (s == "harvest") return CardDB.cardName.harvest;
+            if (s == "instructorrazuvious") return CardDB.cardName.instructorrazuvious;
+            if (s == "ladyblaumeux") return CardDB.cardName.ladyblaumeux;
             if (s == "jaybaxter") return CardDB.cardName.jaybaxter;
             if (s == "molasses") return CardDB.cardName.molasses;
             if (s == "pintsizedsummoner") return CardDB.cardName.pintsizedsummoner;
             if (s == "spellbreaker") return CardDB.cardName.spellbreaker;
+            if (s == "anubarambusher") return CardDB.cardName.anubarambusher;
             if (s == "deadlypoison") return CardDB.cardName.deadlypoison;
+            if (s == "stoneskingargoyle") return CardDB.cardName.stoneskingargoyle;
             if (s == "bloodfury") return CardDB.cardName.bloodfury;
             if (s == "fanofknives") return CardDB.cardName.fanofknives;
+            if (s == "poisoncloud") return CardDB.cardName.poisoncloud;
             if (s == "shieldbearer") return CardDB.cardName.shieldbearer;
             if (s == "sensedemons") return CardDB.cardName.sensedemons;
             if (s == "shieldblock") return CardDB.cardName.shieldblock;
             if (s == "handswapperminion") return CardDB.cardName.handswapperminion;
             if (s == "massivegnoll") return CardDB.cardName.massivegnoll;
+            if (s == "deathcharger") return CardDB.cardName.deathcharger;
             if (s == "ancientoflore") return CardDB.cardName.ancientoflore;
             if (s == "oasissnapjaw") return CardDB.cardName.oasissnapjaw;
             if (s == "illidanstormrage") return CardDB.cardName.illidanstormrage;
@@ -2234,9 +2674,11 @@ namespace HREngine.Bots
             if (s == "wildpyromancer") return CardDB.cardName.wildpyromancer;
             if (s == "razorfenhunter") return CardDB.cardName.razorfenhunter;
             if (s == "twistingnether") return CardDB.cardName.twistingnether;
+            if (s == "voidcaller") return CardDB.cardName.voidcaller;
             if (s == "leaderofthepack") return CardDB.cardName.leaderofthepack;
             if (s == "malygos") return CardDB.cardName.malygos;
             if (s == "becomehogger") return CardDB.cardName.becomehogger;
+            if (s == "baronrivendare") return CardDB.cardName.baronrivendare;
             if (s == "millhousemanastorm") return CardDB.cardName.millhousemanastorm;
             if (s == "innerfire") return CardDB.cardName.innerfire;
             if (s == "valeerasanguinar") return CardDB.cardName.valeerasanguinar;
@@ -2244,20 +2686,25 @@ namespace HREngine.Bots
             if (s == "souloftheforest") return CardDB.cardName.souloftheforest;
             if (s == "silencedebug") return CardDB.cardName.silencedebug;
             if (s == "bloodsailcorsair") return CardDB.cardName.bloodsailcorsair;
+            if (s == "slime") return CardDB.cardName.slime;
             if (s == "tinkmasteroverspark") return CardDB.cardName.tinkmasteroverspark;
             if (s == "iceblock") return CardDB.cardName.iceblock;
             if (s == "brawl") return CardDB.cardName.brawl;
             if (s == "vanish") return CardDB.cardName.vanish;
+            if (s == "poisonseeds") return CardDB.cardName.poisonseeds;
             if (s == "murloc") return CardDB.cardName.murloc;
             if (s == "mindspike") return CardDB.cardName.mindspike;
             if (s == "kingmukla") return CardDB.cardName.kingmukla;
             if (s == "stevengabriel") return CardDB.cardName.stevengabriel;
+            if (s == "gluth") return CardDB.cardName.gluth;
             if (s == "truesilverchampion") return CardDB.cardName.truesilverchampion;
             if (s == "harrisonjones") return CardDB.cardName.harrisonjones;
+            if (s == "destroydeck") return CardDB.cardName.destroydeck;
             if (s == "devilsaur") return CardDB.cardName.devilsaur;
             if (s == "wargolem") return CardDB.cardName.wargolem;
             if (s == "warsongcommander") return CardDB.cardName.warsongcommander;
             if (s == "manawyrm") return CardDB.cardName.manawyrm;
+            if (s == "thaddius") return CardDB.cardName.thaddius;
             if (s == "savagery") return CardDB.cardName.savagery;
             if (s == "spitefulsmith") return CardDB.cardName.spitefulsmith;
             if (s == "shatteredsuncleric") return CardDB.cardName.shatteredsuncleric;
@@ -2267,11 +2714,14 @@ namespace HREngine.Bots
             if (s == "korkronelite") return CardDB.cardName.korkronelite;
             if (s == "junglepanther") return CardDB.cardName.junglepanther;
             if (s == "barongeddon") return CardDB.cardName.barongeddon;
+            if (s == "spectralspider") return CardDB.cardName.spectralspider;
             if (s == "pitlord") return CardDB.cardName.pitlord;
             if (s == "markofnature") return CardDB.cardName.markofnature;
+            if (s == "grobbulus") return CardDB.cardName.grobbulus;
             if (s == "leokk") return CardDB.cardName.leokk;
             if (s == "fierywaraxe") return CardDB.cardName.fierywaraxe;
             if (s == "damage5") return CardDB.cardName.damage5;
+            if (s == "duplicate") return CardDB.cardName.duplicate;
             if (s == "restore5") return CardDB.cardName.restore5;
             if (s == "mindblast") return CardDB.cardName.mindblast;
             if (s == "timberwolf") return CardDB.cardName.timberwolf;
@@ -2285,6 +2735,7 @@ namespace HREngine.Bots
             if (s == "doomguard") return CardDB.cardName.doomguard;
             if (s == "alakirthewindlord") return CardDB.cardName.alakirthewindlord;
             if (s == "hyena") return CardDB.cardName.hyena;
+            if (s == "undertaker") return CardDB.cardName.undertaker;
             if (s == "frothingberserker") return CardDB.cardName.frothingberserker;
             if (s == "powerofthewild") return CardDB.cardName.powerofthewild;
             if (s == "druidoftheclaw") return CardDB.cardName.druidoftheclaw;
@@ -2293,9 +2744,13 @@ namespace HREngine.Bots
             if (s == "recklessrocketeer") return CardDB.cardName.recklessrocketeer;
             if (s == "crazymonkey") return CardDB.cardName.crazymonkey;
             if (s == "damageallbut1") return CardDB.cardName.damageallbut1;
+            if (s == "frostblast") return CardDB.cardName.frostblast;
             if (s == "powerwordshield") return CardDB.cardName.powerwordshield;
+            if (s == "rainoffire") return CardDB.cardName.rainoffire;
             if (s == "arcaneintellect") return CardDB.cardName.arcaneintellect;
             if (s == "angrychicken") return CardDB.cardName.angrychicken;
+            if (s == "nerubianegg") return CardDB.cardName.nerubianegg;
+            if (s == "worshipper") return CardDB.cardName.worshipper;
             if (s == "mindgames") return CardDB.cardName.mindgames;
             if (s == "leeroyjenkins") return CardDB.cardName.leeroyjenkins;
             if (s == "gurubashiberserker") return CardDB.cardName.gurubashiberserker;
@@ -2303,6 +2758,7 @@ namespace HREngine.Bots
             if (s == "enableemotes") return CardDB.cardName.enableemotes;
             if (s == "forceofnature") return CardDB.cardName.forceofnature;
             if (s == "lightspawn") return CardDB.cardName.lightspawn;
+            if (s == "destroyamanacrystal") return CardDB.cardName.destroyamanacrystal;
             if (s == "warglaiveofazzinoth") return CardDB.cardName.warglaiveofazzinoth;
             if (s == "finkleeinhorn") return CardDB.cardName.finkleeinhorn;
             if (s == "frostelemental") return CardDB.cardName.frostelemental;
@@ -2318,9 +2774,11 @@ namespace HREngine.Bots
             if (s == "adrenalinerush") return CardDB.cardName.adrenalinerush;
             if (s == "murloctidecaller") return CardDB.cardName.murloctidecaller;
             if (s == "kirintormage") return CardDB.cardName.kirintormage;
+            if (s == "spectralrider") return CardDB.cardName.spectralrider;
             if (s == "thrallmarfarseer") return CardDB.cardName.thrallmarfarseer;
             if (s == "frostwolfwarlord") return CardDB.cardName.frostwolfwarlord;
             if (s == "sorcerersapprentice") return CardDB.cardName.sorcerersapprentice;
+            if (s == "feugen") return CardDB.cardName.feugen;
             if (s == "willofmukla") return CardDB.cardName.willofmukla;
             if (s == "holyfire") return CardDB.cardName.holyfire;
             if (s == "manawraith") return CardDB.cardName.manawraith;
@@ -2338,7 +2796,9 @@ namespace HREngine.Bots
             if (s == "earthenringfarseer") return CardDB.cardName.earthenringfarseer;
             if (s == "onyxia") return CardDB.cardName.onyxia;
             if (s == "manaaddict") return CardDB.cardName.manaaddict;
+            if (s == "unholyshadow") return CardDB.cardName.unholyshadow;
             if (s == "dualwarglaives") return CardDB.cardName.dualwarglaives;
+            if (s == "sludgebelcher") return CardDB.cardName.sludgebelcher;
             if (s == "worthlessimp") return CardDB.cardName.worthlessimp;
             if (s == "shiv") return CardDB.cardName.shiv;
             if (s == "sheep") return CardDB.cardName.sheep;
@@ -2348,11 +2808,13 @@ namespace HREngine.Bots
             if (s == "holywrath") return CardDB.cardName.holywrath;
             if (s == "ironforgerifleman") return CardDB.cardName.ironforgerifleman;
             if (s == "elitetaurenchieftain") return CardDB.cardName.elitetaurenchieftain;
+            if (s == "spectralwarrior") return CardDB.cardName.spectralwarrior;
             if (s == "bluegillwarrior") return CardDB.cardName.bluegillwarrior;
             if (s == "shapeshift") return CardDB.cardName.shapeshift;
             if (s == "hamiltonchu") return CardDB.cardName.hamiltonchu;
             if (s == "battlerage") return CardDB.cardName.battlerage;
             if (s == "nightblade") return CardDB.cardName.nightblade;
+            if (s == "locustswarm") return CardDB.cardName.locustswarm;
             if (s == "crazedhunter") return CardDB.cardName.crazedhunter;
             if (s == "andybrock") return CardDB.cardName.andybrock;
             if (s == "youthfulbrewmaster") return CardDB.cardName.youthfulbrewmaster;
@@ -2370,7 +2832,9 @@ namespace HREngine.Bots
             if (s == "poultryizer") return CardDB.cardName.poultryizer;
             if (s == "koboldgeomancer") return CardDB.cardName.koboldgeomancer;
             if (s == "legacyoftheemperor") return CardDB.cardName.legacyoftheemperor;
+            if (s == "eruption") return CardDB.cardName.eruption;
             if (s == "cenarius") return CardDB.cardName.cenarius;
+            if (s == "deathlord") return CardDB.cardName.deathlord;
             if (s == "searingtotem") return CardDB.cardName.searingtotem;
             if (s == "taurenwarrior") return CardDB.cardName.taurenwarrior;
             if (s == "explosivetrap") return CardDB.cardName.explosivetrap;
@@ -2391,20 +2855,24 @@ namespace HREngine.Bots
             if (s == "rockbiterweapon") return CardDB.cardName.rockbiterweapon;
             if (s == "starvingbuzzard") return CardDB.cardName.starvingbuzzard;
             if (s == "mirrorimage") return CardDB.cardName.mirrorimage;
+            if (s == "frozenchampion") return CardDB.cardName.frozenchampion;
             if (s == "silverhandrecruit") return CardDB.cardName.silverhandrecruit;
             if (s == "corruption") return CardDB.cardName.corruption;
             if (s == "preparation") return CardDB.cardName.preparation;
             if (s == "cairnebloodhoof") return CardDB.cardName.cairnebloodhoof;
             if (s == "mortalstrike") return CardDB.cardName.mortalstrike;
             if (s == "flare") return CardDB.cardName.flare;
+            if (s == "necroknight") return CardDB.cardName.necroknight;
             if (s == "silverhandknight") return CardDB.cardName.silverhandknight;
             if (s == "breakweapon") return CardDB.cardName.breakweapon;
             if (s == "guardianofkings") return CardDB.cardName.guardianofkings;
             if (s == "ancientbrewmaster") return CardDB.cardName.ancientbrewmaster;
+            if (s == "avenge") return CardDB.cardName.avenge;
             if (s == "youngdragonhawk") return CardDB.cardName.youngdragonhawk;
             if (s == "frostshock") return CardDB.cardName.frostshock;
             if (s == "healingtouch") return CardDB.cardName.healingtouch;
             if (s == "venturecomercenary") return CardDB.cardName.venturecomercenary;
+            if (s == "unbalancingstrike") return CardDB.cardName.unbalancingstrike;
             if (s == "sacrificialpact") return CardDB.cardName.sacrificialpact;
             if (s == "noooooooooooo") return CardDB.cardName.noooooooooooo;
             if (s == "baneofdoom") return CardDB.cardName.baneofdoom;
@@ -2412,6 +2880,7 @@ namespace HREngine.Bots
             if (s == "flesheatingghoul") return CardDB.cardName.flesheatingghoul;
             if (s == "loothoarder") return CardDB.cardName.loothoarder;
             if (s == "mill10") return CardDB.cardName.mill10;
+            if (s == "sapphiron") return CardDB.cardName.sapphiron;
             if (s == "jasonchayes") return CardDB.cardName.jasonchayes;
             if (s == "benbrode") return CardDB.cardName.benbrode;
             if (s == "betrayal") return CardDB.cardName.betrayal;
@@ -2427,22 +2896,27 @@ namespace HREngine.Bots
             if (s == "handtodeck") return CardDB.cardName.handtodeck;
             if (s == "starfire") return CardDB.cardName.starfire;
             if (s == "goldshirefootman") return CardDB.cardName.goldshirefootman;
+            if (s == "unrelentingtrainee") return CardDB.cardName.unrelentingtrainee;
             if (s == "murlocscout") return CardDB.cardName.murlocscout;
             if (s == "ragnarosthefirelord") return CardDB.cardName.ragnarosthefirelord;
             if (s == "rampage") return CardDB.cardName.rampage;
+            if (s == "zombiechow") return CardDB.cardName.zombiechow;
             if (s == "thrall") return CardDB.cardName.thrall;
             if (s == "stoneclawtotem") return CardDB.cardName.stoneclawtotem;
             if (s == "captainsparrot") return CardDB.cardName.captainsparrot;
             if (s == "windfuryharpy") return CardDB.cardName.windfuryharpy;
+            if (s == "unrelentingwarrior") return CardDB.cardName.unrelentingwarrior;
             if (s == "stranglethorntiger") return CardDB.cardName.stranglethorntiger;
             if (s == "summonarandomsecret") return CardDB.cardName.summonarandomsecret;
             if (s == "circleofhealing") return CardDB.cardName.circleofhealing;
             if (s == "snaketrap") return CardDB.cardName.snaketrap;
             if (s == "cabalshadowpriest") return CardDB.cardName.cabalshadowpriest;
+            if (s == "nerubarweblord") return CardDB.cardName.nerubarweblord;
             if (s == "upgrade") return CardDB.cardName.upgrade;
             if (s == "shieldslam") return CardDB.cardName.shieldslam;
             if (s == "flameburst") return CardDB.cardName.flameburst;
             if (s == "windfury") return CardDB.cardName.windfury;
+            if (s == "enrage") return CardDB.cardName.enrage;
             if (s == "natpagle") return CardDB.cardName.natpagle;
             if (s == "restoreallhealth") return CardDB.cardName.restoreallhealth;
             if (s == "houndmaster") return CardDB.cardName.houndmaster;
@@ -2451,6 +2925,7 @@ namespace HREngine.Bots
             if (s == "gnoll") return CardDB.cardName.gnoll;
             if (s == "archmageantonidas") return CardDB.cardName.archmageantonidas;
             if (s == "destroyallheroes") return CardDB.cardName.destroyallheroes;
+            if (s == "chains") return CardDB.cardName.chains;
             if (s == "wrathofairtotem") return CardDB.cardName.wrathofairtotem;
             if (s == "killcommand") return CardDB.cardName.killcommand;
             if (s == "manatidetotem") return CardDB.cardName.manatidetotem;
@@ -2460,24 +2935,30 @@ namespace HREngine.Bots
             if (s == "darkscalehealer") return CardDB.cardName.darkscalehealer;
             if (s == "shadowform") return CardDB.cardName.shadowform;
             if (s == "frostnova") return CardDB.cardName.frostnova;
+            if (s == "purecold") return CardDB.cardName.purecold;
             if (s == "mirrorentity") return CardDB.cardName.mirrorentity;
             if (s == "counterspell") return CardDB.cardName.counterspell;
             if (s == "mindshatter") return CardDB.cardName.mindshatter;
             if (s == "magmarager") return CardDB.cardName.magmarager;
             if (s == "wolfrider") return CardDB.cardName.wolfrider;
             if (s == "emboldener3000") return CardDB.cardName.emboldener3000;
+            if (s == "polarityshift") return CardDB.cardName.polarityshift;
             if (s == "gelbinmekkatorque") return CardDB.cardName.gelbinmekkatorque;
+            if (s == "webspinner") return CardDB.cardName.webspinner;
             if (s == "utherlightbringer") return CardDB.cardName.utherlightbringer;
             if (s == "innerrage") return CardDB.cardName.innerrage;
             if (s == "emeralddrake") return CardDB.cardName.emeralddrake;
+            if (s == "forceaitouseheropower") return CardDB.cardName.forceaitouseheropower;
+            if (s == "echoingooze") return CardDB.cardName.echoingooze;
             if (s == "heroicstrike") return CardDB.cardName.heroicstrike;
+            if (s == "hauntedcreeper") return CardDB.cardName.hauntedcreeper;
             if (s == "barreltoss") return CardDB.cardName.barreltoss;
             if (s == "yongwoo") return CardDB.cardName.yongwoo;
             if (s == "doomhammer") return CardDB.cardName.doomhammer;
             if (s == "stomp") return CardDB.cardName.stomp;
+            if (s == "spectralknight") return CardDB.cardName.spectralknight;
             if (s == "tracking") return CardDB.cardName.tracking;
             if (s == "fireball") return CardDB.cardName.fireball;
-            if (s == "metamorphosis") return CardDB.cardName.metamorphosis;
             if (s == "thecoin") return CardDB.cardName.thecoin;
             if (s == "bootybaybodyguard") return CardDB.cardName.bootybaybodyguard;
             if (s == "scarletcrusader") return CardDB.cardName.scarletcrusader;
@@ -2488,14 +2969,17 @@ namespace HREngine.Bots
             if (s == "emperorcobra") return CardDB.cardName.emperorcobra;
             if (s == "deadlyshot") return CardDB.cardName.deadlyshot;
             if (s == "reinforce") return CardDB.cardName.reinforce;
+            if (s == "supercharge") return CardDB.cardName.supercharge;
             if (s == "claw") return CardDB.cardName.claw;
             if (s == "explosiveshot") return CardDB.cardName.explosiveshot;
             if (s == "avengingwrath") return CardDB.cardName.avengingwrath;
             if (s == "riverpawgnoll") return CardDB.cardName.riverpawgnoll;
+            if (s == "sirzeliek") return CardDB.cardName.sirzeliek;
             if (s == "argentprotector") return CardDB.cardName.argentprotector;
             if (s == "hiddengnome") return CardDB.cardName.hiddengnome;
             if (s == "felguard") return CardDB.cardName.felguard;
             if (s == "northshirecleric") return CardDB.cardName.northshirecleric;
+            if (s == "plague") return CardDB.cardName.plague;
             if (s == "lepergnome") return CardDB.cardName.lepergnome;
             if (s == "fireelemental") return CardDB.cardName.fireelemental;
             if (s == "armorup") return CardDB.cardName.armorup;
@@ -2506,6 +2990,7 @@ namespace HREngine.Bots
             if (s == "defiasringleader") return CardDB.cardName.defiasringleader;
             if (s == "harvestgolem") return CardDB.cardName.harvestgolem;
             if (s == "kingkrush") return CardDB.cardName.kingkrush;
+            if (s == "aibuddydamageownhero5") return CardDB.cardName.aibuddydamageownhero5;
             if (s == "healingtotem") return CardDB.cardName.healingtotem;
             if (s == "ericdodds") return CardDB.cardName.ericdodds;
             if (s == "demigodsfavor") return CardDB.cardName.demigodsfavor;
@@ -2513,17 +2998,22 @@ namespace HREngine.Bots
             if (s == "dalaranmage") return CardDB.cardName.dalaranmage;
             if (s == "twilightdrake") return CardDB.cardName.twilightdrake;
             if (s == "coldlightoracle") return CardDB.cardName.coldlightoracle;
+            if (s == "shadeofnaxxramas") return CardDB.cardName.shadeofnaxxramas;
             if (s == "moltengiant") return CardDB.cardName.moltengiant;
+            if (s == "deathbloom") return CardDB.cardName.deathbloom;
             if (s == "shadowflame") return CardDB.cardName.shadowflame;
             if (s == "anduinwrynn") return CardDB.cardName.anduinwrynn;
             if (s == "argentcommander") return CardDB.cardName.argentcommander;
             if (s == "revealhand") return CardDB.cardName.revealhand;
             if (s == "arcanemissiles") return CardDB.cardName.arcanemissiles;
             if (s == "repairbot") return CardDB.cardName.repairbot;
+            if (s == "unstableghoul") return CardDB.cardName.unstableghoul;
             if (s == "ancientofwar") return CardDB.cardName.ancientofwar;
             if (s == "stormwindchampion") return CardDB.cardName.stormwindchampion;
             if (s == "summonapanther") return CardDB.cardName.summonapanther;
+            if (s == "mrbigglesworth") return CardDB.cardName.mrbigglesworth;
             if (s == "swipe") return CardDB.cardName.swipe;
+            if (s == "aihelperbuddy") return CardDB.cardName.aihelperbuddy;
             if (s == "hex") return CardDB.cardName.hex;
             if (s == "ysera") return CardDB.cardName.ysera;
             if (s == "arcanegolem") return CardDB.cardName.arcanegolem;
@@ -2542,9 +3032,13 @@ namespace HREngine.Bots
             if (s == "totemiccall") return CardDB.cardName.totemiccall;
             if (s == "secretkeeper") return CardDB.cardName.secretkeeper;
             if (s == "dreadcorsair") return CardDB.cardName.dreadcorsair;
+            if (s == "jaws") return CardDB.cardName.jaws;
             if (s == "forkedlightning") return CardDB.cardName.forkedlightning;
+            if (s == "reincarnate") return CardDB.cardName.reincarnate;
             if (s == "handofprotection") return CardDB.cardName.handofprotection;
+            if (s == "noththeplaguebringer") return CardDB.cardName.noththeplaguebringer;
             if (s == "vaporize") return CardDB.cardName.vaporize;
+            if (s == "frostbreath") return CardDB.cardName.frostbreath;
             if (s == "nozdormu") return CardDB.cardName.nozdormu;
             if (s == "divinespirit") return CardDB.cardName.divinespirit;
             if (s == "transcendence") return CardDB.cardName.transcendence;
@@ -2559,6 +3053,7 @@ namespace HREngine.Bots
             if (s == "freeze") return CardDB.cardName.freeze;
             if (s == "madbomber") return CardDB.cardName.madbomber;
             if (s == "consecration") return CardDB.cardName.consecration;
+            if (s == "spectraltrainee") return CardDB.cardName.spectraltrainee;
             if (s == "boar") return CardDB.cardName.boar;
             if (s == "knifejuggler") return CardDB.cardName.knifejuggler;
             if (s == "icebarrier") return CardDB.cardName.icebarrier;
@@ -2575,9 +3070,11 @@ namespace HREngine.Bots
             if (s == "ironbeakowl") return CardDB.cardName.ironbeakowl;
             if (s == "eviscerate") return CardDB.cardName.eviscerate;
             if (s == "repentance") return CardDB.cardName.repentance;
+            if (s == "understudy") return CardDB.cardName.understudy;
             if (s == "sunwalker") return CardDB.cardName.sunwalker;
             if (s == "nagamyrmidon") return CardDB.cardName.nagamyrmidon;
-            if (s == "destoryheropower") return CardDB.cardName.destoryheropower;
+            if (s == "destroyheropower") return CardDB.cardName.destroyheropower;
+            if (s == "skeletalsmith") return CardDB.cardName.skeletalsmith;
             if (s == "slam") return CardDB.cardName.slam;
             if (s == "swordofjustice") return CardDB.cardName.swordofjustice;
             if (s == "bounce") return CardDB.cardName.bounce;
@@ -2601,13 +3098,17 @@ namespace HREngine.Bots
             if (s == "savageroar") return CardDB.cardName.savageroar;
             if (s == "innervate") return CardDB.cardName.innervate;
             if (s == "inferno") return CardDB.cardName.inferno;
+            if (s == "falloutslime") return CardDB.cardName.falloutslime;
             if (s == "earthelemental") return CardDB.cardName.earthelemental;
             if (s == "facelessmanipulator") return CardDB.cardName.facelessmanipulator;
+            if (s == "mindpocalypse") return CardDB.cardName.mindpocalypse;
             if (s == "divinefavor") return CardDB.cardName.divinefavor;
+            if (s == "aibuddydestroyminions") return CardDB.cardName.aibuddydestroyminions;
             if (s == "demolisher") return CardDB.cardName.demolisher;
             if (s == "sunfuryprotector") return CardDB.cardName.sunfuryprotector;
             if (s == "dustdevil") return CardDB.cardName.dustdevil;
             if (s == "powerofthehorde") return CardDB.cardName.powerofthehorde;
+            if (s == "dancingswords") return CardDB.cardName.dancingswords;
             if (s == "holylight") return CardDB.cardName.holylight;
             if (s == "feralspirit") return CardDB.cardName.feralspirit;
             if (s == "raidleader") return CardDB.cardName.raidleader;
@@ -2730,7 +3231,7 @@ namespace HREngine.Bots
             public int needMinNumberOfEnemy = 0;
             public int needMinTotalMinions = 0;
             public int needMinionsCapIfAvailable = 0;
-            
+
             public int spellpowervalue = 0;
             public cardIDEnum cardIDenum = cardIDEnum.None;
             public List<ErrorType2> playrequires;
@@ -2778,7 +3279,7 @@ namespace HREngine.Bots
                 this.needWithMaxAttackValueOf = c.needWithMaxAttackValueOf;
                 this.needWithMinAttackValueOf = c.needWithMinAttackValueOf;
                 this.oneTurnEffect = c.oneTurnEffect;
-                this.playrequires =  new List<ErrorType2>(c.playrequires);
+                this.playrequires = new List<ErrorType2>(c.playrequires);
                 this.poisionous = c.poisionous;
                 this.race = c.race;
                 this.Recall = c.Recall;
@@ -2815,12 +3316,14 @@ namespace HREngine.Bots
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) continue;
+                        if (m.id == -1) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
+                        if (m.id == -1) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -2850,6 +3353,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2857,6 +3361,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2868,6 +3373,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2875,6 +3381,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2886,6 +3393,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr > this.needWithMaxAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2893,6 +3401,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr > this.needWithMaxAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2904,6 +3413,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr < this.needWithMinAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2911,6 +3421,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr < this.needWithMinAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2923,6 +3434,7 @@ namespace HREngine.Bots
                     retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2930,6 +3442,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2941,6 +3454,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.taunt)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2948,6 +3462,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.taunt)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -2971,12 +3486,14 @@ namespace HREngine.Bots
                     retval.Add(new targett(200, p.enemyHeroEntity));//enemyhero
                     foreach (Minion m in p.ownMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
+                        if (m.id == -1) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight))) continue;
+                        if (m.id == -1) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister))) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -3006,6 +3523,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3013,6 +3531,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3024,6 +3543,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3031,6 +3551,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.wounded)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3042,6 +3563,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr > this.needWithMaxAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3049,6 +3571,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr > this.needWithMaxAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3060,6 +3583,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr < this.needWithMinAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3067,6 +3591,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (m.Angr < this.needWithMinAttackValueOf)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3079,6 +3604,7 @@ namespace HREngine.Bots
                     retval.RemoveAll(x => (x.target == 100) || (x.target == 200));
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3086,6 +3612,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!(m.handcard.card.race == this.needRaceForPlaying))
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3097,6 +3624,7 @@ namespace HREngine.Bots
                 {
                     foreach (Minion m in p.ownMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.taunt)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3104,6 +3632,7 @@ namespace HREngine.Bots
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
+                        if (m.id == -1) continue;
                         if (!m.taunt)
                         {
                             retval.RemoveAll(x => x.targetEntity == m.entitiyID);
@@ -3125,17 +3654,12 @@ namespace HREngine.Bots
 
                     offset += (p.managespenst);
 
-                    if (this.battlecry)
-                    {
-                        offset += p.nerubarweblord * 2;
-                    }
-
                     int temp = -(p.startedWithbeschwoerungsportal) * 2;
                     if (retval + temp <= 0) temp = -retval + 1;
                     offset = offset + temp;
 
-                    if (p.mobsplayedThisTurn == 0 )
-                    { 
+                    if (p.mobsplayedThisTurn == 0)
+                    {
                         offset -= p.winzigebeschwoererin;
                     }
 
@@ -3198,12 +3722,6 @@ namespace HREngine.Bots
                 if (p.managespenst != p.startedWithManagespenst && this.type == cardtype.MOB)
                 {
                     offset += (p.managespenst - p.startedWithManagespenst);
-                }
-
-                //Manacosts changes with nerubarweblord
-                if (this.battlecry && p.nerubarweblord != p.startedWithnerubarweblord && this.type == cardtype.MOB)
-                {
-                    offset += (p.nerubarweblord - p.startedWithnerubarweblord);
                 }
 
 
@@ -3294,7 +3812,7 @@ namespace HREngine.Bots
                 {
                     if (p.ownMinions.Count > 7 - this.needEmptyPlacesForPlaying) return false;
                 }
-                
+
                 if (isRequirementInList(CardDB.ErrorType2.REQ_WEAPON_EQUIPPED))
                 {
                     if (p.ownWeaponName == CardDB.cardName.unknown) return false;
@@ -3314,7 +3832,7 @@ namespace HREngine.Bots
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_TARGET_IF_AVAILABLE) && isRequirementInList(CardDB.ErrorType2.REQ_MINION_CAP_IF_TARGET_AVAILABLE))
                 {
-                    if (this.getTargetsForCard(p).Count >= 1 && p.ownMinions.Count > 7-this.needMinionsCapIfAvailable ) return false;
+                    if (this.getTargetsForCard(p).Count >= 1 && p.ownMinions.Count > 7 - this.needMinionsCapIfAvailable) return false;
                 }
 
                 if (isRequirementInList(CardDB.ErrorType2.REQ_ENTIRE_ENTOURAGE_NOT_IN_PLAY))
@@ -3326,7 +3844,7 @@ namespace HREngine.Bots
                     }
                     if (difftotem == 4) return false;
                 }
-                
+
 
                 if (this.Secret)
                 {
@@ -3342,6 +3860,7 @@ namespace HREngine.Bots
 
         }
 
+        List<string> namelist = new List<string>();
         List<Card> cardlist = new List<Card>();
         Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
@@ -3356,6 +3875,10 @@ namespace HREngine.Bots
                 {
                     instance = new CardDB();
                     //instance.enumCreator();// only call this to get latest cardids
+                    /*foreach (KeyValuePair<cardIDEnum, Card> kvp in instance.cardidToCardList)
+                    {
+                        Helpfunctions.Instance.logg(kvp.Value.name + " " + kvp.Value.Attack);
+                    }*/
                 }
                 return instance;
             }
@@ -3380,13 +3903,13 @@ namespace HREngine.Bots
             this.cardidToCardList.Clear();
             Card c = new Card();
             int de = 0;
-            bool targettext = false;
             //placeholdercard
             Card plchldr = new Card();
             plchldr.name = CardDB.cardName.unknown;
             plchldr.cost = 1000;
+            this.namelist.Add("unknown");
             this.cardlist.Add(plchldr);
-
+            string name = "";
             foreach (string s in lines)
             {
                 if (s.Contains("/Entity"))
@@ -3398,11 +3921,16 @@ namespace HREngine.Bots
                         //Helpfunctions.Instance.logg(c.description);
                         continue;
                     }
-
+                    if (name != "")
+                    {
+                        this.namelist.Add(name);
+                    }
+                    name = "";
                     if (c.name != CardDB.cardName.unknown)
                     {
-                        //Helpfunctions.Instance.logg(c.name);
                         this.cardlist.Add(c);
+                        //Helpfunctions.Instance.logg(c.name);
+
                         if (!this.cardidToCardList.ContainsKey(c.cardIDenum))
                         {
                             this.cardidToCardList.Add(c.cardIDenum, c);
@@ -3410,30 +3938,29 @@ namespace HREngine.Bots
                     }
 
                 }
-                if (s.Contains("<Entity version=\"2\" CardID=\""))
+                if (s.Contains("<Entity version=\"") && s.Contains(" CardID=\""))
                 {
                     c = new Card();
                     de = 0;
-                    targettext = false;
-                    string temp = s.Replace("<Entity version=\"2\" CardID=\"", "");
+                    string temp = s.Split(new string[] { "CardID=\"" }, StringSplitOptions.None)[1];
                     temp = temp.Replace("\">", "");
                     //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
                 }
+                /*
                 if (s.Contains("<Entity version=\"1\" CardID=\""))
                 {
                     c = new Card();
                     de = 0;
-                    targettext = false;
                     string temp = s.Replace("<Entity version=\"1\" CardID=\"", "");
                     temp = temp.Replace("\">", "");
                     //c.CardID = temp;
                     allCardIDS.Add(temp);
                     c.cardIDenum = this.cardIdstringToEnum(temp);
                     continue;
-                }
+                }*/
 
                 if (s.Contains("<Tag name=\"Health\""))
                 {
@@ -3504,6 +4031,23 @@ namespace HREngine.Bots
                     continue;
                 }
 
+                if (s.Contains("<Tag name=\"CardName\" "))
+                {
+                    de = 0;
+                    continue;
+                }
+                if (s.Contains("<Tag name=\"CardTextInHand\" "))
+                {
+                    de = 1;
+                    continue;
+                }
+                if (s.Contains("<Tag name=\"TargetingArrowText\" "))
+                {
+                    c.target = true;
+                    de = 2;
+                    continue;
+                }
+
                 if (s.Contains("<enUS>"))
                 {
                     string temp = s.Replace("<enUS>", "");
@@ -3528,7 +4072,7 @@ namespace HREngine.Bots
 
                         //Helpfunctions.Instance.logg(temp);
                         c.name = this.cardNamestringToEnum(temp);
-
+                        name = temp;
                         if (PenalityManager.Instance.specialMinions.ContainsKey(this.cardNamestringToEnum(temp))) c.hasEffect = true;
 
                     }
@@ -3542,13 +4086,11 @@ namespace HREngine.Bots
                             //Helpfunctions.Instance.logg(c.name + " is choice");
                         }
                     }
-                    if (targettext)
+                    if (de == 2)
                     {
                         //c.targettext = temp;
-                        targettext = false;
                     }
-
-                    de++;
+                    de = -1;
                     continue;
                 }
                 if (s.Contains("<Tag name=\"Poisonous\""))
@@ -3758,14 +4300,6 @@ namespace HREngine.Bots
                     if (ti == 1) c.HealTarget = true;
                     continue;
                 }
-
-                if (s.Contains("TargetingArrowText"))
-                {
-                    c.target = true;
-                    targettext = true;
-                    continue;
-                }
-
                 if (s.Contains("<PlayRequirement"))
                 {
                     string temp = s.Split(new string[] { "reqID=\"" }, StringSplitOptions.RemoveEmptyEntries)[1];
@@ -3842,7 +4376,6 @@ namespace HREngine.Bots
 
         }
 
-
         public Card getCardData(CardDB.cardName cardname)
         {
             Card c = new Card();
@@ -3873,10 +4406,10 @@ namespace HREngine.Bots
             //call this, if carddb.txt was changed, to get latest public enum cardIDEnum
             Helpfunctions.Instance.logg("public enum cardIDEnum");
             Helpfunctions.Instance.logg("{");
-            Helpfunctions.Instance.logg( "None,");
+            Helpfunctions.Instance.logg("None,");
             foreach (string cardid in this.allCardIDS)
             {
-                Helpfunctions.Instance.logg(cardid+",");
+                Helpfunctions.Instance.logg(cardid + ",");
             }
             Helpfunctions.Instance.logg("}");
 
@@ -3893,10 +4426,10 @@ namespace HREngine.Bots
 
             List<string> namelist = new List<string>();
 
-            foreach (Card cardid in this.cardlist)
+            foreach (string cardid in this.namelist)
             {
-                if (namelist.Contains(cardid.name.ToString())) continue;
-                namelist.Add(cardid.name.ToString());
+                if (namelist.Contains(cardid)) continue;
+                namelist.Add(cardid);
             }
 
 

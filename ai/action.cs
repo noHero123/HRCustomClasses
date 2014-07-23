@@ -1712,7 +1712,7 @@ namespace HREngine.Bots
                     Minion m = temp[0];
                     minionGetDestroyed(m, false);
                 }
-                if (secretID == CardDB.cardIDEnum.EX1_duplicate) // duplicate
+                if (secretID == CardDB.cardIDEnum.FP1_018) // duplicate
                 {
                     // first damage to your hero is nulled -> lower guessingHeroDamage and destroy weakest minion
                     List<Minion> temp = new List<Minion>(this.ownMinions);
@@ -1769,7 +1769,7 @@ namespace HREngine.Bots
                     m.maxHp = 1;
                 }
 
-                if (secretID == CardDB.cardIDEnum.EX1_Avenge) // avenge
+                if (secretID == CardDB.cardIDEnum.FP1_020) // avenge
                 {
                     // we give our weakest minion +3/+2 :D
                     List<Minion> temp = new List<Minion>(this.ownMinions);
@@ -3022,7 +3022,7 @@ namespace HREngine.Bots
 
                 if (m.handcard.card.name == CardDB.cardName.nerubianegg)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.nerubian);//nerubian
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.FP1_007t);//nerubian
                     callKid(c, m.id - 1, own);
                 }
                 if (m.handcard.card.name == CardDB.cardName.dancingswords)
@@ -3159,14 +3159,14 @@ namespace HREngine.Bots
                 {
                     int place = this.enemyMinions.Count - 1;
                     if (!own) place = this.ownMinions.Count - 1;
-                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.panther);//nerubian
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_017);//nerubian
                     callKid(c, place, !own);
                         
                 }
 
                 if (m.handcard.card.name == CardDB.cardName.hauntedcreeper)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.spectralspider);
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.FP1_002t);
                     callKid(c, m.id - 1, own);
                     callKid(c, m.id - 1, own);
                 }
@@ -3198,7 +3198,7 @@ namespace HREngine.Bots
                 }
                 if (m.handcard.card.name == CardDB.cardName.sludgebelcher)
                 {
-                    CardDB.Card c = CardDB.Instance.getCardData(CardDB.cardName.slime);
+                    CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.FP1_012t);
                     callKid(c, m.id - 1, own);
                 }
                 if (m.handcard.card.name == CardDB.cardName.unstableghoul)
@@ -5932,7 +5932,7 @@ namespace HREngine.Bots
             }
 
             //NaxxCards###################################################################################
-            if (c.name == CardDB.cardName.reincarnation)
+            if (c.name == CardDB.cardName.reincarnate)
             {
                 int place = m.id;
                 if(place >=10) place -=10;
