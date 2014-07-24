@@ -98,6 +98,7 @@ namespace HREngine.Bots
         public int ownHeroEntity = -1;
         public int enemyHeroEntity = -1;
 
+        public int hashcode = 0;
         public int value = Int32.MinValue;
         public int guessingHeroHP = 30;
 
@@ -694,6 +695,84 @@ namespace HREngine.Bots
 
             return true;
         }
+
+        public bool isEqualf(Playfield p)
+        {
+            if (this.value != p.value) return false;
+
+            if (this.ownMinions.Count != p.ownMinions.Count || this.enemyMinions.Count != p.enemyMinions.Count || this.owncards.Count != p.owncards.Count) return false;
+
+            if (this.cardsPlayedThisTurn != p.cardsPlayedThisTurn || this.mobsplayedThisTurn != p.mobsplayedThisTurn || this.ueberladung != p.ueberladung) return false;
+
+            if (this.mana != p.mana || this.enemyMaxMana != p.enemyMaxMana || this.ownMaxMana != p.ownMaxMana) return false;
+
+            if (this.ownHeroName != p.ownHeroName || this.enemyHeroName != p.enemyHeroName) return false;
+
+            if (this.ownHeroHp != p.ownHeroHp || this.ownheroAngr != p.ownheroAngr || this.ownHeroDefence != p.ownHeroDefence || this.ownHeroFrozen != p.ownHeroFrozen || this.heroImmuneWhileAttacking != p.heroImmuneWhileAttacking || this.heroImmune != p.heroImmune) return false;
+
+            if (this.ownHeroReady != p.ownHeroReady || this.ownWeaponAttack != p.ownWeaponAttack || this.ownWeaponDurability != p.ownWeaponDurability || this.ownHeroNumAttackThisTurn != p.ownHeroNumAttackThisTurn || this.ownHeroWindfury != p.ownHeroWindfury) return false;
+
+            if (this.enemyHeroHp != p.enemyHeroHp || this.enemyWeaponAttack != p.enemyWeaponAttack || this.enemyHeroDefence != p.enemyHeroDefence || this.enemyWeaponDurability != p.enemyWeaponDurability || this.enemyHeroFrozen != p.enemyHeroFrozen || this.enemyHeroImmune != p.enemyHeroImmune) return false;
+
+            if (this.ownHeroAblility.name != p.ownHeroAblility.name || this.spellpower != p.spellpower) return false;
+
+            bool minionbool = true;
+            for (int i = 0; i < this.ownMinions.Count; i++)
+            {
+                Minion dis = this.ownMinions[i]; Minion pis = p.ownMinions[i];
+                //if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                //if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
+                if (dis.entitiyID != pis.entitiyID) minionbool = false;
+                if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
+                if (dis.playedThisTurn != pis.playedThisTurn || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.silenced != pis.silenced || dis.stealth != pis.stealth || dis.taunt != pis.taunt || dis.windfury != pis.windfury || dis.wounded != pis.wounded || dis.zonepos != pis.zonepos) minionbool = false;
+                if (dis.divineshild != pis.divineshild || dis.cantLowerHPbelowONE != pis.cantLowerHPbelowONE || dis.immune != pis.immune) minionbool = false;
+                if (minionbool == false) break;
+            }
+            if (minionbool == false)
+            {
+
+                return false;
+            }
+
+            for (int i = 0; i < this.enemyMinions.Count; i++)
+            {
+                Minion dis = this.enemyMinions[i]; Minion pis = p.enemyMinions[i];
+                //if (dis.entitiyID == 0) dis.entitiyID = pis.entitiyID;
+                //if (pis.entitiyID == 0) pis.entitiyID = dis.entitiyID;
+                if (dis.entitiyID != pis.entitiyID) minionbool = false;
+                if (dis.Angr != pis.Angr || dis.Hp != pis.Hp || dis.maxHp != pis.maxHp || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.Ready != pis.Ready) minionbool = false; // includes frozen, exhaunted
+                if (dis.playedThisTurn != pis.playedThisTurn || dis.numAttacksThisTurn != pis.numAttacksThisTurn) minionbool = false;
+                if (dis.silenced != pis.silenced || dis.stealth != pis.stealth || dis.taunt != pis.taunt || dis.windfury != pis.windfury || dis.wounded != pis.wounded || dis.zonepos != pis.zonepos) minionbool = false;
+                if (dis.divineshild != pis.divineshild || dis.cantLowerHPbelowONE != pis.cantLowerHPbelowONE || dis.immune != pis.immune) minionbool = false;
+                if (minionbool == false) break;
+            }
+            if (minionbool == false)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < this.owncards.Count; i++)
+            {
+                Handmanager.Handcard dishc = this.owncards[i]; Handmanager.Handcard pishc = p.owncards[i];
+                if (dishc.position != pishc.position || dishc.entity != pishc.entity || dishc.manacost != pishc.manacost)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int retval = 0;
+            retval += 10000 * this.ownMinions.Count + 100 * this.enemyMinions.Count + 1000 * this.mana + 100000 * (this.ownHeroHp + this.enemyHeroHp) + this.owncards.Count + this.enemycarddraw + this.cardsPlayedThisTurn + this.mobsplayedThisTurn + this.ownheroAngr + this.ownHeroDefence + this.ownWeaponAttack + this.enemyWeaponDurability;
+            return retval;
+        }
+
 
         public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print)
         {

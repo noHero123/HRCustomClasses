@@ -774,28 +774,42 @@ namespace HREngine.Bots
             if (this.useComparison)
             {
                 int i = 0;
-                foreach (Playfield p in posmoves)
+                int max = Math.Min(posmoves.Count, this.maxwide);
+
+                Playfield p = null;
+                Playfield pp = null;
+                //foreach (Playfield p in posmoves)
+                for (i = 0; i < max; i++)
                 {
+                    p = posmoves[i];
+                    int hash = p.GetHashCode();
+                    p.hashcode = hash;
                     bool found = false;
-                    foreach (Playfield pp in temp)
+                    //foreach (Playfield pp in temp)
+                    for (int j = 0; j < temp.Count; j++)
                     {
-                        if (pp.isEqual(p, false))
+                        pp = temp[j];
+                        if (pp.hashcode == p.hashcode)
                         {
-                            found = true;
-                            break;
+                            if (pp.isEqualf(p))
+                            {
+                                found = true;
+                                break;
+                            }
                         }
                     }
                     if (!found) temp.Add(p);
-                    i++;
-                    if (i >= this.maxwide) break;
+                    //i++;
+                    //if (i >= this.maxwide) break;
 
                 }
+
+
             }
             else
             {
                 temp.AddRange(posmoves);
             }
-
             posmoves.Clear();
             posmoves.AddRange(temp.GetRange(0, Math.Min(takenumber, temp.Count)));
             //posmoves.Clear();

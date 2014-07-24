@@ -3864,6 +3864,7 @@ namespace HREngine.Bots
         List<Card> cardlist = new List<Card>();
         Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
+        public Card unknownCard;
 
         private static CardDB instance;
 
@@ -3909,6 +3910,7 @@ namespace HREngine.Bots
             plchldr.cost = 1000;
             this.namelist.Add("unknown");
             this.cardlist.Add(plchldr);
+            this.unknownCard = cardlist[0];
             string name = "";
             foreach (string s in lines)
             {

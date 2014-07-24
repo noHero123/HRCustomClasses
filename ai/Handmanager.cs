@@ -32,7 +32,7 @@ namespace HREngine.Bots
 
             public Handcard()
             {
-                card = new CardDB.Card();
+                card = CardDB.Instance.unknownCard;
             }
             public Handcard(Handcard hc)
             {
