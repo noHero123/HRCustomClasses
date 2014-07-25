@@ -702,7 +702,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 89;
+        public int versionnumber = 90;
         private bool singleLog = false;
 
 
@@ -846,7 +846,7 @@ namespace HREngine.Bots
 
         private void getHerostuff()
         {
-
+            Dictionary<int, HREntity> allEntitys = HRGame.GetEntityMap();
 
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
@@ -869,6 +869,14 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
             enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
             enemySecretCount = 0;
+            //count enemy secrets
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.IsSecret() && ent.GetControllerId() == enemyPlayer.GetControllerId() && ent.GetZone() == HRCardZone.SECRET) enemySecretCount++;
+            }
+
+
+
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
@@ -883,8 +891,15 @@ namespace HREngine.Bots
 
             this.ownHeroFatigue = ownhero.GetFatigue();
             this.enemyHeroFatigue = enemyhero.GetFatigue();
-            //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
-            //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
+
+            this.ownDecksize = 0;
+            this.enemyDecksize = 0;
+            //count decksize
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetControllerId() == ownPlayer.GetControllerId() && ent.GetZone() == HRCardZone.DECK) ownDecksize++;
+                if (ent.GetControllerId() == enemyPlayer.GetControllerId() && ent.GetZone() == HRCardZone.DECK) enemyDecksize++;
+            }
 
             this.heroImmune = ownhero.IsImmune();
             this.enemyHeroImmune = enemyhero.IsImmune();
@@ -8485,11 +8500,14 @@ namespace HREngine.Bots
             {
                 int ownanz = this.ownMinions.Count;
                 int enemanz = this.enemyMinions.Count;
-                foreach (Minion mnn in this.ownMinions)
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn, true);
                 }
-                foreach (Minion mnn in this.enemyMinions)
+                temp.Clear();
+                temp.AddRange(this.enemyMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn, false);
                 }
@@ -11387,9 +11405,9 @@ namespace HREngine.Bots
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
         {
-            this.ownDeckSize = 30;// ods;
+            this.ownDeckSize = ods;
             this.ownHeroFatigue = ohf;
-            this.enemyDeckSize = 30;// eds;
+            this.enemyDeckSize = eds;
             this.enemyHeroFatigue = ehf;
         }
 
@@ -11517,6 +11535,7 @@ namespace HREngine.Bots
 
 
     }
+
 
     public class PenalityManager
     {

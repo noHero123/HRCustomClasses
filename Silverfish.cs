@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 89;
+        public int versionnumber = 90;
         private bool singleLog = false;
 
 
@@ -121,6 +121,7 @@ namespace HREngine.Bots
             getHerostuff();
             getMinions();
             getHandcards();
+            getDecks();
 
             // send ai the data:
             Hrtprozis.Instance.clearAll();
@@ -155,7 +156,7 @@ namespace HREngine.Bots
 
         private void getHerostuff()
         {
-
+            Dictionary<int, HREntity> allEntitys = HRGame.GetEntityMap();
 
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
@@ -178,6 +179,14 @@ namespace HREngine.Bots
             Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
             enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
             enemySecretCount = 0;
+            //count enemy secrets
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.IsSecret() && ent.GetControllerId() == enemyPlayer.GetControllerId() && ent.GetZone() == HRCardZone.SECRET) enemySecretCount++;
+            }
+            
+
+            
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
@@ -192,8 +201,15 @@ namespace HREngine.Bots
 
             this.ownHeroFatigue = ownhero.GetFatigue();
             this.enemyHeroFatigue = enemyhero.GetFatigue();
-            //this.ownDecksize = HRCard.GetCards(ownPlayer, HRCardZone.DECK).Count;
-            //this.enemyDecksize = HRCard.GetCards(enemyPlayer, HRCardZone.DECK).Count;
+
+            this.ownDecksize = 0;
+            this.enemyDecksize = 0;
+            //count decksize
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetControllerId() == ownPlayer.GetControllerId() && ent.GetZone() == HRCardZone.DECK) ownDecksize++;
+                if (ent.GetControllerId() == enemyPlayer.GetControllerId() && ent.GetZone() == HRCardZone.DECK) enemyDecksize++;
+            }
 
             this.heroImmune = ownhero.IsImmune();
             this.enemyHeroImmune = enemyhero.IsImmune();
@@ -494,7 +510,42 @@ namespace HREngine.Bots
 
         }
 
+        private void getDecks()
+        {
+            Dictionary<int, HREntity> allEntitys = HRGame.GetEntityMap();
 
+            int owncontroler = HRPlayer.GetLocalPlayer().GetControllerId();
+            int enemycontroler = HRPlayer.GetEnemyPlayer().GetControllerId();
+            List<CardDB.cardIDEnum> ownCards = new List<CardDB.cardIDEnum>();
+            List<CardDB.cardIDEnum> enemyCards = new List<CardDB.cardIDEnum>();
+
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetZone() == HRCardZone.SECRET && ent.GetControllerId() == enemycontroler) continue; // cant know enemy secrets :D
+
+                if (ent.GetCardType() == HRCardType.MINION || ent.GetCardType() == HRCardType.WEAPON || ent.GetCardType() == HRCardType.ABILITY)
+                {
+                    CardDB.cardIDEnum cardid = CardDB.Instance.cardIdstringToEnum(ent.GetCardId());
+                    string owner = "own";
+                    if (ent.GetControllerId() == enemycontroler) owner = "enemy";
+                    //if (ent.GetControllerId() == enemycontroler && ent.GetZone() == HRCardZone.HAND) Helpfunctions.Instance.logg("enemy card in hand: " + "cardindeck: " + cardid + " " + ent.GetName());
+                    if (cardid != CardDB.cardIDEnum.None) Helpfunctions.Instance.logg("cardindeck: " + cardid + " " + ent.GetName() + " " + ent.GetZone() + " " + owner + " " + ent.GetCardType());
+                    if (ent.GetControllerId() == owncontroler)
+                    {
+                        ownCards.Add(cardid);
+                    }
+                    else
+                    {
+                        enemyCards.Add(cardid);
+                    }
+                }
+
+            }
+
+            Probabilitymaker.Instance.setOwnCards(ownCards);
+            Probabilitymaker.Instance.setEnemyCards(enemyCards);
+
+        }
 
     }
 

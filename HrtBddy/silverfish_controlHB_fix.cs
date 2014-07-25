@@ -8113,11 +8113,14 @@ namespace SilverfishControlFix
             {
                 int ownanz = this.ownMinions.Count;
                 int enemanz = this.enemyMinions.Count;
-                foreach (Minion mnn in this.ownMinions)
+                List<Minion> temp = new List<Minion>(this.ownMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn, true);
                 }
-                foreach (Minion mnn in this.enemyMinions)
+                temp.Clear();
+                temp.AddRange(this.enemyMinions);
+                foreach (Minion mnn in temp)
                 {
                     minionGetDestroyed(mnn, false);
                 }
