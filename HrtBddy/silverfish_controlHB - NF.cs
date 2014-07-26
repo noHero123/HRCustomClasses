@@ -8,9 +8,9 @@ using Triton.Game;
 
 //using System.Linq;
 
-namespace SilverfishControlFix
+namespace SilverfishControlNewFix
 {
-    public class SilverControlFix : ICustomDeck
+    public class SilverControlNF : ICustomDeck
     {
         private readonly PenalityManager penman = PenalityManager.Instance;
         private readonly Silverfish sf;
@@ -22,7 +22,7 @@ namespace SilverfishControlFix
 
         Behavior behave = new BehaviorControl();
 
-        public SilverControlFix()
+        public SilverControlNF()
         {
             bool concede = false;
             bool writeToSingleFile = false;
@@ -58,7 +58,7 @@ namespace SilverfishControlFix
 
 
             bool teststuff = false;
-            // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
+                // set to true, to run a testfile (requires test.txt file in filder where _cardDB.txt file is located)
             bool printstuff = false; // if true, the best board of the tested file is printet stepp by stepp
             Helpfunctions.Instance.ErrorLog("----------------------------");
             Helpfunctions.Instance.ErrorLog("you are running uai V" + sf.versionnumber);
@@ -169,12 +169,12 @@ namespace SilverfishControlFix
                     }
                     HSCard target = getEntityWithNumber(dirtytarget);
 
-                    if (target == null) Logging.Write("error: target is null...");
-
+                    if(target == null) Logging.Write("error: target is null...");
+                    
                     dirtytarget = -1;
                     dirtyTargetSource = -1;
 
-                    if (source == null) TritonHS.DoTarget(target);
+                    if(source == null) TritonHS.DoTarget(target);
                     else source.DoTarget(target);
 
                     yield break;
@@ -395,7 +395,7 @@ namespace SilverfishControlFix
 
     public class Silverfish
     {
-        public int versionnumber = 89;
+        public int versionnumber = 90;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -449,7 +449,7 @@ namespace SilverfishControlFix
         private List<string> ownSecretList = new List<string>();
         private bool ownheroisread;
         private int ueberladung;
-
+        
 
         public Silverfish(bool snglLg)
         {
@@ -545,6 +545,7 @@ namespace SilverfishControlFix
 
         private void getHerostuff()
         {
+            List<HSCard> allcards = TritonHS.GetAllCards();
             //player stuff#########################
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             currentMana = TritonHS.CurrentMana;
@@ -560,10 +561,22 @@ namespace SilverfishControlFix
 
             //count own secrets
             ownSecretList = new List<string>(); // the CARDIDS of the secrets
-            ourSecretsCount = 0;
+            enemySecretCount = 0;
+            //count enemy secrets:
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.IsSecret && ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Secret) enemySecretCount++;
+                if (ent.IsSecret && ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Secret)
+                {
+                    ownSecretList.Add(ent.Id);
+                }
+            }
+
+
+            ourSecretsCount = ownSecretList.Count;
             Helpfunctions.Instance.logg("own secretsCount: " + ourSecretsCount);
             //count enemy secrets
-            enemySecretCount = 0;
+            
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
 
 
@@ -579,8 +592,14 @@ namespace SilverfishControlFix
             ownHeroFatigue = TritonHS.Fatigue;
             enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
 
-            //this.ownDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, true).Count;// or something like this :D
-            //this.enemyDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, false).Count;// or something like this :D
+            this.ownDecksize = 0;
+            this.enemyDecksize = 0;
+            //count decksize
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Deck) ownDecksize++;
+                if (ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Deck) enemyDecksize++;
+            }
 
             heroImmune = TritonHS.OurHero.IsImmune;
             enemyHeroImmune = TritonHS.EnemyHero.IsImmune;
@@ -659,12 +678,11 @@ namespace SilverfishControlFix
             heroAbility =
                 CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
             ownAbilityisReady = (TritonHS.OurHeroPowerCard.IsExhausted) ? false : true;
-            // if exhausted, ability is NOT ready
-            //fix:
-            ownAbilityisReady = TritonHS.OurHeroPowerCard.CanAttack;
+                // if exhausted, ability is NOT ready
+
             enemyAbility =
                 CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
-            // not correct :D
+                // not correct :D
         }
 
         private void getMinions()
@@ -753,23 +771,22 @@ namespace SilverfishControlFix
                         m.Ready = false;
                     }
 
-                    m.Ready = entitiy.CanAttack;
                     //adding the enchantments
 
                     foreach (HSCard enchi in entitiy.AttachedCards)
                     {
-                        if (!enchi.IsNull())
-                        {
-                            Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(enchi.Id));
-                            ench.creator = enchi.CreatorId;
-                            ench.controllerOfCreator = enchi.ControllerId;
-                            ench.cantBeDispelled = false;
-                            m.enchantments.Add(ench);
-                        }
-                        else
-                        {
-                            Logging.Write("Attachedcard is null...");
-                        }
+                      if(!enchi.IsNull())
+                      {
+                        Enchantment ench = CardDB.getEnchantmentFromCardID(CardDB.Instance.cardIdstringToEnum(enchi.Id));
+                        ench.creator = enchi.CreatorId;
+                        ench.controllerOfCreator = enchi.ControllerId;
+                        ench.cantBeDispelled = false;
+                        m.enchantments.Add(ench);
+                      }
+                      else
+                      {
+                        Logging.Write("Attachedcard is null...");
+                      }
                     }
 
 
@@ -813,7 +830,7 @@ namespace SilverfishControlFix
             }
 
             enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
-            // dont know if you can count the enemys-handcars in this way :D
+                // dont know if you can count the enemys-handcars in this way :D
         }
     }
 
@@ -1137,7 +1154,6 @@ namespace SilverfishControlFix
 
 
     }
-
 
     // the ai :D
     //please ask/write me if you use this in your project
@@ -11018,9 +11034,9 @@ namespace SilverfishControlFix
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
         {
-            this.ownDeckSize = 30;// ods;
+            this.ownDeckSize = ods;
             this.ownHeroFatigue = ohf;
-            this.enemyDeckSize = 30;// eds;
+            this.enemyDeckSize = eds;
             this.enemyHeroFatigue = ehf;
         }
 
@@ -20173,6 +20189,7 @@ namespace SilverfishControlFix
         MULLIGAN,
         GENERAL
     }
+
 
     class Settings
     {
