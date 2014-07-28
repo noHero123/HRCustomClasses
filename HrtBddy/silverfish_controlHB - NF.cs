@@ -547,6 +547,23 @@ namespace SilverfishControlNewFix
         private void getHerostuff()
         {
             List<HSCard> allcards = TritonHS.GetAllCards();
+
+            HSCard ownHero = TritonHS.OurHero;
+            HSCard enemHero = TritonHS.EnemyHero;
+            int ownheroentity = TritonHS.OurHero.EntityId;
+            int enemyheroentity = TritonHS.EnemyHero.EntityId;
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.EntityId == enemyheroentity)
+                {
+                    enemHero = ent;
+                }
+                if (ent.EntityId == ownheroentity)
+                {
+                    ownHero = ent;
+                }
+            }
+
             //player stuff#########################
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             currentMana = TritonHS.CurrentMana;
@@ -581,28 +598,19 @@ namespace SilverfishControlNewFix
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
 
 
-            numMinionsPlayedThisTurn = TritonHS.NumMinionsPlayedThisTurn;
-            cardsPlayedThisTurn = TritonHS.NumCardsPlayedThisTurn;
-            ueberladung = TritonHS.RecallOwed;
+            numMinionsPlayedThisTurn = ownHero.GetTag(GAME_TAG.NUM_MINIONS_PLAYED_THIS_TURN);
+            cardsPlayedThisTurn = ownHero.GetTag(GAME_TAG.NUM_CARDS_PLAYED_THIS_TURN);
+            ueberladung = ownHero.GetTag(GAME_TAG.RECALL_OWED);
 
             //get weapon stuff
             ownHeroWeapon = "";
             heroWeaponAttack = 0;
             heroWeaponDurability = 0;
 
-            ownHeroFatigue = TritonHS.Fatigue;
+            ownHeroFatigue = ownHero.GetTag(GAME_TAG.FATIGUE);
             //enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
             //get enemy Fatigue:
-            enemyHeroFatigue = 0;
-            int enemyheroentity = TritonHS.EnemyHero.EntityId;
-            foreach (HSCard ent in allcards)
-            {
-                if (ent.EntityId == enemyheroentity)
-                {
-                    enemyHeroFatigue = ent.GetTag(GAME_TAG.FATIGUE);
-                }
-            }
-            enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
+            enemyHeroFatigue = enemHero.GetTag(GAME_TAG.FATIGUE);
 
             this.ownDecksize = 0;
             this.enemyDecksize = 0;
@@ -613,8 +621,8 @@ namespace SilverfishControlNewFix
                 if (ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Deck) enemyDecksize++;
             }*/
 
-            heroImmune = TritonHS.OurHero.IsImmune;
-            enemyHeroImmune = TritonHS.EnemyHero.IsImmune;
+            heroImmune = (ownHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING)== 0) ? false : true ;
+            enemyHeroImmune = (enemHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING)== 0) ? false : true ;
 
             enemyHeroWeapon = "";
             enemyWeaponAttack = 0;
@@ -623,26 +631,25 @@ namespace SilverfishControlNewFix
             if (TritonHS.DoesEnemyHasWeapon)
             {
                 HSCard weapon = TritonHS.EnemyWeaponCard;
-                enemyHeroWeapon =
-                    CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
-                enemyWeaponAttack = weapon.Attack;
-                enemyWeaponDurability = weapon.Durability;
+                enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
+                enemyWeaponAttack = weapon.GetTag(GAME_TAG.ATK);
+                enemyWeaponDurability = weapon.GetTag(GAME_TAG.DURABILITY) - weapon.GetTag(GAME_TAG.DAMAGE);
             }
 
 
             //own hero stuff###########################
-            heroAtk = TritonHS.OurHeroAttack;
-            heroHp = TritonHS.OurHeroHealthAndArmor - TritonHS.OurHeroArmor;
-            heroDefence = TritonHS.OurHeroArmor;
+            heroAtk = ownHero.GetTag(GAME_TAG.ATK);
+            heroHp = ownHero.GetTag(GAME_TAG.HEALTH) - ownHero.GetTag(GAME_TAG.DAMAGE);
+            heroDefence = ownHero.GetTag(GAME_TAG.ARMOR);
             heroname = Hrtprozis.Instance.heroIDtoName(TritonHS.OurHero.Id);
             bool exausted = false;
-            exausted = TritonHS.OurHero.IsExhausted;
+            exausted = (ownHero.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true ;
             ownheroisread = true;
 
-            heroImmuneToDamageWhileAttacking = (TritonHS.OurHero.IsImmune) ? true : false;
-            herofrozen = TritonHS.OurHero.IsFrozen;
-            heroNumAttacksThisTurn = TritonHS.OurHero.NumAttackThisTurn;
-            heroHasWindfury = TritonHS.OurHero.HasWindfury;
+            heroImmuneToDamageWhileAttacking = heroImmune;
+            herofrozen = (ownHero.GetTag(GAME_TAG.FROZEN) == 0) ? false : true ;
+            heroNumAttacksThisTurn = ownHero.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
+            heroHasWindfury = (ownHero.GetTag(GAME_TAG.WINDFURY)== 0) ? false : true ;
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
@@ -662,8 +669,8 @@ namespace SilverfishControlNewFix
                 HSCard weapon = TritonHS.OurWeaponCard;
                 ownHeroWeapon =
                     CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
-                heroWeaponAttack = weapon.Attack;
-                heroWeaponDurability = weapon.Durability; //weapon.GetDurability();
+                heroWeaponAttack = weapon.GetTag(GAME_TAG.ATK);
+                heroWeaponDurability = weapon.GetTag(GAME_TAG.DURABILITY) - weapon.GetTag(GAME_TAG.DAMAGE); //weapon.GetDurability();
                 heroImmuneToDamageWhileAttacking = false;
                 if (ownHeroWeapon == "gladiatorslongbow")
                 {
@@ -674,22 +681,21 @@ namespace SilverfishControlNewFix
             }
 
             //enemy hero stuff###############################################################
-            enemyAtk = TritonHS.EnemyHeroAttack; //lol should be zero :D
+            enemyAtk = enemHero.GetTag(GAME_TAG.ATK); //lol should be zero :D
 
-            enemyHp = TritonHS.EnemyHeroHealthAndArmor - TritonHS.EnemyHeroArmor;
+            enemyHp = enemHero.GetTag(GAME_TAG.HEALTH) - enemHero.GetTag(GAME_TAG.DAMAGE);
 
             enemyHeroname = Hrtprozis.Instance.heroIDtoName(TritonHS.EnemyHero.Id);
 
-            enemyDefence = TritonHS.EnemyHeroArmor;
+            enemyDefence = enemHero.GetTag(GAME_TAG.ARMOR);
 
-            enemyfrozen = TritonHS.EnemyHero.IsFrozen;
+            enemyfrozen = (enemHero.GetTag(GAME_TAG.FROZEN)== 0) ? false : true ;
 
 
             //own hero ablity stuff###########################################################
 
-            heroAbility =
-                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
-            ownAbilityisReady = (TritonHS.OurHeroPowerCard.IsExhausted) ? false : true;
+            heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            ownAbilityisReady = (TritonHS.OurHeroPowerCard.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
                 // if exhausted, ability is NOT ready
 
             enemyAbility =
@@ -718,14 +724,14 @@ namespace SilverfishControlNewFix
                 {
 
                     HSCard entitiy = entiti;
-                    foreach (HSCard ent in allcards)
+                    /*foreach (HSCard ent in allcards)
                     {
                         if (ent.EntityId == entiti.EntityId)
                         {
                             entitiy = ent;
                             break;
                         }
-                    }
+                    }*/
 
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
@@ -776,16 +782,17 @@ namespace SilverfishControlNewFix
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.exhausted && !m.frozen &&
+                    if (!m.playedThisTurn && !m.frozen &&
                         (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
+                        m.exhausted = false;
                         m.Ready = true;
                     }
 
                     if (m.playedThisTurn && m.charge &&
                         (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
-                        //m.exhausted = false;
+                        m.exhausted = false;
                         m.Ready = true;
                     }
 
