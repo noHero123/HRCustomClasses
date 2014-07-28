@@ -763,7 +763,9 @@ namespace SilverfishControlNewFix
 
                     m.numAttacksThisTurn = entitiy.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
 
-                    m.playedThisTurn = (entitiy.GetTag(GAME_TAG.JUST_PLAYED) == 0) ? false : true;
+                    int numattacksinplay = entitiy.GetTag(GAME_TAG.NUM_TURNS_IN_PLAY);
+
+                    m.playedThisTurn = (numattacksinplay == 0) ? true : false;
 
                     m.windfury = (entitiy.GetTag(GAME_TAG.WINDFURY) == 0) ? false : true;
 
@@ -791,7 +793,7 @@ namespace SilverfishControlNewFix
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (!m.playedThisTurn && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         m.Ready = true;
                     }
