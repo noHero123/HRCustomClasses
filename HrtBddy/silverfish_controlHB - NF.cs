@@ -703,7 +703,7 @@ namespace SilverfishControlNewFix
             enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
             foreach (HSCard ent in allcards)
             {
-                if (ent.EntityId != ownHeroAbilityEntity && ent.GetTag(GAME_TAG.CARDTYPE) == 5)
+                if (ent.EntityId != ownHeroAbilityEntity && ent.GetTag(GAME_TAG.CARDTYPE) == 10)
                 {
                     enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ent.Id));
                     break;
@@ -733,14 +733,14 @@ namespace SilverfishControlNewFix
                 {
 
                     HSCard entitiy = entiti;
-                    /*foreach (HSCard ent in allcards)
+                    foreach (HSCard ent in allcards)
                     {
                         if (ent.EntityId == entiti.EntityId)
                         {
                             entitiy = ent;
                             break;
                         }
-                    }*/
+                    }
 
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
