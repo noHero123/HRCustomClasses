@@ -5,6 +5,7 @@ using System.IO;
 using Triton.Bot;
 using Triton.Common;
 using Triton.Game;
+using Triton.Game.Mapping;
 
 //using System.Linq;
 
