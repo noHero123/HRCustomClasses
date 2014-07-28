@@ -612,8 +612,8 @@ namespace HREngine.Bots
                   }
                   Helpfunctions.Instance.ErrorLog("hero attack without weapon");
                   //Helpfunctions.Instance.ErrorLog("attacker entity: " + HRPlayer.GetLocalPlayer().GetHero().GetEntityId());
-                  return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
-
+                  //return new HREngine.API.Actions.AttackAction(HRPlayer.GetLocalPlayer().GetHero(), target);
+                  return new HREngine.API.Actions.PlayCardAction(HRPlayer.GetLocalPlayer().GetHeroCard(), target);
               }
 
               if (moveTodo.useability)
