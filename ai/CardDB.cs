@@ -3185,7 +3185,6 @@ namespace HREngine.Bots
             public int race = 0;
             public int rarity = 0;
             public int cost = 0;
-            public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
             //public string description = "";
             public int carddraw = 0;
@@ -3257,7 +3256,6 @@ namespace HREngine.Bots
                 this.choice = c.choice;
                 this.Combo = c.Combo;
                 this.cost = c.cost;
-                this.crdtype = c.crdtype;
                 this.deathrattle = c.deathrattle;
                 //this.description = c.description;
                 this.Durability = c.Durability;
@@ -4009,24 +4007,24 @@ namespace HREngine.Bots
                         //Helpfunctions.Instance.logg(temp);
                     }
 
-                    c.crdtype = Convert.ToInt32(temp);
-                    if (c.crdtype == 10)
+                    int crdtype = Convert.ToInt32(temp);
+                    if (crdtype == 10)
                     {
                         c.type = CardDB.cardtype.HEROPWR;
                     }
-                    if (c.crdtype == 4)
+                    if (crdtype == 4)
                     {
                         c.type = CardDB.cardtype.MOB;
                     }
-                    if (c.crdtype == 5)
+                    if (crdtype == 5)
                     {
                         c.type = CardDB.cardtype.SPELL;
                     }
-                    if (c.crdtype == 6)
+                    if (crdtype == 6)
                     {
                         c.type = CardDB.cardtype.ENCHANTMENT;
                     }
-                    if (c.crdtype == 7)
+                    if (crdtype == 7)
                     {
                         c.type = CardDB.cardtype.WEAPON;
                     }

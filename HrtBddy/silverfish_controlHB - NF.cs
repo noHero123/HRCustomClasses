@@ -257,6 +257,13 @@ namespace SilverfishControlNewFix
                 */
 
                     cardtoplay.DoGrab();
+
+                    if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
+                    {
+                        int place = this.localPosToGlobalPos(moveTodo.owntarget, Hrtprozis.Instance.ownMinions.Count);
+                        TritonHS.SetCursorPos(place);
+                    }
+
                     yield return Coroutine.Sleep(500);
                     cardtoplay.DoDrop();
                     yield break;
@@ -281,6 +288,13 @@ namespace SilverfishControlNewFix
                 }*/
 
                 cardtoplay.DoGrab();
+
+                if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
+                {
+                    int place = this.localPosToGlobalPos(moveTodo.owntarget, Hrtprozis.Instance.ownMinions.Count);
+                    TritonHS.SetCursorPos(place);
+                }
+
                 yield return Coroutine.Sleep(500);
                 cardtoplay.DoDrop();
                 yield break;
@@ -340,6 +354,81 @@ namespace SilverfishControlNewFix
 
             TritonHS.EndTurn();
         }
+
+        private int localPosToGlobalPos(int lp, int numMins)
+        {
+            int gp = lp;
+            string place = "left of your first minion";
+            if (lp == 1) place = "right of your first minion";
+            if (lp == 2) place = "right of your second minion";
+            if (lp == 3) place = "right of your third minion";
+            if (lp == 4) place = "right of your 4th minion";
+            if (lp == 5) place = "right of your 5th minion";
+            if (lp == 6) place = "right of your 6th minion";
+            if (lp == 7) place = "right of your 7th minion";
+
+
+            if (numMins == 6) 
+            { 
+                gp = lp;
+                if (lp == 0) gp = 0;
+                if (lp == 1) gp = 1;
+                if (lp == 2) gp = 2;
+                if (lp == 3) gp = 4;
+                if (lp == 4) gp = 6;
+                if (lp == 5) gp = 7;
+                if (lp == 6) gp = 9;
+
+            }
+            if (numMins == 4)
+            {
+                gp = lp + 1;
+                if (lp == 0) gp = 1;
+                if (lp == 1) gp = 2;
+                if (lp == 2) gp = 4;
+                if (lp == 3) gp = 6;
+                if (lp == 4) gp = 7;
+            }
+            if (numMins == 2) 
+            { 
+                gp = lp + 2;
+                if (lp == 0) gp = 2;
+                if (lp == 1) gp = 4;
+                if (lp == 2) gp = 6;
+            }
+            if (numMins == 1) 
+            { 
+                gp = lp + 2;
+                if (lp == 0) gp = 2;
+                if (lp == 1) gp = 6;
+            
+            }
+            if (numMins == 3) 
+            { 
+                gp = lp + 1;
+                if (lp == 0) gp = 1;
+                if (lp == 1) gp = 3;
+                if (lp == 2) gp = 5;
+                if (lp == 3) gp = 7;
+            
+            }
+            if (numMins == 5) 
+            { 
+                gp = lp + 0;
+                if (lp == 0) gp = 0;
+                if (lp == 1) gp = 1;
+                if (lp == 2) gp = 3;
+                if (lp == 3) gp = 5;
+                if (lp == 4) gp = 7;
+                if (lp == 5) gp = 9;
+            
+            }
+            if (numMins == 0) { gp = 4; }
+            Helpfunctions.Instance.ErrorLog("should place minion " + place + " (" + lp + " " + numMins + ") ");
+            Helpfunctions.Instance.logg("should place minion " + place + " (" + lp + " " + numMins + ") ");
+            return gp;
+        }
+
 
         private HSCard getEntityWithNumber(int number)
         {
@@ -733,6 +822,7 @@ namespace SilverfishControlNewFix
                 {
 
                     HSCard entitiy = entiti;
+                    
                     foreach (HSCard ent in allcards)
                     {
                         if (ent.EntityId == entiti.EntityId)
@@ -17461,7 +17551,6 @@ namespace SilverfishControlNewFix
             public int race = 0;
             public int rarity = 0;
             public int cost = 0;
-            public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
             //public string description = "";
             public int carddraw = 0;
@@ -17533,7 +17622,6 @@ namespace SilverfishControlNewFix
                 this.choice = c.choice;
                 this.Combo = c.Combo;
                 this.cost = c.cost;
-                this.crdtype = c.crdtype;
                 this.deathrattle = c.deathrattle;
                 //this.description = c.description;
                 this.Durability = c.Durability;
@@ -18285,24 +18373,24 @@ namespace SilverfishControlNewFix
                         //Helpfunctions.Instance.logg(temp);
                     }
 
-                    c.crdtype = Convert.ToInt32(temp);
-                    if (c.crdtype == 10)
+                    int crdtype = Convert.ToInt32(temp);
+                    if (crdtype == 10)
                     {
                         c.type = CardDB.cardtype.HEROPWR;
                     }
-                    if (c.crdtype == 4)
+                    if (crdtype == 4)
                     {
                         c.type = CardDB.cardtype.MOB;
                     }
-                    if (c.crdtype == 5)
+                    if (crdtype == 5)
                     {
                         c.type = CardDB.cardtype.SPELL;
                     }
-                    if (c.crdtype == 6)
+                    if (crdtype == 6)
                     {
                         c.type = CardDB.cardtype.ENCHANTMENT;
                     }
-                    if (c.crdtype == 7)
+                    if (crdtype == 7)
                     {
                         c.type = CardDB.cardtype.WEAPON;
                     }
@@ -19267,8 +19355,6 @@ namespace SilverfishControlNewFix
             return retval;
         }
 
-
-
     }
 
     public class BoardTester
@@ -20078,6 +20164,7 @@ namespace SilverfishControlNewFix
         CUSTOM_KEYWORD_EFFECT,
         TOPDECK
     }
+    
     public enum TAG_ZONE
     {
         INVALID,

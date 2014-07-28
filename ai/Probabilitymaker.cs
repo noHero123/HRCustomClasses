@@ -69,6 +69,25 @@ namespace HREngine.Bots
             }
         }
 
+        public bool hasEnemyThisCardInDeck(CardDB.cardIDEnum cardid)
+        {
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+
+        public double getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        {
+            return 0.0;
+        }
+
 
     }
 }

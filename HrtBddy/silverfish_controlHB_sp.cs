@@ -246,6 +246,7 @@ namespace SilverfishControlSP
                     dirtytarget = moveTodo.enemyEntitiy;
 
                     cardtoplay.DoGrab();
+
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         int place = this.localPosToGlobalPos(moveTodo.owntarget, Hrtprozis.Instance.ownMinions.Count);
