@@ -563,14 +563,14 @@ namespace SilverfishControlNewFix
             ownSecretList = new List<string>(); // the CARDIDS of the secrets
             enemySecretCount = 0;
             //count enemy secrets:
-            foreach (HSCard ent in allcards)
+            /*foreach (HSCard ent in allcards)
             {
                 if (ent.IsSecret && ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Secret) enemySecretCount++;
                 if (ent.IsSecret && ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Secret)
                 {
                     ownSecretList.Add(ent.Id);
                 }
-            }
+            }*/
 
 
             ourSecretsCount = ownSecretList.Count;
@@ -590,16 +590,27 @@ namespace SilverfishControlNewFix
             heroWeaponDurability = 0;
 
             ownHeroFatigue = TritonHS.Fatigue;
+            //enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
+            //get enemy Fatigue:
+            enemyHeroFatigue = 0;
+            int enemyheroentity = TritonHS.EnemyHero.EntityId;
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.EntityId == enemyheroentity)
+                {
+                    enemyHeroFatigue = ent.GetTag(GAME_TAG.FATIGUE);
+                }
+            }
             enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
 
             this.ownDecksize = 0;
             this.enemyDecksize = 0;
             //count decksize
-            foreach (HSCard ent in allcards)
+            /*foreach (HSCard ent in allcards)
             {
                 if (ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Deck) ownDecksize++;
                 if (ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Deck) enemyDecksize++;
-            }
+            }*/
 
             heroImmune = TritonHS.OurHero.IsImmune;
             enemyHeroImmune = TritonHS.EnemyHero.IsImmune;
@@ -696,49 +707,61 @@ namespace SilverfishControlNewFix
 
             var enchantments = new List<HSCard>();
 
+            List<HSCard> allcards = TritonHS.GetAllCards();
 
-            foreach (HSCard entitiy in list)
+            foreach (HSCard entiti in list)
             {
-                int zp = entitiy.ZonePosition;
+                int zp = entiti.ZonePosition;
 
-                if (entitiy.IsMinion && zp >= 1)
+                if (entiti.IsMinion && zp >= 1)
                 {
+
+                    HSCard entitiy = entiti;
+                    foreach (HSCard ent in allcards)
+                    {
+                        if (ent.EntityId == entiti.EntityId)
+                        {
+                            entitiy = ent;
+                            break;
+                        }
+                    }
+
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
                     var m = new Minion();
                     m.name = c.name;
                     m.handcard.card = c;
 
-                    m.Angr = entitiy.Attack;
-                    m.maxHp = entitiy.MaxHp;
-                    m.Hp = entitiy.Health;
+                    m.Angr = entitiy.GetTag(GAME_TAG.ATK);
+                    m.maxHp = entitiy.GetTag(GAME_TAG.HEALTH);
+                    m.Hp = entitiy.GetTag(GAME_TAG.HEALTH) - entitiy.GetTag(GAME_TAG.DAMAGE);
 
                     m.wounded = false;
                     if (m.maxHp > m.Hp) m.wounded = true;
 
-                    m.exhausted = entitiy.IsExhausted;
+                    m.exhausted = (entitiy.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
 
-                    m.taunt = (entitiy.HasTaunt) ? true : false;
+                    m.taunt = (entitiy.GetTag(GAME_TAG.TAUNT) == 0) ? false : true;
 
-                    m.charge = (entitiy.HasCharge) ? true : false;
+                    m.charge = (entitiy.GetTag(GAME_TAG.CHARGE) == 0) ? false : true;
 
-                    m.numAttacksThisTurn = entitiy.NumAttackThisTurn;
+                    m.numAttacksThisTurn = entitiy.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
 
-                    m.playedThisTurn = (entitiy.IsRecentlyArrived) ? true : false;
+                    m.playedThisTurn = (entitiy.GetTag(GAME_TAG.JUST_PLAYED) == 0) ? false : true;
 
-                    m.windfury = (entitiy.HasWindfury) ? true : false;
+                    m.windfury = (entitiy.GetTag(GAME_TAG.WINDFURY) == 0) ? false : true;
 
-                    m.frozen = (entitiy.IsFrozen) ? true : false;
+                    m.frozen = (entitiy.GetTag(GAME_TAG.FROZEN) == 0) ? false : true;
 
-                    m.divineshild = (entitiy.HasDivineShield) ? true : false;
+                    m.divineshild = (entitiy.GetTag(GAME_TAG.DIVINE_SHIELD) == 0) ? false : true;
 
-                    m.stealth = (entitiy.IsStealthed) ? true : false;
+                    m.stealth = (entitiy.GetTag(GAME_TAG.STEALTH) == 0) ? false : true;
 
-                    m.poisonous = (entitiy.IsPoisonous) ? true : false;
+                    m.poisonous = (entitiy.GetTag(GAME_TAG.POISONOUS) == 0) ? false : true;
 
-                    m.immune = (entitiy.IsImmune) ? true : false;
+                    m.immune = (entitiy.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
 
-                    m.silenced = (entitiy.IsSilenced) ? true : false;
+                    m.silenced = (entitiy.GetTag(GAME_TAG.SILENCED) == 0) ? false : true;
 
 
                     m.zonepos = zp;
@@ -19853,7 +19876,7 @@ namespace SilverfishControlNewFix
         OPPOSING
     }
 
-    public enum GAME_TAG
+    public enum GAME_TAGs
     {
         STATE = 204,
         TURN = 20,
