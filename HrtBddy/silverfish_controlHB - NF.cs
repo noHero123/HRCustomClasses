@@ -695,11 +695,20 @@ namespace SilverfishControlNewFix
             //own hero ablity stuff###########################################################
 
             heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
-            ownAbilityisReady = (TritonHS.OurHeroPowerCard.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
+            ownAbilityisReady = (TritonHS.OurHeroPowerCard.GetTag(GAME_TAG.EXHAUSTED) == 0) ? true : false;
                 // if exhausted, ability is NOT ready
 
-            enemyAbility =
-                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            int ownHeroAbilityEntity = TritonHS.OurHeroPowerCard.EntityId;
+
+            enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.EntityId != ownHeroAbilityEntity && ent.GetTag(GAME_TAG.CARDTYPE) == 5)
+                {
+                    enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ent.Id));
+                    break;
+                }
+            }
                 // not correct :D
         }
 
