@@ -581,14 +581,14 @@ namespace SilverfishControlNewFix
             ownSecretList = new List<string>(); // the CARDIDS of the secrets
             enemySecretCount = 0;
             //count enemy secrets:
-            /*foreach (HSCard ent in allcards)
+            foreach (HSCard ent in allcards)
             {
-                if (ent.IsSecret && ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Secret) enemySecretCount++;
-                if (ent.IsSecret && ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Secret)
+                if (ent.IsSecret && ent.ControllerId != ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 7) enemySecretCount++;
+                if (ent.IsSecret && ent.ControllerId == ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 7)
                 {
                     ownSecretList.Add(ent.Id);
                 }
-            }*/
+            }
 
 
             ourSecretsCount = ownSecretList.Count;
@@ -615,11 +615,11 @@ namespace SilverfishControlNewFix
             this.ownDecksize = 0;
             this.enemyDecksize = 0;
             //count decksize
-            /*foreach (HSCard ent in allcards)
+            foreach (HSCard ent in allcards)
             {
-                if (ent.ControllerId == ownPlayerController && ent.GetZone == CardZone.Deck) ownDecksize++;
-                if (ent.ControllerId != ownPlayerController && ent.GetZone == CardZone.Deck) enemyDecksize++;
-            }*/
+                if (ent.ControllerId == ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 2) ownDecksize++;
+                if (ent.ControllerId != ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 2) enemyDecksize++;
+            }
 
             heroImmune = (ownHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING)== 0) ? false : true ;
             enemyHeroImmune = (enemHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING)== 0) ? false : true ;
