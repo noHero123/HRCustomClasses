@@ -598,9 +598,9 @@ namespace SilverfishControlNewFix
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
 
 
-            numMinionsPlayedThisTurn = ownHero.GetTag(GAME_TAG.NUM_MINIONS_PLAYED_THIS_TURN);
-            cardsPlayedThisTurn = ownHero.GetTag(GAME_TAG.NUM_CARDS_PLAYED_THIS_TURN);
-            ueberladung = ownHero.GetTag(GAME_TAG.RECALL_OWED);
+            numMinionsPlayedThisTurn = TritonHS.NumMinionsPlayedThisTurn;
+            cardsPlayedThisTurn = TritonHS.NumCardsPlayedThisTurn;
+            ueberladung = TritonHS.RecallOwed;
 
             //get weapon stuff
             ownHeroWeapon = "";
@@ -791,22 +791,18 @@ namespace SilverfishControlNewFix
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.frozen &&
-                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
-                        m.exhausted = false;
                         m.Ready = true;
                     }
 
-                    if (m.playedThisTurn && m.charge &&
-                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (m.playedThisTurn && m.charge && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
-                        m.exhausted = false;
+                        //m.exhausted = false;
                         m.Ready = true;
                     }
 
-                    if (!m.silenced &&
-                        (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
+                    if (!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
                     {
                         m.Ready = false;
                     }
