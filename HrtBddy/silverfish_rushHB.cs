@@ -5,6 +5,7 @@ using System.IO;
 using Triton.Bot;
 using Triton.Common;
 using Triton.Game;
+using Triton.Game.Mapping;
 
 //using System.Linq;
 
@@ -245,19 +246,28 @@ namespace SilverfishRush
                     dirtyTargetSource = moveTodo.cardEntitiy;
                     dirtytarget = moveTodo.enemyEntitiy;
 
+
+                    //we can place mobs (if api supports it)
+                    /*
+                if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
+                {
+                    //moveTodo.owntarget (maybe +1 (depends on api)) is the place, where the mob should be placed
+                    //return;
+                }
+                */
+
                     cardtoplay.DoGrab();
+
                     if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                     {
                         int place = this.localPosToGlobalPos(moveTodo.owntarget, Hrtprozis.Instance.ownMinions.Count);
-                        //TritonHS.SetCardPos(place);
+                        TritonHS.SetCursorPos(place);
                     }
-                    
+
                     yield return Coroutine.Sleep(500);
-                    
                     cardtoplay.DoDrop();
                     yield break;
                 }
-
                 Helpfunctions.Instance.ErrorLog("play: " + cardtoplay.Name + " target nothing");
                 Helpfunctions.Instance.logg("play: " + cardtoplay.Name + " choice: " + moveTodo.druidchoice);
                 if (moveTodo.druidchoice >= 1)
@@ -269,12 +279,22 @@ namespace SilverfishRush
                 dirtyTargetSource = -1;
                 dirtytarget = -1;
 
+                //mob placement...
+                /*
+                if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
+                {
+                    //moveTodo.owntarget (maybe +1 (depends on api)) is the place, where the mob should be placed
+                    //return;
+                }*/
+
                 cardtoplay.DoGrab();
+
                 if (moveTodo.handcard.card.type == CardDB.cardtype.MOB)
                 {
                     int place = this.localPosToGlobalPos(moveTodo.owntarget, Hrtprozis.Instance.ownMinions.Count);
-                    //TritonHS.SetCardPos(place);
+                    TritonHS.SetCursorPos(place);
                 }
+
                 yield return Coroutine.Sleep(500);
                 cardtoplay.DoDrop();
                 yield break;
@@ -347,18 +367,68 @@ namespace SilverfishRush
             if (lp == 6) place = "right of your 6th minion";
             if (lp == 7) place = "right of your 7th minion";
 
-            
-            if (numMins == 6) { gp = lp; }
-            if (numMins == 4) { gp = lp + 1; }
-            if (numMins == 2) { gp = lp + 2; }
-            if (numMins == 1) { gp = lp + 2; }
-            if (numMins == 3) { gp = lp + 1; }
-            if (numMins == 5) { gp = lp + 0; }
-            if (numMins == 0) { gp = 5; }
-            Helpfunctions.Instance.ErrorLog("should place minion " + place + " (" + lp + " " + numMins+") " );
+
+            if (numMins == 6)
+            {
+                gp = lp;
+                if (lp == 0) gp = 0;
+                if (lp == 1) gp = 1;
+                if (lp == 2) gp = 2;
+                if (lp == 3) gp = 4;
+                if (lp == 4) gp = 6;
+                if (lp == 5) gp = 7;
+                if (lp == 6) gp = 9;
+
+            }
+            if (numMins == 4)
+            {
+                gp = lp + 1;
+                if (lp == 0) gp = 1;
+                if (lp == 1) gp = 2;
+                if (lp == 2) gp = 4;
+                if (lp == 3) gp = 6;
+                if (lp == 4) gp = 7;
+            }
+            if (numMins == 2)
+            {
+                gp = lp + 2;
+                if (lp == 0) gp = 2;
+                if (lp == 1) gp = 4;
+                if (lp == 2) gp = 6;
+            }
+            if (numMins == 1)
+            {
+                gp = lp + 2;
+                if (lp == 0) gp = 2;
+                if (lp == 1) gp = 6;
+
+            }
+            if (numMins == 3)
+            {
+                gp = lp + 1;
+                if (lp == 0) gp = 1;
+                if (lp == 1) gp = 3;
+                if (lp == 2) gp = 5;
+                if (lp == 3) gp = 7;
+
+            }
+            if (numMins == 5)
+            {
+                gp = lp + 0;
+                if (lp == 0) gp = 0;
+                if (lp == 1) gp = 1;
+                if (lp == 2) gp = 3;
+                if (lp == 3) gp = 5;
+                if (lp == 4) gp = 7;
+                if (lp == 5) gp = 9;
+
+            }
+            if (numMins == 0) { gp = 4; }
+            Helpfunctions.Instance.ErrorLog("should place minion " + place + " (" + lp + " " + numMins + ") ");
             Helpfunctions.Instance.logg("should place minion " + place + " (" + lp + " " + numMins + ") ");
             return gp;
         }
+
 
         private HSCard getEntityWithNumber(int number)
         {
@@ -415,7 +485,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        public int versionnumber = 89;
+        public int versionnumber = 91;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -524,7 +594,11 @@ namespace SilverfishRush
             getHerostuff();
 
             //small fix for not knowing when to mulligan:
-            if (ownMaxMana == 1 && numMinionsPlayedThisTurn == 0 && cardsPlayedThisTurn == 0) setnewLoggFile();
+            if (ownMaxMana == 1 && currentMana == 1 && numMinionsPlayedThisTurn == 0 && cardsPlayedThisTurn == 0)
+            {
+                setnewLoggFile();
+                getHerostuff();
+            }
 
             getMinions();
             getHandcards();
@@ -565,6 +639,24 @@ namespace SilverfishRush
 
         private void getHerostuff()
         {
+            List<HSCard> allcards = TritonHS.GetAllCards();
+
+            HSCard ownHero = TritonHS.OurHero;
+            HSCard enemHero = TritonHS.EnemyHero;
+            int ownheroentity = TritonHS.OurHero.EntityId;
+            int enemyheroentity = TritonHS.EnemyHero.EntityId;
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.EntityId == enemyheroentity)
+                {
+                    enemHero = ent;
+                }
+                if (ent.EntityId == ownheroentity)
+                {
+                    ownHero = ent;
+                }
+            }
+
             //player stuff#########################
             //this.currentMana =ownPlayer.GetTag(HRGameTag.RESOURCES) - ownPlayer.GetTag(HRGameTag.RESOURCES_USED) + ownPlayer.GetTag(HRGameTag.TEMP_RESOURCES);
             currentMana = TritonHS.CurrentMana;
@@ -580,10 +672,22 @@ namespace SilverfishRush
 
             //count own secrets
             ownSecretList = new List<string>(); // the CARDIDS of the secrets
-            ourSecretsCount = 0;
+            enemySecretCount = 0;
+            //count enemy secrets:
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.IsSecret && ent.ControllerId != ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 7) enemySecretCount++;
+                if (ent.IsSecret && ent.ControllerId == ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 7)
+                {
+                    ownSecretList.Add(ent.Id);
+                }
+            }
+
+
+            ourSecretsCount = ownSecretList.Count;
             Helpfunctions.Instance.logg("own secretsCount: " + ourSecretsCount);
             //count enemy secrets
-            enemySecretCount = 0;
+
             Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
 
 
@@ -596,14 +700,20 @@ namespace SilverfishRush
             heroWeaponAttack = 0;
             heroWeaponDurability = 0;
 
-            ownHeroFatigue = TritonHS.Fatigue;
-            enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
+            ownHeroFatigue = TritonHS.LocalPlayerFatigue;
+            enemyHeroFatigue = TritonHS.EnemyPlayerFatigue;
 
-            //this.ownDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, true).Count;// or something like this :D
-            //this.enemyDecksize = Triton.Game.TritonHS.GetCards(Triton.Game.CardZone.Deck, false).Count;// or something like this :D
+            this.ownDecksize = 0;
+            this.enemyDecksize = 0;
+            //count decksize
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.ControllerId == ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 2) ownDecksize++;
+                if (ent.ControllerId != ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 2) enemyDecksize++;
+            }
 
-            heroImmune = TritonHS.OurHero.IsImmune;
-            enemyHeroImmune = TritonHS.EnemyHero.IsImmune;
+            heroImmune = (ownHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
+            enemyHeroImmune = (enemHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
 
             enemyHeroWeapon = "";
             enemyWeaponAttack = 0;
@@ -612,26 +722,25 @@ namespace SilverfishRush
             if (TritonHS.DoesEnemyHasWeapon)
             {
                 HSCard weapon = TritonHS.EnemyWeaponCard;
-                enemyHeroWeapon =
-                    CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
-                enemyWeaponAttack = weapon.Attack;
-                enemyWeaponDurability = weapon.Durability;
+                enemyHeroWeapon = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
+                enemyWeaponAttack = weapon.GetTag(GAME_TAG.ATK);
+                enemyWeaponDurability = weapon.GetTag(GAME_TAG.DURABILITY) - weapon.GetTag(GAME_TAG.DAMAGE);
             }
 
 
             //own hero stuff###########################
-            heroAtk = TritonHS.OurHeroAttack;
-            heroHp = TritonHS.OurHeroHealthAndArmor - TritonHS.OurHeroArmor;
-            heroDefence = TritonHS.OurHeroArmor;
+            heroAtk = ownHero.GetTag(GAME_TAG.ATK);
+            heroHp = ownHero.GetTag(GAME_TAG.HEALTH) - ownHero.GetTag(GAME_TAG.DAMAGE);
+            heroDefence = ownHero.GetTag(GAME_TAG.ARMOR);
             heroname = Hrtprozis.Instance.heroIDtoName(TritonHS.OurHero.Id);
             bool exausted = false;
-            exausted = TritonHS.OurHero.IsExhausted;
+            exausted = (ownHero.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
             ownheroisread = true;
 
-            heroImmuneToDamageWhileAttacking = (TritonHS.OurHero.IsImmune) ? true : false;
-            herofrozen = TritonHS.OurHero.IsFrozen;
-            heroNumAttacksThisTurn = TritonHS.OurHero.NumAttackThisTurn;
-            heroHasWindfury = TritonHS.OurHero.HasWindfury;
+            heroImmuneToDamageWhileAttacking = heroImmune;
+            herofrozen = (ownHero.GetTag(GAME_TAG.FROZEN) == 0) ? false : true;
+            heroNumAttacksThisTurn = ownHero.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
+            heroHasWindfury = (ownHero.GetTag(GAME_TAG.WINDFURY) == 0) ? false : true;
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
@@ -651,8 +760,8 @@ namespace SilverfishRush
                 HSCard weapon = TritonHS.OurWeaponCard;
                 ownHeroWeapon =
                     CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(weapon.Id)).name.ToString();
-                heroWeaponAttack = weapon.Attack;
-                heroWeaponDurability = weapon.Durability; //weapon.GetDurability();
+                heroWeaponAttack = weapon.GetTag(GAME_TAG.ATK);
+                heroWeaponDurability = weapon.GetTag(GAME_TAG.DURABILITY) - weapon.GetTag(GAME_TAG.DAMAGE); //weapon.GetDurability();
                 heroImmuneToDamageWhileAttacking = false;
                 if (ownHeroWeapon == "gladiatorslongbow")
                 {
@@ -663,26 +772,34 @@ namespace SilverfishRush
             }
 
             //enemy hero stuff###############################################################
-            enemyAtk = TritonHS.EnemyHeroAttack; //lol should be zero :D
+            enemyAtk = enemHero.GetTag(GAME_TAG.ATK); //lol should be zero :D
 
-            enemyHp = TritonHS.EnemyHeroHealthAndArmor - TritonHS.EnemyHeroArmor;
+            enemyHp = enemHero.GetTag(GAME_TAG.HEALTH) - enemHero.GetTag(GAME_TAG.DAMAGE);
 
             enemyHeroname = Hrtprozis.Instance.heroIDtoName(TritonHS.EnemyHero.Id);
 
-            enemyDefence = TritonHS.EnemyHeroArmor;
+            enemyDefence = enemHero.GetTag(GAME_TAG.ARMOR);
 
-            enemyfrozen = TritonHS.EnemyHero.IsFrozen;
+            enemyfrozen = (enemHero.GetTag(GAME_TAG.FROZEN) == 0) ? false : true;
 
 
             //own hero ablity stuff###########################################################
 
-            heroAbility =
-                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
-            ownAbilityisReady = (TritonHS.OurHeroPowerCard.IsExhausted) ? false : true;
+            heroAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            ownAbilityisReady = (TritonHS.OurHeroPowerCard.GetTag(GAME_TAG.EXHAUSTED) == 0) ? true : false;
             // if exhausted, ability is NOT ready
 
-            enemyAbility =
-                CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            int ownHeroAbilityEntity = TritonHS.OurHeroPowerCard.EntityId;
+
+            enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(TritonHS.OurHeroPowerCard.Id));
+            foreach (HSCard ent in allcards)
+            {
+                if (ent.EntityId != ownHeroAbilityEntity && ent.GetTag(GAME_TAG.CARDTYPE) == 10)
+                {
+                    enemyAbility = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(ent.Id));
+                    break;
+                }
+            }
             // not correct :D
         }
 
@@ -697,49 +814,64 @@ namespace SilverfishRush
 
             var enchantments = new List<HSCard>();
 
+            List<HSCard> allcards = TritonHS.GetAllCards();
 
-            foreach (HSCard entitiy in list)
+            foreach (HSCard entiti in list)
             {
-                int zp = entitiy.ZonePosition;
+                int zp = entiti.ZonePosition;
 
-                if (entitiy.IsMinion && zp >= 1)
+                if (entiti.IsMinion && zp >= 1)
                 {
+
+                    HSCard entitiy = entiti;
+
+                    foreach (HSCard ent in allcards)
+                    {
+                        if (ent.EntityId == entiti.EntityId)
+                        {
+                            entitiy = ent;
+                            break;
+                        }
+                    }
+
                     //Helpfunctions.Instance.ErrorLog("zonepos " + zp);
                     CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.Instance.cardIdstringToEnum(entitiy.Id));
                     var m = new Minion();
                     m.name = c.name;
                     m.handcard.card = c;
 
-                    m.Angr = entitiy.Attack;
-                    m.maxHp = entitiy.MaxHp;
-                    m.Hp = entitiy.Health;
+                    m.Angr = entitiy.GetTag(GAME_TAG.ATK);
+                    m.maxHp = entitiy.GetTag(GAME_TAG.HEALTH);
+                    m.Hp = entitiy.GetTag(GAME_TAG.HEALTH) - entitiy.GetTag(GAME_TAG.DAMAGE);
 
                     m.wounded = false;
                     if (m.maxHp > m.Hp) m.wounded = true;
 
-                    m.exhausted = entitiy.IsExhausted;
+                    m.exhausted = (entitiy.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
 
-                    m.taunt = (entitiy.HasTaunt) ? true : false;
+                    m.taunt = (entitiy.GetTag(GAME_TAG.TAUNT) == 0) ? false : true;
 
-                    m.charge = (entitiy.HasCharge) ? true : false;
+                    m.charge = (entitiy.GetTag(GAME_TAG.CHARGE) == 0) ? false : true;
 
-                    m.numAttacksThisTurn = entitiy.NumAttackThisTurn;
+                    m.numAttacksThisTurn = entitiy.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
 
-                    m.playedThisTurn = (entitiy.IsRecentlyArrived) ? true : false;
+                    int numattacksinplay = entitiy.GetTag(GAME_TAG.NUM_TURNS_IN_PLAY);
 
-                    m.windfury = (entitiy.HasWindfury) ? true : false;
+                    m.playedThisTurn = (numattacksinplay == 0) ? true : false;
 
-                    m.frozen = (entitiy.IsFrozen) ? true : false;
+                    m.windfury = (entitiy.GetTag(GAME_TAG.WINDFURY) == 0) ? false : true;
 
-                    m.divineshild = (entitiy.HasDivineShield) ? true : false;
+                    m.frozen = (entitiy.GetTag(GAME_TAG.FROZEN) == 0) ? false : true;
 
-                    m.stealth = (entitiy.IsStealthed) ? true : false;
+                    m.divineshild = (entitiy.GetTag(GAME_TAG.DIVINE_SHIELD) == 0) ? false : true;
 
-                    m.poisonous = (entitiy.IsPoisonous) ? true : false;
+                    m.stealth = (entitiy.GetTag(GAME_TAG.STEALTH) == 0) ? false : true;
 
-                    m.immune = (entitiy.IsImmune) ? true : false;
+                    m.poisonous = (entitiy.GetTag(GAME_TAG.POISONOUS) == 0) ? false : true;
 
-                    m.silenced = (entitiy.IsSilenced) ? true : false;
+                    m.immune = (entitiy.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
+
+                    m.silenced = (entitiy.GetTag(GAME_TAG.SILENCED) == 0) ? false : true;
 
 
                     m.zonepos = zp;
@@ -753,21 +885,18 @@ namespace SilverfishRush
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.exhausted && !m.frozen &&
-                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (!m.playedThisTurn && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         m.Ready = true;
                     }
 
-                    if (m.playedThisTurn && m.charge &&
-                        (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (m.playedThisTurn && m.charge && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         //m.exhausted = false;
                         m.Ready = true;
                     }
 
-                    if (!m.silenced &&
-                        (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
+                    if (!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord))
                     {
                         m.Ready = false;
                     }
@@ -833,6 +962,8 @@ namespace SilverfishRush
             enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
             // dont know if you can count the enemys-handcars in this way :D
         }
+
+
     }
 
     public abstract class Behavior
@@ -1155,7 +1286,6 @@ namespace SilverfishRush
 
 
     }
-
 
     // the ai :D
     //please ask/write me if you use this in your project
@@ -11036,9 +11166,9 @@ namespace SilverfishRush
 
         public void updateFatigueStats(int ods, int ohf, int eds, int ehf)
         {
-            this.ownDeckSize = 30;// ods;
+            this.ownDeckSize = ods;
             this.ownHeroFatigue = ohf;
-            this.enemyDeckSize = 30;// eds;
+            this.enemyDeckSize = eds;
             this.enemyHeroFatigue = ehf;
         }
 
@@ -17425,7 +17555,6 @@ namespace SilverfishRush
             public int race = 0;
             public int rarity = 0;
             public int cost = 0;
-            public int crdtype = 0;
             public cardtype type = CardDB.cardtype.NONE;
             //public string description = "";
             public int carddraw = 0;
@@ -17497,7 +17626,6 @@ namespace SilverfishRush
                 this.choice = c.choice;
                 this.Combo = c.Combo;
                 this.cost = c.cost;
-                this.crdtype = c.crdtype;
                 this.deathrattle = c.deathrattle;
                 //this.description = c.description;
                 this.Durability = c.Durability;
@@ -18249,24 +18377,24 @@ namespace SilverfishRush
                         //Helpfunctions.Instance.logg(temp);
                     }
 
-                    c.crdtype = Convert.ToInt32(temp);
-                    if (c.crdtype == 10)
+                    int crdtype = Convert.ToInt32(temp);
+                    if (crdtype == 10)
                     {
                         c.type = CardDB.cardtype.HEROPWR;
                     }
-                    if (c.crdtype == 4)
+                    if (crdtype == 4)
                     {
                         c.type = CardDB.cardtype.MOB;
                     }
-                    if (c.crdtype == 5)
+                    if (crdtype == 5)
                     {
                         c.type = CardDB.cardtype.SPELL;
                     }
-                    if (c.crdtype == 6)
+                    if (crdtype == 6)
                     {
                         c.type = CardDB.cardtype.ENCHANTMENT;
                     }
-                    if (c.crdtype == 7)
+                    if (crdtype == 7)
                     {
                         c.type = CardDB.cardtype.WEAPON;
                     }
@@ -19231,8 +19359,6 @@ namespace SilverfishRush
             return retval;
         }
 
-
-
     }
 
     public class BoardTester
@@ -19855,7 +19981,7 @@ namespace SilverfishRush
         OPPOSING
     }
 
-    public enum GAME_TAG
+    public enum GAME_TAGs
     {
         STATE = 204,
         TURN = 20,
@@ -20042,6 +20168,7 @@ namespace SilverfishRush
         CUSTOM_KEYWORD_EFFECT,
         TOPDECK
     }
+
     public enum TAG_ZONE
     {
         INVALID,
@@ -20191,6 +20318,7 @@ namespace SilverfishRush
         MULLIGAN,
         GENERAL
     }
+
 
     class Settings
     {

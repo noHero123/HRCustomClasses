@@ -485,7 +485,7 @@ namespace SilverfishControlNewFix
 
     public class Silverfish
     {
-        public int versionnumber = 90;
+        public int versionnumber = 91;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -594,7 +594,11 @@ namespace SilverfishControlNewFix
             getHerostuff();
 
             //small fix for not knowing when to mulligan:
-            if (ownMaxMana == 1 && numMinionsPlayedThisTurn == 0 && cardsPlayedThisTurn == 0) setnewLoggFile();
+            if (ownMaxMana == 1 && currentMana == 1 && numMinionsPlayedThisTurn == 0 && cardsPlayedThisTurn == 0)
+            {
+                setnewLoggFile();
+                getHerostuff();
+            }
 
             getMinions();
             getHandcards();
@@ -696,10 +700,8 @@ namespace SilverfishControlNewFix
             heroWeaponAttack = 0;
             heroWeaponDurability = 0;
 
-            ownHeroFatigue = ownHero.GetTag(GAME_TAG.FATIGUE);
-            //enemyHeroFatigue = 0; // hankerspace has only one value for fatigue
-            //get enemy Fatigue:
-            enemyHeroFatigue = enemHero.GetTag(GAME_TAG.FATIGUE);
+            ownHeroFatigue = TritonHS.LocalPlayerFatigue;
+            enemyHeroFatigue = TritonHS.EnemyPlayerFatigue;
 
             this.ownDecksize = 0;
             this.enemyDecksize = 0;
@@ -960,6 +962,8 @@ namespace SilverfishControlNewFix
             enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
                 // dont know if you can count the enemys-handcars in this way :D
         }
+    
+
     }
 
     public abstract class Behavior
