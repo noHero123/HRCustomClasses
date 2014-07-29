@@ -979,7 +979,7 @@ namespace SilverfishControl
             List<CardDB.cardIDEnum> ownCards = new List<CardDB.cardIDEnum>();
             List<CardDB.cardIDEnum> enemyCards = new List<CardDB.cardIDEnum>();
 
-            foreach (HREntity ent in allEntitys)
+            foreach (HSCard ent in allEntitys)
             {
                 if (ent.GetTag(GAME_TAG.ZONE) == 7 && ent.GetTag(GAME_TAG.CONTROLLER) == enemycontroler) continue; // cant know enemy secrets :D
 
