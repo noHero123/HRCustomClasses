@@ -812,7 +812,9 @@ namespace HREngine.Bots
                 if (m.frozen || (m.handcard.card.name == CardDB.cardName.ancientwatcher && !m.silenced))
                 {
                     m.Ready = false;
+                    continue;
                 }
+                if (m.Angr == 0) continue;
                 m.Ready = true;
                 m.numAttacksThisTurn = 0;
             }
@@ -1268,6 +1270,7 @@ namespace HREngine.Bots
             this.complete = false;
             this.sEnemTurn = false;
             this.value = int.MinValue;
+            this.diedMinions.Clear();
         }
 
         public List<targett> getAttackTargets(bool own)
@@ -3305,17 +3308,15 @@ namespace HREngine.Bots
             }
 
             //deathrattle enchantments // these can be triggered after an silence (if they are casted after the silence)
-            bool geistderahnen = false;
             foreach (Enchantment e in m.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.CS2_038e && !geistderahnen)
+                if (e.CARDID == CardDB.cardIDEnum.CS2_038e )
                 {
                     //revive minion due to "geist der ahnen"
                     CardDB.Card kid = m.handcard.card;
                     int pos = this.ownMinions.Count - 1;
                     if (!own) pos = this.enemyMinions.Count - 1;
                     callKid(kid, pos, own);
-                    geistderahnen = true;
                 }
                 //Seele des Waldes
                 if (e.CARDID == CardDB.cardIDEnum.EX1_158e)
@@ -3847,8 +3848,10 @@ namespace HREngine.Bots
             minionGetDamagedOrHealed(m, damages, heals, own, false);
         }*/
 
+
         private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own ,  bool dontCalcLostDmg=false, bool isMinionattack=false)
         {
+            if (m.Hp <= 0) return;
             int damage = damages;
             int heal = heals;
 
@@ -4079,30 +4082,96 @@ namespace HREngine.Bots
             int ownAttack = m.Angr;
             int enemyAttack = enemy.Angr;
             // defender take damage
-            if (m.handcard.card.poisionous)
-            {
-                minionGetDestroyed(enemy, enemyOwn);
-            }
-            else
-            {
-                int oldHP = enemy.Hp;
-                minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn,false,true);
-                if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
-            }
 
-
-            //attacker take damage
-            if (!m.immune && !dontcount)
+            if (enemy.name == CardDB.cardName.sylvanaswindrunner)
             {
-                if (enemy.handcard.card.poisionous)
+
+                //attacker take damage
+                if (!m.immune && !dontcount)
                 {
-                    minionGetDestroyed(m, attackOwn);
+                    if (enemy.handcard.card.poisionous)
+                    {
+                        minionGetDestroyed(m, attackOwn);
+                    }
+                    else
+                    {
+                        int oldHP = m.Hp;
+                        minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn, false, true);
+                        if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    }
+                }
+
+                if (m.handcard.card.poisionous)
+                {
+                    minionGetDestroyed(enemy, enemyOwn);
                 }
                 else
                 {
-                    int oldHP = m.Hp;
-                    minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn,false,true);
-                    if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    int oldHP = enemy.Hp;
+                    minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn, false, true);
+                    if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
+                }
+
+                
+            }
+            else
+            {
+
+                if (m.handcard.card.poisionous)
+                {
+                    minionGetDestroyed(enemy, enemyOwn);
+                }
+                else
+                {
+                    int oldHP = enemy.Hp;
+                    minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn, false, true);
+                    if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
+                }
+
+                if (enemy.name == CardDB.cardName.sylvanaswindrunner && enemy.Hp <= 0)
+                {//test if attacking minion switched placed due to sylvanas
+                    if (attackOwn)
+                    {
+                        bool notfound = true;
+                        foreach (Minion mnn in this.ownMinions)
+                        {
+                            if (mnn.entitiyID == m.entitiyID)
+                            {
+                                notfound = false;
+                                break;
+                            }
+                        }
+
+                        if (notfound) attackOwn = false;
+                    }
+                    else
+                    {
+                        bool notfound = true;
+                        foreach (Minion mnn in this.enemyMinions)
+                        {
+                            if (mnn.entitiyID == m.entitiyID)
+                            {
+                                notfound = false;
+                                break;
+                            }
+                        }
+
+                        if (notfound) attackOwn = true;
+                    }
+                }
+                //attacker take damage
+                if (!m.immune && !dontcount)
+                {
+                    if (enemy.handcard.card.poisionous)
+                    {
+                        minionGetDestroyed(m, attackOwn);
+                    }
+                    else
+                    {
+                        int oldHP = m.Hp;
+                        minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn, false, true);
+                        if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    }
                 }
             }
         }
@@ -7135,6 +7204,7 @@ namespace HREngine.Bots
                             bool dmgdone = false;
                             foreach (Minion enemy in temp2)
                             {
+                                if (enemy.name == CardDB.cardName.nerubianegg && m.Hp >=2) continue;
                                 if (enemy.Hp > 1)
                                 {
                                     minionGetDamagedOrHealed(enemy, damage, 0, false);

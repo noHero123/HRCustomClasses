@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 91;
+        public int versionnumber = 92;
         private bool singleLog = false;
 
 
@@ -211,8 +211,8 @@ namespace HREngine.Bots
                 if (ent.GetControllerId() == enemyPlayer.GetControllerId() && ent.GetZone() == HRCardZone.DECK) enemyDecksize++;
             }
 
-            this.heroImmune = ownhero.IsImmune();
-            this.enemyHeroImmune = enemyhero.IsImmune();
+            this.heroImmune = (ownhero.GetTag(HRGameTag.CANT_BE_DAMAGED) == 1) ? true : false;
+            this.enemyHeroImmune = (enemyhero.GetTag(HRGameTag.CANT_BE_DAMAGED) == 1) ? true : false;
 
             this.enemyHeroWeapon = "";
             this.enemyWeaponAttack = 0;
@@ -236,23 +236,13 @@ namespace HREngine.Bots
             exausted = ownhero.IsExhausted();
             this.ownheroisread = true;
 
-            this.heroImmuneToDamageWhileAttacking = (ownhero.IsImmune()) ? true : false;
+            this.heroImmuneToDamageWhileAttacking = false;
             this.herofrozen = ownhero.IsFrozen();
             this.heroNumAttacksThisTurn = ownhero.GetNumAttacksThisTurn();
             this.heroHasWindfury = ownhero.HasWindfury();
             //int numberofattacks = ownhero.GetNumAttacksThisTurn();
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
-
-            if (exausted == true)
-            {
-                this.ownheroisread = false;
-            }
-            if (exausted == false && this.heroAtk == 0)
-            {
-                this.ownheroisread = false;
-            }
-            if (herofrozen) ownheroisread = false;
 
 
             if (ownPlayer.HasWeapon())
@@ -266,10 +256,26 @@ namespace HREngine.Bots
                 {
                     this.heroImmuneToDamageWhileAttacking = true;
                 }
+                if (this.ownHeroWeapon == "doomhammer")
+                {
+                    this.heroHasWindfury = true;
+                }
 
                 //Helpfunctions.Instance.ErrorLog("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
 
             }
+            if(exausted) this.ownheroisread = false;
+
+            if (this.heroNumAttacksThisTurn ==  1 && this.heroHasWindfury )
+            {
+                this.ownheroisread = true;
+            }
+            if (exausted == false && this.heroAtk == 0)
+            {
+                this.ownheroisread = false;
+            }
+            if (herofrozen) ownheroisread = false;
+
 
             //enemy hero stuff###############################################################
             this.enemyAtk = enemyhero.GetATK();
@@ -368,7 +374,7 @@ namespace HREngine.Bots
 
                     m.Ready = false; // if exhausted, he is NOT ready
 
-                    if (!m.playedThisTurn && !m.exhausted && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
+                    if (!m.playedThisTurn && !m.frozen && (m.numAttacksThisTurn == 0 || (m.numAttacksThisTurn == 1 && m.windfury)))
                     {
                         m.Ready = true;
                     }

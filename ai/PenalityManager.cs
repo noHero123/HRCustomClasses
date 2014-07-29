@@ -168,7 +168,7 @@ namespace HREngine.Bots
             retval += getHealPenality( name,  target,  p,  choice, lethal);
             retval += getCardDrawPenality( name,  target,  p,  choice);
             retval += getCardDrawofEffectMinions( card,  p);
-            //retval += getCardDiscardPenality( name,  p);
+            retval += getCardDiscardPenality( name,  p);
             retval += getDestroyOwnPenality(name, target, p, lethal);
             
             retval += getDestroyPenality( name,  target,  p, lethal);
@@ -251,6 +251,8 @@ namespace HREngine.Bots
                     return 10;
                 }
             }
+            if (target == -1) return 60;
+            if (card.name == CardDB.cardName.blessingofmight) return 6;
             return pen;
         }
 
@@ -804,6 +806,7 @@ namespace HREngine.Bots
         private int getCardDiscardPenality(CardDB.cardName name, Playfield p)
         {
             if (p.owncards.Count <= 1) return 0;
+            if (p.ownMaxMana <= 3) return 0;
             int pen = 0;
             if (this.cardDiscardDatabase.ContainsKey(name))
             {
@@ -1017,6 +1020,21 @@ namespace HREngine.Bots
             if ((name == CardDB.cardName.wildgrowth || name == CardDB.cardName.nourish)  && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
             {
                 return 500;
+            }
+
+            if (name == CardDB.cardName.ancestralspirit)
+            {
+                if (target >= 10 && target <= 19)
+                {
+                    if (m.name == CardDB.cardName.deathlord || m.name == CardDB.cardName.zombiechow || m.name == CardDB.cardName.dancingswords) return 0;
+                    return 500;
+                }
+                if (target >= 0 && target <= 9)
+                {
+                    if (this.specialMinions.ContainsKey(m.name)) return -5;
+                    return 0;
+                }
+               
             }
 
             if (name == CardDB.cardName.sylvanaswindrunner)

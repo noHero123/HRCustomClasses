@@ -3315,13 +3315,13 @@ namespace HREngine.Bots
                     foreach (Minion m in p.ownMinions)
                     {
                         if (m.id == -1) continue;
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister) || m.name == CardDB.cardName.spectralknight) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -3485,13 +3485,13 @@ namespace HREngine.Bots
                     foreach (Minion m in p.ownMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister))) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight))) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -3648,9 +3648,9 @@ namespace HREngine.Bots
 
                 if (this.type == cardtype.MOB)
                 {
-                    offset += (p.soeldnerDerVenture) * 3;
+                    offset += p.soeldnerDerVenture * 3;
 
-                    offset += (p.managespenst);
+                    offset += p.managespenst;
 
                     int temp = -(p.startedWithbeschwoerungsportal) * 2;
                     if (retval + temp <= 0) temp = -retval + 1;
@@ -3659,6 +3659,11 @@ namespace HREngine.Bots
                     if (p.mobsplayedThisTurn == 0)
                     {
                         offset -= p.winzigebeschwoererin;
+                    }
+
+                    if (this.battlecry)
+                    {
+                        offset += p.nerubarweblord * 2;
                     }
 
                 }
@@ -3720,6 +3725,11 @@ namespace HREngine.Bots
                 if (p.managespenst != p.startedWithManagespenst && this.type == cardtype.MOB)
                 {
                     offset += (p.managespenst - p.startedWithManagespenst);
+                }
+
+                if (this.battlecry && p.nerubarweblord != p.startedWithnerubarweblord && this.type == cardtype.MOB)
+                {
+                    offset += (p.nerubarweblord - p.startedWithnerubarweblord)*2;
                 }
 
 

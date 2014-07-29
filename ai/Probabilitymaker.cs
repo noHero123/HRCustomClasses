@@ -5,7 +5,8 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-    class Probabilitymaker
+
+    public class Probabilitymaker
     {
         Dictionary<CardDB.cardIDEnum, int> ownCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
         Dictionary<CardDB.cardIDEnum, int> enemyCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
@@ -90,4 +91,5 @@ namespace HREngine.Bots
 
 
     }
+
 }

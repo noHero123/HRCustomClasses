@@ -11,7 +11,7 @@ using Triton.Game.Mapping;
 
 namespace SilverfishRush
 {
-    public class SilverRush : ICustomDeck
+    public class SilverfishRush : ICustomDeck
     {
         private readonly PenalityManager penman = PenalityManager.Instance;
         private readonly Silverfish sf;
@@ -23,7 +23,7 @@ namespace SilverfishRush
 
         Behavior behave = new BehaviorRush();
 
-        public SilverRush()
+        public SilverfishRush()
         {
             bool concede = false;
             bool writeToSingleFile = false;
@@ -485,7 +485,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        public int versionnumber = 91;
+        public int versionnumber = 92;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -602,6 +602,7 @@ namespace SilverfishRush
 
             getMinions();
             getHandcards();
+            getDecks();
 
             // send ai the data:
             Hrtprozis.Instance.clearAll();
@@ -712,8 +713,8 @@ namespace SilverfishRush
                 if (ent.ControllerId != ownPlayerController && ent.GetTag(GAME_TAG.ZONE) == 2) enemyDecksize++;
             }
 
-            heroImmune = (ownHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
-            enemyHeroImmune = (enemHero.GetTag(GAME_TAG.IMMUNE_WHILE_ATTACKING) == 0) ? false : true;
+            heroImmune = (ownHero.GetTag(GAME_TAG.CANT_BE_DAMAGED) == 0) ? false : true;
+            enemyHeroImmune = (enemHero.GetTag(GAME_TAG.CANT_BE_DAMAGED) == 0) ? false : true;
 
             enemyHeroWeapon = "";
             enemyWeaponAttack = 0;
@@ -737,22 +738,13 @@ namespace SilverfishRush
             exausted = (ownHero.GetTag(GAME_TAG.EXHAUSTED) == 0) ? false : true;
             ownheroisread = true;
 
-            heroImmuneToDamageWhileAttacking = heroImmune;
+            heroImmuneToDamageWhileAttacking = false;
             herofrozen = (ownHero.GetTag(GAME_TAG.FROZEN) == 0) ? false : true;
             heroNumAttacksThisTurn = ownHero.GetTag(GAME_TAG.NUM_ATTACKS_THIS_TURN);
             heroHasWindfury = (ownHero.GetTag(GAME_TAG.WINDFURY) == 0) ? false : true;
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
-            if (exausted)
-            {
-                ownheroisread = false;
-            }
-            if (exausted == false && heroAtk == 0)
-            {
-                ownheroisread = false;
-            }
-            if (herofrozen) ownheroisread = false;
 
 
             if (TritonHS.DoWeHaveWeapon)
@@ -767,9 +759,25 @@ namespace SilverfishRush
                 {
                     heroImmuneToDamageWhileAttacking = true;
                 }
+                if (this.ownHeroWeapon == "doomhammer")
+                {
+                    this.heroHasWindfury = true;
+                }
 
                 //Helpfunctions.Instance.ErrorLog("weapon: " + ownHeroWeapon + " " + heroWeaponAttack + " " + heroWeaponDurability);
             }
+
+            if (exausted) this.ownheroisread = false;
+
+            if (this.heroNumAttacksThisTurn == 1 && this.heroHasWindfury)
+            {
+                this.ownheroisread = true;
+            }
+            if (exausted == false && this.heroAtk == 0)
+            {
+                this.ownheroisread = false;
+            }
+            if (herofrozen) ownheroisread = false;
 
             //enemy hero stuff###############################################################
             enemyAtk = enemHero.GetTag(GAME_TAG.ATK); //lol should be zero :D
@@ -963,6 +971,38 @@ namespace SilverfishRush
             // dont know if you can count the enemys-handcars in this way :D
         }
 
+        private void getDecks()
+        {
+            List<HSCard> allEntitys = TritonHS.GetAllCards();
+            int owncontroler = TritonHS.OurHero.GetTag(GAME_TAG.CONTROLLER);
+            int enemycontroler = TritonHS.EnemyHero.GetTag(GAME_TAG.CONTROLLER);
+            List<CardDB.cardIDEnum> ownCards = new List<CardDB.cardIDEnum>();
+            List<CardDB.cardIDEnum> enemyCards = new List<CardDB.cardIDEnum>();
+
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetTag(GAME_TAG.ZONE) == 7 && ent.GetTag(GAME_TAG.CONTROLLER) == enemycontroler) continue; // cant know enemy secrets :D
+
+                if (ent.GetTag(GAME_TAG.CARDTYPE) == 4 || ent.GetTag(GAME_TAG.CARDTYPE) == 5 || ent.GetTag(GAME_TAG.CARDTYPE) == 7)//is minion, weapon or spell
+                {
+                    CardDB.cardIDEnum cardid = CardDB.Instance.cardIdstringToEnum(ent.Id);
+                    Helpfunctions.Instance.logg("found " + cardid);
+                    if (ent.GetTag(GAME_TAG.CONTROLLER) == owncontroler)
+                    {
+                        ownCards.Add(cardid);
+                    }
+                    else
+                    {
+                        enemyCards.Add(cardid);
+                    }
+                }
+
+            }
+
+            Probabilitymaker.Instance.setOwnCards(ownCards);
+            Probabilitymaker.Instance.setEnemyCards(enemyCards);
+
+        }
 
     }
 
@@ -2079,7 +2119,9 @@ namespace SilverfishRush
                 if (m.frozen || (m.handcard.card.name == CardDB.cardName.ancientwatcher && !m.silenced))
                 {
                     m.Ready = false;
+                    continue;
                 }
+                if (m.Angr == 0) continue;
                 m.Ready = true;
                 m.numAttacksThisTurn = 0;
             }
@@ -2535,6 +2577,7 @@ namespace SilverfishRush
             this.complete = false;
             this.sEnemTurn = false;
             this.value = int.MinValue;
+            this.diedMinions.Clear();
         }
 
         public List<targett> getAttackTargets(bool own)
@@ -4572,17 +4615,15 @@ namespace SilverfishRush
             }
 
             //deathrattle enchantments // these can be triggered after an silence (if they are casted after the silence)
-            bool geistderahnen = false;
             foreach (Enchantment e in m.enchantments)
             {
-                if (e.CARDID == CardDB.cardIDEnum.CS2_038e && !geistderahnen)
+                if (e.CARDID == CardDB.cardIDEnum.CS2_038e)
                 {
                     //revive minion due to "geist der ahnen"
                     CardDB.Card kid = m.handcard.card;
                     int pos = this.ownMinions.Count - 1;
                     if (!own) pos = this.enemyMinions.Count - 1;
                     callKid(kid, pos, own);
-                    geistderahnen = true;
                 }
                 //Seele des Waldes
                 if (e.CARDID == CardDB.cardIDEnum.EX1_158e)
@@ -5114,8 +5155,10 @@ namespace SilverfishRush
             minionGetDamagedOrHealed(m, damages, heals, own, false);
         }*/
 
+
         private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own, bool dontCalcLostDmg = false, bool isMinionattack = false)
         {
+            if (m.Hp <= 0) return;
             int damage = damages;
             int heal = heals;
 
@@ -5346,30 +5389,96 @@ namespace SilverfishRush
             int ownAttack = m.Angr;
             int enemyAttack = enemy.Angr;
             // defender take damage
-            if (m.handcard.card.poisionous)
-            {
-                minionGetDestroyed(enemy, enemyOwn);
-            }
-            else
-            {
-                int oldHP = enemy.Hp;
-                minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn, false, true);
-                if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
-            }
 
-
-            //attacker take damage
-            if (!m.immune && !dontcount)
+            if (enemy.name == CardDB.cardName.sylvanaswindrunner)
             {
-                if (enemy.handcard.card.poisionous)
+
+                //attacker take damage
+                if (!m.immune && !dontcount)
                 {
-                    minionGetDestroyed(m, attackOwn);
+                    if (enemy.handcard.card.poisionous)
+                    {
+                        minionGetDestroyed(m, attackOwn);
+                    }
+                    else
+                    {
+                        int oldHP = m.Hp;
+                        minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn, false, true);
+                        if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    }
+                }
+
+                if (m.handcard.card.poisionous)
+                {
+                    minionGetDestroyed(enemy, enemyOwn);
                 }
                 else
                 {
-                    int oldHP = m.Hp;
-                    minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn, false, true);
-                    if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    int oldHP = enemy.Hp;
+                    minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn, false, true);
+                    if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
+                }
+
+
+            }
+            else
+            {
+
+                if (m.handcard.card.poisionous)
+                {
+                    minionGetDestroyed(enemy, enemyOwn);
+                }
+                else
+                {
+                    int oldHP = enemy.Hp;
+                    minionGetDamagedOrHealed(enemy, ownAttack, 0, enemyOwn, false, true);
+                    if (!m.silenced && oldHP > enemy.Hp && m.handcard.card.name == CardDB.cardName.waterelemental) enemy.frozen = true;
+                }
+
+                if (enemy.name == CardDB.cardName.sylvanaswindrunner && enemy.Hp <= 0)
+                {//test if attacking minion switched placed due to sylvanas
+                    if (attackOwn)
+                    {
+                        bool notfound = true;
+                        foreach (Minion mnn in this.ownMinions)
+                        {
+                            if (mnn.entitiyID == m.entitiyID)
+                            {
+                                notfound = false;
+                                break;
+                            }
+                        }
+
+                        if (notfound) attackOwn = false;
+                    }
+                    else
+                    {
+                        bool notfound = true;
+                        foreach (Minion mnn in this.enemyMinions)
+                        {
+                            if (mnn.entitiyID == m.entitiyID)
+                            {
+                                notfound = false;
+                                break;
+                            }
+                        }
+
+                        if (notfound) attackOwn = true;
+                    }
+                }
+                //attacker take damage
+                if (!m.immune && !dontcount)
+                {
+                    if (enemy.handcard.card.poisionous)
+                    {
+                        minionGetDestroyed(m, attackOwn);
+                    }
+                    else
+                    {
+                        int oldHP = m.Hp;
+                        minionGetDamagedOrHealed(m, enemyAttack, 0, attackOwn, false, true);
+                        if (!enemy.silenced && oldHP > m.Hp && enemy.handcard.card.name == CardDB.cardName.waterelemental) m.frozen = true;
+                    }
                 }
             }
         }
@@ -8402,6 +8511,7 @@ namespace SilverfishRush
                             bool dmgdone = false;
                             foreach (Minion enemy in temp2)
                             {
+                                if (enemy.name == CardDB.cardName.nerubianegg && m.Hp >= 2) continue;
                                 if (enemy.Hp > 1)
                                 {
                                     minionGetDamagedOrHealed(enemy, damage, 0, false);
@@ -11297,6 +11407,93 @@ namespace SilverfishRush
 
     }
 
+    public class Probabilitymaker
+    {
+        Dictionary<CardDB.cardIDEnum, int> ownCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
+        Dictionary<CardDB.cardIDEnum, int> enemyCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
+        List<CardDB.Card> ownDeckGuessed = new List<CardDB.Card>();
+        List<CardDB.Card> enemyDeckGuessed = new List<CardDB.Card>();
+
+        private static Probabilitymaker instance;
+        public static Probabilitymaker Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Probabilitymaker();
+                }
+                return instance;
+            }
+        }
+
+        private Probabilitymaker()
+        {
+
+        }
+
+        public void setOwnCards(List<CardDB.cardIDEnum> list)
+        {
+            setupDeck(list, ownDeckGuessed, ownCardsPlayed);
+        }
+
+        public void setEnemyCards(List<CardDB.cardIDEnum> list)
+        {
+            setupDeck(list, enemyDeckGuessed, enemyCardsPlayed);
+        }
+
+        private void setupDeck(List<CardDB.cardIDEnum> cardsPlayed, List<CardDB.Card> deckGuessed, Dictionary<CardDB.cardIDEnum, int> knownCards)
+        {
+            deckGuessed.Clear();
+            knownCards.Clear();
+            foreach (CardDB.cardIDEnum crdidnm in cardsPlayed)
+            {
+                if (crdidnm == CardDB.cardIDEnum.GAME_005) continue; //(im sure, he has no coins in his deck :D)
+                if (knownCards.ContainsKey(crdidnm))
+                {
+                    knownCards[crdidnm]++;
+                }
+                else
+                {
+                    if (CardDB.Instance.getCardDataFromID(crdidnm).rarity == 5)
+                    {
+                        //you cant own rare ones more than once!
+                        knownCards.Add(crdidnm, 2);
+                        continue;
+                    }
+                    knownCards.Add(crdidnm, 1);
+                }
+            }
+
+            foreach (KeyValuePair<CardDB.cardIDEnum, int> kvp in knownCards)
+            {
+                if (kvp.Value == 1) deckGuessed.Add(CardDB.Instance.getCardDataFromID(kvp.Key));
+            }
+        }
+
+        public bool hasEnemyThisCardInDeck(CardDB.cardIDEnum cardid)
+        {
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+
+        public double getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        {
+            return 0.0;
+        }
+
+
+    }
+
+
     public class PenalityManager
     {
         //todo acolyteofpain
@@ -11459,7 +11656,7 @@ namespace SilverfishRush
             retval += getHealPenality(name, target, p, choice, lethal);
             retval += getCardDrawPenality(name, target, p, choice);
             retval += getCardDrawofEffectMinions(card, p);
-            //retval += getCardDiscardPenality( name,  p);
+            retval += getCardDiscardPenality(name, p);
             retval += getDestroyOwnPenality(name, target, p, lethal);
 
             retval += getDestroyPenality(name, target, p, lethal);
@@ -11542,6 +11739,8 @@ namespace SilverfishRush
                     return 10;
                 }
             }
+            if (target == -1) return 60;
+            if (card.name == CardDB.cardName.blessingofmight) return 6;
             return pen;
         }
 
@@ -12095,6 +12294,7 @@ namespace SilverfishRush
         private int getCardDiscardPenality(CardDB.cardName name, Playfield p)
         {
             if (p.owncards.Count <= 1) return 0;
+            if (p.ownMaxMana <= 3) return 0;
             int pen = 0;
             if (this.cardDiscardDatabase.ContainsKey(name))
             {
@@ -12308,6 +12508,21 @@ namespace SilverfishRush
             if ((name == CardDB.cardName.wildgrowth || name == CardDB.cardName.nourish) && p.ownMaxMana == 9 && !(p.ownHeroName == HeroEnum.thief && p.cardsPlayedThisTurn == 0))
             {
                 return 500;
+            }
+
+            if (name == CardDB.cardName.ancestralspirit)
+            {
+                if (target >= 10 && target <= 19)
+                {
+                    if (m.name == CardDB.cardName.deathlord || m.name == CardDB.cardName.zombiechow || m.name == CardDB.cardName.dancingswords) return 0;
+                    return 500;
+                }
+                if (target >= 0 && target <= 9)
+                {
+                    if (this.specialMinions.ContainsKey(m.name)) return -5;
+                    return 0;
+                }
+
             }
 
             if (name == CardDB.cardName.sylvanaswindrunner)
@@ -17685,13 +17900,13 @@ namespace SilverfishRush
                     foreach (Minion m in p.ownMinions)
                     {
                         if (m.id == -1) continue;
-                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) continue;
+                        if ((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister) || m.name == CardDB.cardName.spectralknight) || m.stealth) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -17855,13 +18070,13 @@ namespace SilverfishRush
                     foreach (Minion m in p.ownMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister)) || m.stealth) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight)) || m.stealth) continue;
                         retval.Add(new targett(m.id, m.entitiyID));
                     }
                     foreach (Minion m in p.enemyMinions)
                     {
                         if (m.id == -1) continue;
-                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister))) continue;
+                        if (((this.type == cardtype.SPELL || this.type == cardtype.HEROPWR) && (m.name == CardDB.cardName.faeriedragon || m.name == CardDB.cardName.laughingsister || m.name == CardDB.cardName.spectralknight))) continue;
                         retval.Add(new targett(m.id + 10, m.entitiyID));
                     }
 
@@ -18018,9 +18233,9 @@ namespace SilverfishRush
 
                 if (this.type == cardtype.MOB)
                 {
-                    offset += (p.soeldnerDerVenture) * 3;
+                    offset += p.soeldnerDerVenture * 3;
 
-                    offset += (p.managespenst);
+                    offset += p.managespenst;
 
                     int temp = -(p.startedWithbeschwoerungsportal) * 2;
                     if (retval + temp <= 0) temp = -retval + 1;
@@ -18029,6 +18244,11 @@ namespace SilverfishRush
                     if (p.mobsplayedThisTurn == 0)
                     {
                         offset -= p.winzigebeschwoererin;
+                    }
+
+                    if (this.battlecry)
+                    {
+                        offset += p.nerubarweblord * 2;
                     }
 
                 }
@@ -18090,6 +18310,11 @@ namespace SilverfishRush
                 if (p.managespenst != p.startedWithManagespenst && this.type == cardtype.MOB)
                 {
                     offset += (p.managespenst - p.startedWithManagespenst);
+                }
+
+                if (this.battlecry && p.nerubarweblord != p.startedWithnerubarweblord && this.type == cardtype.MOB)
+                {
+                    offset += (p.nerubarweblord - p.startedWithnerubarweblord) * 2;
                 }
 
 
@@ -19358,6 +19583,8 @@ namespace SilverfishRush
 
             return retval;
         }
+
+
 
     }
 
