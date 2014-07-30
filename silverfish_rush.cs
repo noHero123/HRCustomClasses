@@ -2818,7 +2818,7 @@ namespace HREngine.Bots
             this.complete = false;
             this.sEnemTurn = false;
             this.value = int.MinValue;
-            this.diedMinions.Clear();
+            if (this.diedMinions != null) this.diedMinions.Clear();
         }
 
         public List<targett> getAttackTargets(bool own)

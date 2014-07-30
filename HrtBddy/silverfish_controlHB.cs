@@ -485,7 +485,7 @@ namespace SilverfishControl
 
     public class Silverfish
     {
-        public int versionnumber = 92;
+        public int versionnumber = 93;
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -2577,7 +2577,7 @@ namespace SilverfishControl
             this.complete = false;
             this.sEnemTurn = false;
             this.value = int.MinValue;
-            this.diedMinions.Clear();
+            if (this.diedMinions != null) this.diedMinions.Clear();
         }
 
         public List<targett> getAttackTargets(bool own)
