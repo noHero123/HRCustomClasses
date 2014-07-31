@@ -49,7 +49,7 @@ namespace SilverfishRush
             }
 
             bool playaround = false;
-            bool playaroundprob = 40;
+            int playaroundprob = 40;
             if (playaround)
             {
                 Ai.Instance.setPlayAround(playaround, playaroundprob);
