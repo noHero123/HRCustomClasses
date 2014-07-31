@@ -11,9 +11,9 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 93;
+        public int versionnumber = 94;
         private bool singleLog = false;
-
+        private string botbehave = "rush";
 
         Settings sttngs = Settings.Instance;
 
@@ -111,7 +111,7 @@ namespace HREngine.Bots
 
         public void updateEverything(Behavior botbase)
         {
-
+            if (botbase is BehaviorControl) this.botbehave = "control";
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
             ownPlayerController = ownPlayer.GetHero().GetControllerId();//ownPlayer.GetHero().GetControllerId()
@@ -172,7 +172,7 @@ namespace HREngine.Bots
             this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber);
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("emana " + enemyMaxMana);
@@ -486,7 +486,6 @@ namespace HREngine.Bots
             this.anzcards = 0;
             this.enemyAnzCards = 0;
             List<HRCard> list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-            list.AddRange(HRCard.GetCards(HRPlayer.GetEnemyPlayer(), HRCardZone.HAND));
 
             foreach (HRCard item in list)
             {
@@ -508,7 +507,14 @@ namespace HREngine.Bots
                     this.anzcards++;
                 }
 
-                if (entitiy.GetControllerId() != this.ownPlayerController && entitiy.GetZonePosition() >= 1) // enemy handcard
+                
+            }
+
+            Dictionary<int, HREntity> allEntitys = HRGame.GetEntityMap();
+
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetControllerId() != this.ownPlayerController && ent.GetZonePosition() >= 1 && ent.GetZone() == HRCardZone.HAND) // enemy handcard
                 {
                     this.enemyAnzCards++;
                 }
@@ -532,17 +538,20 @@ namespace HREngine.Bots
                 if (ent.GetCardType() == HRCardType.MINION || ent.GetCardType() == HRCardType.WEAPON || ent.GetCardType() == HRCardType.ABILITY)
                 {
                     CardDB.cardIDEnum cardid = CardDB.Instance.cardIdstringToEnum(ent.GetCardId());
-                    string owner = "own";
-                    if (ent.GetControllerId() == enemycontroler) owner = "enemy";
+                    //string owner = "own";
+                    //if (ent.GetControllerId() == enemycontroler) owner = "enemy";
                     //if (ent.GetControllerId() == enemycontroler && ent.GetZone() == HRCardZone.HAND) Helpfunctions.Instance.logg("enemy card in hand: " + "cardindeck: " + cardid + " " + ent.GetName());
-                    if (cardid != CardDB.cardIDEnum.None) Helpfunctions.Instance.logg("cardindeck: " + cardid + " " + ent.GetName() + " " + ent.GetZone() + " " + owner + " " + ent.GetCardType());
-                    if (ent.GetControllerId() == owncontroler)
+                    //if (cardid != CardDB.cardIDEnum.None) Helpfunctions.Instance.logg("cardindeck: " + cardid + " " + ent.GetName() + " " + ent.GetZone() + " " + owner + " " + ent.GetCardType());
+                    if (cardid != CardDB.cardIDEnum.None)
                     {
-                        ownCards.Add(cardid);
-                    }
-                    else
-                    {
-                        enemyCards.Add(cardid);
+                        if (ent.GetControllerId() == owncontroler)
+                        {
+                            ownCards.Add(cardid);
+                        }
+                        else
+                        {
+                            enemyCards.Add(cardid);
+                        }
                     }
                 }
 

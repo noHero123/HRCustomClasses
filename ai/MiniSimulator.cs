@@ -17,6 +17,7 @@ namespace HREngine.Bots
         private bool useLethalCheck = true;
         private bool useComparison = true;
 
+
         private bool printNormalstuff = false;
 
         List<Playfield> posmoves = new List<Playfield>(7000);
@@ -30,6 +31,7 @@ namespace HREngine.Bots
 
         private bool simulateSecondTurn = false;
         private bool playaround = false;
+        private int playaroundprob = 20;
 
         PenalityManager pen = PenalityManager.Instance;
 
@@ -60,9 +62,10 @@ namespace HREngine.Bots
             this.simulateSecondTurn = sts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -668,7 +671,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround,false, this.playaroundprob);
                     }
 
                     //sort stupid stuff ouf
@@ -728,7 +731,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround,false, this.playaroundprob);
                     }
                 }
             }

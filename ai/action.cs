@@ -774,7 +774,7 @@ namespace HREngine.Bots
         }
 
 
-        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print)
+        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print, int pprob)
         {
             int maxwide = 20;
 
@@ -797,7 +797,7 @@ namespace HREngine.Bots
             {
                 int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
-                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemyAnzCards, pprob);
                 int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
                 if (oldval < newval)
@@ -1020,7 +1020,7 @@ namespace HREngine.Bots
         }
 
 
-        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount)
+        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount, int playAroundProb)
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
@@ -1045,7 +1045,7 @@ namespace HREngine.Bots
 
                 if (usewhirlwind)
                 {
-                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana);
+                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana, playAroundProb);
                 }
             }
 
@@ -1053,33 +1053,33 @@ namespace HREngine.Bots
 
             if (enemyHeroNamee == HeroEnum.mage)
             {
-                    mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana);
-                    mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana, playAroundProb);
+                mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.hunter)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.priest)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.shaman)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.pala)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.druid)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana, playAroundProb);
             }
             
 
@@ -1087,13 +1087,14 @@ namespace HREngine.Bots
             return mana;
         }
 
-        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana)
+        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana, int playAroundProb)
         {
             
             //todo manacosts
-
                 if (cardname == CardDB.cardName.flamestrike && currmana >= 7)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_032, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
+
                     List<Minion> temp = new List<Minion>(this.ownMinions);
                     int damage = getEnemySpellDamageDamage(4);
                     foreach (Minion enemy in temp)
@@ -1107,6 +1108,7 @@ namespace HREngine.Bots
 
                 if (cardname == CardDB.cardName.blizzard && currmana >= 6)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_028, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     List<Minion> temp = new List<Minion>(this.ownMinions);
                     int damage = getEnemySpellDamageDamage(2);
                     foreach (Minion enemy in temp)
@@ -1122,6 +1124,7 @@ namespace HREngine.Bots
 
                 if (cardname == CardDB.cardName.unleashthehounds && currmana >= 5)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_538, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     int anz = this.ownMinions.Count;
                     int posi = this.enemyMinions.Count - 1;
                     CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_538t);//hound
@@ -1139,6 +1142,7 @@ namespace HREngine.Bots
 
                 if (cardname == CardDB.cardName.holynova && currmana >= 5)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS1_112, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     int heal = 2;
                     int damage = getEnemySpellDamageDamage(2);
@@ -1163,6 +1167,7 @@ namespace HREngine.Bots
 
                 if (cardname == CardDB.cardName.lightningstorm && currmana >= 4)//3
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_259, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     List<Minion> temp = new List<Minion>(this.ownMinions);
                     int damage = getEnemySpellDamageDamage(2);
                     foreach (Minion enemy in temp)
@@ -1177,6 +1182,7 @@ namespace HREngine.Bots
 
                 if (cardname == CardDB.cardName.whirlwind && currmana >= 3 )//1
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_400, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     List<Minion> temp = new List<Minion>(this.enemyMinions);
                     int damage = getEnemySpellDamageDamage(1);
                     foreach (Minion enemy in temp)
@@ -1197,6 +1203,7 @@ namespace HREngine.Bots
            
                 if (cardname == CardDB.cardName.consecration && currmana >= 4)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_093, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     List<Minion> temp = new List<Minion>(this.ownMinions);
                     int damage = getEnemySpellDamageDamage(2);
                     foreach (Minion enemy in temp)
@@ -1213,6 +1220,7 @@ namespace HREngine.Bots
             
                 if (cardname == CardDB.cardName.swipe && currmana >= 4)
                 {
+                    if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_012, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                     int damage = getEnemySpellDamageDamage(4);
                     // all others get 1 spelldamage
                     int damage1 = getEnemySpellDamageDamage(1);
@@ -1314,7 +1322,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                //if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
+                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -1632,7 +1640,7 @@ namespace HREngine.Bots
 
         }
 
-        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false)
+        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false, int pprob=0)
         {
             this.value = int.MinValue;
 
@@ -1658,7 +1666,7 @@ namespace HREngine.Bots
                 guessHeroDamage();
                 if (this.guessingHeroHP >= 1)
                 {
-                    simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                    simulateEnemysTurn(simulateTwoTurns, playaround, print, pprob);
                 }
                 this.complete = true;
             }
@@ -3137,7 +3145,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        if (enemyAnzCards + enemycarddraw >= 1)
+                        if (enemyAnzCards >= 1)
                         {
                             CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_301);//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
@@ -4051,10 +4059,20 @@ namespace HREngine.Bots
 
             if (logging) Helpfunctions.Instance.logg(".attck with" + m.name + " A " + m.Angr + " H " + m.Hp);
             
-            if (target == 200)//target is hero
+            if (target == 200)//target is enemy hero
+            {
+                int oldhp = this.enemyHeroHp;
+                attackOrHealHero(m.Angr, false);
+                if (oldhp > this.enemyHeroHp)
+                {
+                    if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.enemyHeroFrozen = true;
+                }
+                return;
+            }
+            if (target == 100)//target is hero
             {
                 int oldhp = this.ownHeroHp;
-                attackOrHealHero(m.Angr, false);
+                attackOrHealHero(m.Angr, true);
                 if (oldhp > this.ownHeroHp)
                 {
                     if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.ownHeroFrozen = true;
@@ -6527,7 +6545,7 @@ namespace HREngine.Bots
             }
             if (c.name == CardDB.cardName.divinefavor)
             {
-                int enemcardsanz = this.enemyAnzCards + this.enemycarddraw;
+                int enemcardsanz = this.enemyAnzCards;
                 int diff = enemcardsanz - this.owncards.Count;
                 if (diff >= 1)
                 {
@@ -6596,7 +6614,7 @@ namespace HREngine.Bots
             }
             if (c.name == CardDB.cardName.mindvision)
             {
-                if (this.enemyAnzCards+this.enemycarddraw >= 1)
+                if (this.enemyAnzCards >= 1)
                 {
                     //this.owncarddraw++;
                     this.drawACard(CardDB.cardName.unknown, true, true);
@@ -7140,23 +7158,25 @@ namespace HREngine.Bots
                     else
                     {
                         this.enemyDeckSize--;
-                        if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                        if (this.enemyAnzCards >= 10)
                         {
                             this.evaluatePenality -= 50;
                             return;
                         }
                         this.enemycarddraw++;
+                        this.enemyAnzCards++;
                     }
 
                 }
                 else
                 {
-                    if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                    if (this.enemyAnzCards >= 10)
                     {
                         this.evaluatePenality -= 50;
                         return;
                     }
                     this.enemycarddraw++;
+                    this.enemyAnzCards++;
 
                 }
                 return;

@@ -254,6 +254,44 @@ namespace HREngine.Bots
             {
                 help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.cardIDenum);
             }
+            help.logg("Enemy cards: " + this.enemyAnzCards);
+            if(Ai.Instance.playaround)
+            {
+                if(Hrtprozis.Instance.enemyHeroname == HeroEnum.mage)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_032) + " " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_028));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.warrior)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_400));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.hunter)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_538));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.priest)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS1_112));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.shaman)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_259));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.pala)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_093));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.druid)
+                {
+                    help.logg("probs: "  + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_012));
+                }
+            }
         }
 
 

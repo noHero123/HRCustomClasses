@@ -109,17 +109,19 @@ namespace HREngine.Bots
            try
            {
                bool playaround = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAround") == "true") ? true : false;
-
+               int playaroundprob = Convert.ToInt32(HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAroundProb"));
+               if (playaroundprob > 100) playaroundprob = 100;
+               if (playaroundprob < 0) playaroundprob = 0;
                if (playaround)
                {
-                   Ai.Instance.setPlayAround(playaround);
+                   Ai.Instance.setPlayAround(playaround, playaroundprob);
                    Helpfunctions.Instance.ErrorLog("activated playaround");
                }
 
            }
            catch
            {
-               Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
+               Helpfunctions.Instance.ErrorLog("error in reading play around settings");
            }
 
            Helpfunctions.Instance.ErrorLog("write to single log file is: " + writeToSingleFile);
@@ -702,9 +704,9 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 93;
+        public int versionnumber = 94;
         private bool singleLog = false;
-
+        private string botbehave = "rush";
 
         Settings sttngs = Settings.Instance;
 
@@ -802,7 +804,7 @@ namespace HREngine.Bots
 
         public void updateEverything(Behavior botbase)
         {
-
+            if (botbase is BehaviorControl) this.botbehave = "control";
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
             ownPlayerController = ownPlayer.GetHero().GetControllerId();//ownPlayer.GetHero().GetControllerId()
@@ -863,7 +865,7 @@ namespace HREngine.Bots
             this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber);
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("emana " + enemyMaxMana);
@@ -1177,7 +1179,6 @@ namespace HREngine.Bots
             this.anzcards = 0;
             this.enemyAnzCards = 0;
             List<HRCard> list = HRCard.GetCards(HRPlayer.GetLocalPlayer(), HRCardZone.HAND);
-            list.AddRange(HRCard.GetCards(HRPlayer.GetEnemyPlayer(), HRCardZone.HAND));
 
             foreach (HRCard item in list)
             {
@@ -1199,7 +1200,14 @@ namespace HREngine.Bots
                     this.anzcards++;
                 }
 
-                if (entitiy.GetControllerId() != this.ownPlayerController && entitiy.GetZonePosition() >= 1) // enemy handcard
+
+            }
+
+            Dictionary<int, HREntity> allEntitys = HRGame.GetEntityMap();
+
+            foreach (HREntity ent in allEntitys.Values)
+            {
+                if (ent.GetControllerId() != this.ownPlayerController && ent.GetZonePosition() >= 1 && ent.GetZone() == HRCardZone.HAND) // enemy handcard
                 {
                     this.enemyAnzCards++;
                 }
@@ -1223,17 +1231,20 @@ namespace HREngine.Bots
                 if (ent.GetCardType() == HRCardType.MINION || ent.GetCardType() == HRCardType.WEAPON || ent.GetCardType() == HRCardType.ABILITY)
                 {
                     CardDB.cardIDEnum cardid = CardDB.Instance.cardIdstringToEnum(ent.GetCardId());
-                    string owner = "own";
-                    if (ent.GetControllerId() == enemycontroler) owner = "enemy";
+                    //string owner = "own";
+                    //if (ent.GetControllerId() == enemycontroler) owner = "enemy";
                     //if (ent.GetControllerId() == enemycontroler && ent.GetZone() == HRCardZone.HAND) Helpfunctions.Instance.logg("enemy card in hand: " + "cardindeck: " + cardid + " " + ent.GetName());
-                    if (cardid != CardDB.cardIDEnum.None) Helpfunctions.Instance.logg("cardindeck: " + cardid + " " + ent.GetName() + " " + ent.GetZone() + " " + owner + " " + ent.GetCardType());
-                    if (ent.GetControllerId() == owncontroler)
+                    //if (cardid != CardDB.cardIDEnum.None) Helpfunctions.Instance.logg("cardindeck: " + cardid + " " + ent.GetName() + " " + ent.GetZone() + " " + owner + " " + ent.GetCardType());
+                    if (cardid != CardDB.cardIDEnum.None)
                     {
-                        ownCards.Add(cardid);
-                    }
-                    else
-                    {
-                        enemyCards.Add(cardid);
+                        if (ent.GetControllerId() == owncontroler)
+                        {
+                            ownCards.Add(cardid);
+                        }
+                        else
+                        {
+                            enemyCards.Add(cardid);
+                        }
                     }
                 }
 
@@ -1564,6 +1575,88 @@ namespace HREngine.Bots
             return retval;
         }
 
+
+    }
+
+    public class Helpfunctions
+    {
+
+        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
+        {
+            List<T> retlist = new List<T>();
+            int i = 0;
+
+            foreach (T item in source)
+            {
+                retlist.Add(item);
+                i++;
+
+                if (i >= limit) break;
+            }
+            return retlist;
+        }
+
+
+        public bool runningbot = false;
+
+        private static Helpfunctions instance;
+
+        public static Helpfunctions Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Helpfunctions();
+                }
+                return instance;
+            }
+        }
+
+        private Helpfunctions()
+        {
+
+            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
+        }
+
+        private bool writelogg = true;
+        public void loggonoff(bool onoff)
+        {
+            //writelogg = onoff;
+        }
+
+        public void createNewLoggfile()
+        {
+            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
+        }
+
+        public void logg(string s)
+        {
+
+
+            if (!writelogg) return;
+            try
+            {
+                using (StreamWriter sw = File.AppendText(Settings.Instance.logpath + Settings.Instance.logfile))
+                {
+                    sw.WriteLine(s);
+                }
+            }
+            catch { }
+        }
+
+        public DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+
+        public void ErrorLog(string s)
+        {
+            HREngine.API.Utilities.HRLog.Write(s);
+        }
 
     }
 
@@ -2322,7 +2415,7 @@ namespace HREngine.Bots
         }
 
 
-        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print)
+        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print, int pprob)
         {
             int maxwide = 20;
 
@@ -2345,7 +2438,7 @@ namespace HREngine.Bots
             {
                 int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
-                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemyAnzCards, pprob);
                 int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
                 if (oldval < newval)
@@ -2568,7 +2661,7 @@ namespace HREngine.Bots
         }
 
 
-        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount)
+        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount, int playAroundProb)
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
@@ -2593,7 +2686,7 @@ namespace HREngine.Bots
 
                 if (usewhirlwind)
                 {
-                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana);
+                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana, playAroundProb);
                 }
             }
 
@@ -2601,33 +2694,33 @@ namespace HREngine.Bots
 
             if (enemyHeroNamee == HeroEnum.mage)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana);
-                mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana, playAroundProb);
+                mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.hunter)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.priest)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.shaman)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.pala)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.druid)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana, playAroundProb);
             }
 
 
@@ -2635,13 +2728,14 @@ namespace HREngine.Bots
             return mana;
         }
 
-        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana)
+        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana, int playAroundProb)
         {
 
             //todo manacosts
-
             if (cardname == CardDB.cardName.flamestrike && currmana >= 7)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_032, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
+
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(4);
                 foreach (Minion enemy in temp)
@@ -2655,6 +2749,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.blizzard && currmana >= 6)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_028, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2670,6 +2765,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.unleashthehounds && currmana >= 5)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_538, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 int anz = this.ownMinions.Count;
                 int posi = this.enemyMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_538t);//hound
@@ -2687,6 +2783,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.holynova && currmana >= 5)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS1_112, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int heal = 2;
                 int damage = getEnemySpellDamageDamage(2);
@@ -2711,6 +2808,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.lightningstorm && currmana >= 4)//3
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_259, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2725,6 +2823,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.whirlwind && currmana >= 3)//1
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_400, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getEnemySpellDamageDamage(1);
                 foreach (Minion enemy in temp)
@@ -2745,6 +2844,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.consecration && currmana >= 4)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_093, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2761,6 +2861,7 @@ namespace HREngine.Bots
 
             if (cardname == CardDB.cardName.swipe && currmana >= 4)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_012, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 int damage = getEnemySpellDamageDamage(4);
                 // all others get 1 spelldamage
                 int damage1 = getEnemySpellDamageDamage(1);
@@ -2862,7 +2963,7 @@ namespace HREngine.Bots
                     }
                 }
 
-                //if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
+                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -3180,7 +3281,7 @@ namespace HREngine.Bots
 
         }
 
-        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false)
+        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false, int pprob = 0)
         {
             this.value = int.MinValue;
 
@@ -3206,7 +3307,7 @@ namespace HREngine.Bots
                 guessHeroDamage();
                 if (this.guessingHeroHP >= 1)
                 {
-                    simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                    simulateEnemysTurn(simulateTwoTurns, playaround, print, pprob);
                 }
                 this.complete = true;
             }
@@ -4685,7 +4786,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        if (enemyAnzCards + enemycarddraw >= 1)
+                        if (enemyAnzCards >= 1)
                         {
                             CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_301);//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
@@ -5599,10 +5700,20 @@ namespace HREngine.Bots
 
             if (logging) Helpfunctions.Instance.logg(".attck with" + m.name + " A " + m.Angr + " H " + m.Hp);
 
-            if (target == 200)//target is hero
+            if (target == 200)//target is enemy hero
+            {
+                int oldhp = this.enemyHeroHp;
+                attackOrHealHero(m.Angr, false);
+                if (oldhp > this.enemyHeroHp)
+                {
+                    if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.enemyHeroFrozen = true;
+                }
+                return;
+            }
+            if (target == 100)//target is hero
             {
                 int oldhp = this.ownHeroHp;
-                attackOrHealHero(m.Angr, false);
+                attackOrHealHero(m.Angr, true);
                 if (oldhp > this.ownHeroHp)
                 {
                     if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.ownHeroFrozen = true;
@@ -8075,7 +8186,7 @@ namespace HREngine.Bots
             }
             if (c.name == CardDB.cardName.divinefavor)
             {
-                int enemcardsanz = this.enemyAnzCards + this.enemycarddraw;
+                int enemcardsanz = this.enemyAnzCards;
                 int diff = enemcardsanz - this.owncards.Count;
                 if (diff >= 1)
                 {
@@ -8144,7 +8255,7 @@ namespace HREngine.Bots
             }
             if (c.name == CardDB.cardName.mindvision)
             {
-                if (this.enemyAnzCards + this.enemycarddraw >= 1)
+                if (this.enemyAnzCards >= 1)
                 {
                     //this.owncarddraw++;
                     this.drawACard(CardDB.cardName.unknown, true, true);
@@ -8688,23 +8799,25 @@ namespace HREngine.Bots
                     else
                     {
                         this.enemyDeckSize--;
-                        if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                        if (this.enemyAnzCards >= 10)
                         {
                             this.evaluatePenality -= 50;
                             return;
                         }
                         this.enemycarddraw++;
+                        this.enemyAnzCards++;
                     }
 
                 }
                 else
                 {
-                    if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                    if (this.enemyAnzCards >= 10)
                     {
                         this.evaluatePenality -= 50;
                         return;
                     }
                     this.enemycarddraw++;
+                    this.enemyAnzCards++;
 
                 }
                 return;
@@ -9620,6 +9733,7 @@ namespace HREngine.Bots
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
+        public int playaroundprob = 40;
 
         public MiniSimulator nextTurnSimulator;
         MiniSimulator mainTurnSimulator;
@@ -9639,7 +9753,7 @@ namespace HREngine.Bots
         public Behavior botBase = null;
 
         private bool secondturnsim = false;
-        private bool playaround = false;
+        public bool playaround = false;
 
         private static Ai instance;
 
@@ -9677,10 +9791,11 @@ namespace HREngine.Bots
             this.secondturnsim = stts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
-            this.mainTurnSimulator.setPlayAround(spa);
+            this.mainTurnSimulator.setPlayAround(spa, pprob);
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void doallmoves(bool test, bool isLethalCheck)
@@ -10031,6 +10146,7 @@ namespace HREngine.Bots
         private bool useLethalCheck = true;
         private bool useComparison = true;
 
+
         private bool printNormalstuff = false;
 
         List<Playfield> posmoves = new List<Playfield>(7000);
@@ -10044,6 +10160,7 @@ namespace HREngine.Bots
 
         private bool simulateSecondTurn = false;
         private bool playaround = false;
+        private int playaroundprob = 20;
 
         PenalityManager pen = PenalityManager.Instance;
 
@@ -10074,9 +10191,10 @@ namespace HREngine.Bots
             this.simulateSecondTurn = sts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -10682,7 +10800,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob);
                     }
 
                     //sort stupid stuff ouf
@@ -10742,7 +10860,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob);
                     }
                 }
             }
@@ -11166,11 +11284,48 @@ namespace HREngine.Bots
             {
                 help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.cardIDenum);
             }
+            help.logg("Enemy cards: " + this.enemyAnzCards);
+            if (Ai.Instance.playaround)
+            {
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.mage)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_032) + " " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_028));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.warrior)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_400));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.hunter)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_538));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.priest)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS1_112));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.shaman)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_259));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.pala)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_093));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.druid)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_012));
+                }
+            }
         }
 
 
     }
-
 
     public enum HeroEnum
     {
@@ -11614,7 +11769,6 @@ namespace HREngine.Bots
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
             help.logg("ability: " + "true" + " " + this.enemyAbility.cardIDenum);
             help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
-
         }
 
 
@@ -11648,7 +11802,6 @@ namespace HREngine.Bots
 
 
     }
-
 
     public class PenalityManager
     {
@@ -12304,7 +12457,7 @@ namespace HREngine.Bots
             }
             if (name == CardDB.cardName.divinefavor)
             {
-                carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+                carddraw = p.enemyAnzCards - (p.owncards.Count);
                 if (carddraw == 0) return 500;
             }
 
@@ -13061,6 +13214,8 @@ namespace HREngine.Bots
                 return 0;
             }
 
+            if (c.name == CardDB.cardName.flare) return 0;
+
             int attackedbefore = 0;
 
             foreach (Minion mnn in p.ownMinions)
@@ -13803,89 +13958,7 @@ namespace HREngine.Bots
 
     }
 
-    public class Helpfunctions
-    {
-
-        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
-        {
-            List<T> retlist = new List<T>();
-            int i = 0;
-
-            foreach (T item in source)
-            {
-                retlist.Add(item);
-                i++;
-
-                if (i >= limit) break;
-            }
-            return retlist;
-        }
-
-
-        public bool runningbot = false;
-
-        private static Helpfunctions instance;
-
-        public static Helpfunctions Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new Helpfunctions();
-                }
-                return instance;
-            }
-        }
-
-        private Helpfunctions()
-        {
-
-            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
-        }
-
-        private bool writelogg = true;
-        public void loggonoff(bool onoff)
-        {
-            //writelogg = onoff;
-        }
-
-        public void createNewLoggfile()
-        {
-            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
-        }
-
-        public void logg(string s)
-        {
-
-
-            if (!writelogg) return;
-            try
-            {
-                using (StreamWriter sw = File.AppendText(Settings.Instance.logpath + Settings.Instance.logfile))
-                {
-                    sw.WriteLine(s);
-                }
-            }
-            catch { }
-        }
-
-        public DateTime UnixTimeStampToDateTime(int unixTimeStamp)
-        {
-            // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
-        }
-
-        public void ErrorLog(string s)
-        {
-            HREngine.API.Utilities.HRLog.Write(s);
-        }
-
-    }
-
-    class Probabilitymaker
+    public class Probabilitymaker
     {
         Dictionary<CardDB.cardIDEnum, int> ownCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
         Dictionary<CardDB.cardIDEnum, int> enemyCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
@@ -13963,14 +14036,52 @@ namespace HREngine.Bots
             return true;
         }
 
-        public double getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        public int anzCardsInDeck(CardDB.cardIDEnum cardid)
         {
-            return 0.0;
+            int ret = 2;
+            CardDB.Card c = CardDB.Instance.getCardDataFromID(cardid);
+            if (c.rarity == 5) ret = 1;//you can have only one rare;
+
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return 1;
+                }
+                return 0;
+            }
+            return ret;
+
+        }
+
+
+        public int getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        {
+            //calculates probability \in [0,...,100]
+
+
+            int cardsremaining = this.anzCardsInDeck(cardid);
+            double retval = 0.0;
+            if (cardsremaining == 0) return 0;
+            //http://de.wikipedia.org/wiki/Hypergeometrische_Verteilung (we calculte 1-p(x=0))
+
+            if (cardsremaining == 1)
+            {
+                retval = 1.0 - ((double)(decksize)) / ((double)(decksize + handsize));
+            }
+            else
+            {
+                retval = 1.0 - ((double)(decksize * (decksize - 1))) / ((double)((decksize + handsize) * (decksize + handsize - 1)));
+            }
+
+            retval = Math.Min(retval, 1.0);
+
+            return (int)(100.0 * retval);
         }
 
 
     }
-
 
     public class ComboBreaker
     {
@@ -19873,10 +19984,12 @@ namespace HREngine.Bots
         int enemyWeaponAttack = 0;
         int enemyWeaponDur = 0;
         string enemyWeapon = "";
+        int enemyNumberHand = 5;
 
         List<Minion> ownminions = new List<Minion>();
         List<Minion> enemyminions = new List<Minion>();
         List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
+        List<CardDB.cardIDEnum> enemycards = new List<CardDB.cardIDEnum>();
 
         public BoardTester()
         {
@@ -20243,6 +20356,79 @@ namespace HREngine.Bots
                     counter = 0;
                 }
 
+                if (s.StartsWith("Enemy cards: "))
+                {
+                    enemyNumberHand = Convert.ToInt32(s.Split(' ')[1]);
+                }
+
+                if (s.StartsWith("probs: "))
+                {
+                    int i = 0;
+                    foreach (string p in s.Split(' '))
+                    {
+                        if (p.StartsWith("probs:") || p == "" || p == null) continue;
+                        int num = Convert.ToInt32(p);
+                        CardDB.cardIDEnum c = CardDB.cardIDEnum.None;
+                        if (i == 0)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_032;
+                            }
+                            if (this.enemyheroname == "warrior")
+                            {
+                                c = CardDB.cardIDEnum.EX1_400;
+                            }
+
+                            if (this.enemyheroname == "hunter")
+                            {
+                                c = CardDB.cardIDEnum.EX1_538;
+                            }
+
+                            if (this.enemyheroname == "priest")
+                            {
+                                c = CardDB.cardIDEnum.CS1_112;
+                            }
+
+                            if (this.enemyheroname == "shaman")
+                            {
+                                c = CardDB.cardIDEnum.EX1_259;
+                            }
+
+                            if (this.enemyheroname == "pala")
+                            {
+                                c = CardDB.cardIDEnum.CS2_093;
+                            }
+
+                            if (this.enemyheroname == "druid")
+                            {
+                                c = CardDB.cardIDEnum.CS2_012;
+                            }
+                        }
+
+                        if (i == 1)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_028;
+                            }
+                        }
+
+                        if (num == 1)
+                        {
+                            enemycards.Add(c);
+                        }
+                        if (num == 0)
+                        {
+                            enemycards.Add(c);
+                            enemycards.Add(c);
+                        }
+                        i++;
+                    }
+
+                    Probabilitymaker.Instance.setEnemyCards(enemycards);
+                }
+
                 if (s.StartsWith("player:"))
                 {
                     readstate = 42;
@@ -20272,7 +20458,7 @@ namespace HREngine.Bots
 
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownFatigue, this.enemyDecksize, this.enemyFatigue);
 
-            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
+            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, enemyNumberHand);
 
 
         }

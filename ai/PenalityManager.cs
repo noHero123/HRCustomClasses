@@ -660,7 +660,7 @@ namespace HREngine.Bots
             }
             if (name == CardDB.cardName.divinefavor)
             {
-                carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+                carddraw = p.enemyAnzCards - (p.owncards.Count);
                 if (carddraw == 0) return 500;
             }
             
@@ -1416,6 +1416,8 @@ namespace HREngine.Bots
             {
                 return 0;
             }
+
+            if (c.name == CardDB.cardName.flare) return 0;
 
             int attackedbefore = 0;
 

@@ -84,9 +84,48 @@ namespace HREngine.Bots
             return true;
         }
 
-        public double getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        public int anzCardsInDeck(CardDB.cardIDEnum cardid)
         {
-            return 0.0;
+            int ret = 2;
+            CardDB.Card c = CardDB.Instance.getCardDataFromID(cardid);
+            if (c.rarity == 5) ret = 1;//you can have only one rare;
+
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return 1;
+                }
+                return 0;
+            }
+            return ret;
+
+        }
+
+
+        public int getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        {
+            //calculates probability \in [0,...,100]
+
+            
+            int cardsremaining = this.anzCardsInDeck(cardid);
+            if (cardsremaining == 0) return 0;
+            double retval = 0.0;
+            //http://de.wikipedia.org/wiki/Hypergeometrische_Verteilung (we calculte 1-p(x=0))
+
+            if (cardsremaining == 1)
+            {
+                retval = 1.0 - ((double)(decksize)) / ((double)(decksize + handsize));
+            }
+            else
+            {
+                retval = 1.0 - ((double)(decksize * (decksize - 1))) / ((double)((decksize + handsize) * (decksize + handsize - 1)));
+            }
+
+            retval = Math.Min(retval, 1.0);
+
+            return (int) (100.0 * retval);
         }
 
 

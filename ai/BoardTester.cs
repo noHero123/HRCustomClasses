@@ -48,10 +48,12 @@ namespace HREngine.Bots
         int enemyWeaponAttack = 0;
         int enemyWeaponDur = 0;
         string enemyWeapon = "";
+        int enemyNumberHand = 5;
 
         List<Minion> ownminions = new List<Minion>();
         List<Minion> enemyminions = new List<Minion>();
         List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
+        List<CardDB.cardIDEnum> enemycards = new List<CardDB.cardIDEnum>();
 
         public BoardTester()
         {
@@ -418,6 +420,79 @@ namespace HREngine.Bots
                     counter = 0;
                 }
 
+                if (s.StartsWith("Enemy cards: "))
+                {
+                    enemyNumberHand = Convert.ToInt32(s.Split(' ')[1]); 
+                }
+
+                if (s.StartsWith("probs: "))
+                {
+                    int i=0;
+                    foreach (string p in s.Split(' '))
+                    {
+                        if (p.StartsWith("probs:") || p == "" || p == null) continue;
+                        int num = Convert.ToInt32(p);
+                        CardDB.cardIDEnum c = CardDB.cardIDEnum.None;
+                        if (i == 0)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_032;
+                            }
+                            if (this.enemyheroname == "warrior")
+                            {
+                                c = CardDB.cardIDEnum.EX1_400;
+                            }
+
+                            if (this.enemyheroname == "hunter")
+                            {
+                                c = CardDB.cardIDEnum.EX1_538;
+                            }
+
+                            if (this.enemyheroname == "priest")
+                            {
+                                c = CardDB.cardIDEnum.CS1_112;
+                            }
+
+                            if (this.enemyheroname == "shaman")
+                            {
+                                c = CardDB.cardIDEnum.EX1_259;
+                            }
+
+                            if (this.enemyheroname == "pala")
+                            {
+                                c = CardDB.cardIDEnum.CS2_093;
+                            }
+
+                            if (this.enemyheroname == "druid")
+                            {
+                                c = CardDB.cardIDEnum.CS2_012;
+                            }
+                        }
+
+                        if (i == 1)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_028;
+                            }
+                        }
+
+                        if (num == 1) 
+                        { 
+                            enemycards.Add(c); 
+                        }
+                        if (num == 0)
+                        {
+                            enemycards.Add(c);
+                            enemycards.Add(c);
+                        }
+                        i++;
+                    }
+
+                    Probabilitymaker.Instance.setEnemyCards(enemycards);
+                }
+
                 if (s.StartsWith("player:"))
                 {
                     readstate = 42;
@@ -447,7 +522,7 @@ namespace HREngine.Bots
             
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownFatigue, this.enemyDecksize, this.enemyFatigue);
             
-            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
+            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, enemyNumberHand);
 
 
         }

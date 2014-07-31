@@ -16,6 +16,7 @@ namespace HREngine.Bots
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
+        public int playaroundprob = 40;
 
         public MiniSimulator nextTurnSimulator;
         MiniSimulator mainTurnSimulator;
@@ -35,7 +36,7 @@ namespace HREngine.Bots
         public Behavior botBase = null;
 
         private bool secondturnsim = false;
-        private bool playaround = false;
+        public bool playaround = false;
 
         private static Ai instance;
 
@@ -73,10 +74,11 @@ namespace HREngine.Bots
             this.secondturnsim = stts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
-            this.mainTurnSimulator.setPlayAround(spa);
+            this.mainTurnSimulator.setPlayAround(spa, pprob);
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void doallmoves(bool test, bool isLethalCheck)

@@ -103,17 +103,19 @@ namespace HREngine.Bots
            try
            {
                bool playaround = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAround") == "true") ? true : false;
-
+               int playaroundprob = Convert.ToInt32(HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAroundProb"));
+               if (playaroundprob > 100) playaroundprob = 100;
+               if (playaroundprob < 0) playaroundprob = 0;
                if (playaround)
                {
-                   Ai.Instance.setPlayAround(playaround);
+                   Ai.Instance.setPlayAround(playaround,playaroundprob);
                    Helpfunctions.Instance.ErrorLog("activated playaround");
                }
 
            }
            catch
            {
-               Helpfunctions.Instance.ErrorLog("error in reading two-turn-simulation from settings");
+               Helpfunctions.Instance.ErrorLog("error in reading play around settings");
            }
 
            Helpfunctions.Instance.ErrorLog("write to single log file is: " + writeToSingleFile);

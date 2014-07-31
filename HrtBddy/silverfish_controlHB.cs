@@ -49,9 +49,10 @@ namespace SilverfishControl
             }
 
             bool playaround = false;
+            bool playaroundprob = 40;
             if (playaround)
             {
-                Ai.Instance.setPlayAround(playaround);
+                Ai.Instance.setPlayAround(playaround, playaroundprob);
                 Helpfunctions.Instance.ErrorLog("activated playaround");
             }
 
@@ -485,7 +486,8 @@ namespace SilverfishControl
 
     public class Silverfish
     {
-        public int versionnumber = 93;
+        public int versionnumber = 94;
+        private string botbehave = "rush";
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
         private readonly List<Handmanager.Handcard> handCards = new List<Handmanager.Handcard>();
@@ -589,6 +591,7 @@ namespace SilverfishControl
 
         public void updateEverything(Behavior botbase)
         {
+            if (botbase is BehaviorControl) this.botbehave = "control";
             ownPlayerController = TritonHS.OurHero.ControllerId;
             // create hero + minion data
             getHerostuff();
@@ -665,8 +668,7 @@ namespace SilverfishControl
             enemyMaxMana = ownMaxMana;
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" +
-                                        versionnumber);
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
             Helpfunctions.Instance.logg("#######################################################################");
             Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
             Helpfunctions.Instance.logg("emana " + enemyMaxMana);
@@ -745,7 +747,7 @@ namespace SilverfishControl
 
             //Helpfunctions.Instance.ErrorLog(ownhero.GetName() + " ready params ex: " + exausted + " " + heroAtk + " " + numberofattacks + " " + herofrozen);
 
-            
+
 
             if (TritonHS.DoWeHaveWeapon)
             {
@@ -826,7 +828,7 @@ namespace SilverfishControl
 
             foreach (HSCard entiti in list)
             {
-                int zp = entiti.ZonePosition;
+                int zp = entiti.GetTag(GAME_TAG.ZONE_POSITION);
 
                 if (entiti.IsMinion && zp >= 1)
                 {
@@ -967,7 +969,12 @@ namespace SilverfishControl
                 }
             }
 
-            enemyAnzCards = TritonHS.GetCards(CardZone.Hand, false).Count;
+            List<HSCard> allcards = TritonHS.GetAllCards();
+            enemyAnzCards = 0;
+            foreach (HSCard hs in allcards)
+            {
+                if (hs.GetTag(GAME_TAG.ZONE) == 3 && hs.ControllerId != ownPlayerController && hs.GetTag(GAME_TAG.ZONE_POSITION) >= 1) enemyAnzCards++;
+            }
             // dont know if you can count the enemys-handcars in this way :D
         }
 
@@ -986,7 +993,7 @@ namespace SilverfishControl
                 if (ent.GetTag(GAME_TAG.CARDTYPE) == 4 || ent.GetTag(GAME_TAG.CARDTYPE) == 5 || ent.GetTag(GAME_TAG.CARDTYPE) == 7)//is minion, weapon or spell
                 {
                     CardDB.cardIDEnum cardid = CardDB.Instance.cardIdstringToEnum(ent.Id);
-                    Helpfunctions.Instance.logg("found " + cardid);
+                    //Helpfunctions.Instance.logg("found " + cardid);
                     if (ent.GetTag(GAME_TAG.CONTROLLER) == owncontroler)
                     {
                         ownCards.Add(cardid);
@@ -2081,7 +2088,7 @@ namespace SilverfishControl
         }
 
 
-        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print)
+        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print, int pprob)
         {
             int maxwide = 20;
 
@@ -2104,7 +2111,7 @@ namespace SilverfishControl
             {
                 int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
-                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemycarddraw + this.enemyAnzCards);
+                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemyAnzCards, pprob);
                 int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
                 posmoves[0].value = int.MinValue;
                 if (oldval < newval)
@@ -2327,7 +2334,7 @@ namespace SilverfishControl
         }
 
 
-        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount)
+        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount, int playAroundProb)
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
@@ -2352,7 +2359,7 @@ namespace SilverfishControl
 
                 if (usewhirlwind)
                 {
-                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana);
+                    mana = EnemyPlaysACard(CardDB.cardName.whirlwind, mana, playAroundProb);
                 }
             }
 
@@ -2360,33 +2367,33 @@ namespace SilverfishControl
 
             if (enemyHeroNamee == HeroEnum.mage)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana);
-                mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.flamestrike, mana, playAroundProb);
+                mana = EnemyPlaysACard(CardDB.cardName.blizzard, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.hunter)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.unleashthehounds, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.priest)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.holynova, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.shaman)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.lightningstorm, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.pala)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.consecration, mana, playAroundProb);
             }
 
             if (enemyHeroNamee == HeroEnum.druid)
             {
-                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana);
+                mana = EnemyPlaysACard(CardDB.cardName.swipe, mana, playAroundProb);
             }
 
 
@@ -2394,13 +2401,14 @@ namespace SilverfishControl
             return mana;
         }
 
-        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana)
+        private int EnemyPlaysACard(CardDB.cardName cardname, int currmana, int playAroundProb)
         {
 
             //todo manacosts
-
             if (cardname == CardDB.cardName.flamestrike && currmana >= 7)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_032, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
+
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(4);
                 foreach (Minion enemy in temp)
@@ -2414,6 +2422,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.blizzard && currmana >= 6)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_028, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2429,6 +2438,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.unleashthehounds && currmana >= 5)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_538, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 int anz = this.ownMinions.Count;
                 int posi = this.enemyMinions.Count - 1;
                 CardDB.Card kid = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_538t);//hound
@@ -2446,6 +2456,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.holynova && currmana >= 5)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS1_112, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int heal = 2;
                 int damage = getEnemySpellDamageDamage(2);
@@ -2470,6 +2481,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.lightningstorm && currmana >= 4)//3
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_259, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2484,6 +2496,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.whirlwind && currmana >= 3)//1
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_400, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
                 int damage = getEnemySpellDamageDamage(1);
                 foreach (Minion enemy in temp)
@@ -2504,6 +2517,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.consecration && currmana >= 4)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_093, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 List<Minion> temp = new List<Minion>(this.ownMinions);
                 int damage = getEnemySpellDamageDamage(2);
                 foreach (Minion enemy in temp)
@@ -2520,6 +2534,7 @@ namespace SilverfishControl
 
             if (cardname == CardDB.cardName.swipe && currmana >= 4)
             {
+                if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_012, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
                 int damage = getEnemySpellDamageDamage(4);
                 // all others get 1 spelldamage
                 int damage1 = getEnemySpellDamageDamage(1);
@@ -2621,7 +2636,7 @@ namespace SilverfishControl
                     }
                 }
 
-                //if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
+                if (trgts2.Count == 0) trgts2.Add(new targett(100, this.ownHeroEntity));
             }
 
             if (hastanks) return trgts;
@@ -2939,7 +2954,7 @@ namespace SilverfishControl
 
         }
 
-        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false)
+        public void endTurn(bool simulateTwoTurns, bool playaround, bool print = false, int pprob = 0)
         {
             this.value = int.MinValue;
 
@@ -2965,7 +2980,7 @@ namespace SilverfishControl
                 guessHeroDamage();
                 if (this.guessingHeroHP >= 1)
                 {
-                    simulateEnemysTurn(simulateTwoTurns, playaround, print);
+                    simulateEnemysTurn(simulateTwoTurns, playaround, print, pprob);
                 }
                 this.complete = true;
             }
@@ -4444,7 +4459,7 @@ namespace SilverfishControl
                     }
                     else
                     {
-                        if (enemyAnzCards + enemycarddraw >= 1)
+                        if (enemyAnzCards >= 1)
                         {
                             CardDB.Card c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_301);//felguard
                             callKid(c, this.ownMinions.Count - 1, true);
@@ -5358,10 +5373,20 @@ namespace SilverfishControl
 
             if (logging) Helpfunctions.Instance.logg(".attck with" + m.name + " A " + m.Angr + " H " + m.Hp);
 
-            if (target == 200)//target is hero
+            if (target == 200)//target is enemy hero
+            {
+                int oldhp = this.enemyHeroHp;
+                attackOrHealHero(m.Angr, false);
+                if (oldhp > this.enemyHeroHp)
+                {
+                    if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.enemyHeroFrozen = true;
+                }
+                return;
+            }
+            if (target == 100)//target is hero
             {
                 int oldhp = this.ownHeroHp;
-                attackOrHealHero(m.Angr, false);
+                attackOrHealHero(m.Angr, true);
                 if (oldhp > this.ownHeroHp)
                 {
                     if (!m.silenced && m.handcard.card.name == CardDB.cardName.waterelemental) this.ownHeroFrozen = true;
@@ -7834,7 +7859,7 @@ namespace SilverfishControl
             }
             if (c.name == CardDB.cardName.divinefavor)
             {
-                int enemcardsanz = this.enemyAnzCards + this.enemycarddraw;
+                int enemcardsanz = this.enemyAnzCards;
                 int diff = enemcardsanz - this.owncards.Count;
                 if (diff >= 1)
                 {
@@ -7903,7 +7928,7 @@ namespace SilverfishControl
             }
             if (c.name == CardDB.cardName.mindvision)
             {
-                if (this.enemyAnzCards + this.enemycarddraw >= 1)
+                if (this.enemyAnzCards >= 1)
                 {
                     //this.owncarddraw++;
                     this.drawACard(CardDB.cardName.unknown, true, true);
@@ -8447,23 +8472,25 @@ namespace SilverfishControl
                     else
                     {
                         this.enemyDeckSize--;
-                        if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                        if (this.enemyAnzCards >= 10)
                         {
                             this.evaluatePenality -= 50;
                             return;
                         }
                         this.enemycarddraw++;
+                        this.enemyAnzCards++;
                     }
 
                 }
                 else
                 {
-                    if (this.enemyAnzCards + this.enemycarddraw >= 10)
+                    if (this.enemyAnzCards >= 10)
                     {
                         this.evaluatePenality -= 50;
                         return;
                     }
                     this.enemycarddraw++;
+                    this.enemyAnzCards++;
 
                 }
                 return;
@@ -9379,6 +9406,7 @@ namespace SilverfishControl
         private bool dontRecalc = true;
         private bool useLethalCheck = true;
         private bool useComparison = true;
+        public int playaroundprob = 40;
 
         public MiniSimulator nextTurnSimulator;
         MiniSimulator mainTurnSimulator;
@@ -9398,7 +9426,7 @@ namespace SilverfishControl
         public Behavior botBase = null;
 
         private bool secondturnsim = false;
-        private bool playaround = false;
+        public bool playaround = false;
 
         private static Ai instance;
 
@@ -9436,10 +9464,11 @@ namespace SilverfishControl
             this.secondturnsim = stts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
-            this.mainTurnSimulator.setPlayAround(spa);
+            this.mainTurnSimulator.setPlayAround(spa, pprob);
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void doallmoves(bool test, bool isLethalCheck)
@@ -9790,6 +9819,7 @@ namespace SilverfishControl
         private bool useLethalCheck = true;
         private bool useComparison = true;
 
+
         private bool printNormalstuff = false;
 
         List<Playfield> posmoves = new List<Playfield>(7000);
@@ -9803,6 +9833,7 @@ namespace SilverfishControl
 
         private bool simulateSecondTurn = false;
         private bool playaround = false;
+        private int playaroundprob = 20;
 
         PenalityManager pen = PenalityManager.Instance;
 
@@ -9833,9 +9864,10 @@ namespace SilverfishControl
             this.simulateSecondTurn = sts;
         }
 
-        public void setPlayAround(bool spa)
+        public void setPlayAround(bool spa, int pprob)
         {
             this.playaround = spa;
+            this.playaroundprob = pprob;
         }
 
         private void addToPosmoves(Playfield pf)
@@ -10441,7 +10473,7 @@ namespace SilverfishControl
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob);
                     }
 
                     //sort stupid stuff ouf
@@ -10501,7 +10533,7 @@ namespace SilverfishControl
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob);
                     }
                 }
             }
@@ -10924,6 +10956,44 @@ namespace SilverfishControl
             foreach (Handmanager.Handcard c in this.handCards)
             {
                 help.logg("pos " + c.position + " " + c.card.name + " " + c.manacost + " entity " + c.entity + " " + c.card.cardIDenum);
+            }
+            help.logg("Enemy cards: " + this.enemyAnzCards);
+            if (Ai.Instance.playaround)
+            {
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.mage)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_032) + " " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_028));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.warrior)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_400));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.hunter)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_538));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.priest)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS1_112));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.shaman)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.EX1_259));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.pala)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_093));
+                }
+
+                if (Hrtprozis.Instance.enemyHeroname == HeroEnum.druid)
+                {
+                    help.logg("probs: " + Probabilitymaker.Instance.anzCardsInDeck(CardDB.cardIDEnum.CS2_012));
+                }
             }
         }
 
@@ -11372,7 +11442,6 @@ namespace SilverfishControl
             help.logg(this.enemyWeaponAttack + " " + this.enemyWeaponDurability + " " + this.enemyHeroWeapon);
             help.logg("ability: " + "true" + " " + this.enemyAbility.cardIDenum);
             help.logg("fatigue: " + this.ownDeckSize + " " + this.ownHeroFatigue + " " + this.enemyDeckSize + " " + this.enemyHeroFatigue);
-
         }
 
 
@@ -11406,93 +11475,6 @@ namespace SilverfishControl
 
 
     }
-
-    public class Probabilitymaker
-    {
-        Dictionary<CardDB.cardIDEnum, int> ownCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
-        Dictionary<CardDB.cardIDEnum, int> enemyCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
-        List<CardDB.Card> ownDeckGuessed = new List<CardDB.Card>();
-        List<CardDB.Card> enemyDeckGuessed = new List<CardDB.Card>();
-
-        private static Probabilitymaker instance;
-        public static Probabilitymaker Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new Probabilitymaker();
-                }
-                return instance;
-            }
-        }
-
-        private Probabilitymaker()
-        {
-
-        }
-
-        public void setOwnCards(List<CardDB.cardIDEnum> list)
-        {
-            setupDeck(list, ownDeckGuessed, ownCardsPlayed);
-        }
-
-        public void setEnemyCards(List<CardDB.cardIDEnum> list)
-        {
-            setupDeck(list, enemyDeckGuessed, enemyCardsPlayed);
-        }
-
-        private void setupDeck(List<CardDB.cardIDEnum> cardsPlayed, List<CardDB.Card> deckGuessed, Dictionary<CardDB.cardIDEnum, int> knownCards)
-        {
-            deckGuessed.Clear();
-            knownCards.Clear();
-            foreach (CardDB.cardIDEnum crdidnm in cardsPlayed)
-            {
-                if (crdidnm == CardDB.cardIDEnum.GAME_005) continue; //(im sure, he has no coins in his deck :D)
-                if (knownCards.ContainsKey(crdidnm))
-                {
-                    knownCards[crdidnm]++;
-                }
-                else
-                {
-                    if (CardDB.Instance.getCardDataFromID(crdidnm).rarity == 5)
-                    {
-                        //you cant own rare ones more than once!
-                        knownCards.Add(crdidnm, 2);
-                        continue;
-                    }
-                    knownCards.Add(crdidnm, 1);
-                }
-            }
-
-            foreach (KeyValuePair<CardDB.cardIDEnum, int> kvp in knownCards)
-            {
-                if (kvp.Value == 1) deckGuessed.Add(CardDB.Instance.getCardDataFromID(kvp.Key));
-            }
-        }
-
-        public bool hasEnemyThisCardInDeck(CardDB.cardIDEnum cardid)
-        {
-            if (this.enemyCardsPlayed.ContainsKey(cardid))
-            {
-                if (this.enemyCardsPlayed[cardid] == 1)
-                {
-
-                    return true;
-                }
-                return false;
-            }
-            return true;
-        }
-
-        public double getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
-        {
-            return 0.0;
-        }
-
-
-    }
-
 
     public class PenalityManager
     {
@@ -12148,7 +12130,7 @@ namespace SilverfishControl
             }
             if (name == CardDB.cardName.divinefavor)
             {
-                carddraw = p.enemyAnzCards + p.enemycarddraw - (p.owncards.Count);
+                carddraw = p.enemyAnzCards - (p.owncards.Count);
                 if (carddraw == 0) return 500;
             }
 
@@ -12905,6 +12887,8 @@ namespace SilverfishControl
                 return 0;
             }
 
+            if (c.name == CardDB.cardName.flare) return 0;
+
             int attackedbefore = 0;
 
             foreach (Minion mnn in p.ownMinions)
@@ -13647,85 +13631,128 @@ namespace SilverfishControl
 
     }
 
-    public class Helpfunctions
+    public class Probabilitymaker
     {
+        Dictionary<CardDB.cardIDEnum, int> ownCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
+        Dictionary<CardDB.cardIDEnum, int> enemyCardsPlayed = new Dictionary<CardDB.cardIDEnum, int>();
+        List<CardDB.Card> ownDeckGuessed = new List<CardDB.Card>();
+        List<CardDB.Card> enemyDeckGuessed = new List<CardDB.Card>();
 
-        public static List<T> TakeList<T>(IEnumerable<T> source, int limit)
-        {
-            List<T> retlist = new List<T>();
-            int i = 0;
-
-            foreach (T item in source)
-            {
-                retlist.Add(item);
-                i++;
-
-                if (i >= limit) break;
-            }
-            return retlist;
-        }
-
-
-        public bool runningbot = false;
-
-        private static Helpfunctions instance;
-
-        public static Helpfunctions Instance
+        private static Probabilitymaker instance;
+        public static Probabilitymaker Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new Helpfunctions();
+                    instance = new Probabilitymaker();
                 }
                 return instance;
             }
         }
 
-        private Helpfunctions()
+        private Probabilitymaker()
         {
 
-            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
         }
 
-        private bool writelogg = true;
-        public void loggonoff(bool onoff)
+        public void setOwnCards(List<CardDB.cardIDEnum> list)
         {
-            //writelogg = onoff;
+            setupDeck(list, ownDeckGuessed, ownCardsPlayed);
         }
 
-        public void createNewLoggfile()
+        public void setEnemyCards(List<CardDB.cardIDEnum> list)
         {
-            System.IO.File.WriteAllText(Settings.Instance.logpath + Settings.Instance.logfile, "");
+            setupDeck(list, enemyDeckGuessed, enemyCardsPlayed);
         }
 
-        public void logg(string s)
+        private void setupDeck(List<CardDB.cardIDEnum> cardsPlayed, List<CardDB.Card> deckGuessed, Dictionary<CardDB.cardIDEnum, int> knownCards)
         {
-
-
-            if (!writelogg) return;
-            try
+            deckGuessed.Clear();
+            knownCards.Clear();
+            foreach (CardDB.cardIDEnum crdidnm in cardsPlayed)
             {
-                using (StreamWriter sw = File.AppendText(Settings.Instance.logpath + Settings.Instance.logfile))
+                if (crdidnm == CardDB.cardIDEnum.GAME_005) continue; //(im sure, he has no coins in his deck :D)
+                if (knownCards.ContainsKey(crdidnm))
                 {
-                    sw.WriteLine(s);
+                    knownCards[crdidnm]++;
+                }
+                else
+                {
+                    if (CardDB.Instance.getCardDataFromID(crdidnm).rarity == 5)
+                    {
+                        //you cant own rare ones more than once!
+                        knownCards.Add(crdidnm, 2);
+                        continue;
+                    }
+                    knownCards.Add(crdidnm, 1);
                 }
             }
-            catch { }
+
+            foreach (KeyValuePair<CardDB.cardIDEnum, int> kvp in knownCards)
+            {
+                if (kvp.Value == 1) deckGuessed.Add(CardDB.Instance.getCardDataFromID(kvp.Key));
+            }
         }
 
-        public DateTime UnixTimeStampToDateTime(int unixTimeStamp)
+        public bool hasEnemyThisCardInDeck(CardDB.cardIDEnum cardid)
         {
-            // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return true;
+                }
+                return false;
+            }
+            return true;
         }
 
-        public void ErrorLog(string s)
+        public int anzCardsInDeck(CardDB.cardIDEnum cardid)
         {
-            Logging.Write(s);
+            int ret = 2;
+            CardDB.Card c = CardDB.Instance.getCardDataFromID(cardid);
+            if (c.rarity == 5) ret = 1;//you can have only one rare;
+
+            if (this.enemyCardsPlayed.ContainsKey(cardid))
+            {
+                if (this.enemyCardsPlayed[cardid] == 1)
+                {
+
+                    return 1;
+                }
+                return 0;
+            }
+            return ret;
+
         }
+
+
+        public int getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum cardid, int handsize, int decksize)
+        {
+            //calculates probability \in [0,...,100]
+
+
+            int cardsremaining = this.anzCardsInDeck(cardid);
+            double retval = 0.0;
+            if (cardsremaining == 0) return 0;
+            //http://de.wikipedia.org/wiki/Hypergeometrische_Verteilung (we calculte 1-p(x=0))
+
+            if (cardsremaining == 1)
+            {
+                retval = 1.0 - ((double)(decksize)) / ((double)(decksize + handsize));
+            }
+            else
+            {
+                retval = 1.0 - ((double)(decksize * (decksize - 1))) / ((double)((decksize + handsize) * (decksize + handsize - 1)));
+            }
+
+            retval = Math.Min(retval, 1.0);
+
+            return (int)(100.0 * retval);
+        }
+
 
     }
 
@@ -19630,10 +19657,12 @@ namespace SilverfishControl
         int enemyWeaponAttack = 0;
         int enemyWeaponDur = 0;
         string enemyWeapon = "";
+        int enemyNumberHand = 5;
 
         List<Minion> ownminions = new List<Minion>();
         List<Minion> enemyminions = new List<Minion>();
         List<Handmanager.Handcard> handcards = new List<Handmanager.Handcard>();
+        List<CardDB.cardIDEnum> enemycards = new List<CardDB.cardIDEnum>();
 
         public BoardTester()
         {
@@ -20000,6 +20029,79 @@ namespace SilverfishControl
                     counter = 0;
                 }
 
+                if (s.StartsWith("Enemy cards: "))
+                {
+                    enemyNumberHand = Convert.ToInt32(s.Split(' ')[1]);
+                }
+
+                if (s.StartsWith("probs: "))
+                {
+                    int i = 0;
+                    foreach (string p in s.Split(' '))
+                    {
+                        if (p.StartsWith("probs:") || p == "" || p == null) continue;
+                        int num = Convert.ToInt32(p);
+                        CardDB.cardIDEnum c = CardDB.cardIDEnum.None;
+                        if (i == 0)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_032;
+                            }
+                            if (this.enemyheroname == "warrior")
+                            {
+                                c = CardDB.cardIDEnum.EX1_400;
+                            }
+
+                            if (this.enemyheroname == "hunter")
+                            {
+                                c = CardDB.cardIDEnum.EX1_538;
+                            }
+
+                            if (this.enemyheroname == "priest")
+                            {
+                                c = CardDB.cardIDEnum.CS1_112;
+                            }
+
+                            if (this.enemyheroname == "shaman")
+                            {
+                                c = CardDB.cardIDEnum.EX1_259;
+                            }
+
+                            if (this.enemyheroname == "pala")
+                            {
+                                c = CardDB.cardIDEnum.CS2_093;
+                            }
+
+                            if (this.enemyheroname == "druid")
+                            {
+                                c = CardDB.cardIDEnum.CS2_012;
+                            }
+                        }
+
+                        if (i == 1)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_028;
+                            }
+                        }
+
+                        if (num == 1)
+                        {
+                            enemycards.Add(c);
+                        }
+                        if (num == 0)
+                        {
+                            enemycards.Add(c);
+                            enemycards.Add(c);
+                        }
+                        i++;
+                    }
+
+                    Probabilitymaker.Instance.setEnemyCards(enemycards);
+                }
+
                 if (s.StartsWith("player:"))
                 {
                     readstate = 42;
@@ -20029,7 +20131,7 @@ namespace SilverfishControl
 
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownFatigue, this.enemyDecksize, this.enemyFatigue);
 
-            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, 5);
+            Handmanager.Instance.setHandcards(this.handcards, this.handcards.Count, enemyNumberHand);
 
 
         }
@@ -20395,7 +20497,6 @@ namespace SilverfishControl
         CUSTOM_KEYWORD_EFFECT,
         TOPDECK
     }
-
     public enum TAG_ZONE
     {
         INVALID,
@@ -20546,7 +20647,6 @@ namespace SilverfishControl
         GENERAL
     }
 
-
     class Settings
     {
 
@@ -20598,5 +20698,4 @@ namespace SilverfishControl
             this.targetEntity = ent;
         }
     }
-
 }
