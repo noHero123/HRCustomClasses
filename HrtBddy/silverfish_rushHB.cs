@@ -384,7 +384,7 @@ namespace SilverfishRush
             if (numMins == 4)
             {
                 gp = lp + 1;
-                if (lp == 0) gp = 1;
+                if (lp == 0) gp = 0;
                 if (lp == 1) gp = 2;
                 if (lp == 2) gp = 4;
                 if (lp == 3) gp = 6;
