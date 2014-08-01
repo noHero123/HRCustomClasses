@@ -198,6 +198,7 @@ namespace HREngine.Bots
            }
            if (totalwin >= this.stopAfterWins)
            {
+               if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return false;
                Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins!");
                KeepConcede++;
                HRGame.ConcedeGame();
