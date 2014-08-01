@@ -486,7 +486,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        public int versionnumber = 95;
+        public int versionnumber = 96;
         private string botbehave = "rush";
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
@@ -1206,7 +1206,7 @@ namespace SilverfishRush
             if (m.poisonous) retval += 4;
 
             if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
-            if (m.name == CardDB.cardName.nerubianegg && m.Angr == 0 && !m.taunt) retval = 0;
+            if (m.name == CardDB.cardName.nerubianegg && m.Angr <= 3 && !m.taunt) retval = 0;
             return retval;
         }
 
@@ -1327,7 +1327,7 @@ namespace SilverfishRush
             if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
             if (m.Angr >= 4) retval += 20;
             if (m.Angr >= 7) retval += 50;
-            if (m.name == CardDB.cardName.nerubianegg && m.Angr == 0 && !m.taunt) retval = 0;
+            if (m.name == CardDB.cardName.nerubianegg && m.Angr <= 3 && !m.taunt) retval = 0;
             return retval;
         }
 
