@@ -521,7 +521,7 @@ namespace HREngine.Bots
                     }
 
                     // no pen if own is enrage
-                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded && m.Ready)
                     {
                         return pen;
                     }

@@ -8,6 +8,7 @@ namespace HREngine.Bots
 
    public abstract class Bot : API.IBot
    {
+       private int stopAfterWins = 30;
        private int concedeLvl = 5; // the rank, till you want to concede
        private int dirtytarget = -1;
        private int dirtychoice = -1;
@@ -46,6 +47,17 @@ namespace HREngine.Bots
            catch
            {
                Helpfunctions.Instance.ErrorLog("cant read your concede-Lvl");
+           }
+
+           try
+           {
+               this.stopAfterWins = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.stopwin")));
+               if (this.stopAfterWins <= 0) this.stopAfterWins = 10000;
+               Helpfunctions.Instance.ErrorLog("stop after " + stopAfterWins + " wins");
+           }
+           catch
+           {
+               Helpfunctions.Instance.ErrorLog("cant read stop after # of wins");
            }
 
            this.sf = new Silverfish(writeToSingleFile);
@@ -144,7 +156,7 @@ namespace HREngine.Bots
        }
 
        int lossedtodo = 0;
-       int KeepConcede= 0;
+       int KeepConcede = 0;
        int oldwin = 0;
        private bool autoconcede()
        {
@@ -178,13 +190,21 @@ namespace HREngine.Bots
                }
            }
 
-           
+
 
            if ((totalwin + totallose - KeepConcede) != 0)
            {
                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
            }
-           
+           if (totalwin >= this.stopAfterWins)
+           {
+               Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins!");
+               KeepConcede++;
+               HRGame.ConcedeGame();
+               disableRelogger();
+               HREngine.API.HRGame.OpenScene(HRGameMode.ARENA);
+               return true;
+           }
 
            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return false;
            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
@@ -224,7 +244,7 @@ namespace HREngine.Bots
        private bool concedeVSenemy(string ownh, string enemyh)
        {
            if (!(HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.RANKED_PLAY || HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.UNRANKED_PLAY)) return false;
-           if(Mulligan.Instance.shouldConcede(Hrtprozis.Instance.heroNametoEnum(ownh), Hrtprozis.Instance.heroNametoEnum(enemyh)))
+           if (Mulligan.Instance.shouldConcede(Hrtprozis.Instance.heroNametoEnum(ownh), Hrtprozis.Instance.heroNametoEnum(enemyh)))
            {
                Helpfunctions.Instance.ErrorLog("not today!!!!");
                KeepConcede++;
@@ -234,6 +254,48 @@ namespace HREngine.Bots
            }
            return false;
        }
+
+       private void disableRelogger()
+       {
+           int version = sf.versionnumber;
+           int totalwin = 0;
+           int totallose = 0;
+           string[] lines = new string[0] { };
+           try
+           {
+               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+               lines = System.IO.File.ReadAllLines(path + "Settings.ini");
+           }
+           catch
+           {
+               Helpfunctions.Instance.logg("cant find Settings.ini");
+           }
+           List<string> newlines = new List<string>();
+           for (int i = 0; i < lines.Length; i++)
+           {
+               string s = lines[i];
+
+               if (s.Contains("client.relogger"))
+               {
+                   s = "client.relogger=false";
+               }
+               //Helpfunctions.Instance.ErrorLog("add " + s);
+               newlines.Add(s);
+
+           }
+
+
+           try
+           {
+               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
+               System.IO.File.WriteAllLines(path + "Settings.ini", newlines.ToArray());
+           }
+           catch
+           {
+               Helpfunctions.Instance.logg("cant write Settings.ini");
+           }
+       }
+
 
        private void writeSettings()
        {

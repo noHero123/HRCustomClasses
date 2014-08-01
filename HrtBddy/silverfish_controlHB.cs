@@ -486,7 +486,7 @@ namespace SilverfishControl
 
     public class Silverfish
     {
-        public int versionnumber = 94;
+        public int versionnumber = 95;
         private string botbehave = "rush";
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
@@ -2492,9 +2492,9 @@ namespace SilverfishControl
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_032, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
 
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 int damage = getEnemySpellDamageDamage(4);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
                 }
@@ -2506,9 +2506,9 @@ namespace SilverfishControl
             if (cardname == CardDB.cardName.blizzard && currmana >= 6)
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_028, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 int damage = getEnemySpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     enemy.frozen = true;
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
@@ -2540,17 +2540,16 @@ namespace SilverfishControl
             if (cardname == CardDB.cardName.holynova && currmana >= 5)
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS1_112, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int heal = 2;
                 int damage = getEnemySpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, 0, heal, false, true);
                 }
                 attackOrHealHero(-heal, false);
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
                 }
@@ -2565,9 +2564,9 @@ namespace SilverfishControl
             if (cardname == CardDB.cardName.lightningstorm && currmana >= 4)//3
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_259, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                int damage = getEnemySpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                List<Minion> temp = this.ownMinions;
+                int damage = getEnemySpellDamageDamage(3);
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
                 }
@@ -2580,15 +2579,14 @@ namespace SilverfishControl
             if (cardname == CardDB.cardName.whirlwind && currmana >= 3)//1
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.EX1_400, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getEnemySpellDamageDamage(1);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false, true);
                 }
-                temp.Clear();
-                temp = new List<Minion>(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
                 }
@@ -2601,9 +2599,9 @@ namespace SilverfishControl
             if (cardname == CardDB.cardName.consecration && currmana >= 4)
             {
                 if (playAroundProb > Probabilitymaker.Instance.getProbOfEnemyHavingCardInHand(CardDB.cardIDEnum.CS2_093, this.enemyAnzCards, this.enemyDeckSize)) return currmana;
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 int damage = getEnemySpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true, true);
                 }
@@ -2622,7 +2620,7 @@ namespace SilverfishControl
                 // all others get 1 spelldamage
                 int damage1 = getEnemySpellDamageDamage(1);
 
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 int target = 10;
                 foreach (Minion mnn in temp)
                 {
@@ -2631,7 +2629,7 @@ namespace SilverfishControl
                         target = mnn.id;
                     }
                 }
-                foreach (Minion mnn in temp)
+                foreach (Minion mnn in temp.ToArray())
                 {
                     if (mnn.id + 10 != target)
                     {
@@ -3129,8 +3127,8 @@ namespace SilverfishControl
                 if (secretID == CardDB.cardIDEnum.EX1_610) //explosive trap
                 {
                     //take 2 damage to each enemy
-                    List<Minion> temp = new List<Minion>(this.enemyMinions);
-                    foreach (Minion m in temp)
+                    List<Minion> temp = this.enemyMinions;
+                    foreach (Minion m in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(m, 2, 0, false);
                     }
@@ -3276,18 +3274,18 @@ namespace SilverfishControl
         private void endTurnBuffs(bool own)
         {
 
-            List<Minion> temp = new List<Minion>();
+            List<Minion> temp = null;
 
             if (own)
             {
-                temp.AddRange(this.ownMinions);
+                temp = this.ownMinions;
             }
             else
             {
-                temp.AddRange(this.enemyMinions);
+                temp = this.enemyMinions;
             }
             // end buffs
-            foreach (Minion m in temp)
+            foreach (Minion m in temp.ToArray())
             {
                 m.cantLowerHPbelowONE = false;
                 m.immune = false;
@@ -3341,18 +3339,17 @@ namespace SilverfishControl
 
             }
 
-            temp.Clear();
             if (own)
             {
-                temp.AddRange(this.enemyMinions);
+                temp = this.enemyMinions;
 
             }
             else
             {
-                temp.AddRange(this.ownMinions);
+                temp = this.ownMinions;
             }
 
-            foreach (Minion m in temp)
+            foreach (Minion m in temp.ToArray())
             {
                 m.cantLowerHPbelowONE = false;
                 m.immune = false;
@@ -3382,41 +3379,40 @@ namespace SilverfishControl
         private void endTurnEffect(bool own)
         {
 
-            List<Minion> temp = new List<Minion>();
-            List<Minion> ownmins = new List<Minion>();
-            List<Minion> enemymins = new List<Minion>();
+            List<Minion> temp;
+            List<Minion> ownmins;
+            List<Minion> enemymins;
             if (own)
             {
-                temp.AddRange(this.ownMinions);
-                ownmins.AddRange(this.ownMinions);
-                enemymins.AddRange(this.enemyMinions);
+                temp = this.ownMinions;
+                ownmins = this.ownMinions;
+                enemymins = this.enemyMinions;
             }
             else
             {
-                temp.AddRange(this.enemyMinions);
-                ownmins.AddRange(this.enemyMinions);
-                enemymins.AddRange(this.ownMinions);
+                temp = this.enemyMinions;
+                ownmins = this.enemyMinions;
+                enemymins = this.ownMinions;
             }
 
 
 
-            foreach (Minion m in temp)
+            foreach (Minion m in temp.ToArray())
             {
                 if (m.silenced) continue;
 
                 if (m.name == CardDB.cardName.barongeddon) // all other chards get dmg get 2 dmg
                 {
-                    List<Minion> temp2 = new List<Minion>(this.ownMinions);
-                    foreach (Minion mm in temp2)
+                    List<Minion> temp2 = this.ownMinions;
+                    foreach (Minion mm in temp2.ToArray())
                     {
                         if (mm.entitiyID != m.entitiyID)
                         {
                             minionGetDamagedOrHealed(mm, 2, 0, true);
                         }
                     }
-                    temp2.Clear();
-                    temp2.AddRange(this.enemyMinions);
-                    foreach (Minion mm in temp2)
+                    temp2 = this.enemyMinions;
+                    foreach (Minion mm in temp2.ToArray())
                     {
                         if (mm.entitiyID != m.entitiyID)
                         {
@@ -3502,8 +3498,8 @@ namespace SilverfishControl
 
                 if (m.name == CardDB.cardName.healingtotem) // heal
                 {
-                    List<Minion> temp2 = new List<Minion>(ownmins);
-                    foreach (Minion mins in temp2)
+                    List<Minion> temp2 = ownmins;
+                    foreach (Minion mins in temp2.ToArray())
                     {
                         minionGetDamagedOrHealed(mins, 0, 1, own);
                     }
@@ -3547,9 +3543,10 @@ namespace SilverfishControl
                     {
                         List<Minion> temp2 = new List<Minion>(enemymins);
                         temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the stronges
-                        foreach (Minion mins in Helpfunctions.TakeList(temp2, 1))
+                        foreach (Minion mins in temp2)
                         {
                             minionGetDamagedOrHealed(mins, 8, 0, !own);
+                            break;
                         }
                     }
                     else
@@ -3583,7 +3580,7 @@ namespace SilverfishControl
                         this.drawACard(CardDB.cardName.yseraawakens, own);
                     }
                 }
-                if (m.name == CardDB.cardName.echoingooze) // draw card
+                if (m.name == CardDB.cardName.echoingooze)
                 {
                     this.callKid(m.handcard.card, m.id, own);
                     foreach (Minion mnn in temp)
@@ -3613,7 +3610,7 @@ namespace SilverfishControl
 
             }
 
-            foreach (Minion m in enemymins)
+            foreach (Minion m in enemymins.ToArray())
             {
                 if (m.name == CardDB.cardName.gruul) // gain +1/+1
                 {
@@ -3640,31 +3637,31 @@ namespace SilverfishControl
 
         private void startTurnEffect(bool own)
         {
-            List<Minion> temp = new List<Minion>();
-            List<Minion> ownmins = new List<Minion>();
-            List<Minion> enemymins = new List<Minion>();
+            List<Minion> temp;
+            List<Minion> ownmins;
+            List<Minion> enemymins;
             if (own)
             {
-                temp.AddRange(this.ownMinions);
-                ownmins.AddRange(this.ownMinions);
-                enemymins.AddRange(this.enemyMinions);
+                temp = this.ownMinions;
+                ownmins = this.ownMinions;
+                enemymins = this.enemyMinions;
             }
             else
             {
-                temp.AddRange(this.enemyMinions);
-                ownmins.AddRange(this.enemyMinions);
-                enemymins.AddRange(this.ownMinions);
+                temp = this.enemyMinions;
+                ownmins = this.enemyMinions;
+                enemymins = this.ownMinions;
             }
 
             bool untergang = false;
-            foreach (Minion m in temp)
+            foreach (Minion m in temp.ToArray())
             {
                 if (m.silenced) continue;
 
                 if (m.name == CardDB.cardName.demolisher) // deal 2 dmg
                 {
-                    List<Minion> temp2 = new List<Minion>(enemymins);
-                    foreach (Minion mins in temp2)
+                    List<Minion> temp2 = enemymins;
+                    foreach (Minion mins in temp2.ToArray())
                     {
                         minionGetDamagedOrHealed(mins, 2, 0, !own);
                     }
@@ -3703,9 +3700,9 @@ namespace SilverfishControl
                 {
                     if (ownmins.Count >= 1)
                     {
-                        List<Minion> temp2 = new List<Minion>(ownmins);
+                        List<Minion> temp2 = ownmins;
                         bool healed = false;
-                        foreach (Minion mins in temp2)
+                        foreach (Minion mins in temp2.ToArray())
                         {
                             if (mins.wounded)
                             {
@@ -3806,10 +3803,10 @@ namespace SilverfishControl
             }
 
 
-            foreach (Minion m in enemymins) // search for corruption in other minions
+            foreach (Minion m in enemymins.ToArray()) // search for corruption in other minions
             {
-                List<Enchantment> elist = new List<Enchantment>(m.enchantments);
-                foreach (Enchantment e in elist)
+                List<Enchantment> elist = m.enchantments;
+                foreach (Enchantment e in elist.ToArray())
                 {
 
                     if (e.CARDID == CardDB.cardIDEnum.CS2_063e)//corruption
@@ -3828,12 +3825,12 @@ namespace SilverfishControl
 
             if (untergang)
             {
-                foreach (Minion mins in ownmins)
+                foreach (Minion mins in ownmins.ToArray())
                 {
                     minionGetDestroyed(mins, own);
 
                 }
-                foreach (Minion mins in enemymins)
+                foreach (Minion mins in enemymins.ToArray())
                 {
                     minionGetDestroyed(mins, !own);
                 }
@@ -3995,14 +3992,13 @@ namespace SilverfishControl
             // deletes the effect of the cardID with creator from all minions 
             Enchantment e = CardDB.getEnchantmentFromCardID(CardID);
             e.creator = creator;
-            List<Minion> temp = new List<Minion>(this.ownMinions);
-            foreach (Minion m in temp)
+            List<Minion> temp = this.ownMinions;
+            foreach (Minion m in temp.ToArray())
             {
                 debuff(m, e, true);
             }
-            temp.Clear();
-            temp.AddRange(this.enemyMinions);
-            foreach (Minion m in temp)
+            temp = this.enemyMinions;
+            foreach (Minion m in temp.ToArray())
             {
                 debuff(m, e, false);
             }
@@ -4080,16 +4076,16 @@ namespace SilverfishControl
 
         private void adjacentBuffUpdate(bool own)
         {
-            List<Minion> lm = new List<Minion>();
+            List<Minion> lm;
             if (own)
             {
-                lm.AddRange(this.ownMinions);
+                lm = this.ownMinions;
             }
             else
             {
-                lm.AddRange(this.enemyMinions);
+                lm = this.enemyMinions;
             }
-            foreach (Minion m in lm)
+            foreach (Minion m in lm.ToArray())
             {
                 getNewEffects(m, own, m.id, false);
             }
@@ -4174,12 +4170,11 @@ namespace SilverfishControl
         private void getNewEffects(Minion m, bool own, int placeOfNewMob, bool isSummon)
         {
             bool havekriegshymnenanfuehrerin = false;
-            List<Minion> temp = new List<Minion>(this.ownMinions);
+            List<Minion> temp = this.ownMinions;
             int controller = this.ownController;
             if (!own)
             {
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
+                temp = this.enemyMinions;
                 controller = 0;
             }
             int ownanz = temp.Count;
@@ -4316,19 +4311,18 @@ namespace SilverfishControl
             }
 
             // minions that gave ALL minions buffs
-            temp.Clear();
             if (own)
             {
-                temp.AddRange(this.enemyMinions);
+                temp = this.enemyMinions;
                 controller = 0;
             }
             else
             {
-                temp.AddRange(this.ownMinions);
+                temp = this.ownMinions;
                 controller = this.ownController;
             }
 
-            foreach (Minion ownm in temp) // the enemy grimmschuppenorakel!
+            foreach (Minion ownm in temp.ToArray()) // the enemy grimmschuppenorakel!
             {
                 if (ownm.silenced) continue; // silenced minions dont buff
 
@@ -4436,14 +4430,13 @@ namespace SilverfishControl
                     if (logging) Helpfunctions.Instance.logg("deathrattle monstrositaet:");
                     attackOrHealHero(2, false);
                     attackOrHealHero(2, true);
-                    List<Minion> temp = new List<Minion>(this.ownMinions);
-                    foreach (Minion mnn in temp)
+                    List<Minion> temp = this.ownMinions;
+                    foreach (Minion mnn in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(mnn, 2, 0, true);
                     }
-                    temp.Clear();
-                    temp.AddRange(this.enemyMinions);
-                    foreach (Minion mnn in temp)
+                    temp = this.enemyMinions;
+                    foreach (Minion mnn in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(mnn, 2, 0, false);
                     }
@@ -4690,14 +4683,13 @@ namespace SilverfishControl
                 }
                 if (m.handcard.card.name == CardDB.cardName.unstableghoul)
                 {
-                    List<Minion> temp = new List<Minion>(this.enemyMinions);
-                    foreach (Minion mnn in temp)
+                    List<Minion> temp = this.enemyMinions;
+                    foreach (Minion mnn in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(mnn, 1, 0, false, true);
                     }
-                    temp.Clear();
-                    temp.AddRange(this.ownMinions);
-                    foreach (Minion mnn in temp)
+                    temp = this.ownMinions;
+                    foreach (Minion mnn in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(mnn, 1, 0, true, true);
                     }
@@ -4739,12 +4731,12 @@ namespace SilverfishControl
 
         private void triggerAMinionDied(Minion m, bool own)
         {
-            List<Minion> temp = new List<Minion>();
-            List<Minion> temp2 = new List<Minion>();
+            List<Minion> temp;
+            List<Minion> temp2;
             if (own)
             {
-                temp.AddRange(this.ownMinions);
-                temp2.AddRange(this.enemyMinions);
+                temp = this.ownMinions;
+                temp2 = this.enemyMinions;
                 if (this.ownhasorcanplayKelThuzad)
                 {
                     this.diedMinions.Add(m);
@@ -4752,8 +4744,8 @@ namespace SilverfishControl
             }
             else
             {
-                temp.AddRange(this.enemyMinions);
-                temp2.AddRange(this.ownMinions);
+                temp = this.enemyMinions;
+                temp2 = this.ownMinions;
 
                 if (this.enemyhasorcanplayKelThuzad)
                 {
@@ -4937,10 +4929,16 @@ namespace SilverfishControl
 
         private void minionGetControlled(Minion m, bool newOwner, bool canAttack)
         {
-            List<Minion> newOwnerList = new List<Minion>();
+            List<Minion> newOwnerList;
 
-            if (newOwner) { newOwnerList = new List<Minion>(this.ownMinions); }
-            else { newOwnerList.AddRange(this.enemyMinions); }
+            if (newOwner)
+            {
+                newOwnerList = this.ownMinions;
+            }
+            else
+            {
+                newOwnerList = this.enemyMinions;
+            }
 
             if (newOwnerList.Count >= 7) return;
 
@@ -4949,9 +4947,9 @@ namespace SilverfishControl
                 removeMinionFromListNoDeath(m, this.enemyMinions, !newOwner);
                 m.Ready = false;
                 m.playedThisTurn = true;
-                this.getNewEffects(m, newOwner, newOwnerList.Count, false);
+                this.getNewEffects(m, newOwner, ownMinions.Count, false);
 
-                addMiniontoList(m, this.ownMinions, newOwnerList.Count, newOwner);
+                addMiniontoList(m, this.ownMinions, ownMinions.Count, newOwner);
                 if (m.charge || canAttack)
                 {
                     m.charge = false;
@@ -4963,7 +4961,7 @@ namespace SilverfishControl
             {
                 removeMinionFromListNoDeath(m, this.ownMinions, !newOwner);
                 //m.Ready=false;
-                addMiniontoList(m, this.enemyMinions, newOwnerList.Count, newOwner);
+                addMiniontoList(m, this.enemyMinions, enemyMinions.Count, newOwner);
                 //if (m.charge) minionGetCharge(m);
             }
 
@@ -4979,7 +4977,7 @@ namespace SilverfishControl
             {
                 m.Ready = true;
             }
-            if (!m.charge && m.numAttacksThisTurn <= 1)
+            if (m.charge && m.playedThisTurn && m.numAttacksThisTurn <= 1)
             {
                 m.Ready = true;
             }
@@ -5669,32 +5667,28 @@ namespace SilverfishControl
 
         private void addMiniontoList(Minion m, List<Minion> l, int pos, bool own)
         {
-            List<Minion> newmins = new List<Minion>(l);
-            l.Clear();
-
-            int i = 0;
-            foreach (Minion mnn in newmins)
+            //List<Minion> newmins = new List<Minion>(l);
+            //l.Clear();
+            if (l.Count >= pos)
             {
-
-                if (pos == i)
-                {
-                    m.id = i;
-                    m.zonepos = i + 1;
-                    l.Add(m);
-                    i++;
-                }
+                l.Insert(pos, m);
+            }
+            else
+            {
+                l.Add(m);
+            }
+            int i = 0;
+            foreach (Minion mnn in l)
+            {
                 mnn.id = i;
                 mnn.zonepos = i + 1;
-                l.Add(mnn);
                 i++;
             }
-            // maybe he is last mob
-            if (pos == i)
+            int j = 0;
+            foreach (Minion mnn in l)
             {
-                m.id = i;
-                m.zonepos = i + 1;
-                l.Add(m);
-                i++;
+                if (mnn.id != j) Helpfunctions.Instance.logg("ERROR");
+                j++;
             }
             adjacentBuffUpdate(own);
             triggerPlayedAMinion(m.handcard, own);
@@ -6164,14 +6158,14 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.voidterror)
             {
-                List<Minion> temp = new List<Minion>();
+                List<Minion> temp;
                 if (own)
                 {
-                    temp.AddRange(this.ownMinions);
+                    temp = this.ownMinions;
                 }
                 else
                 {
-                    temp.AddRange(this.enemyMinions);
+                    temp = this.enemyMinions;
                 }
 
                 int angr = 0;
@@ -6184,7 +6178,7 @@ namespace SilverfishControl
                         hp += m.Hp;
                     }
                 }
-                foreach (Minion m in temp)
+                foreach (Minion m in temp.ToArray())
                 {
                     if (m.id == position || m.id == position - 1)
                     {
@@ -6345,14 +6339,13 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.dreadinfernal)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion m in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(m, 1, 0, true);
                 }
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion m in temp)
+                temp = this.enemyMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(m, 1, 0, false);
                 }
@@ -6370,8 +6363,11 @@ namespace SilverfishControl
                         attackOrHealHero(1, true);
                         continue;
                     }
-                    List<Minion> temp = new List<Minion>(this.ownMinions);
-                    temp.AddRange(this.enemyMinions);
+                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    if (temp.Count == 0)
+                    {
+                        temp.AddRange(this.ownMinions);
+                    }
                     temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));//destroys the weakest
 
                     foreach (Minion m in temp)
@@ -6417,7 +6413,7 @@ namespace SilverfishControl
             if (c.name == CardDB.cardName.tundrarhino)
             {
                 minionGetCharge(c);
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 foreach (Minion m in temp)
                 {
                     if ((TAG_RACE)m.handcard.card.race == TAG_RACE.PET)
@@ -6429,11 +6425,9 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.stampedingkodo)
             {
-                List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));//destroys the weakest
-                temp.AddRange(temp2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp2)
                 {
                     if (enemy.Angr <= 2)
                     {
@@ -6445,7 +6439,7 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.sunfuryprotector)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 foreach (Minion m in temp)
                 {
                     if (m.id == position - 1 || m.id == position)
@@ -6457,7 +6451,7 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.ancientmage)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 foreach (Minion m in temp)
                 {
                     if (m.id == position - 1 || m.id == position)
@@ -6469,8 +6463,8 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.defenderofargus)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion m in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     if (m.id == position - 1 || m.id == position)//position and position -1 because its not placed jet
                     {
@@ -6484,17 +6478,16 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.coldlightseer)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion m in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     if ((TAG_RACE)m.handcard.card.race == TAG_RACE.MURLOC)
                     {
                         minionGetBuffed(m, 0, 2, true);
                     }
                 }
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion m in temp)
+                temp = this.enemyMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     if ((TAG_RACE)m.handcard.card.race == TAG_RACE.MURLOC)
                     {
@@ -6505,14 +6498,13 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.deathwing)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion enemy in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDestroyed(enemy, true);
                 }
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion enemy in temp)
+                temp = this.enemyMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDestroyed(enemy, false);
                 }
@@ -6726,14 +6718,13 @@ namespace SilverfishControl
                         for (int i = 0; i < anz; i++)
                         {
                             int dmg = getSpellDamageDamage(1);
-                            List<Minion> temp = new List<Minion>(this.ownMinions);
-                            foreach (Minion m in temp)
+                            List<Minion> temp = this.ownMinions;
+                            foreach (Minion m in temp.ToArray())
                             {
                                 minionGetDamagedOrHealed(m, 1, 0, true);
                             }
-                            temp.Clear();
-                            temp.AddRange(this.enemyMinions);
-                            foreach (Minion m in temp)
+                            temp = this.enemyMinions;
+                            foreach (Minion m in temp.ToArray())
                             {
                                 minionGetDamagedOrHealed(m, 1, 0, false);
                             }
@@ -6770,14 +6761,14 @@ namespace SilverfishControl
                         for (int i = 0; i < anz; i++)
                         {
                             int dmg = getSpellDamageDamage(1);
-                            List<Minion> temp = new List<Minion>(this.ownMinions);
-                            foreach (Minion m in temp)
+                            List<Minion> temp = this.ownMinions;
+                            foreach (Minion m in temp.ToArray())
                             {
                                 minionGetDamagedOrHealed(m, 1, 0, true);
                             }
-                            temp.Clear();
-                            temp.AddRange(this.enemyMinions);
-                            foreach (Minion m in temp)
+
+                            temp = this.enemyMinions;
+                            foreach (Minion m in temp.ToArray())
                             {
                                 minionGetDamagedOrHealed(m, 1, 0, false);
                             }
@@ -7320,8 +7311,8 @@ namespace SilverfishControl
             if (c.name == CardDB.cardName.shadowflame)
             {
                 int damage1 = getSpellDamageDamage(m.Angr);
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
-                foreach (Minion mnn in temp)
+                List<Minion> temp = this.enemyMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(mnn, damage1, 0, false);
                 }
@@ -7407,8 +7398,8 @@ namespace SilverfishControl
                 {
                     attackOrHealHero(damage1, false);
                 }
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
-                foreach (Minion mnn in temp)
+                List<Minion> temp = this.enemyMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     if (mnn.id + 10 != target)
                     {
@@ -7527,8 +7518,8 @@ namespace SilverfishControl
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
-                    List<Minion> tempolist = new List<Minion>(this.ownMinions);
-                    foreach (Minion mnn in tempolist)
+                    List<Minion> tempolist = this.ownMinions;
+                    foreach (Minion mnn in tempolist.ToArray())
                     {
                         if (mnn.id == target + 1 || mnn.id == target - 1)
                         {
@@ -7571,8 +7562,8 @@ namespace SilverfishControl
                 if (immune) m.immune = true;
                 if (adjacentDamage >= 1)
                 {
-                    List<Minion> tempolist = new List<Minion>(this.enemyMinions);
-                    foreach (Minion mnn in tempolist)
+                    List<Minion> tempolist = this.enemyMinions;
+                    foreach (Minion mnn in tempolist.ToArray())
                     {
                         if (mnn.id + 10 == target + 1 || mnn.id + 10 == target - 1)
                         {
@@ -7625,14 +7616,15 @@ namespace SilverfishControl
             //hunter#########################################################################
             if (c.name == CardDB.cardName.multishot && this.enemyMinions.Count >= 2)
             {
-                List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(3);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));//damage the strongest
-                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
-                foreach (Minion enemy in temp)
+                int i = 0;
+                foreach (Minion enemy in temp2)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    i++;
+                    if (i == 2) break;
                 }
 
             }
@@ -7671,13 +7663,12 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.deadlyshot && this.enemyMinions.Count >= 1)
             {
-                List<Minion> temp = new List<Minion>();
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                 temp2.Sort((a, b) => a.Angr.CompareTo(b.Angr));
-                temp.AddRange(Helpfunctions.TakeList(temp2, 1));
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp2.ToArray())
                 {
                     minionGetDestroyed(enemy, false);
+                    break;
                 }
 
             }
@@ -7685,14 +7676,14 @@ namespace SilverfishControl
             //warrior#########################################################################
             if (c.name == CardDB.cardName.commandingshout)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 Enchantment e1 = CardDB.getEnchantmentFromCardID(CardDB.cardIDEnum.NEW1_036e);
                 e1.creator = hc.entity;
                 e1.controllerOfCreator = this.ownController;
                 Enchantment e2 = CardDB.getEnchantmentFromCardID(CardDB.cardIDEnum.NEW1_036e2);
                 e2.creator = hc.entity;
                 e2.controllerOfCreator = this.ownController;
-                foreach (Minion mnn in temp)
+                foreach (Minion mnn in temp.ToArray())
                 {//cantLowerHPbelowONE
                     addEffectToMinionNoDoubles(mnn, e1, true);
                     addEffectToMinionNoDoubles(mnn, e2, true);
@@ -7716,14 +7707,14 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.brawl)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion mnn in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     minionGetDestroyed(mnn, true);
                 }
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion mnn in temp)
+
+                temp = this.enemyMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     minionGetDestroyed(mnn, false);
                 }
@@ -7733,14 +7724,15 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.cleave && this.enemyMinions.Count >= 2)
             {
-                List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(2);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
-                foreach (Minion enemy in temp)
+                temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));
+                int i = 0;
+                foreach (Minion enemy in temp2)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    i++;
+                    if (i == 2) break;
                 }
 
             }
@@ -7765,15 +7757,14 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.whirlwind)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(1);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
-                temp.Clear();
-                temp = new List<Minion>(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true);
                 }
@@ -7802,9 +7793,9 @@ namespace SilverfishControl
             if (c.name == CardDB.cardName.blizzard)
             {
                 int damage = getSpellDamageDamage(2);
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int maxHp = 0;
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     enemy.frozen = true;
                     if (maxHp < enemy.Hp) maxHp = enemy.Hp;
@@ -7837,6 +7828,8 @@ namespace SilverfishControl
                 }
                 if (i < ammount) attackOrHealHero(ammount - i, false);*/
 
+                // pessimistic
+                /*
                 int damage = 1;
                 int i = 0;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
@@ -7860,6 +7853,33 @@ namespace SilverfishControl
                         attackOrHealHero(damage, false);
                     }
                     i++;
+                }*/
+
+                // optimistic
+
+                int damage = 1;
+                int i = 0;
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int times = this.getSpellDamageDamage(3);
+                if (this.enemyHeroHp <= times)
+                {
+                    attackOrHealHero(damage, false);
+                }
+                else
+                {
+                    while (i < times)
+                    {
+                        if (temp.Count >= 1)
+                        {
+                            minionGetDamagedOrHealed(temp[0], damage, 0, false);
+                            temp = new List<Minion>(this.enemyMinions);
+                        }
+                        else
+                        {
+                            attackOrHealHero(damage, false);
+                        }
+                        i++;
+                    }
                 }
 
 
@@ -7882,16 +7902,16 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.arcaneexplosion)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(1);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
             }
             if (c.name == CardDB.cardName.frostnova)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 foreach (Minion enemy in temp)
                 {
                     enemy.frozen = true;
@@ -7900,10 +7920,10 @@ namespace SilverfishControl
             }
             if (c.name == CardDB.cardName.flamestrike)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(4);
                 int maxHp = 0;
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     if (maxHp < enemy.Hp) maxHp = enemy.Hp;
 
@@ -7916,9 +7936,9 @@ namespace SilverfishControl
             //pala#################################################################
             if (c.name == CardDB.cardName.consecration)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
@@ -7956,7 +7976,8 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.avengingwrath)
             {
-
+                //pessimistic
+                /*
                 int damage = 1;
                 int i = 0;
                 List<Minion> temp = new List<Minion>(this.enemyMinions);
@@ -7980,6 +8001,32 @@ namespace SilverfishControl
                         attackOrHealHero(damage, false);
                     }
                     i++;
+                }*/
+
+                int damage = 1;
+                int i = 0;
+                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                int times = this.getSpellDamageDamage(8);
+                if (this.enemyHeroHp <= times)
+                {
+                    attackOrHealHero(times, false);
+                }
+                else
+                {
+                    while (i < times)
+                    {
+                        if (temp.Count >= 1)
+                        {
+                            temp.Sort((a, b) => a.Hp.CompareTo(b.Hp));
+                            minionGetDamagedOrHealed(temp[0], damage, 0, false);
+                            temp = new List<Minion>(this.enemyMinions);
+                        }
+                        else
+                        {
+                            attackOrHealHero(damage, false);
+                        }
+                        i++;
+                    }
                 }
 
             }
@@ -7988,15 +8035,14 @@ namespace SilverfishControl
             //priest ####################################################
             if (c.name == CardDB.cardName.circleofhealing)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int heal = getSpellHeal(4);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, 0, heal, false);
                 }
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, 0, heal, true);
                 }
@@ -8053,17 +8099,16 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.holynova)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 int heal = getSpellHeal(2);
                 int damage = getSpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, 0, heal, true, true);
                 }
                 attackOrHealHero(-heal, true);
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion enemy in temp)
+                temp = this.enemyMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false, true);
                 }
@@ -8078,10 +8123,10 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.bladeflurry)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = this.getSpellDamageDamage(this.ownWeaponAttack);
                 int maxhp = 0;
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true);
                     if (maxhp < enemy.Hp) maxhp = Math.Min(enemy.Hp, damage);
@@ -8115,9 +8160,9 @@ namespace SilverfishControl
             }
             if (c.name == CardDB.cardName.fanofknives)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(1);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
@@ -8136,15 +8181,14 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.vanish)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int heal = getSpellHeal(4);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionReturnToHand(enemy, false, 0);
                 }
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionReturnToHand(enemy, true, 0);
                 }
@@ -8154,14 +8198,15 @@ namespace SilverfishControl
             //shaman #################################################
             if (c.name == CardDB.cardName.forkedlightning && this.enemyMinions.Count >= 2)
             {
-                List<Minion> temp = new List<Minion>();
                 int damage = getSpellDamageDamage(2);
                 List<Minion> temp2 = new List<Minion>(this.enemyMinions);
-                temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
-                temp.AddRange(Helpfunctions.TakeList(temp2, 2));
-                foreach (Minion enemy in temp)
+                temp2.Sort((a, b) => a.Hp.CompareTo(b.Hp));
+                int i = 0;
+                foreach (Minion enemy in temp2)
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
+                    i++;
+                    if (i == 2) break;
                 }
 
             }
@@ -8175,11 +8220,11 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.lightningstorm)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(2);
 
                 int maxHp = 0;
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     if (maxHp < enemy.Hp) maxHp = enemy.Hp;
 
@@ -8199,7 +8244,7 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.totemicmight)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 foreach (Minion m in temp)
                 {
                     if (m.handcard.card.race == 21) // if minion is a totem, buff it
@@ -8212,7 +8257,7 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.bloodlust)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 foreach (Minion m in temp)
                 {
                     Enchantment e = CardDB.getEnchantmentFromCardID(CardDB.cardIDEnum.CS2_046e);
@@ -8234,14 +8279,13 @@ namespace SilverfishControl
             }
             if (c.name == CardDB.cardName.twistingnether)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
-                foreach (Minion enemy in temp)
+                List<Minion> temp = this.enemyMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDestroyed(enemy, false);
                 }
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDestroyed(enemy, true);
                 }
@@ -8250,15 +8294,14 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.hellfire)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(3);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, true);
                 }
@@ -8271,7 +8314,7 @@ namespace SilverfishControl
             //druid #################################################
             if (c.name == CardDB.cardName.souloftheforest)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 Enchantment e = CardDB.getEnchantmentFromCardID(CardDB.cardIDEnum.EX1_158e);
                 e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
@@ -8339,9 +8382,9 @@ namespace SilverfishControl
             {
                 if (choice == 2)
                 {
-                    List<Minion> temp = new List<Minion>(this.enemyMinions);
+                    List<Minion> temp = this.enemyMinions;
                     int damage = getSpellDamageDamage(2);
-                    foreach (Minion enemy in temp)
+                    foreach (Minion enemy in temp.ToArray())
                     {
                         minionGetDamagedOrHealed(enemy, damage, 0, false);
                     }
@@ -8385,7 +8428,7 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.savageroar)
             {
-                List<Minion> temp = new List<Minion>(this.ownMinions);
+                List<Minion> temp = this.ownMinions;
                 Enchantment e = CardDB.getEnchantmentFromCardID(CardDB.cardIDEnum.CS2_011o);
                 e.creator = hc.entity;
                 e.controllerOfCreator = this.ownController;
@@ -8438,18 +8481,17 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.yseraawakens)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(5);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     if (enemy.name != CardDB.cardName.ysera)// dont attack ysera
                     {
                         minionGetDamagedOrHealed(enemy, damage, 0, false);
                     }
                 }
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion enemy in temp)
+                temp = this.ownMinions;
+                foreach (Minion enemy in temp.ToArray())
                 {
                     if (enemy.name != CardDB.cardName.ysera)//dont attack ysera
                     {
@@ -8463,9 +8505,9 @@ namespace SilverfishControl
 
             if (c.name == CardDB.cardName.stomp)
             {
-                List<Minion> temp = new List<Minion>(this.enemyMinions);
+                List<Minion> temp = this.enemyMinions;
                 int damage = getSpellDamageDamage(2);
-                foreach (Minion enemy in temp)
+                foreach (Minion enemy in temp.ToArray())
                 {
                     minionGetDamagedOrHealed(enemy, damage, 0, false);
                 }
@@ -8478,14 +8520,13 @@ namespace SilverfishControl
             {
                 int ownanz = this.ownMinions.Count;
                 int enemanz = this.enemyMinions.Count;
-                List<Minion> temp = new List<Minion>(this.ownMinions);
-                foreach (Minion mnn in temp)
+                List<Minion> temp = this.ownMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     minionGetDestroyed(mnn, true);
                 }
-                temp.Clear();
-                temp.AddRange(this.enemyMinions);
-                foreach (Minion mnn in temp)
+                temp = this.enemyMinions;
+                foreach (Minion mnn in temp.ToArray())
                 {
                     minionGetDestroyed(mnn, false);
                 }
@@ -8605,8 +8646,8 @@ namespace SilverfishControl
         {
             if (own) // effects only for OWN minons
             {
-                List<Minion> tempo = new List<Minion>(this.ownMinions);
-                foreach (Minion m in tempo)
+                List<Minion> tempo = this.ownMinions;
+                foreach (Minion m in tempo.ToArray())
                 {
                     if (m.silenced) continue;
 
@@ -8614,7 +8655,6 @@ namespace SilverfishControl
                     {
                         if (this.enemyMinions.Count >= 1)
                         {
-                            List<Minion> temp = new List<Minion>();
                             int damage = 1;
                             List<Minion> temp2 = new List<Minion>(this.enemyMinions);
                             temp2.Sort((a, b) => -a.Hp.CompareTo(b.Hp));
@@ -8650,6 +8690,15 @@ namespace SilverfishControl
                         minionGetBuffed(m, 1, 1, own);
                     }
 
+                    if (m.handcard.card.name == CardDB.cardName.murloctidecaller && hc.card.race == 14 && m.entitiyID != hc.entity)
+                    {
+                        minionGetBuffed(m, 1, 0, true);
+                    }
+                    if (m.handcard.card.name == CardDB.cardName.oldmurkeye && hc.card.race == 14 && m.entitiyID != hc.entity)
+                    {
+                        minionGetBuffed(m, 1, 0, true);
+                    }
+
                 }
 
 
@@ -8657,22 +8706,14 @@ namespace SilverfishControl
 
 
             //effects for ALL minons
-            List<Minion> tempoo = new List<Minion>(this.ownMinions);
-            foreach (Minion m in tempoo)
+            /*List<Minion> tempoo = this.ownMinions;
+            foreach (Minion m in tempoo.ToArray())
             {
                 if (m.silenced) continue;
-                if (m.handcard.card.name == CardDB.cardName.murloctidecaller && hc.card.race == 14 && m.entitiyID != hc.entity)
-                {
-                    minionGetBuffed(m, 1, 0, true);
-                }
-                if (m.handcard.card.name == CardDB.cardName.oldmurkeye && hc.card.race == 14 && m.entitiyID != hc.entity)
-                {
-                    minionGetBuffed(m, 1, 0, true);
-                }
-            }
-            tempoo.Clear();
-            tempoo.AddRange(this.enemyMinions);
-            foreach (Minion m in tempoo)
+                
+            }*/
+            List<Minion> tempoo = this.enemyMinions;
+            foreach (Minion m in tempoo.ToArray())
             {
                 if (m.silenced) continue;
                 //truebaugederalte
@@ -8693,8 +8734,8 @@ namespace SilverfishControl
         {
 
             bool wilderpyro = false;
-            List<Minion> temp = new List<Minion>(this.ownMinions);
-            foreach (Minion m in temp)
+            List<Minion> temp = this.ownMinions;
+            foreach (Minion m in temp.ToArray())
             {
                 if (m.silenced) continue;
 
@@ -8747,22 +8788,20 @@ namespace SilverfishControl
 
             if (wilderpyro)
             {
-                temp.Clear();
-                temp.AddRange(this.ownMinions);
-                foreach (Minion m in temp)
+                temp = this.ownMinions;
+                foreach (Minion m in temp.ToArray())
                 {
                     if (m.silenced) continue;
 
                     if (m.handcard.card.name == CardDB.cardName.wildpyromancer)
                     {
-                        List<Minion> temp2 = new List<Minion>(this.ownMinions);
-                        foreach (Minion mnn in temp2)
+                        List<Minion> temp2 = this.ownMinions;
+                        foreach (Minion mnn in temp2.ToArray())
                         {
                             minionGetDamagedOrHealed(mnn, 1, 0, true);
                         }
-                        temp2.Clear();
-                        temp2.AddRange(this.enemyMinions);
-                        foreach (Minion mnn in temp2)
+                        temp2 = this.enemyMinions;
+                        foreach (Minion mnn in temp2.ToArray())
                         {
                             minionGetDamagedOrHealed(mnn, 1, 0, false);
                         }
@@ -8774,12 +8813,17 @@ namespace SilverfishControl
 
         public void removeCard(Handmanager.Handcard hcc)
         {
-
-            this.owncards.RemoveAll(x => x.entity == hcc.entity);
+            //this.owncards.RemoveAll(x => x.entity == hcc.entity);
             int i = 1;
-            foreach (Handmanager.Handcard hc in this.owncards)
+            foreach (Handmanager.Handcard hc in this.owncards.ToArray())
             {
-                hc.position = i;
+                if (hc.entity == hcc.entity)
+                {
+                    this.owncards.Remove(hc);
+                    continue;
+                }
+                this.owncards[i - 1].position = i;
+                //hc.position = i;
                 i++;
             }
 
@@ -8872,8 +8916,8 @@ namespace SilverfishControl
 
         private void triggerACardGetPlayed(CardDB.Card c)
         {
-            List<Minion> temp = new List<Minion>(this.ownMinions);
-            foreach (Minion mnn in temp)
+            List<Minion> temp = this.ownMinions;
+            foreach (Minion mnn in temp.ToArray())
             {
                 if (mnn.silenced) continue;
                 if (mnn.handcard.card.name == CardDB.cardName.illidanstormrage)
@@ -12074,7 +12118,7 @@ namespace SilverfishControl
                     }
 
                     // no pen if own is enrage
-                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded)
+                    if (enrageDatabase.ContainsKey(m.name) && !m.wounded && m.Ready)
                     {
                         return pen;
                     }
