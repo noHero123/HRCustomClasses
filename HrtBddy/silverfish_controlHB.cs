@@ -20754,7 +20754,7 @@ namespace SilverfishControl
         OPPOSING
     }
 
-    public enum GAME_TAG
+    public enum GAME_TAGs
     {
         STATE = 204,
         TURN = 20,

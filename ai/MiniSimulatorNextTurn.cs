@@ -299,31 +299,142 @@ namespace HREngine.Bots
                     }
 
                     //take a card and play it
-                    List<CardDB.cardName> playedcards = new List<CardDB.cardName>();
 
-                    foreach (Handmanager.Handcard hc in p.owncards)
+                    if (!p.attacked)
                     {
-                        if (this.calculated > this.totalboards) continue;
-                        CardDB.Card c = hc.card;
-                        //help.logg("try play crd" + c.name + " " + c.getManaCost(p) + " " + c.canplayCard(p));
-                        if (playedcards.Contains(c.name)) continue; // dont play the same card in one loop
-                        playedcards.Add(c.name);
-                        if (c.choice)
+
+                        List<CardDB.cardName> playedcards = new List<CardDB.cardName>();
+                        foreach (Handmanager.Handcard hc in p.owncards)
                         {
-                            if (doAllChoices(p, hc, isLethalCheck))
+                            if (this.calculated > this.totalboards) continue;
+                            CardDB.Card c = hc.card;
+                            //help.logg("try play crd" + c.name + " " + c.getManaCost(p) + " " + c.canplayCard(p));
+                            if (playedcards.Contains(c.name)) continue; // dont play the same card in one loop
+                            playedcards.Add(c.name);
+                            if (c.choice)
                             {
-                                havedonesomething = true;
+                                if (doAllChoices(p, hc, isLethalCheck))
+                                {
+                                    havedonesomething = true;
+                                }
+                            }
+                            else
+                            {
+                                int bestplace = p.getBestPlace(c, isLethalCheck);
+                                if (hc.canplayCard(p))
+                                {
+                                    havedonesomething = true;
+                                    List<targett> trgts = c.getTargetsForCard(p);
+
+                                    if (isLethalCheck && (pen.DamageTargetDatabase.ContainsKey(c.name) || pen.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                    {
+                                        targett trg = trgts.Find(x => x.target == 200);
+                                        if (trg != null)
+                                        {
+                                            trgts.Clear();
+                                            trgts.Add(trg);
+                                        }
+                                        else
+                                        {
+                                            // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                            if (trgts.Count >= 1)
+                                            {
+                                                trg = trgts[0];
+                                                trgts.Clear();
+                                                trgts.Add(trg);
+                                            }
+                                        }
+                                    }
+
+
+                                    int cardplayPenality = 0;
+
+                                    if (trgts.Count == 0)
+                                    {
+
+
+                                        if (usePenalityManager)
+                                        {
+                                            cardplayPenality = pen.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
+                                            if (cardplayPenality <= 499)
+                                            {
+                                                Playfield pf = new Playfield(p);
+                                                havedonesomething = true;
+                                                pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                                addToPosmoves(pf);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Playfield pf = new Playfield(p);
+                                            havedonesomething = true;
+                                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            addToPosmoves(pf);
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        if (isLethalCheck)// only target enemy hero during Lethal check!
+                                        {
+                                            targett trg = trgts.Find(x => x.target == 200);
+                                            if (trg != null)
+                                            {
+                                                trgts.Clear();
+                                                trgts.Add(trg);
+                                            }
+                                        }
+
+                                        foreach (targett trgt in trgts)
+                                        {
+
+
+                                            if (usePenalityManager)
+                                            {
+                                                cardplayPenality = pen.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
+                                                if (cardplayPenality <= 499)
+                                                {
+                                                    Playfield pf = new Playfield(p);
+                                                    havedonesomething = true;
+                                                    pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                    addToPosmoves(pf);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Playfield pf = new Playfield(p);
+                                                havedonesomething = true;
+                                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                addToPosmoves(pf);
+                                            }
+
+                                        }
+
+                                    }
+
+
+                                }
                             }
                         }
-                        else
-                        {
-                            int bestplace = p.getBestPlace(c, isLethalCheck);
-                            if (hc.canplayCard(p))
-                            {
-                                havedonesomething = true;
-                                List<targett> trgts = c.getTargetsForCard(p);
 
-                                if (isLethalCheck && (pen.DamageTargetDatabase.ContainsKey(c.name) || pen.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+
+
+                        // use ability
+                        /// TODO check if ready after manaup
+                        if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
+                        {
+                            if (this.calculated > this.totalboards) continue;
+                            int abilityPenality = 0;
+
+                            havedonesomething = true;
+                            // if we have mage or priest, we have to target something####################################################
+                            if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
+                            {
+
+                                List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
+
+                                if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && (p.ownHeroAblility.name != CardDB.cardName.lesserheal || (p.ownHeroAblility.name == CardDB.cardName.lesserheal && p.auchenaiseelenpriesterin)))))// only target enemy hero during Lethal check!
                                 {
                                     targett trg = trgts.Find(x => x.target == 200);
                                     if (trg != null)
@@ -343,21 +454,19 @@ namespace HREngine.Bots
                                     }
                                 }
 
-
-                                int cardplayPenality = 0;
-
-                                if (trgts.Count == 0)
+                                foreach (targett trgt in trgts)
                                 {
+
 
 
                                     if (usePenalityManager)
                                     {
-                                        cardplayPenality = pen.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
-                                        if (cardplayPenality <= 499)
+                                        abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
+                                        if (abilityPenality <= 499)
                                         {
                                             Playfield pf = new Playfield(p);
                                             havedonesomething = true;
-                                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                             addToPosmoves(pf);
                                         }
                                     }
@@ -365,56 +474,39 @@ namespace HREngine.Bots
                                     {
                                         Playfield pf = new Playfield(p);
                                         havedonesomething = true;
-                                        pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
                                         addToPosmoves(pf);
                                     }
 
+                                }
+                            }
+                            else
+                            {
+                                // the other classes dont have to target####################################################
+                                Playfield pf = new Playfield(p);
 
+                                if (usePenalityManager)
+                                {
+                                    abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
+                                    if (abilityPenality <= 499)
+                                    {
+                                        havedonesomething = true;
+                                        pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                        addToPosmoves(pf);
+                                    }
                                 }
                                 else
                                 {
-                                    if (isLethalCheck)// only target enemy hero during Lethal check!
-                                    {
-                                        targett trg = trgts.Find(x => x.target == 200);
-                                        if (trg != null)
-                                        {
-                                            trgts.Clear();
-                                            trgts.Add(trg);
-                                        }
-                                    }
-
-                                    foreach (targett trgt in trgts)
-                                    {
-
-
-                                        if (usePenalityManager)
-                                        {
-                                            cardplayPenality = pen.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
-                                            if (cardplayPenality <= 499)
-                                            {
-                                                Playfield pf = new Playfield(p);
-                                                havedonesomething = true;
-                                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                                addToPosmoves(pf);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Playfield pf = new Playfield(p);
-                                            havedonesomething = true;
-                                            pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
-                                            addToPosmoves(pf);
-                                        }
-
-                                    }
-
+                                    havedonesomething = true;
+                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                    addToPosmoves(pf);
                                 }
 
-
                             }
-                        }
-                    }
 
+                        }
+
+                    }
                     //attack with a minion
 
                     List<Minion> playedMinions = new List<Minion>(8);
@@ -575,91 +667,7 @@ namespace HREngine.Bots
                         }
                     }
 
-                    // use ability
-                    /// TODO check if ready after manaup
-                    if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
-                    {
-                        if (this.calculated > this.totalboards) continue;
-                        int abilityPenality = 0;
-
-                        havedonesomething = true;
-                        // if we have mage or priest, we have to target something####################################################
-                        if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
-                        {
-
-                            List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
-
-                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && (p.ownHeroAblility.name != CardDB.cardName.lesserheal || (p.ownHeroAblility.name == CardDB.cardName.lesserheal && p.auchenaiseelenpriesterin)))))// only target enemy hero during Lethal check!
-                            {
-                                targett trg = trgts.Find(x => x.target == 200);
-                                if (trg != null)
-                                {
-                                    trgts.Clear();
-                                    trgts.Add(trg);
-                                }
-                                else
-                                {
-                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
-                                    if (trgts.Count >= 1)
-                                    {
-                                        trg = trgts[0];
-                                        trgts.Clear();
-                                        trgts.Add(trg);
-                                    }
-                                }
-                            }
-
-                            foreach (targett trgt in trgts)
-                            {
-
-
-
-                                if (usePenalityManager)
-                                {
-                                    abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
-                                    if (abilityPenality <= 499)
-                                    {
-                                        Playfield pf = new Playfield(p);
-                                        havedonesomething = true;
-                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                        addToPosmoves(pf);
-                                    }
-                                }
-                                else
-                                {
-                                    Playfield pf = new Playfield(p);
-                                    havedonesomething = true;
-                                    pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
-                                    addToPosmoves(pf);
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            // the other classes dont have to target####################################################
-                            Playfield pf = new Playfield(p);
-
-                            if (usePenalityManager)
-                            {
-                                abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
-                                if (abilityPenality <= 499)
-                                {
-                                    havedonesomething = true;
-                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                    addToPosmoves(pf);
-                                }
-                            }
-                            else
-                            {
-                                havedonesomething = true;
-                                pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
-                                addToPosmoves(pf);
-                            }
-
-                        }
-
-                    }
+                    
 
 
                     if (isLethalCheck)

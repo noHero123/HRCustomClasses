@@ -90,6 +90,8 @@ namespace HREngine.Bots
         public bool logging = false;
         public bool sEnemTurn = false;
 
+        public bool attacked = false;
+
         public int attackFaceHP = 15;
 
         public int evaluatePenality = 0;
@@ -412,6 +414,7 @@ namespace HREngine.Bots
 
         public Playfield(Playfield p)
         {
+            this.attacked = p.attacked;
             this.sEnemTurn = p.sEnemTurn;
             this.ownController = p.ownController;
             this.ownHeroEntity = p.ownHeroEntity;
@@ -4373,6 +4376,7 @@ namespace HREngine.Bots
 
         public void attackWithMinion(Minion ownMinion, int target, int targetEntity, int penality)
         {
+            this.attacked = true;
             this.evaluatePenality += penality;
             Action a = new Action();
             a.minionplay = true;
@@ -7731,6 +7735,7 @@ namespace HREngine.Bots
 
         public void attackWithWeapon(int target, int targetEntity, int penality)
         {
+            this.attacked = true;
             this.evaluatePenality += penality;
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;
