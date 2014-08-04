@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 96;
+        public int versionnumber = 97;
         private bool singleLog = false;
         private string botbehave = "rush";
 
@@ -111,7 +111,10 @@ namespace HREngine.Bots
 
         public void updateEverything(Behavior botbase)
         {
+            this.botbehave = "rush";
             if (botbase is BehaviorControl) this.botbehave = "control";
+            if (Ai.Instance.secondturnsim) this.botbehave += " twoturnsim";
+            if (Ai.Instance.playaround) this.botbehave += " playaround";
             HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
             HRPlayer enemyPlayer = HRPlayer.GetEnemyPlayer();
             ownPlayerController = ownPlayer.GetHero().GetControllerId();//ownPlayer.GetHero().GetControllerId()

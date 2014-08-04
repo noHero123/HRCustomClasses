@@ -28,6 +28,8 @@ namespace HREngine.Bots
 
             retval += p.ownMaxMana * 20 - p.enemyMaxMana * 20;
 
+            if (p.enemyHeroName == HeroEnum.mage || p.enemyHeroName == HeroEnum.druid) retval -= 2 * p.enemyspellpower;
+
             if (p.ownHeroHp + p.ownHeroDefence > hpboarder)
             {
                 retval += p.ownHeroHp + p.ownHeroDefence;
@@ -44,7 +46,7 @@ namespace HREngine.Bots
             }
             else
             {
-                retval += (int)Math.Pow((aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence), 2);
+                retval += 3*(aggroboarder + 1 - p.enemyHeroHp - p.enemyHeroDefence);
             }
 
             if (p.ownWeaponAttack >= 1)
@@ -184,7 +186,10 @@ namespace HREngine.Bots
 
             if (m.poisonous) retval += 4;
 
-            if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced) retval += penman.priorityTargets[m.name];
+            if (penman.priorityTargets.ContainsKey(m.name) && !m.silenced)
+            { 
+                retval += penman.priorityTargets[m.name];
+            }
             if (m.name == CardDB.cardName.nerubianegg && m.Angr <= 3 && !m.taunt) retval = 0;
             return retval;
         }

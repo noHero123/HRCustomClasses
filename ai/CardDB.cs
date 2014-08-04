@@ -3768,9 +3768,6 @@ namespace HREngine.Bots
                 }
 
 
-
-
-
                 switch (this.name)
                 {
                     case CardDB.cardName.dreadcorsair:

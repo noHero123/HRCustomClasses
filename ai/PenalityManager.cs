@@ -33,6 +33,8 @@ namespace HREngine.Bots
         Dictionary<CardDB.cardName, int> healthBuffDatabase = new Dictionary<CardDB.cardName, int>();
         Dictionary<CardDB.cardName, int> tauntBuffDatabase = new Dictionary<CardDB.cardName, int>();
 
+        Dictionary<CardDB.cardName, int> lethalHelpers = new Dictionary<CardDB.cardName, int>();
+
         Dictionary<CardDB.cardName, int> cardDrawBattleCryDatabase = new Dictionary<CardDB.cardName, int>();
         Dictionary<CardDB.cardName, int> cardDiscardDatabase = new Dictionary<CardDB.cardName, int>();
         Dictionary<CardDB.cardName, int> destroyOwnDatabase = new Dictionary<CardDB.cardName, int>();
@@ -42,6 +44,8 @@ namespace HREngine.Bots
         Dictionary<CardDB.cardName, int> heroDamagingAoeDatabase = new Dictionary<CardDB.cardName, int>();
 
         Dictionary<CardDB.cardName, int> randomEffects = new Dictionary<CardDB.cardName, int>();
+
+        Dictionary<CardDB.cardName, int> silenceTargets = new Dictionary<CardDB.cardName, int>();
 
         Dictionary<CardDB.cardName, int> returnHandDatabase = new Dictionary<CardDB.cardName, int>();
         public Dictionary<CardDB.cardName, int> priorityTargets = new Dictionary<CardDB.cardName, int>();
@@ -80,6 +84,8 @@ namespace HREngine.Bots
             setupHeroDamagingAOE();
             setupBuffingMinions();
             setupRandomCards();
+            setupLethalHelpMinions();
+            setupSilenceTargets();
         }
 
         public void setCombos()
@@ -367,6 +373,10 @@ namespace HREngine.Bots
                     {
                         return -10;
                     }
+                    if (this.silenceTargets.ContainsKey(m.name) && !m.silenced)
+                    {
+                        return 0;
+                    }
 
                     //silence nothing
                     if (m.Angr <= m.handcard.card.Attack && m.maxHp <= m.handcard.card.Health && !m.taunt && !m.windfury && !m.divineshild && !m.poisonous && m.enchantments.Count == 0 && !this.specialMinions.ContainsKey(name))
@@ -507,13 +517,12 @@ namespace HREngine.Bots
                     if (name == CardDB.cardName.demonfire && (TAG_RACE)m.handcard.card.race == TAG_RACE.DEMON) return 0;
                     if (name == CardDB.cardName.earthshock && m.Hp >= 2 )
                     {
+                        if ((!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord)) || m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
+                            return 0;
                         if (priorityDatabase.ContainsKey(m.name) && !m.silenced)
                         {
                             return 500;
                         }
-
-                        if ((!m.silenced && (m.name == CardDB.cardName.ancientwatcher || m.name == CardDB.cardName.ragnarosthefirelord)) || m.Angr < m.handcard.card.Attack || m.maxHp < m.handcard.card.Health || (m.frozen && !m.playedThisTurn && m.numAttacksThisTurn == 0))
-                        return 0;
                     }
                     if (name == CardDB.cardName.earthshock)//dont silence other own minions
                     {
@@ -923,6 +932,10 @@ namespace HREngine.Bots
 
             if (lethal && card.type == CardDB.cardtype.MOB)
             {
+                if(this.lethalHelpers.ContainsKey(name))
+                {
+                    return 0;
+                }
 
                 if (this.buffingMinionsDatabase.ContainsKey(name))
                 {
@@ -987,6 +1000,13 @@ namespace HREngine.Bots
                 }
             }
 
+            if (card.name == CardDB.cardName.upgrade)
+            {
+                if (p.ownWeaponDurability == 0)
+                {
+                    return 16;
+                }
+            }
 
             //some effects, which are bad :D
             int pen = 0;
@@ -1197,7 +1217,7 @@ namespace HREngine.Bots
             {
                 if (p.mobsplayedThisTurn>=1)
                 {
-                    return 10;
+                    return 20;
                 }
             }
 
@@ -2084,8 +2104,6 @@ namespace HREngine.Bots
             priorityTargets.Add(CardDB.cardName.barongeddon, 10);
             priorityTargets.Add(CardDB.cardName.stormwindchampion, 10);
             priorityTargets.Add(CardDB.cardName.gurubashiberserker, 10);
-            //priorityTargets.Add(CardDB.cardName.cairnebloodhoof, 19);
-            //priorityTargets.Add(CardDB.cardName.harvestgolem, 16);
 
             //warrior cards
             priorityTargets.Add(CardDB.cardName.frothingberserker, 10);
@@ -2131,6 +2149,105 @@ namespace HREngine.Bots
             priorityTargets.Add(CardDB.cardName.shadeofnaxxramas, 10);
             priorityTargets.Add(CardDB.cardName.undertaker, 10);
 
+        }
+
+        private void setupLethalHelpMinions()
+        {
+            lethalHelpers.Add(CardDB.cardName.auchenaisoulpriest, 0);
+            //spellpower minions
+            lethalHelpers.Add(CardDB.cardName.archmage, 0);
+            lethalHelpers.Add(CardDB.cardName.dalaranmage, 0);
+            lethalHelpers.Add(CardDB.cardName.koboldgeomancer, 0);
+            lethalHelpers.Add(CardDB.cardName.ogremagi, 0);
+            lethalHelpers.Add(CardDB.cardName.ancientmage, 0);
+            lethalHelpers.Add(CardDB.cardName.azuredrake, 0);
+            lethalHelpers.Add(CardDB.cardName.bloodmagethalnos, 0);
+            lethalHelpers.Add(CardDB.cardName.malygos, 0);
+            //
+
+        }
+
+        private void setupSilenceTargets()
+        {
+            this.silenceTargets.Add(CardDB.cardName.abomination, 0);
+            this.silenceTargets.Add(CardDB.cardName.acolyteofpain, 0);
+            this.silenceTargets.Add(CardDB.cardName.archmageantonidas, 0);
+            this.silenceTargets.Add(CardDB.cardName.armorsmith, 0);
+            this.silenceTargets.Add(CardDB.cardName.auchenaisoulpriest, 0);
+            this.silenceTargets.Add(CardDB.cardName.barongeddon, 0);
+            //this.silenceTargets.Add(CardDB.cardName.bloodimp, 0);
+            this.silenceTargets.Add(CardDB.cardName.cairnebloodhoof, 0);
+            this.silenceTargets.Add(CardDB.cardName.cultmaster, 0);
+            this.silenceTargets.Add(CardDB.cardName.direwolfalpha, 0);
+            this.silenceTargets.Add(CardDB.cardName.doomsayer, 0);
+            this.silenceTargets.Add(CardDB.cardName.emperorcobra, 0);
+            this.silenceTargets.Add(CardDB.cardName.etherealarcanist, 0);
+            this.silenceTargets.Add(CardDB.cardName.flametonguetotem, 0);
+            this.silenceTargets.Add(CardDB.cardName.gadgetzanauctioneer, 10);
+            this.silenceTargets.Add(CardDB.cardName.grommashhellscream, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.gruul, 0);
+            this.silenceTargets.Add(CardDB.cardName.gurubashiberserker, 0);
+            this.silenceTargets.Add(CardDB.cardName.hogger, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.illidanstormrage, 0);
+            this.silenceTargets.Add(CardDB.cardName.impmaster, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.knifejuggler, 0);
+            this.silenceTargets.Add(CardDB.cardName.lightspawn, 0);
+            this.silenceTargets.Add(CardDB.cardName.lightwarden, 0);
+            this.silenceTargets.Add(CardDB.cardName.lightwell, 0);
+            this.silenceTargets.Add(CardDB.cardName.lorewalkercho, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.malygos, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.manatidetotem, 0);
+            this.silenceTargets.Add(CardDB.cardName.manawraith, 0);
+            this.silenceTargets.Add(CardDB.cardName.manawyrm, 0);
+            this.silenceTargets.Add(CardDB.cardName.masterswordsmith, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.murloctidecaller, 0);
+            this.silenceTargets.Add(CardDB.cardName.murlocwarleader, 0);
+            this.silenceTargets.Add(CardDB.cardName.natpagle, 0);
+            this.silenceTargets.Add(CardDB.cardName.northshirecleric, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.oldmurkeye, 0);
+            this.silenceTargets.Add(CardDB.cardName.prophetvelen, 0);
+            this.silenceTargets.Add(CardDB.cardName.questingadventurer, 0);
+            this.silenceTargets.Add(CardDB.cardName.raidleader, 0);
+
+            this.silenceTargets.Add(CardDB.cardName.savannahhighmane, 0);
+            this.silenceTargets.Add(CardDB.cardName.scavenginghyena, 0);
+            this.silenceTargets.Add(CardDB.cardName.sorcerersapprentice, 0);
+            this.silenceTargets.Add(CardDB.cardName.southseacaptain, 0);
+            this.silenceTargets.Add(CardDB.cardName.spitefulsmith, 0);
+            this.silenceTargets.Add(CardDB.cardName.starvingbuzzard, 0);
+            this.silenceTargets.Add(CardDB.cardName.stormwindchampion, 0);
+            this.silenceTargets.Add(CardDB.cardName.summoningportal, 0);
+            this.silenceTargets.Add(CardDB.cardName.sylvanaswindrunner, 0);
+            this.silenceTargets.Add(CardDB.cardName.timberwolf, 0);
+            this.silenceTargets.Add(CardDB.cardName.tirionfordring, 0);
+            this.silenceTargets.Add(CardDB.cardName.tundrarhino, 0);
+            //this.specialMinions.Add(CardDB.cardName.unboundelemental, 0);
+            //this.specialMinions.Add(CardDB.cardName.venturecomercenary, 0);
+            this.silenceTargets.Add(CardDB.cardName.violetteacher, 0);
+            this.silenceTargets.Add(CardDB.cardName.warsongcommander, 0);
+            //this.specialMinions.Add(CardDB.cardName.waterelemental, 0);
+
+            // naxx cards
+            this.silenceTargets.Add(CardDB.cardName.baronrivendare, 0);
+            this.silenceTargets.Add(CardDB.cardName.undertaker, 0);
+            this.silenceTargets.Add(CardDB.cardName.darkcultist, 0);
+            this.silenceTargets.Add(CardDB.cardName.feugen, 0);
+            this.silenceTargets.Add(CardDB.cardName.stalagg, 0);
+            this.silenceTargets.Add(CardDB.cardName.hauntedcreeper, 0);
+            this.silenceTargets.Add(CardDB.cardName.kelthuzad, 10);
+            this.silenceTargets.Add(CardDB.cardName.madscientist, 0);
+            this.silenceTargets.Add(CardDB.cardName.maexxna, 0);
+            this.silenceTargets.Add(CardDB.cardName.nerubarweblord, 0);
+            this.silenceTargets.Add(CardDB.cardName.shadeofnaxxramas, 0);
+            //this.specialMinions.Add(CardDB.cardName.voidcaller, 0);
+            this.silenceTargets.Add(CardDB.cardName.webspinner, 0);
         }
 
         private void setupRandomCards()

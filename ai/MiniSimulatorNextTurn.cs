@@ -5,7 +5,7 @@ using System.Text;
 
 namespace HREngine.Bots
 {
-    public class MiniSimulator
+    public class MiniSimulatorNextTurn
     {
         //#####################################################################################################################
         private int maxdeep = 6;
@@ -37,14 +37,8 @@ namespace HREngine.Bots
 
         PenalityManager pen = PenalityManager.Instance;
 
-        public MiniSimulator()
+        public MiniSimulatorNextTurn()
         {
-        }
-        public MiniSimulator(int deep, int wide, int ttlboards)
-        {
-            this.maxdeep = deep;
-            this.maxwide = wide;
-            this.totalboards = ttlboards;
         }
 
         public void updateParams(int deep, int wide, int ttlboards)
@@ -528,7 +522,7 @@ namespace HREngine.Bots
 
 
                             }
-                            if ( ( !m.stealth || isLethalCheck) && p.enemySecretCount == 0 && trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            if ((!m.stealth || isLethalCheck) && p.enemySecretCount == 0 && trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
                             {
                                 break;
                             }
@@ -595,7 +589,7 @@ namespace HREngine.Bots
 
                             List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
 
-                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && (p.ownHeroAblility.name != CardDB.cardName.lesserheal || (p.ownHeroAblility.name == CardDB.cardName.lesserheal && p.auchenaiseelenpriesterin) ))))// only target enemy hero during Lethal check!
+                            if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && (p.ownHeroAblility.name != CardDB.cardName.lesserheal || (p.ownHeroAblility.name == CardDB.cardName.lesserheal && p.auchenaiseelenpriesterin)))))// only target enemy hero during Lethal check!
                             {
                                 targett trg = trgts.Find(x => x.target == 200);
                                 if (trg != null)
@@ -674,7 +668,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround,false, this.playaroundprob, this.playaroundprob2);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob, this.playaroundprob2);
                     }
 
                     //sort stupid stuff ouf
@@ -734,7 +728,7 @@ namespace HREngine.Bots
                     }
                     else
                     {
-                        p.endTurn(this.simulateSecondTurn, this.playaround,false, this.playaroundprob, this.playaroundprob2);
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob, this.playaroundprob2);
                     }
                 }
             }

@@ -116,6 +116,81 @@ namespace HREngine.Bots
                     enemmaxman = Convert.ToInt32(ss);
                 }
 
+                if (s.StartsWith("Enemy cards: "))
+                {
+                    enemyNumberHand = Convert.ToInt32(s.Split(' ')[2]);
+                    continue;
+                }
+
+                if (s.StartsWith("probs: "))
+                {
+                    int i = 0;
+                    foreach (string p in s.Split(' '))
+                    {
+                        if (p.StartsWith("probs:") || p == "" || p == null) continue;
+                        int num = Convert.ToInt32(p);
+                        CardDB.cardIDEnum c = CardDB.cardIDEnum.None;
+                        if (i == 0)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_032;
+                            }
+                            if (this.enemyheroname == "warrior")
+                            {
+                                c = CardDB.cardIDEnum.EX1_400;
+                            }
+
+                            if (this.enemyheroname == "hunter")
+                            {
+                                c = CardDB.cardIDEnum.EX1_538;
+                            }
+
+                            if (this.enemyheroname == "priest")
+                            {
+                                c = CardDB.cardIDEnum.CS1_112;
+                            }
+
+                            if (this.enemyheroname == "shaman")
+                            {
+                                c = CardDB.cardIDEnum.EX1_259;
+                            }
+
+                            if (this.enemyheroname == "pala")
+                            {
+                                c = CardDB.cardIDEnum.CS2_093;
+                            }
+
+                            if (this.enemyheroname == "druid")
+                            {
+                                c = CardDB.cardIDEnum.CS2_012;
+                            }
+                        }
+
+                        if (i == 1)
+                        {
+                            if (this.enemyheroname == "mage")
+                            {
+                                c = CardDB.cardIDEnum.CS2_028;
+                            }
+                        }
+
+                        if (num == 1)
+                        {
+                            enemycards.Add(c);
+                        }
+                        if (num == 0)
+                        {
+                            enemycards.Add(c);
+                            enemycards.Add(c);
+                        }
+                        i++;
+                    }
+
+                    Probabilitymaker.Instance.setEnemyCards(enemycards);
+                    continue;
+                }
+
                 if (readstate == 42 && counter == 1) // player
                 {
                     this.overdrive = Convert.ToInt32(s.Split(' ')[2]);
@@ -418,79 +493,6 @@ namespace HREngine.Bots
 
                     readstate = 5;
                     counter = 0;
-                }
-
-                if (s.StartsWith("Enemy cards: "))
-                {
-                    enemyNumberHand = Convert.ToInt32(s.Split(' ')[1]); 
-                }
-
-                if (s.StartsWith("probs: "))
-                {
-                    int i=0;
-                    foreach (string p in s.Split(' '))
-                    {
-                        if (p.StartsWith("probs:") || p == "" || p == null) continue;
-                        int num = Convert.ToInt32(p);
-                        CardDB.cardIDEnum c = CardDB.cardIDEnum.None;
-                        if (i == 0)
-                        {
-                            if (this.enemyheroname == "mage")
-                            {
-                                c = CardDB.cardIDEnum.CS2_032;
-                            }
-                            if (this.enemyheroname == "warrior")
-                            {
-                                c = CardDB.cardIDEnum.EX1_400;
-                            }
-
-                            if (this.enemyheroname == "hunter")
-                            {
-                                c = CardDB.cardIDEnum.EX1_538;
-                            }
-
-                            if (this.enemyheroname == "priest")
-                            {
-                                c = CardDB.cardIDEnum.CS1_112;
-                            }
-
-                            if (this.enemyheroname == "shaman")
-                            {
-                                c = CardDB.cardIDEnum.EX1_259;
-                            }
-
-                            if (this.enemyheroname == "pala")
-                            {
-                                c = CardDB.cardIDEnum.CS2_093;
-                            }
-
-                            if (this.enemyheroname == "druid")
-                            {
-                                c = CardDB.cardIDEnum.CS2_012;
-                            }
-                        }
-
-                        if (i == 1)
-                        {
-                            if (this.enemyheroname == "mage")
-                            {
-                                c = CardDB.cardIDEnum.CS2_028;
-                            }
-                        }
-
-                        if (num == 1) 
-                        { 
-                            enemycards.Add(c); 
-                        }
-                        if (num == 0)
-                        {
-                            enemycards.Add(c);
-                            enemycards.Add(c);
-                        }
-                        i++;
-                    }
-
-                    Probabilitymaker.Instance.setEnemyCards(enemycards);
                 }
 
                 if (s.StartsWith("player:"))

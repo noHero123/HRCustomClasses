@@ -18,8 +18,10 @@ namespace HREngine.Bots
         private bool useComparison = true;
         public int playaroundprob = 40;
 
-        public MiniSimulator nextTurnSimulator;
+        public MiniSimulatorNextTurn nextTurnSimulator;
         MiniSimulator mainTurnSimulator;
+
+        public EnemyTurnSimulator enemyTurnSim;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -35,7 +37,7 @@ namespace HREngine.Bots
         Playfield nextMoveGuess = new Playfield();
         public Behavior botBase = null;
 
-        private bool secondturnsim = false;
+        public bool secondturnsim = false;
         public bool playaround = false;
 
         private static Ai instance;
@@ -56,8 +58,9 @@ namespace HREngine.Bots
         {
             this.nextMoveGuess = new Playfield();
             this.nextMoveGuess.mana = -1;
-            this.nextTurnSimulator = new MiniSimulator();
+            this.nextTurnSimulator = new MiniSimulatorNextTurn();
             this.mainTurnSimulator = new MiniSimulator(maxdeep, maxwide, 0); // 0 for unlimited
+            this.enemyTurnSim = new EnemyTurnSimulator();
             this.mainTurnSimulator.setPrintingstuff(true);
         }
 
@@ -74,9 +77,9 @@ namespace HREngine.Bots
             this.secondturnsim = stts;
         }
 
-        public void setPlayAround(bool spa, int pprob)
+        public void setPlayAround(bool spa, int pprob, int pprob2)
         {
-            this.mainTurnSimulator.setPlayAround(spa, pprob);
+            this.mainTurnSimulator.setPlayAround(spa, pprob, pprob2);
             this.playaround = spa;
             this.playaroundprob = pprob;
         }

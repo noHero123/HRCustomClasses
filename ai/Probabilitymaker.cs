@@ -128,7 +128,6 @@ namespace HREngine.Bots
             return (int) (100.0 * retval);
         }
 
-
     }
 
 }

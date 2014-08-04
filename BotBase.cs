@@ -118,9 +118,14 @@ namespace HREngine.Bots
                int playaroundprob = Convert.ToInt32(HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAroundProb"));
                if (playaroundprob > 100) playaroundprob = 100;
                if (playaroundprob < 0) playaroundprob = 0;
+
+               int playaroundprob2 = Convert.ToInt32(HRSettings.Get.ReadSetting("silverfish.xml", "uai.playAroundProb2"));
+               if (playaroundprob2 < playaroundprob) playaroundprob2 = playaroundprob;
+               if (playaroundprob2 > 100) playaroundprob2 = 100;
+               if (playaroundprob2 < 0) playaroundprob2 = 0;
                if (playaround)
                {
-                   Ai.Instance.setPlayAround(playaround,playaroundprob);
+                   Ai.Instance.setPlayAround(playaround,playaroundprob, playaroundprob2);
                    Helpfunctions.Instance.ErrorLog("activated playaround");
                }
 

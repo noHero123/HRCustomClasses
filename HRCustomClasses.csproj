@@ -50,7 +50,9 @@
     <Compile Include="ai\BoardTester.cs" />
     <Compile Include="ai\ComboBreaker.cs" />
     <Compile Include="ai\BehaviorRush.cs" />
+    <Compile Include="ai\EnemyTurnSimulator.cs" />
     <Compile Include="ai\MiniSimulator.cs" />
+    <Compile Include="ai\MiniSimulatorNextTurn.cs" />
     <Compile Include="ai\Mulligan.cs" />
     <Compile Include="ai\Probabilitymaker.cs" />
     <Compile Include="BasicBot.cs" />
