@@ -71,7 +71,7 @@ namespace HREngine.Bots
             try
             {
                 this.enemyConcede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyconcede") == "true") ? true : false;
-                Helpfunctions.Instance.ErrorLog("concede whether enemy has lethal");
+               if(this.enemyConcede) Helpfunctions.Instance.ErrorLog("concede whether enemy has lethal");
             }
             catch
             {
