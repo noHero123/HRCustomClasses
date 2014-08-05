@@ -21,7 +21,7 @@ namespace SilverfishRush
         private int dirtychoice = -1;
         private int dirtytarget = -1;
 
-        Behavior behave = new BehaviorControl();
+        Behavior behave = new BehaviorRush();
 
         public SilverRush()
         {
