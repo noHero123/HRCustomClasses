@@ -3870,6 +3870,7 @@ namespace HREngine.Bots
         Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
         public Card unknownCard;
+        public bool installedWrong = false;
 
         private static CardDB instance;
 
@@ -3901,9 +3902,24 @@ namespace HREngine.Bots
             }
             catch
             {
+                string path = Settings.Instance.path;
                 Helpfunctions.Instance.logg("cant find _carddb.txt");
                 Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
                 Helpfunctions.Instance.ErrorLog("cant find _carddb.txt");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("you installed silverfish wrong");
+                Helpfunctions.Instance.ErrorLog("the path where the carddb should be installed is: " + path);
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                this.installedWrong = true;
             }
             cardlist.Clear();
             this.cardidToCardList.Clear();

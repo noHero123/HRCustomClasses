@@ -15,11 +15,13 @@ namespace HREngine.Bots
        private string choiceCardId = "";
        DateTime starttime = DateTime.Now;
        Silverfish sf;
+       bool enemyConcede = false;
 
        Behavior behave;
 
        public Bot()
        {
+           
            behave = this.getBotBehave();
            OnBattleStateUpdate = HandleOnBattleStateUpdate;
            OnMulliganStateUpdate = HandleBattleMulliganPhase;
@@ -60,10 +62,21 @@ namespace HREngine.Bots
                Helpfunctions.Instance.ErrorLog("cant read stop after # of wins");
            }
 
+           try
+           {
+               this.enemyConcede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyconcede") == "true") ? true : false;
+               Helpfunctions.Instance.ErrorLog("concede whether enemy has lethal");
+           }
+           catch
+           {
+               Helpfunctions.Instance.ErrorLog("cant read enemy concede");
+           }
+
            this.sf = new Silverfish(writeToSingleFile);
 
 
-
+           CardDB cdb = CardDB.Instance;
+           if (cdb.installedWrong) return;
 
 
            Mulligan.Instance.setAutoConcede(concede);
@@ -602,6 +615,9 @@ namespace HREngine.Bots
              }
 
              sf.updateEverything(behave);
+
+             if (Ai.Instance.bestmoveValue <= -900) { HRGame.ConcedeGame();}
+
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
             {

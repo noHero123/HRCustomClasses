@@ -485,7 +485,7 @@ namespace SilverfishRush
 
     public class Silverfish
     {
-        public int versionnumber = 97;
+        public int versionnumber = 98;
         private string botbehave = "rush";
 
         private readonly List<Minion> enemyMinions = new List<Minion>();
@@ -1494,6 +1494,8 @@ namespace SilverfishRush
         public bool logging = false;
         public bool sEnemTurn = false;
 
+        public bool attacked = false;
+
         public int attackFaceHP = 15;
 
         public int evaluatePenality = 0;
@@ -1816,6 +1818,7 @@ namespace SilverfishRush
 
         public Playfield(Playfield p)
         {
+            this.attacked = p.attacked;
             this.sEnemTurn = p.sEnemTurn;
             this.ownController = p.ownController;
             this.ownHeroEntity = p.ownHeroEntity;
@@ -2175,254 +2178,7 @@ namespace SilverfishRush
             return retval;
         }
 
-
-        public void simulateEnemysTurn(bool simulateTwoTurns, bool playaround, bool print, int pprob, int pprob2)
-        {
-            int maxwide = 20;
-
-            this.enemyAbilityReady = true;
-            this.enemyHeroNumAttackThisTurn = 0;
-            this.enemyHeroWindfury = false;
-            if (this.enemyWeaponName == CardDB.cardName.doomhammer) this.enemyHeroWindfury = true;
-            this.enemyheroImmuneWhileAttacking = false;
-            if (this.enemyWeaponName == CardDB.cardName.gladiatorslongbow) this.enemyheroImmuneWhileAttacking = true;
-            if (!this.enemyHeroFrozen && this.enemyWeaponDurability > 0) this.enemyHeroReady = true;
-            this.enemyheroAngr = this.enemyWeaponAttack;
-            bool havedonesomething = true;
-            List<Playfield> posmoves = new List<Playfield>();
-            posmoves.Add(new Playfield(this));
-            List<Playfield> temp = new List<Playfield>();
-            int deep = 0;
-            int enemMana = Math.Min(this.enemyMaxMana + 1, 10);
-
-            if (playaround && !this.loatheb)
-            {
-                int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
-                posmoves[0].value = int.MinValue;
-                enemMana = posmoves[0].EnemyCardPlaying(this.enemyHeroName, enemMana, this.enemyAnzCards, pprob, pprob2);
-                int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
-                posmoves[0].value = int.MinValue;
-                if (oldval < newval)
-                {
-                    posmoves.Clear();
-                    posmoves.Add(new Playfield(this));
-                }
-            }
-
-            foreach (Minion m in posmoves[0].enemyMinions)
-            {
-                if (m.frozen || (m.handcard.card.name == CardDB.cardName.ancientwatcher && !m.silenced))
-                {
-                    m.Ready = false;
-                    continue;
-                }
-                if (m.Angr == 0) continue;
-                m.Ready = true;
-                m.numAttacksThisTurn = 0;
-            }
-
-            //play ability!
-            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0) && !loatheb)
-            {
-                int abilityPenality = 0;
-
-                havedonesomething = true;
-                // if we have mage or priest, we have to target something####################################################
-                if (posmoves[0].enemyHeroName == HeroEnum.mage || posmoves[0].enemyHeroName == HeroEnum.priest)
-                {
-
-                    List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
-                    foreach (targett trgt in trgts)
-                    {
-                        if (trgt.target >= 100) continue;
-                        Playfield pf = new Playfield(posmoves[0]);
-                        //havedonesomething = true;
-                        //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
-                        pf.ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
-                        posmoves.Add(pf);
-                    }
-                }
-                else
-                {
-                    // the other classes dont have to target####################################################
-                    Playfield pf = new Playfield(posmoves[0]);
-
-                    //havedonesomething = true;
-                    posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, -1, -1);
-                    posmoves.Add(pf);
-                }
-
-            }
-
-            while (havedonesomething)
-            {
-
-                temp.Clear();
-                temp.AddRange(posmoves);
-                havedonesomething = false;
-                Playfield bestold = null;
-                int bestoldval = 20000000;
-                foreach (Playfield p in temp)
-                {
-
-                    if (p.complete)
-                    {
-                        continue;
-                    }
-                    List<Minion> playedMinions = new List<Minion>(8);
-
-                    foreach (Minion m in p.enemyMinions)
-                    {
-
-                        if (m.Ready && m.Angr >= 1 && !m.frozen)
-                        {
-                            //BEGIN:cut (double/similar) attacking minions out#####################################
-                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
-                            List<Minion> tempoo = new List<Minion>(playedMinions);
-                            bool dontattacked = true;
-                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
-                            foreach (Minion mnn in tempoo)
-                            {
-                                // special minions are allowed to attack in silended and unsilenced state!
-                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.cardName.ContainsKey(m.name));
-
-                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
-
-                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
-                                {
-                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
-                                    continue;
-                                }
-
-                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
-                                {
-                                    if (m.name != mnn.name) // different name -> take it
-                                    {
-                                        continue;
-                                    }
-                                    // same name -> test whether they are equal
-                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
-                                    continue;
-                                }
-
-                            }
-
-                            if (dontattacked)
-                            {
-                                playedMinions.Add(m);
-                            }
-                            else
-                            {
-                                //help.logg(m.name + " doesnt need to attack!");
-                                continue;
-                            }
-                            //END: cut (double/similar) attacking minions out#####################################
-
-                            //help.logg(m.name + " is going to attack!");
-                            List<targett> trgts = p.getAttackTargets(false);
-
-
-
-                            if (true)//(this.useCutingTargets)
-                            {
-                                trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
-                            }
-
-                            foreach (targett trgt in trgts)
-                            {
-
-                                Playfield pf = new Playfield(p);
-                                havedonesomething = true;
-                                pf.ENEMYattackWithMinion(m, trgt.target, trgt.targetEntity);
-                                posmoves.Add(pf);
-
-
-                            }
-                            if (trgts.Count == 1 && trgts[0].target == 100)//only enemy hero is available als attack
-                            {
-                                break;
-                            }
-                        }
-
-                    }
-                    // attacked with minions done
-                    // attack with hero
-                    if (p.enemyHeroReady)
-                    {
-                        List<targett> trgts = p.getAttackTargets(false);
-
-                        havedonesomething = true;
-
-
-                        if (true)//(this.useCutingTargets)
-                        {
-                            trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
-                        }
-
-                        foreach (targett trgt in trgts)
-                        {
-                            Playfield pf = new Playfield(p);
-                            pf.ENEMYattackWithWeapon(trgt.target, trgt.targetEntity, 0);
-                            posmoves.Add(pf);
-                        }
-                    }
-
-                    // use ability
-                    /// TODO check if ready after manaup
-
-                    p.endEnemyTurn();
-                    p.guessingHeroHP = this.guessingHeroHP;
-                    if (Ai.Instance.botBase.getPlayfieldValue(p) < bestoldval) // want the best enemy-play-> worst for us
-                    {
-                        bestoldval = Ai.Instance.botBase.getPlayfieldValue(p);
-                        bestold = p;
-                    }
-                    posmoves.Remove(p);
-
-                    if (posmoves.Count >= maxwide) break;
-                }
-
-                if (bestoldval <= 10000 && bestold != null)
-                {
-                    posmoves.Add(bestold);
-                }
-
-                deep++;
-                if (posmoves.Count >= maxwide) break;
-            }
-
-            foreach (Playfield p in posmoves)
-            {
-                if (!p.complete) p.endEnemyTurn();
-            }
-
-            int bestval = int.MaxValue;
-            Playfield bestplay = posmoves[0];
-            if (print) bestplay.printBoard();
-            foreach (Playfield p in posmoves)
-            {
-                p.guessingHeroHP = this.guessingHeroHP;
-                int val = Ai.Instance.botBase.getPlayfieldValue(p);
-                if (bestval > val)// we search the worst value
-                {
-                    bestplay = p;
-                    bestval = val;
-                }
-            }
-
-            this.value = bestplay.value;
-            if (simulateTwoTurns)
-            {
-                bestplay.prepareNextTurn();
-                this.value = (int)(0.5 * bestval + 0.5 * Ai.Instance.nextTurnSimulator.doallmoves(bestplay, false));
-            }
-
-
-
-        }
-
-
-        private int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount, int playAroundProb, int pap2)
+        public int EnemyCardPlaying(HeroEnum enemyHeroNamee, int currmana, int cardcount, int playAroundProb, int pap2)
         {
             int mana = currmana;
             if (cardcount == 0) return currmana;
@@ -3091,7 +2847,7 @@ namespace SilverfishRush
             return bestplace;
         }
 
-        private void endEnemyTurn()
+        public void endEnemyTurn()
         {
             endTurnEffect(false);//own turn ends
             endTurnBuffs(false);//end enemy turn
@@ -3127,7 +2883,8 @@ namespace SilverfishRush
                 guessHeroDamage();
                 if (this.guessingHeroHP >= 1)
                 {
-                    simulateEnemysTurn(simulateTwoTurns, playaround, print, pprob, pprob2);
+                    //simulateEnemysTurn(simulateTwoTurns, playaround, print, pprob, pprob2);
+                    Ai.Instance.enemyTurnSim.simulateEnemysTurn(this, simulateTwoTurns, playaround, print, pprob, pprob2);
                 }
                 this.complete = true;
             }
@@ -5436,7 +5193,6 @@ namespace SilverfishRush
             minionGetDamagedOrHealed(m, damages, heals, own, false);
         }*/
 
-
         private void minionGetDamagedOrHealed(Minion m, int damages, int heals, bool own, bool dontCalcLostDmg = false, bool isMinionattack = false)
         {
             if (m.Hp <= 0) return;
@@ -5776,6 +5532,7 @@ namespace SilverfishRush
 
         public void attackWithMinion(Minion ownMinion, int target, int targetEntity, int penality)
         {
+            this.attacked = true;
             this.evaluatePenality += penality;
             Action a = new Action();
             a.minionplay = true;
@@ -9134,6 +8891,7 @@ namespace SilverfishRush
 
         public void attackWithWeapon(int target, int targetEntity, int penality)
         {
+            this.attacked = true;
             this.evaluatePenality += penality;
             //this.ownHeroAttackedInRound = true;
             this.ownHeroNumAttackThisTurn++;
@@ -9731,8 +9489,10 @@ namespace SilverfishRush
         private bool useComparison = true;
         public int playaroundprob = 40;
 
-        public MiniSimulator nextTurnSimulator;
+        public MiniSimulatorNextTurn nextTurnSimulator;
         MiniSimulator mainTurnSimulator;
+
+        public EnemyTurnSimulator enemyTurnSim;
 
         PenalityManager penman = PenalityManager.Instance;
 
@@ -9769,8 +9529,9 @@ namespace SilverfishRush
         {
             this.nextMoveGuess = new Playfield();
             this.nextMoveGuess.mana = -1;
-            this.nextTurnSimulator = new MiniSimulator();
+            this.nextTurnSimulator = new MiniSimulatorNextTurn();
             this.mainTurnSimulator = new MiniSimulator(maxdeep, maxwide, 0); // 0 for unlimited
+            this.enemyTurnSim = new EnemyTurnSimulator();
             this.mainTurnSimulator.setPrintingstuff(true);
         }
 
@@ -10791,6 +10552,1169 @@ namespace SilverfishRush
                         }
 
                     }
+
+
+                    if (isLethalCheck)
+                    {
+                        p.complete = true;
+                    }
+                    else
+                    {
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob, this.playaroundprob2);
+                    }
+
+                    //sort stupid stuff ouf
+
+                    if (botBase.getPlayfieldValue(p) > bestoldval)
+                    {
+                        bestoldval = botBase.getPlayfieldValue(p);
+                        bestold = p;
+                    }
+                    if (!test)
+                    {
+                        posmoves.Remove(p);
+                    }
+
+                    if (this.calculated > this.totalboards) break;
+                }
+
+                if (!test && bestoldval >= -10000 && bestold != null)
+                {
+                    this.posmoves.Add(bestold);
+                }
+
+                //Helpfunctions.Instance.loggonoff(true);
+                if (this.printNormalstuff)
+                {
+                    int donec = 0;
+                    foreach (Playfield p in posmoves)
+                    {
+                        if (p.complete) donec++;
+                    }
+                    Helpfunctions.Instance.logg("deep " + deep + " len " + this.posmoves.Count + " dones " + donec);
+                }
+
+                if (!test)
+                {
+                    cuttingposibilities();
+                }
+
+                if (this.printNormalstuff)
+                {
+                    Helpfunctions.Instance.logg("cut to len " + this.posmoves.Count);
+                }
+                //Helpfunctions.Instance.loggonoff(false);
+                deep++;
+
+                if (this.calculated > this.totalboards) break;
+                if (deep >= this.maxdeep) break;//remove this?
+            }
+
+            foreach (Playfield p in posmoves)//temp
+            {
+                if (!p.complete)
+                {
+                    if (isLethalCheck)
+                    {
+                        p.complete = true;
+                    }
+                    else
+                    {
+                        p.endTurn(this.simulateSecondTurn, this.playaround, false, this.playaroundprob, this.playaroundprob2);
+                    }
+                }
+            }
+            // Helpfunctions.Instance.logg("find best ");
+            if (posmoves.Count >= 1)
+            {
+                int bestval = int.MinValue;
+                int bestanzactions = 1000;
+                Playfield bestplay = posmoves[0];//temp[0]
+                foreach (Playfield p in posmoves)//temp
+                {
+                    int val = botBase.getPlayfieldValue(p);
+                    if (bestval <= val)
+                    {
+                        if (bestval == val && bestanzactions < p.playactions.Count) continue;
+                        bestplay = p;
+                        bestval = val;
+                        bestanzactions = p.playactions.Count;
+                    }
+
+                }
+
+                this.bestmove = bestplay.getNextAction();
+                this.bestmoveValue = bestval;
+                this.bestboard = new Playfield(bestplay);
+                //Helpfunctions.Instance.logg("return");
+                return bestval;
+            }
+            //Helpfunctions.Instance.logg("return");
+            this.bestmove = null;
+            this.bestmoveValue = -100000;
+            this.bestboard = playf;
+            return -10000;
+        }
+
+        public void cuttingposibilities()
+        {
+            // take the x best values
+            int takenumber = this.maxwide;
+            List<Playfield> temp = new List<Playfield>();
+            posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
+
+            if (this.useComparison)
+            {
+                int i = 0;
+                int max = Math.Min(posmoves.Count, this.maxwide);
+
+                Playfield p = null;
+                Playfield pp = null;
+                //foreach (Playfield p in posmoves)
+                for (i = 0; i < max; i++)
+                {
+                    p = posmoves[i];
+                    int hash = p.GetHashCode();
+                    p.hashcode = hash;
+                    bool found = false;
+                    //foreach (Playfield pp in temp)
+                    for (int j = 0; j < temp.Count; j++)
+                    {
+                        pp = temp[j];
+                        if (pp.hashcode == p.hashcode)
+                        {
+                            if (pp.isEqualf(p))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) temp.Add(p);
+                    //i++;
+                    //if (i >= this.maxwide) break;
+
+                }
+
+
+            }
+            else
+            {
+                temp.AddRange(posmoves);
+            }
+            posmoves.Clear();
+            posmoves.AddRange(temp.GetRange(0, Math.Min(takenumber, temp.Count)));
+            //posmoves.Clear();
+            //posmoves.AddRange(Helpfunctions.TakeList(temp, takenumber));
+
+        }
+
+        public List<targett> cutAttackTargets(List<targett> oldlist, Playfield p, bool own)
+        {
+            List<targett> retvalues = new List<targett>();
+            List<Minion> addedmins = new List<Minion>(8);
+
+            bool priomins = false;
+            List<targett> retvaluesPrio = new List<targett>();
+            foreach (targett t in oldlist)
+            {
+                if ((own && t.target == 200) || (!own && t.target == 100))
+                {
+                    retvalues.Add(t);
+                    continue;
+                }
+                if ((own && t.target >= 10 && t.target <= 19) || (!own && t.target >= 0 && t.target <= 9))
+                {
+                    Minion m = null;
+                    if (own) m = p.enemyMinions[t.target - 10];
+                    if (!own) m = p.ownMinions[t.target];
+                    /*if (penman.priorityDatabase.ContainsKey(m.name))
+                    {
+                        //retvalues.Add(t);
+                        retvaluesPrio.Add(t);
+                        priomins = true;
+                        //help.logg(m.name + " is added to targetlist");
+                        continue;
+                    }*/
+
+
+                    bool goingtoadd = true;
+                    List<Minion> temp = new List<Minion>(addedmins);
+                    bool isSpecial = pen.specialMinions.ContainsKey(m.name);
+                    foreach (Minion mnn in temp)
+                    {
+                        // special minions are allowed to attack in silended and unsilenced state!
+                        //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                        bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
+
+                        if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                        {
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
+                        if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                        {
+                            if (m.name != mnn.name) // different name -> take it
+                            {
+                                continue;
+                            }
+                            // same name -> test whether they are equal
+                            if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) goingtoadd = false;
+                            continue;
+                        }
+
+                    }
+
+                    if (goingtoadd)
+                    {
+                        addedmins.Add(m);
+                        retvalues.Add(t);
+                        //help.logg(m.name + " " + m.id +" is added to targetlist");
+                    }
+                    else
+                    {
+                        //help.logg(m.name + " is not needed to attack");
+                        continue;
+                    }
+
+                }
+            }
+            //help.logg("end targetcutting");
+            if (priomins) return retvaluesPrio;
+
+            return retvalues;
+        }
+
+        public void printPosmoves()
+        {
+            foreach (Playfield p in this.posmoves)
+            {
+                p.printBoard();
+            }
+        }
+
+    }
+
+    public class EnemyTurnSimulator
+    {
+
+        private List<Playfield> posmoves = new List<Playfield>(7000);
+        private int maxwide = 20;
+
+
+        public void simulateEnemysTurn(Playfield rootfield, bool simulateTwoTurns, bool playaround, bool print, int pprob, int pprob2)
+        {
+            bool havedonesomething = true;
+            posmoves.Clear();
+
+            rootfield.enemyAbilityReady = true;
+            rootfield.enemyHeroNumAttackThisTurn = 0;
+            rootfield.enemyHeroWindfury = false;
+            if (rootfield.enemyWeaponName == CardDB.cardName.doomhammer) rootfield.enemyHeroWindfury = true;
+            rootfield.enemyheroImmuneWhileAttacking = false;
+            if (rootfield.enemyWeaponName == CardDB.cardName.gladiatorslongbow) rootfield.enemyheroImmuneWhileAttacking = true;
+            if (!rootfield.enemyHeroFrozen && rootfield.enemyWeaponDurability > 0) rootfield.enemyHeroReady = true;
+            rootfield.enemyheroAngr = rootfield.enemyWeaponAttack;
+
+            posmoves.Add(new Playfield(rootfield));
+            List<Playfield> temp = new List<Playfield>();
+            int deep = 0;
+            int enemMana = Math.Min(rootfield.enemyMaxMana + 1, 10);
+
+            if (playaround && !rootfield.loatheb)
+            {
+                int oldval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                enemMana = posmoves[0].EnemyCardPlaying(rootfield.enemyHeroName, enemMana, rootfield.enemyAnzCards, pprob, pprob2);
+                int newval = Ai.Instance.botBase.getPlayfieldValue(posmoves[0]);
+                posmoves[0].value = int.MinValue;
+                if (oldval < newval)
+                {
+                    posmoves.Clear();
+                    posmoves.Add(new Playfield(rootfield));
+                }
+            }
+
+            foreach (Minion m in posmoves[0].enemyMinions)
+            {
+                if (m.frozen || (m.handcard.card.name == CardDB.cardName.ancientwatcher && !m.silenced))
+                {
+                    m.Ready = false;
+                    continue;
+                }
+                if (m.Angr == 0) continue;
+                m.Ready = true;
+                m.numAttacksThisTurn = 0;
+            }
+
+            //play ability!
+            if (posmoves[0].enemyAbilityReady && enemMana >= 2 && posmoves[0].enemyHeroAblility.canplayCard(posmoves[0], 0) && !rootfield.loatheb)
+            {
+                int abilityPenality = 0;
+
+                havedonesomething = true;
+                // if we have mage or priest, we have to target something####################################################
+                if (posmoves[0].enemyHeroName == HeroEnum.mage || posmoves[0].enemyHeroName == HeroEnum.priest)
+                {
+
+                    List<targett> trgts = posmoves[0].enemyHeroAblility.getTargetsForCardEnemy(posmoves[0]);
+                    foreach (targett trgt in trgts)
+                    {
+                        if (trgt.target >= 100) continue;
+                        Playfield pf = new Playfield(posmoves[0]);
+                        //havedonesomething = true;
+                        //Helpfunctions.Instance.logg("use ability on " + trgt.target + " " + trgt.targetEntity);
+                        pf.ENEMYactivateAbility(posmoves[0].enemyHeroAblility, trgt.target, trgt.targetEntity);
+                        posmoves.Add(pf);
+                    }
+                }
+                else
+                {
+                    // the other classes dont have to target####################################################
+                    Playfield pf = new Playfield(posmoves[0]);
+
+                    //havedonesomething = true;
+                    posmoves[0].ENEMYactivateAbility(posmoves[0].enemyHeroAblility, -1, -1);
+                    posmoves.Add(pf);
+                }
+
+            }
+
+            while (havedonesomething)
+            {
+
+                temp.Clear();
+                temp.AddRange(posmoves);
+                havedonesomething = false;
+                Playfield bestold = null;
+                int bestoldval = 20000000;
+                foreach (Playfield p in temp)
+                {
+
+                    if (p.complete)
+                    {
+                        continue;
+                    }
+                    List<Minion> playedMinions = new List<Minion>(8);
+
+                    foreach (Minion m in p.enemyMinions)
+                    {
+
+                        if (m.Ready && m.Angr >= 1 && !m.frozen)
+                        {
+                            //BEGIN:cut (double/similar) attacking minions out#####################################
+                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
+                            List<Minion> tempoo = new List<Minion>(playedMinions);
+                            bool dontattacked = true;
+                            bool isSpecial = PenalityManager.Instance.specialMinions.ContainsKey(m.name);
+                            foreach (Minion mnn in tempoo)
+                            {
+                                // special minions are allowed to attack in silended and unsilenced state!
+                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.cardName.ContainsKey(m.name));
+
+                                bool otherisSpecial = PenalityManager.Instance.specialMinions.ContainsKey(mnn.name);
+
+                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                                {
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                                {
+                                    if (m.name != mnn.name) // different name -> take it
+                                    {
+                                        continue;
+                                    }
+                                    // same name -> test whether they are equal
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                            }
+
+                            if (dontattacked)
+                            {
+                                playedMinions.Add(m);
+                            }
+                            else
+                            {
+                                //help.logg(m.name + " doesnt need to attack!");
+                                continue;
+                            }
+                            //END: cut (double/similar) attacking minions out#####################################
+
+                            //help.logg(m.name + " is going to attack!");
+                            List<targett> trgts = p.getAttackTargets(false);
+
+
+
+                            if (true)//(this.useCutingTargets)
+                            {
+                                trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
+                            }
+
+                            foreach (targett trgt in trgts)
+                            {
+
+                                Playfield pf = new Playfield(p);
+                                havedonesomething = true;
+                                pf.ENEMYattackWithMinion(m, trgt.target, trgt.targetEntity);
+                                posmoves.Add(pf);
+
+
+                            }
+                            if (trgts.Count == 1 && trgts[0].target == 100)//only enemy hero is available als attack
+                            {
+                                break;
+                            }
+                        }
+
+                    }
+                    // attacked with minions done
+                    // attack with hero
+                    if (p.enemyHeroReady)
+                    {
+                        List<targett> trgts = p.getAttackTargets(false);
+
+                        havedonesomething = true;
+
+
+                        if (true)//(this.useCutingTargets)
+                        {
+                            trgts = Ai.Instance.nextTurnSimulator.cutAttackTargets(trgts, p, false);
+                        }
+
+                        foreach (targett trgt in trgts)
+                        {
+                            Playfield pf = new Playfield(p);
+                            pf.ENEMYattackWithWeapon(trgt.target, trgt.targetEntity, 0);
+                            posmoves.Add(pf);
+                        }
+                    }
+
+                    // use ability
+                    /// TODO check if ready after manaup
+
+                    p.endEnemyTurn();
+                    p.guessingHeroHP = rootfield.guessingHeroHP;
+                    if (Ai.Instance.botBase.getPlayfieldValue(p) < bestoldval) // want the best enemy-play-> worst for us
+                    {
+                        bestoldval = Ai.Instance.botBase.getPlayfieldValue(p);
+                        bestold = p;
+                    }
+                    posmoves.Remove(p);
+
+                    if (posmoves.Count >= maxwide) break;
+                }
+
+                if (bestoldval <= 10000 && bestold != null)
+                {
+                    posmoves.Add(bestold);
+                }
+
+                deep++;
+                if (posmoves.Count >= maxwide) break;
+            }
+
+            foreach (Playfield p in posmoves)
+            {
+                if (!p.complete) p.endEnemyTurn();
+            }
+
+            int bestval = int.MaxValue;
+            Playfield bestplay = posmoves[0];
+            if (print) bestplay.printBoard();
+            foreach (Playfield p in posmoves)
+            {
+                p.guessingHeroHP = rootfield.guessingHeroHP;
+                int val = Ai.Instance.botBase.getPlayfieldValue(p);
+                if (bestval > val)// we search the worst value
+                {
+                    bestplay = p;
+                    bestval = val;
+                }
+            }
+
+            rootfield.value = bestplay.value;
+            if (simulateTwoTurns)
+            {
+                bestplay.prepareNextTurn();
+                rootfield.value = (int)(0.5 * bestval + 0.5 * Ai.Instance.nextTurnSimulator.doallmoves(bestplay, false));
+            }
+
+
+
+        }
+
+
+    }
+
+    public class MiniSimulatorNextTurn
+    {
+        //#####################################################################################################################
+        private int maxdeep = 6;
+        private int maxwide = 10;
+        private int totalboards = 50;
+        private bool usePenalityManager = true;
+        private bool useCutingTargets = true;
+        private bool dontRecalc = true;
+        private bool useLethalCheck = true;
+        private bool useComparison = true;
+
+
+        private bool printNormalstuff = false;
+
+        List<Playfield> posmoves = new List<Playfield>(7000);
+
+        public Action bestmove = new Action();
+        public int bestmoveValue = 0;
+        public Playfield bestboard = new Playfield();
+
+        public Behavior botBase = null;
+        private int calculated = 0;
+
+        private bool simulateSecondTurn = false;
+        private bool playaround = false;
+        private int playaroundprob = 50;
+        private int playaroundprob2 = 80;
+
+
+        PenalityManager pen = PenalityManager.Instance;
+
+        public MiniSimulatorNextTurn()
+        {
+        }
+
+        public void updateParams(int deep, int wide, int ttlboards)
+        {
+            this.maxdeep = deep;
+            this.maxwide = wide;
+            this.totalboards = ttlboards;
+        }
+
+        public void setPrintingstuff(bool sp)
+        {
+            this.printNormalstuff = sp;
+        }
+
+        public void setSecondTurnSimu(bool sts)
+        {
+            this.simulateSecondTurn = sts;
+        }
+
+        public void setPlayAround(bool spa, int pprob, int pprob2)
+        {
+            this.playaround = spa;
+            this.playaroundprob = pprob;
+            this.playaroundprob2 = pprob2;
+        }
+
+        private void addToPosmoves(Playfield pf)
+        {
+            if (pf.ownHeroHp <= 0) return;
+            /*foreach (Playfield p in this.posmoves)
+            {
+                if (pf.isEqual(p, false)) return;
+            }*/
+            this.posmoves.Add(pf);
+            //posmoves.Sort((a, b) => -(botBase.getPlayfieldValue(a)).CompareTo(botBase.getPlayfieldValue(b)));//want to keep the best
+            //if (posmoves.Count > this.maxwide) posmoves.RemoveAt(this.maxwide);
+            if (this.totalboards >= 1)
+            {
+                this.calculated++;
+            }
+        }
+
+        private bool doAllChoices(Playfield p, Handmanager.Handcard hc, bool lethalcheck)
+        {
+            bool havedonesomething = false;
+
+            for (int i = 1; i < 3; i++)
+            {
+                CardDB.Card c = hc.card;
+                if (c.name == CardDB.cardName.keeperofthegrove)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
+                    }
+                }
+
+                if (c.name == CardDB.cardName.starfall)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007b);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_007a);
+                    }
+                }
+
+                if (c.name == CardDB.cardName.ancientoflore)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.NEW1_008b);
+                    }
+                }
+
+                if (c.name == CardDB.cardName.powerofthewild)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160b);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_160a);
+                    }
+                }
+                if (c.name == CardDB.cardName.ancientofwar)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_178b);
+                    }
+                }
+                if (c.name == CardDB.cardName.druidoftheclaw)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t1);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_165t2);
+                    }
+                }
+                //cenarius dont need
+                if (c.name == CardDB.cardName.keeperofthegrove)//keeper of the grove
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_166b);
+                    }
+                }
+                if (c.name == CardDB.cardName.markofnature)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_155b);
+                    }
+                }
+                if (c.name == CardDB.cardName.nourish)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_164b);
+                    }
+                }
+                if (c.name == CardDB.cardName.wrath)
+                {
+                    if (i == 1)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154a);
+                    }
+                    if (i == 2)
+                    {
+                        c = CardDB.Instance.getCardDataFromID(CardDB.cardIDEnum.EX1_154b);
+                    }
+                }
+
+                if (c.canplayCard(p, hc.manacost))
+                {
+                    havedonesomething = true;
+
+
+
+                    int bestplace = p.getBestPlace(c, lethalcheck);
+                    List<targett> trgts = c.getTargetsForCard(p);
+                    int cardplayPenality = 0;
+                    if (trgts.Count == 0)
+                    {
+
+
+                        if (usePenalityManager)
+                        {
+                            cardplayPenality = pen.getPlayCardPenality(hc.card, -1, p, i, lethalcheck);
+                            if (cardplayPenality <= 499)
+                            {
+                                //help.logg(hc.card.name + " is played");
+                                Playfield pf = new Playfield(p);
+                                pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                                addToPosmoves(pf);
+                            }
+                        }
+                        else
+                        {
+                            Playfield pf = new Playfield(p);
+                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, i, bestplace, cardplayPenality);
+                            addToPosmoves(pf);
+                        }
+
+                    }
+                    else
+                    {
+                        foreach (targett trgt in trgts)
+                        {
+
+                            if (usePenalityManager)
+                            {
+                                cardplayPenality = pen.getPlayCardPenality(hc.card, trgt.target, p, 0, lethalcheck);
+                                if (cardplayPenality <= 499)
+                                {
+                                    //help.logg(hc.card.name + " is played");
+                                    Playfield pf = new Playfield(p);
+                                    pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                    addToPosmoves(pf);
+                                }
+                            }
+                            else
+                            {
+                                Playfield pf = new Playfield(p);
+                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, i, bestplace, cardplayPenality);
+                                addToPosmoves(pf);
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+
+            return havedonesomething;
+        }
+
+        public int doallmoves(Playfield playf, bool isLethalCheck)
+        {
+            //Helpfunctions.Instance.logg("NXTTRN" + playf.mana);
+            if (botBase == null) botBase = Ai.Instance.botBase;
+            bool test = false;
+            this.posmoves.Clear();
+            this.addToPosmoves(playf);
+            bool havedonesomething = true;
+            List<Playfield> temp = new List<Playfield>();
+            int deep = 0;
+            //Helpfunctions.Instance.logg("NXTTRN" + playf.mana + " " + posmoves.Count);
+            this.calculated = 0;
+            while (havedonesomething)
+            {
+                if (this.printNormalstuff) Helpfunctions.Instance.logg("ailoop");
+                GC.Collect();
+                temp.Clear();
+                temp.AddRange(this.posmoves);
+                havedonesomething = false;
+                Playfield bestold = null;
+                int bestoldval = -20000000;
+                foreach (Playfield p in temp)
+                {
+
+                    if (p.complete || p.ownHeroHp <= 0)
+                    {
+                        continue;
+                    }
+
+                    //take a card and play it
+
+                    if (!p.attacked)
+                    {
+
+                        List<CardDB.cardName> playedcards = new List<CardDB.cardName>();
+                        foreach (Handmanager.Handcard hc in p.owncards)
+                        {
+                            if (this.calculated > this.totalboards) continue;
+                            CardDB.Card c = hc.card;
+                            //help.logg("try play crd" + c.name + " " + c.getManaCost(p) + " " + c.canplayCard(p));
+                            if (playedcards.Contains(c.name)) continue; // dont play the same card in one loop
+                            playedcards.Add(c.name);
+                            if (c.choice)
+                            {
+                                if (doAllChoices(p, hc, isLethalCheck))
+                                {
+                                    havedonesomething = true;
+                                }
+                            }
+                            else
+                            {
+                                int bestplace = p.getBestPlace(c, isLethalCheck);
+                                if (hc.canplayCard(p))
+                                {
+                                    havedonesomething = true;
+                                    List<targett> trgts = c.getTargetsForCard(p);
+
+                                    if (isLethalCheck && (pen.DamageTargetDatabase.ContainsKey(c.name) || pen.DamageTargetSpecialDatabase.ContainsKey(c.name)))// only target enemy hero during Lethal check!
+                                    {
+                                        targett trg = trgts.Find(x => x.target == 200);
+                                        if (trg != null)
+                                        {
+                                            trgts.Clear();
+                                            trgts.Add(trg);
+                                        }
+                                        else
+                                        {
+                                            // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                            if (trgts.Count >= 1)
+                                            {
+                                                trg = trgts[0];
+                                                trgts.Clear();
+                                                trgts.Add(trg);
+                                            }
+                                        }
+                                    }
+
+
+                                    int cardplayPenality = 0;
+
+                                    if (trgts.Count == 0)
+                                    {
+
+
+                                        if (usePenalityManager)
+                                        {
+                                            cardplayPenality = pen.getPlayCardPenality(c, -1, p, 0, isLethalCheck);
+                                            if (cardplayPenality <= 499)
+                                            {
+                                                Playfield pf = new Playfield(p);
+                                                havedonesomething = true;
+                                                pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                                addToPosmoves(pf);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Playfield pf = new Playfield(p);
+                                            havedonesomething = true;
+                                            pf.playCard(hc, hc.position - 1, hc.entity, -1, -1, 0, bestplace, cardplayPenality);
+                                            addToPosmoves(pf);
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        if (isLethalCheck)// only target enemy hero during Lethal check!
+                                        {
+                                            targett trg = trgts.Find(x => x.target == 200);
+                                            if (trg != null)
+                                            {
+                                                trgts.Clear();
+                                                trgts.Add(trg);
+                                            }
+                                        }
+
+                                        foreach (targett trgt in trgts)
+                                        {
+
+
+                                            if (usePenalityManager)
+                                            {
+                                                cardplayPenality = pen.getPlayCardPenality(c, trgt.target, p, 0, isLethalCheck);
+                                                if (cardplayPenality <= 499)
+                                                {
+                                                    Playfield pf = new Playfield(p);
+                                                    havedonesomething = true;
+                                                    pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                    addToPosmoves(pf);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Playfield pf = new Playfield(p);
+                                                havedonesomething = true;
+                                                pf.playCard(hc, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                                                addToPosmoves(pf);
+                                            }
+
+                                        }
+
+                                    }
+
+
+                                }
+                            }
+                        }
+
+
+
+                        // use ability
+                        /// TODO check if ready after manaup
+                        if (p.ownAbilityReady && p.mana >= 2 && p.ownHeroAblility.canplayCard(p, 2))
+                        {
+                            if (this.calculated > this.totalboards) continue;
+                            int abilityPenality = 0;
+
+                            havedonesomething = true;
+                            // if we have mage or priest, we have to target something####################################################
+                            if (p.ownHeroName == HeroEnum.mage || p.ownHeroName == HeroEnum.priest)
+                            {
+
+                                List<targett> trgts = p.ownHeroAblility.getTargetsForCard(p);
+
+                                if (isLethalCheck && (p.ownHeroName == HeroEnum.mage || (p.ownHeroName == HeroEnum.priest && (p.ownHeroAblility.name != CardDB.cardName.lesserheal || (p.ownHeroAblility.name == CardDB.cardName.lesserheal && p.auchenaiseelenpriesterin)))))// only target enemy hero during Lethal check!
+                                {
+                                    targett trg = trgts.Find(x => x.target == 200);
+                                    if (trg != null)
+                                    {
+                                        trgts.Clear();
+                                        trgts.Add(trg);
+                                    }
+                                    else
+                                    {
+                                        // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                        if (trgts.Count >= 1)
+                                        {
+                                            trg = trgts[0];
+                                            trgts.Clear();
+                                            trgts.Add(trg);
+                                        }
+                                    }
+                                }
+
+                                foreach (targett trgt in trgts)
+                                {
+
+
+
+                                    if (usePenalityManager)
+                                    {
+                                        abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, trgt.target, p, 0, isLethalCheck);
+                                        if (abilityPenality <= 499)
+                                        {
+                                            Playfield pf = new Playfield(p);
+                                            havedonesomething = true;
+                                            pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                            addToPosmoves(pf);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Playfield pf = new Playfield(p);
+                                        havedonesomething = true;
+                                        pf.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                                        addToPosmoves(pf);
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                // the other classes dont have to target####################################################
+                                Playfield pf = new Playfield(p);
+
+                                if (usePenalityManager)
+                                {
+                                    abilityPenality = pen.getPlayCardPenality(p.ownHeroAblility, -1, pf, 0, isLethalCheck);
+                                    if (abilityPenality <= 499)
+                                    {
+                                        havedonesomething = true;
+                                        pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                        addToPosmoves(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    havedonesomething = true;
+                                    pf.activateAbility(p.ownHeroAblility, -1, -1, abilityPenality);
+                                    addToPosmoves(pf);
+                                }
+
+                            }
+
+                        }
+
+                    }
+                    //attack with a minion
+
+                    List<Minion> playedMinions = new List<Minion>(8);
+
+                    foreach (Minion m in p.ownMinions)
+                    {
+                        if (this.calculated > this.totalboards) continue;
+
+                        if (m.Ready && m.Angr >= 1 && !m.frozen)
+                        {
+                            //BEGIN:cut (double/similar) attacking minions out#####################################
+                            // DONT LET SIMMILAR MINIONS ATTACK IN ONE TURN (example 3 unlesh the hounds-hounds doesnt need to simulated hole)
+                            List<Minion> tempoo = new List<Minion>(playedMinions);
+                            bool dontattacked = true;
+                            bool isSpecial = pen.specialMinions.ContainsKey(m.name);
+                            foreach (Minion mnn in tempoo)
+                            {
+                                // special minions are allowed to attack in silended and unsilenced state!
+                                //help.logg(mnn.silenced + " " + m.silenced + " " + mnn.name + " " + m.name + " " + penman.specialMinions.ContainsKey(m.name));
+
+                                bool otherisSpecial = pen.specialMinions.ContainsKey(mnn.name);
+
+                                if ((!isSpecial || (isSpecial && m.silenced)) && (!otherisSpecial || (otherisSpecial && mnn.silenced))) // both are not special, if they are the same, dont add
+                                {
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                                if (isSpecial == otherisSpecial && !m.silenced && !mnn.silenced) // same are special
+                                {
+                                    if (m.name != mnn.name) // different name -> take it
+                                    {
+                                        continue;
+                                    }
+                                    // same name -> test whether they are equal
+                                    if (mnn.Angr == m.Angr && mnn.Hp == m.Hp && mnn.divineshild == m.divineshild && mnn.taunt == m.taunt && mnn.poisonous == m.poisonous) dontattacked = false;
+                                    continue;
+                                }
+
+                            }
+
+                            if (dontattacked)
+                            {
+                                playedMinions.Add(m);
+                            }
+                            else
+                            {
+                                //help.logg(m.name + " doesnt need to attack!");
+                                continue;
+                            }
+                            //END: cut (double/similar) attacking minions out#####################################
+
+                            //help.logg(m.name + " is going to attack!");
+                            List<targett> trgts = p.getAttackTargets(true);
+
+
+                            if (isLethalCheck)// only target enemy hero during Lethal check!
+                            {
+                                targett trg = trgts.Find(x => x.target == 200);
+                                if (trg != null)
+                                {
+                                    trgts.Clear();
+                                    trgts.Add(trg);
+                                }
+                                else
+                                {
+                                    // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                    if (trgts.Count >= 1)
+                                    {
+                                        trg = trgts[0];
+                                        trgts.Clear();
+                                        trgts.Add(trg);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
+                            }
+
+                            foreach (targett trgt in trgts)
+                            {
+
+
+                                int attackPenality = 0;
+
+                                if (usePenalityManager)
+                                {
+                                    attackPenality = pen.getAttackWithMininonPenality(m, p, trgt.target, isLethalCheck);
+                                    if (attackPenality <= 499)
+                                    {
+                                        Playfield pf = new Playfield(p);
+                                        havedonesomething = true;
+                                        pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                        addToPosmoves(pf);
+                                    }
+                                }
+                                else
+                                {
+                                    Playfield pf = new Playfield(p);
+                                    havedonesomething = true;
+                                    pf.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                                    addToPosmoves(pf);
+                                }
+
+
+                            }
+                            if ((!m.stealth || isLethalCheck) && p.enemySecretCount == 0 && trgts.Count == 1 && trgts[0].target == 200)//only enemy hero is available als attack
+                            {
+                                break;
+                            }
+                        }
+
+                    }
+
+                    // attack with hero
+                    if (p.ownHeroReady)
+                    {
+                        if (this.calculated > this.totalboards) continue;
+                        List<targett> trgts = p.getAttackTargets(true);
+
+                        havedonesomething = true;
+
+                        if (isLethalCheck)// only target enemy hero during Lethal check!
+                        {
+                            targett trg = trgts.Find(x => x.target == 200);
+                            if (trg != null)
+                            {
+                                trgts.Clear();
+                                trgts.Add(trg);
+                            }
+                            else
+                            {
+                                // no enemy hero -> enemy have taunts ->kill the taunts from left to right
+                                if (trgts.Count >= 1)
+                                {
+                                    trg = trgts[0];
+                                    trgts.Clear();
+                                    trgts.Add(trg);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (this.useCutingTargets) trgts = this.cutAttackTargets(trgts, p, true);
+                        }
+
+                        foreach (targett trgt in trgts)
+                        {
+                            Playfield pf = new Playfield(p);
+                            int heroAttackPen = 0;
+                            if (usePenalityManager)
+                            {
+                                heroAttackPen = pen.getAttackWithHeroPenality(trgt.target, p, isLethalCheck);
+                            }
+                            pf.attackWithWeapon(trgt.target, trgt.targetEntity, heroAttackPen);
+                            addToPosmoves(pf);
+                        }
+                    }
+
+
 
 
                     if (isLethalCheck)
@@ -18822,9 +19746,6 @@ namespace SilverfishRush
                 }
 
 
-
-
-
                 switch (this.name)
                 {
                     case CardDB.cardName.dreadcorsair:
@@ -18927,6 +19848,7 @@ namespace SilverfishRush
         Dictionary<cardIDEnum, Card> cardidToCardList = new Dictionary<cardIDEnum, Card>();
         List<string> allCardIDS = new List<string>();
         public Card unknownCard;
+        public bool installedWrong = false;
 
         private static CardDB instance;
 
@@ -18958,9 +19880,24 @@ namespace SilverfishRush
             }
             catch
             {
+                string path = Settings.Instance.path;
                 Helpfunctions.Instance.logg("cant find _carddb.txt");
                 Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
                 Helpfunctions.Instance.ErrorLog("cant find _carddb.txt");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("you installed silverfish wrong");
+                Helpfunctions.Instance.ErrorLog("the path where the carddb should be installed is: " + path);
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                this.installedWrong = true;
             }
             cardlist.Clear();
             this.cardidToCardList.Clear();
@@ -21142,5 +22079,6 @@ namespace SilverfishRush
             this.targetEntity = ent;
         }
     }
+
 
 }
