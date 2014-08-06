@@ -8031,6 +8031,7 @@ namespace HREngine.Bots
         {
             foreach (Action a in this.playactions)
             {
+                
                 if (a.cardplay)
                 {
                     Helpfunctions.Instance.logg("play " + a.handcard.card.name);
@@ -8070,6 +8071,108 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.logg("");
             }
         }
+
+
+        public void printActionforDummies(Action a)
+        {
+                if (a.cardplay)
+                {
+                    Helpfunctions.Instance.ErrorLog("play " + a.handcard.card.name);
+                    if (a.druidchoice >= 1)
+                    {
+                        string choose = (a.druidchoice == 1) ? "left card" : "right card";
+                        Helpfunctions.Instance.ErrorLog("choose the " + choose);
+                    }
+                    if (a.owntarget >= 0)
+                    {
+                        Helpfunctions.Instance.ErrorLog("on position " + a.owntarget);
+                    }
+                    if (a.enemytarget >= 0)
+                    {
+                        if (a.enemytarget >= 10 && a.enemytarget <= 19)
+                        {
+                            string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                            Helpfunctions.Instance.ErrorLog("and target to the enemy " + ename);
+                        }
+
+                        if (a.enemytarget >= 0 && a.enemytarget <= 9)
+                        {
+                            string ename = "" + this.ownMinions[a.enemytarget].name;
+                            Helpfunctions.Instance.ErrorLog("and target to your own" + ename);
+                        }
+
+                        if (a.enemytarget == 100)
+                        {
+                            Helpfunctions.Instance.ErrorLog("and target your own hero");
+                        }
+
+                        if (a.enemytarget == 200)
+                        {
+                            Helpfunctions.Instance.ErrorLog("and target to the enemy hero");
+                        }
+                    }
+                    
+                }
+                if (a.minionplay)
+                {
+                    string name = "" + this.ownMinions[a.owntarget].name;
+                    if (a.enemytarget == 200)
+                    {
+                        Helpfunctions.Instance.ErrorLog("attack with: " + name + " the enemy hero");
+                    }
+                    else
+                    {
+                        string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                        Helpfunctions.Instance.ErrorLog("attack with: " + name + " the enemy: " + ename);
+                    }
+                  
+                }
+
+                if (a.heroattack)
+                {
+                    if (a.enemytarget == 200)
+                    {
+                        Helpfunctions.Instance.ErrorLog("attack with your hero the enemy hero!");
+                    }
+                    else
+                    {
+                        string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                        Helpfunctions.Instance.ErrorLog("attack with the hero, and choose the enemy: " + ename);
+                    }
+                }
+                if (a.useability)
+                {
+                    Helpfunctions.Instance.ErrorLog("use your Heropower ");
+                    if (a.enemytarget >= 0)
+                    {
+                        if (a.enemytarget >= 10 && a.enemytarget <=19)
+                        {
+                            string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                            Helpfunctions.Instance.ErrorLog("on enemy: " + ename);
+                        }
+
+                        if (a.enemytarget >= 0 && a.enemytarget <= 9)
+                        {
+                            string ename = "" + this.ownMinions[a.enemytarget].name;
+                            Helpfunctions.Instance.ErrorLog("on your own: " + ename);
+                        }
+
+                        if (a.enemytarget == 100)
+                        {
+                            Helpfunctions.Instance.ErrorLog("on your own hero");
+                        }
+
+                        if (a.enemytarget == 200)
+                        {
+                            Helpfunctions.Instance.ErrorLog("on your the enemy hero");
+                        }
+
+                    }
+                }
+                Helpfunctions.Instance.ErrorLog("");
+            
+        }
+
 
     }
 

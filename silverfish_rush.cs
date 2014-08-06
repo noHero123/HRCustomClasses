@@ -20,20 +20,44 @@ namespace HREngine.Bots
         private int dirtytarget = -1;
         private int dirtychoice = -1;
         private string choiceCardId = "";
-        PenalityManager penman = PenalityManager.Instance;
         DateTime starttime = DateTime.Now;
         Silverfish sf;
         bool enemyConcede = false;
+
+        public bool learnmode = true;
+        public bool printlearnmode = true;
+
         Behavior behave = new BehaviorRush();
+
+
+
+        //crawlerstuff
+        bool isgoingtoconcede = false;
+        int wins = 0;
+        int loses = 0;
 
         public Bot()
         {
-
+            OnVictory = HandleWining;
+            OnLost = HandleLosing;
             OnBattleStateUpdate = HandleOnBattleStateUpdate;
             OnMulliganStateUpdate = HandleBattleMulliganPhase;
             starttime = DateTime.Now;
             bool concede = false;
             bool writeToSingleFile = false;
+
+            try
+            {
+                this.learnmode = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.wwuaid") == "true") ? true : false;
+                if (this.learnmode)
+                {
+                    Helpfunctions.Instance.ErrorLog("Learn mode is ON");
+                }
+            }
+            catch
+            {
+                Helpfunctions.Instance.ErrorLog("a wild error occurrs! cant read the settings...");
+            }
             try
             {
                 concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
@@ -71,7 +95,7 @@ namespace HREngine.Bots
             try
             {
                 this.enemyConcede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.enemyconcede") == "true") ? true : false;
-               if(this.enemyConcede) Helpfunctions.Instance.ErrorLog("concede whether enemy has lethal");
+                if (this.enemyConcede) Helpfunctions.Instance.ErrorLog("concede whether enemy has lethal");
             }
             catch
             {
@@ -80,9 +104,9 @@ namespace HREngine.Bots
 
             this.sf = new Silverfish(writeToSingleFile);
 
+
             CardDB cdb = CardDB.Instance;
             if (cdb.installedWrong) return;
-
 
 
             Mulligan.Instance.setAutoConcede(concede);
@@ -184,52 +208,13 @@ namespace HREngine.Bots
         int oldwin = 0;
         private bool autoconcede()
         {
-            int totalwin = 0;
-            int totallose = 0;
-            string[] lines = new string[0] { };
-            try
-            {
-                string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-                lines = System.IO.File.ReadAllLines(path + "Settings.ini");
-            }
-            catch
-            {
-                Helpfunctions.Instance.logg("cant find Settings.ini");
-            }
-            foreach (string s in lines)
-            {
-                if (s.Contains("bot.stats.victory"))
-                {
-                    int val1 = s.Length;
-                    string temp1 = s.Substring(18, (val1 - 18));
-                    //HRLog.Write(temp1);
-                    totalwin = int.Parse(temp1);
-                }
-                else if (s.Contains("bot.stats.defeat"))
-                {
-                    int val2 = s.Length;
-                    string temp2 = s.Substring(17, (val2 - 17));
-                    //HRLog.Write(temp2);
-                    totallose = int.Parse(temp2);
-                }
-            }
-
-
-
-            if ((totalwin + totallose - KeepConcede) != 0)
+            int totalwin = this.wins;
+            int totallose = this.loses;
+            /*if ((totalwin + totallose - KeepConcede) != 0)
             {
                 Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
-            }
-            if (totalwin >= this.stopAfterWins)
-            {
-                if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return false;
-                Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins!");
-                KeepConcede++;
-                HRGame.ConcedeGame();
-                disableRelogger();
-                HREngine.API.HRGame.OpenScene(HRGameMode.ARENA);
-                return true;
-            }
+            }*/
+
 
             if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return false;
             int curlvl = HRPlayer.GetLocalPlayer().GetRank();
@@ -239,8 +224,7 @@ namespace HREngine.Bots
                 this.oldwin = totalwin;
                 Helpfunctions.Instance.ErrorLog("not today!! (you won a game)");
                 KeepConcede++;
-                writeSettings();
-                HRGame.ConcedeGame();
+                this.isgoingtoconcede = true;
                 return true;
             }
 
@@ -249,8 +233,7 @@ namespace HREngine.Bots
                 this.lossedtodo--;
                 Helpfunctions.Instance.ErrorLog("not today!");
                 KeepConcede++;
-                writeSettings();
-                HRGame.ConcedeGame();
+                this.isgoingtoconcede = true;
                 return true;
             }
 
@@ -259,8 +242,7 @@ namespace HREngine.Bots
                 this.lossedtodo = 3;
                 Helpfunctions.Instance.ErrorLog("not today!!!");
                 KeepConcede++;
-                writeSettings();
-                HRGame.ConcedeGame();
+                this.isgoingtoconcede = true;
                 return true;
             }
             return false;
@@ -274,7 +256,7 @@ namespace HREngine.Bots
                 Helpfunctions.Instance.ErrorLog("not today!!!!");
                 KeepConcede++;
                 writeSettings();
-                HRGame.ConcedeGame();
+                this.isgoingtoconcede = true;
                 return true;
             }
             return false;
@@ -321,12 +303,9 @@ namespace HREngine.Bots
             }
         }
 
-
         private void writeSettings()
         {
             int version = sf.versionnumber;
-            int totalwin = 0;
-            int totallose = 0;
             string[] lines = new string[0] { };
             try
             {
@@ -342,22 +321,6 @@ namespace HREngine.Bots
             {
                 string s = lines[i];
 
-                if (s.Contains("bot.stats.victory"))
-                {
-                    int val1 = s.Length;
-                    string temp1 = s.Substring(18, (val1 - 18));
-                    //HRLog.Write(temp1);
-                    totalwin = int.Parse(temp1);
-                }
-
-                if (s.Contains("bot.stats.defeat"))
-                {
-                    int val2 = s.Length;
-                    string temp2 = s.Substring(17, (val2 - 17));
-                    //HRLog.Write(temp2);
-                    totallose = int.Parse(temp2);
-                }
-
                 if (s.Contains("uai.version"))
                 {
                     s = "uai.version=V" + version;
@@ -370,19 +333,19 @@ namespace HREngine.Bots
 
                 if (s.Contains("uai.wins"))
                 {
-                    s = "uai.wins=" + totalwin;
+                    s = "uai.wins=" + this.wins;
                 }
                 if (s.Contains("uai.loses"))
                 {
-                    s = "uai.loses=" + totallose;
+                    s = "uai.loses=" + this.loses;
                 }
                 if (s.Contains("uai.winrate"))
                 {
                     s = "uai.winrate=" + 0;
                     double winr = 0;
-                    if ((totalwin + totallose - KeepConcede) != 0)
+                    if ((this.wins + this.loses - KeepConcede) != 0)
                     {
-                        winr = ((double)(totalwin * 100) / (double)(totalwin + totallose - KeepConcede));
+                        winr = ((double)(this.wins * 100) / (double)(this.wins + this.loses - KeepConcede));
                         s = "uai.winrate=" + Math.Round(winr, 2);
                     }
 
@@ -394,7 +357,7 @@ namespace HREngine.Bots
                     if ((DateTime.Now - starttime).TotalHours >= 0.001)
                     {
 
-                        winh = (double)totalwin / (DateTime.Now - starttime).TotalHours;
+                        winh = (double)this.wins / (DateTime.Now - starttime).TotalHours;
                         s = "uai.winph=" + Math.Round(winh, 2);
                     }
 
@@ -475,7 +438,7 @@ namespace HREngine.Bots
 
                 sf.setnewLoggFile();
 
-                writeSettings();
+                //writeSettings();
 
                 if (Mulligan.Instance.loserLoserLoser)
                 {
@@ -486,6 +449,12 @@ namespace HREngine.Bots
                     if (!autoconcede())
                     {
                         concedeVSenemy(ownName, enemName);
+                    }
+                    if (this.isgoingtoconcede)
+                    {
+                        this.isgoingtoconcede = false;
+                        if (this.learnmode) return new HREngine.API.Actions.MakeNothingAction();
+                        return new HREngine.API.Actions.ConcedeAction();
                     }
                 }
 
@@ -507,6 +476,13 @@ namespace HREngine.Bots
 
             try
             {
+
+                if (this.isgoingtoconcede)
+                {
+                    this.isgoingtoconcede = false;
+                    return new HREngine.API.Actions.ConcedeAction();
+                }
+
                 if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
                 {
                     Helpfunctions.Instance.ErrorLog("dirty targeting...");
@@ -620,9 +596,19 @@ namespace HREngine.Bots
                     }
                 }
 
-                sf.updateEverything(behave);
+                this.printlearnmode = sf.updateEverything(behave);
 
-                if (Ai.Instance.bestmoveValue <= -900) { HRGame.ConcedeGame(); }
+                if (this.learnmode)
+                {
+                    if (this.printlearnmode)
+                    {
+                        Ai.Instance.simmulateWholeTurnandPrint();
+                    }
+                    this.printlearnmode = false;
+                    return new HREngine.API.Actions.MakeNothingAction();
+                }
+
+                if (Ai.Instance.bestmoveValue <= -900) { return new HREngine.API.Actions.ConcedeAction(); }
 
                 Action moveTodo = Ai.Instance.bestmove;
                 if (moveTodo == null)
@@ -732,6 +718,36 @@ namespace HREngine.Bots
             //HRBattle.FinishRound();
         }
 
+        private HREngine.API.Actions.ActionBase HandleWining()
+        {
+            this.wins++;
+            writeSettings();
+            int totalwin = this.wins;
+            int totallose = this.loses;
+            Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+
+            if (totalwin >= this.stopAfterWins)
+            {
+                if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return null;
+                Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins! lets finish this!");
+                disableRelogger();
+                Helpfunctions.Instance.ErrorLog("relogger is disabled");
+                HREngine.API.HRGame.OpenScene(HRGameMode.ARENA);
+                return null;
+            }
+            return null;
+        }
+
+        private HREngine.API.Actions.ActionBase HandleLosing()
+        {
+            this.loses++;
+            writeSettings();
+            int totalwin = this.wins;
+            int totallose = this.loses;
+            Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+            return null;
+        }
+
         private HREntity getEntityWithNumber(int number)
         {
             foreach (HREntity e in this.getallEntitys())
@@ -784,11 +800,20 @@ namespace HREngine.Bots
             return list;
         }
 
+
+        protected virtual HRCard GetMinionByPriority(HRCard lastMinion = null)
+        {
+            return null;
+        }
+
     }
 
     public class Silverfish
     {
-        public int versionnumber = 98;
+        public int versionnumber = 99;
+
+        Playfield lastpf;
+
         private bool singleLog = false;
         private string botbehave = "rush";
 
@@ -886,7 +911,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void updateEverything(Behavior botbase)
+        public bool updateEverything(Behavior botbase)
         {
             this.botbehave = "rush";
             if (botbase is BehaviorControl) this.botbehave = "control";
@@ -921,18 +946,52 @@ namespace HREngine.Bots
 
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);
 
+
+            Playfield p = new Playfield();
+            if (lastpf != null)
+            {
+                if (lastpf.isEqualf(p))
+                {
+                    return false;
+                }
+                lastpf = p;
+            }
+            else
+            {
+                lastpf = p;
+            }
+
             // print data
+            this.printstuff();
             Hrtprozis.Instance.printHero();
             Hrtprozis.Instance.printOwnMinions();
             Hrtprozis.Instance.printEnemyMinions();
             Handmanager.Instance.printcards();
 
             // calculate stuff
+
+
+
             Helpfunctions.Instance.ErrorLog("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
             Helpfunctions.Instance.ErrorLog("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            return true;
 
         }
+
+        private void printstuff()
+        {
+            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
+            Helpfunctions.Instance.logg("emana " + enemyMaxMana);
+            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
+            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
+        }
+
 
         private void getHerostuff()
         {
@@ -950,13 +1009,7 @@ namespace HREngine.Bots
             this.currentMana = ownPlayer.GetNumAvailableResources();
             this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);
             this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
-            Helpfunctions.Instance.logg("emana " + enemyMaxMana);
-            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
+
             enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
             enemySecretCount = 0;
             //count enemy secrets
@@ -966,8 +1019,6 @@ namespace HREngine.Bots
             }
 
 
-
-            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);
@@ -9764,6 +9815,7 @@ namespace HREngine.Bots
         {
             foreach (Action a in this.playactions)
             {
+
                 if (a.cardplay)
                 {
                     Helpfunctions.Instance.logg("play " + a.handcard.card.name);
@@ -9804,6 +9856,108 @@ namespace HREngine.Bots
             }
         }
 
+
+        public void printActionforDummies(Action a)
+        {
+            if (a.cardplay)
+            {
+                Helpfunctions.Instance.ErrorLog("play " + a.handcard.card.name);
+                if (a.druidchoice >= 1)
+                {
+                    string choose = (a.druidchoice == 1) ? "left card" : "right card";
+                    Helpfunctions.Instance.ErrorLog("choose the " + choose);
+                }
+                if (a.owntarget >= 0)
+                {
+                    Helpfunctions.Instance.ErrorLog("on position " + a.owntarget);
+                }
+                if (a.enemytarget >= 0)
+                {
+                    if (a.enemytarget >= 10 && a.enemytarget <= 19)
+                    {
+                        string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                        Helpfunctions.Instance.ErrorLog("and target to the enemy " + ename);
+                    }
+
+                    if (a.enemytarget >= 0 && a.enemytarget <= 9)
+                    {
+                        string ename = "" + this.ownMinions[a.enemytarget].name;
+                        Helpfunctions.Instance.ErrorLog("and target to your own" + ename);
+                    }
+
+                    if (a.enemytarget == 100)
+                    {
+                        Helpfunctions.Instance.ErrorLog("and target your own hero");
+                    }
+
+                    if (a.enemytarget == 200)
+                    {
+                        Helpfunctions.Instance.ErrorLog("and target to the enemy hero");
+                    }
+                }
+
+            }
+            if (a.minionplay)
+            {
+                string name = "" + this.ownMinions[a.owntarget].name;
+                if (a.enemytarget == 200)
+                {
+                    Helpfunctions.Instance.ErrorLog("attack with: " + name + " the enemy hero");
+                }
+                else
+                {
+                    string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                    Helpfunctions.Instance.ErrorLog("attack with: " + name + " the enemy: " + ename);
+                }
+
+            }
+
+            if (a.heroattack)
+            {
+                if (a.enemytarget == 200)
+                {
+                    Helpfunctions.Instance.ErrorLog("attack with your hero the enemy hero!");
+                }
+                else
+                {
+                    string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                    Helpfunctions.Instance.ErrorLog("attack with the hero, and choose the enemy: " + ename);
+                }
+            }
+            if (a.useability)
+            {
+                Helpfunctions.Instance.ErrorLog("use your Heropower ");
+                if (a.enemytarget >= 0)
+                {
+                    if (a.enemytarget >= 10 && a.enemytarget <= 19)
+                    {
+                        string ename = "" + this.enemyMinions[a.enemytarget - 10].name;
+                        Helpfunctions.Instance.ErrorLog("on enemy: " + ename);
+                    }
+
+                    if (a.enemytarget >= 0 && a.enemytarget <= 9)
+                    {
+                        string ename = "" + this.ownMinions[a.enemytarget].name;
+                        Helpfunctions.Instance.ErrorLog("on your own: " + ename);
+                    }
+
+                    if (a.enemytarget == 100)
+                    {
+                        Helpfunctions.Instance.ErrorLog("on your own hero");
+                    }
+
+                    if (a.enemytarget == 200)
+                    {
+                        Helpfunctions.Instance.ErrorLog("on your the enemy hero");
+                    }
+
+                }
+            }
+            Helpfunctions.Instance.ErrorLog("");
+
+        }
+
+
     }
 
     public class Ai
@@ -9833,6 +9987,7 @@ namespace HREngine.Bots
 
         public Action bestmove = new Action();
         public int bestmoveValue = 0;
+        public Playfield bestb = new Playfield();
         Playfield bestboard = new Playfield();
         Playfield nextMoveGuess = new Playfield();
         public Behavior botBase = null;
@@ -9898,6 +10053,7 @@ namespace HREngine.Bots
             bestplay.printActions();
             this.bestmove = bestplay.getNextAction();
             this.bestmoveValue = bestval;
+            this.bestb = new Playfield(bestplay);
             this.bestboard = new Playfield(bestplay);
 
             if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
@@ -10217,6 +10373,107 @@ namespace HREngine.Bots
             tempbestboard.sEnemTurn = this.simulateEnemyTurn;
             tempbestboard.endTurn(this.secondturnsim, this.playaround, true);
         }
+
+        public void simmulateWholeTurnandPrint()
+        {
+            help.ErrorLog("");
+            help.ErrorLog("what would silverfish do?---------");
+            help.ErrorLog("");
+            //this.bestboard.printActions();
+
+            Playfield tempbestboard = new Playfield();
+
+            if (bestmove != null) // save the guessed move, so we doesnt need to recalc!
+            {
+                tempbestboard.printActionforDummies(bestmove);
+                if (bestmove.cardplay)
+                {
+                    //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                    Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmove.cardEntitiy);
+                    if (bestmove.owntarget >= 0 && bestmove.enemytarget >= 0 && bestmove.enemytarget <= 9 && bestmove.owntarget < bestmove.enemytarget)
+                    {
+                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget - 1, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                    else
+                    {
+                        tempbestboard.playCard(bestmove.handcard, hc.position - 1, hc.entity, bestmove.enemytarget, bestmove.enemyEntitiy, bestmove.druidchoice, bestmove.owntarget, 0);
+                    }
+                }
+
+                if (bestmove.minionplay)
+                {
+                    //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                    Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmove.ownEntitiy);
+                    tempbestboard.attackWithMinion(mm, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                if (bestmove.heroattack)
+                {
+                    tempbestboard.attackWithWeapon(bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+                if (bestmove.useability)
+                {
+                    //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                    tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmove.enemytarget, bestmove.enemyEntitiy, 0);
+                }
+
+            }
+            else
+            {
+                tempbestboard.mana = -1;
+                help.ErrorLog("end turn");
+            }
+
+            foreach (Action bestmovee in bestboard.playactions)
+            {
+                tempbestboard.printActionforDummies(bestmovee);
+
+                if (bestmovee != null) // save the guessed move, so we doesnt need to recalc!
+                {
+                    bestmovee.print();
+                    if (bestmovee.cardplay)
+                    {
+                        //pf.playCard(c, hc.position - 1, hc.entity, trgt.target, trgt.targetEntity, 0, bestplace, cardplayPenality);
+                        Handmanager.Handcard hc = tempbestboard.owncards.Find(x => x.entity == bestmovee.cardEntitiy);
+                        if (bestmovee.owntarget >= 0 && bestmovee.enemytarget >= 0 && bestmovee.enemytarget <= 9 && bestmovee.owntarget < bestmovee.enemytarget)
+                        {
+                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget - 1, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                        else
+                        {
+                            tempbestboard.playCard(bestmovee.handcard, hc.position - 1, hc.entity, bestmovee.enemytarget, bestmovee.enemyEntitiy, bestmovee.druidchoice, bestmovee.owntarget, 0);
+                        }
+                    }
+
+                    if (bestmovee.minionplay)
+                    {
+                        //.attackWithMinion(m, trgt.target, trgt.targetEntity, attackPenality);
+                        Minion mm = tempbestboard.ownMinions.Find(x => x.entitiyID == bestmovee.ownEntitiy);
+                        tempbestboard.attackWithMinion(mm, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                    if (bestmovee.heroattack)
+                    {
+                        tempbestboard.attackWithWeapon(bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                    if (bestmovee.useability)
+                    {
+                        //.activateAbility(p.ownHeroAblility, trgt.target, trgt.targetEntity, abilityPenality);
+                        tempbestboard.activateAbility(this.nextMoveGuess.ownHeroAblility, bestmovee.enemytarget, bestmovee.enemyEntitiy, 0);
+                    }
+
+                }
+                else
+                {
+                    tempbestboard.mana = -1;
+                    help.ErrorLog("end turn");
+                }
+            }
+        }
+
+
 
     }
 

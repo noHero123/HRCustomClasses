@@ -11,7 +11,10 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 98;
+        public int versionnumber = 99;
+
+        Playfield lastpf;
+
         private bool singleLog = false;
         private string botbehave = "rush";
 
@@ -109,7 +112,7 @@ namespace HREngine.Bots
             }
         }
 
-        public void updateEverything(Behavior botbase)
+        public bool updateEverything(Behavior botbase)
         {
             this.botbehave = "rush";
             if (botbase is BehaviorControl) this.botbehave = "control";
@@ -144,18 +147,52 @@ namespace HREngine.Bots
 
             Hrtprozis.Instance.updateFatigueStats(this.ownDecksize, this.ownHeroFatigue, this.enemyDecksize, this.enemyHeroFatigue);
 
+
+            Playfield p = new Playfield();
+            if (lastpf != null)
+            {
+                if (lastpf.isEqualf(p))
+                {
+                    return false;
+                }
+                lastpf = p;
+            }
+            else
+            {
+                lastpf = p;
+            }
+
             // print data
+            this.printstuff();
             Hrtprozis.Instance.printHero();
             Hrtprozis.Instance.printOwnMinions();
             Hrtprozis.Instance.printEnemyMinions();
             Handmanager.Instance.printcards();
 
             // calculate stuff
+
+            
+
             Helpfunctions.Instance.ErrorLog("calculating stuff... " + DateTime.Now.ToString("HH:mm:ss.ffff"));
             Ai.Instance.dosomethingclever(botbase);
             Helpfunctions.Instance.ErrorLog("calculating ended! " + DateTime.Now.ToString("HH:mm:ss.ffff"));
+            return true;
 
         }
+
+        private void printstuff()
+        {
+            HRPlayer ownPlayer = HRPlayer.GetLocalPlayer();
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
+            Helpfunctions.Instance.logg("#######################################################################");
+            Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
+            Helpfunctions.Instance.logg("emana " + enemyMaxMana);
+            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
+            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
+        }
+
 
         private void getHerostuff()
         {
@@ -173,13 +210,7 @@ namespace HREngine.Bots
             this.currentMana = ownPlayer.GetNumAvailableResources();
             this.ownMaxMana = ownPlayer.GetTag(HRGameTag.RESOURCES);
             this.enemyMaxMana = enemyPlayer.GetTag(HRGameTag.RESOURCES);
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("start calculations, current time: " + DateTime.Now.ToString("HH:mm:ss") + " V" + this.versionnumber + " " + this.botbehave);
-            Helpfunctions.Instance.logg("#######################################################################");
-            Helpfunctions.Instance.logg("mana " + currentMana + "/" + ownMaxMana);
-            Helpfunctions.Instance.logg("emana " + enemyMaxMana);
-            Helpfunctions.Instance.logg("own secretsCount: " + ownPlayer.GetSecretDefinitions().Count);
+            
             enemySecretCount = HRCard.GetCards(enemyPlayer, HRCardZone.SECRET).Count;
             enemySecretCount = 0;
             //count enemy secrets
@@ -189,8 +220,6 @@ namespace HREngine.Bots
             }
             
 
-            
-            Helpfunctions.Instance.logg("enemy secretsCount: " + enemySecretCount);
             this.ownSecretList = ownPlayer.GetSecretDefinitions();
             this.numMinionsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_MINIONS_PLAYED_THIS_TURN);
             this.cardsPlayedThisTurn = ownPlayer.GetTag(HRGameTag.NUM_CARDS_PLAYED_THIS_TURN);

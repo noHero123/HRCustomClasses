@@ -19,15 +19,38 @@ namespace HREngine.Bots
 
        Behavior behave;
 
+       public bool learnmode = false;
+       public bool printlearnmode = true;
+
+       //crawlerstuff
+       bool isgoingtoconcede = false;
+       int wins = 0;
+       int loses = 0;
+
        public Bot()
        {
            
            behave = this.getBotBehave();
+           OnVictory = HandleWining;
+           OnLost = HandleLosing;
            OnBattleStateUpdate = HandleOnBattleStateUpdate;
            OnMulliganStateUpdate = HandleBattleMulliganPhase;
            starttime = DateTime.Now;
            bool concede = false;
            bool writeToSingleFile = false;
+
+           try
+           {
+               this.learnmode = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.wwuaid") == "true") ? true : false;
+               if (this.learnmode)
+               {
+                   Helpfunctions.Instance.ErrorLog("Learn mode is ON");
+               }
+           }
+           catch
+           {
+               Helpfunctions.Instance.ErrorLog("a wild error occurrs! cant read the settings...");
+           }
            try
            {
                concede = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.autoconcede") == "true") ? true : false;
@@ -178,52 +201,13 @@ namespace HREngine.Bots
        int oldwin = 0;
        private bool autoconcede()
        {
-           int totalwin = 0;
-           int totallose = 0;
-           string[] lines = new string[0] { };
-           try
-           {
-               string path = (HRSettings.Get.CustomRuleFilePath).Remove(HRSettings.Get.CustomRuleFilePath.Length - 13) + "Common" + System.IO.Path.DirectorySeparatorChar;
-               lines = System.IO.File.ReadAllLines(path + "Settings.ini");
-           }
-           catch
-           {
-               Helpfunctions.Instance.logg("cant find Settings.ini");
-           }
-           foreach (string s in lines)
-           {
-               if (s.Contains("bot.stats.victory"))
-               {
-                   int val1 = s.Length;
-                   string temp1 = s.Substring(18, (val1 - 18));
-                   //HRLog.Write(temp1);
-                   totalwin = int.Parse(temp1);
-               }
-               else if (s.Contains("bot.stats.defeat"))
-               {
-                   int val2 = s.Length;
-                   string temp2 = s.Substring(17, (val2 - 17));
-                   //HRLog.Write(temp2);
-                   totallose = int.Parse(temp2);
-               }
-           }
-
-
-
-           if ((totalwin + totallose - KeepConcede) != 0)
+           int totalwin = this.wins;
+           int totallose = this.loses;
+           /*if ((totalwin + totallose - KeepConcede) != 0)
            {
                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
-           }
-           if (totalwin >= this.stopAfterWins)
-           {
-               if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return false;
-               Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins!");
-               KeepConcede++;
-               HRGame.ConcedeGame();
-               disableRelogger();
-               HREngine.API.HRGame.OpenScene(HRGameMode.ARENA);
-               return true;
-           }
+           }*/
+           
 
            if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode != HRGameMode.RANKED_PLAY) return false;
            int curlvl = HRPlayer.GetLocalPlayer().GetRank();
@@ -233,8 +217,7 @@ namespace HREngine.Bots
                this.oldwin = totalwin;
                Helpfunctions.Instance.ErrorLog("not today!! (you won a game)");
                KeepConcede++;
-               writeSettings();
-               HRGame.ConcedeGame();
+               this.isgoingtoconcede = true;
                return true;
            }
 
@@ -243,8 +226,7 @@ namespace HREngine.Bots
                this.lossedtodo--;
                Helpfunctions.Instance.ErrorLog("not today!");
                KeepConcede++;
-               writeSettings();
-               HRGame.ConcedeGame();
+               this.isgoingtoconcede = true;
                return true;
            }
 
@@ -253,8 +235,7 @@ namespace HREngine.Bots
                this.lossedtodo = 3;
                Helpfunctions.Instance.ErrorLog("not today!!!");
                KeepConcede++;
-               writeSettings();
-               HRGame.ConcedeGame();
+               this.isgoingtoconcede = true;
                return true;
            }
            return false;
@@ -268,7 +249,7 @@ namespace HREngine.Bots
                Helpfunctions.Instance.ErrorLog("not today!!!!");
                KeepConcede++;
                writeSettings();
-               HRGame.ConcedeGame();
+               this.isgoingtoconcede = true;
                return true;
            }
            return false;
@@ -315,12 +296,9 @@ namespace HREngine.Bots
            }
        }
 
-
        private void writeSettings()
        {
            int version = sf.versionnumber;
-           int totalwin = 0;
-           int totallose = 0;
            string[] lines = new string[0] { };
            try
            {
@@ -336,22 +314,6 @@ namespace HREngine.Bots
            {
                string s = lines[i];
 
-               if (s.Contains("bot.stats.victory"))
-               {
-                   int val1 = s.Length;
-                   string temp1 = s.Substring(18, (val1 - 18));
-                   //HRLog.Write(temp1);
-                   totalwin = int.Parse(temp1);
-               }
-
-               if (s.Contains("bot.stats.defeat"))
-               {
-                   int val2 = s.Length;
-                   string temp2 = s.Substring(17, (val2 - 17));
-                   //HRLog.Write(temp2);
-                   totallose = int.Parse(temp2);
-               }
-
                if (s.Contains("uai.version"))
                {
                    s = "uai.version=V" + version;
@@ -364,19 +326,19 @@ namespace HREngine.Bots
 
                if (s.Contains("uai.wins"))
                {
-                   s = "uai.wins=" + totalwin;
+                   s = "uai.wins=" + this.wins;
                }
                if (s.Contains("uai.loses"))
                {
-                   s = "uai.loses=" + totallose;
+                   s = "uai.loses=" + this.loses;
                }
                if (s.Contains("uai.winrate"))
                {
                    s = "uai.winrate=" + 0;
                    double winr = 0;
-                   if ((totalwin + totallose - KeepConcede) != 0)
+                   if ((this.wins + this.loses - KeepConcede) != 0)
                    {
-                       winr = ((double)(totalwin * 100) / (double)(totalwin + totallose - KeepConcede));
+                       winr = ((double)(this.wins * 100) / (double)(this.wins + this.loses - KeepConcede));
                        s = "uai.winrate=" + Math.Round(winr, 2);
                    }
 
@@ -388,7 +350,7 @@ namespace HREngine.Bots
                    if ((DateTime.Now - starttime).TotalHours >= 0.001)
                    {
 
-                       winh = (double)totalwin / (DateTime.Now - starttime).TotalHours;
+                       winh = (double)this.wins / (DateTime.Now - starttime).TotalHours;
                        s = "uai.winph=" + Math.Round(winh, 2);
                    }
 
@@ -469,7 +431,7 @@ namespace HREngine.Bots
 
                sf.setnewLoggFile();
 
-               writeSettings();
+               //writeSettings();
 
                if (Mulligan.Instance.loserLoserLoser)
                {
@@ -480,6 +442,12 @@ namespace HREngine.Bots
                    if (!autoconcede())
                    {
                        concedeVSenemy(ownName, enemName);
+                   }
+                   if (this.isgoingtoconcede)
+                   {
+                       this.isgoingtoconcede = false;
+                       if (this.learnmode) return new HREngine.API.Actions.MakeNothingAction();
+                       return new HREngine.API.Actions.ConcedeAction();
                    }
                }
 
@@ -501,6 +469,13 @@ namespace HREngine.Bots
           
           try
          {
+            
+             if (this.isgoingtoconcede)
+             {
+                 this.isgoingtoconcede = false;
+                 return new HREngine.API.Actions.ConcedeAction();
+             }
+
              if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
              {
                  Helpfunctions.Instance.ErrorLog("dirty targeting...");
@@ -614,9 +589,19 @@ namespace HREngine.Bots
                  }
              }
 
-             sf.updateEverything(behave);
+             this.printlearnmode = sf.updateEverything(behave);
 
-             if (Ai.Instance.bestmoveValue <= -900) { HRGame.ConcedeGame();}
+             if (this.learnmode)
+             {
+                 if (this.printlearnmode)
+                 {
+                     Ai.Instance.simmulateWholeTurnandPrint();
+                 }
+                 this.printlearnmode = false;
+                 return new HREngine.API.Actions.MakeNothingAction();
+             }
+
+             if (Ai.Instance.bestmoveValue <= -900) { return new HREngine.API.Actions.ConcedeAction();}
 
             Action moveTodo = Ai.Instance.bestmove;
             if (moveTodo == null)
@@ -726,6 +711,36 @@ namespace HREngine.Bots
          //HRBattle.FinishRound();
       }
 
+      private HREngine.API.Actions.ActionBase HandleWining()
+      {
+          this.wins++;
+          writeSettings();
+          int totalwin = this.wins;
+          int totallose = this.loses;
+          Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+
+          if (totalwin >= this.stopAfterWins)
+          {
+              if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return null;
+              Helpfunctions.Instance.ErrorLog("we have done our " + totalwin + " wins! lets finish this!");
+              disableRelogger();
+              Helpfunctions.Instance.ErrorLog("relogger is disabled");
+              HREngine.API.HRGame.OpenScene(HRGameMode.ARENA);
+              return null;
+          }
+          return null;
+      }
+
+      private HREngine.API.Actions.ActionBase HandleLosing()
+      {
+          this.loses++;
+          writeSettings();
+          int totalwin = this.wins;
+          int totallose = this.loses;
+          Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+          return null;
+      }
+
       private HREntity getEntityWithNumber(int number)
       {
           foreach (HREntity e in this.getallEntitys())
@@ -790,4 +805,5 @@ namespace HREngine.Bots
           return null;
       }
    }
+
 }
