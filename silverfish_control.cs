@@ -381,6 +381,10 @@ namespace HREngine.Bots
 
         private HREngine.API.Actions.ActionBase HandleBattleMulliganPhase()
         {
+            if (this.learnmode)
+            {
+                return new HREngine.API.Actions.MakeNothingAction();
+            }
             Helpfunctions.Instance.ErrorLog("handle mulligan");
 
             if ((TAG_MULLIGAN)HRPlayer.GetLocalPlayer().GetTag(HRGameTag.MULLIGAN_STATE) != TAG_MULLIGAN.INPUT)
@@ -718,6 +722,10 @@ namespace HREngine.Bots
             {
                 Helpfunctions.Instance.ErrorLog(Exception.Message);
                 Helpfunctions.Instance.ErrorLog(Environment.StackTrace);
+                if (this.learnmode)
+                {
+                    return new HREngine.API.Actions.MakeNothingAction();
+                }
             }
             return null;
             //HRBattle.FinishRound();
@@ -828,7 +836,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 100;
+        public int versionnumber = 101;
 
         Playfield lastpf;
 
