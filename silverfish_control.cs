@@ -483,6 +483,11 @@ namespace HREngine.Bots
                     return new HREngine.API.Actions.ConcedeAction();
                 }
 
+                if (this.learnmode && (HRBattle.IsInTargetMode() || HRChoice.IsChoiceActive()))
+                {
+                    return new HREngine.API.Actions.MakeNothingAction();
+                }
+
                 if (HRBattle.IsInTargetMode() && dirtytarget >= 0)
                 {
                     Helpfunctions.Instance.ErrorLog("dirty targeting...");
@@ -724,8 +729,14 @@ namespace HREngine.Bots
             writeSettings();
             int totalwin = this.wins;
             int totallose = this.loses;
-            Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
-
+            if ((totalwin + totallose - KeepConcede) != 0)
+            {
+                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+            }
+            else
+            {
+                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate: infinity!!!! (division by zero :D)");
+            }
             if (totalwin >= this.stopAfterWins)
             {
                 if (HREngine.API.Utilities.HRSettings.Get.SelectedGameMode == HRGameMode.ARENA) return null;
@@ -744,7 +755,14 @@ namespace HREngine.Bots
             writeSettings();
             int totalwin = this.wins;
             int totallose = this.loses;
-            Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+            if ((totalwin + totallose - KeepConcede) != 0)
+            {
+                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate:" + (totalwin * 100 / (totalwin + totallose - KeepConcede)));
+            }
+            else
+            {
+                Helpfunctions.Instance.ErrorLog("#info: win:" + totalwin + " concede:" + KeepConcede + " lose:" + (totallose - KeepConcede) + " real winrate: infinity!!!! (division by zero :D)");
+            }
             return null;
         }
 
@@ -810,7 +828,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 99;
+        public int versionnumber = 100;
 
         Playfield lastpf;
 
