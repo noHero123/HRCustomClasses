@@ -120,6 +120,7 @@ namespace HREngine.Bots
            try
            {
                int mxwde = Convert.ToInt32((HRSettings.Get.ReadSetting("silverfish.xml", "uai.maxwide")));
+               Ai.Instance.setMaxWide(mxwde);
                if (mxwde != 3000)
                {
                    Ai.Instance.setMaxWide(mxwde);
@@ -134,13 +135,12 @@ namespace HREngine.Bots
            try
            {
                bool twots = (HRSettings.Get.ReadSetting("silverfish.xml", "uai.simulateTwoTurns") == "true") ? true : false;
+               Ai.Instance.setTwoTurnSimulation(twots);
                if (twots)
                {
                    Ai.Instance.setTwoTurnSimulation(twots);
                    Helpfunctions.Instance.ErrorLog("activated two turn simulation");
                }
-
-              
 
            }
            catch
