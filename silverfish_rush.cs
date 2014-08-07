@@ -454,12 +454,7 @@ namespace HREngine.Bots
                     {
                         concedeVSenemy(ownName, enemName);
                     }
-                    if (this.isgoingtoconcede)
-                    {
-                        this.isgoingtoconcede = false;
-                        if (this.learnmode) return new HREngine.API.Actions.MakeNothingAction();
-                        return new HREngine.API.Actions.ConcedeAction();
-                    }
+
                 }
 
                 return null;
@@ -836,7 +831,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 101;
+        public int versionnumber = 102;
 
         Playfield lastpf;
 
@@ -20494,21 +20489,21 @@ namespace HREngine.Bots
             {
                 string path = Settings.Instance.path;
                 Helpfunctions.Instance.logg("cant find _carddb.txt");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
                 Helpfunctions.Instance.ErrorLog("cant find _carddb.txt");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
                 Helpfunctions.Instance.ErrorLog("you installed silverfish wrong");
                 Helpfunctions.Instance.ErrorLog("the path where the carddb should be installed is: " + path);
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
-                Helpfunctions.Instance.ErrorLog("ERROR#################################################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
+                Helpfunctions.Instance.ErrorLog("ERROR###################");
                 this.installedWrong = true;
             }
             cardlist.Clear();

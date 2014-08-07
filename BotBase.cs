@@ -449,12 +449,6 @@ namespace HREngine.Bots
                    {
                        concedeVSenemy(ownName, enemName);
                    }
-                   if (this.isgoingtoconcede)
-                   {
-                       this.isgoingtoconcede = false;
-                       if (this.learnmode) return new HREngine.API.Actions.MakeNothingAction();
-                       return new HREngine.API.Actions.ConcedeAction();
-                   }
                }
 
                return null;

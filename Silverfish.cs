@@ -11,7 +11,7 @@ namespace HREngine.Bots
 
     public class Silverfish
     {
-        public int versionnumber = 101;
+        public int versionnumber = 102;
 
         Playfield lastpf;
 
